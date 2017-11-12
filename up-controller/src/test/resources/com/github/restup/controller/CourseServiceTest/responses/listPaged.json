@@ -1,0 +1,17 @@
+{
+  "limit": 2,
+  "offset": 1,
+  "total": 6,
+  "data": [
+    {
+      "id": 3,
+      "type": "course",
+      "name": "French 101"
+    },
+    {
+      "id": 4,
+      "type": "course",
+      "name": "Computer Science"
+    }
+  ]
+}

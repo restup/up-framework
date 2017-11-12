@@ -1,0 +1,229 @@
+{
+  "data": {
+    "id": "${json-unit.ignore}",
+    "type": "com.deep.Shallow",
+    "deep": {
+      "id": "${json-unit.ignore}",
+      "name": "E",
+      "depth": 10,
+      "deeper": {
+        "id": "${json-unit.ignore}",
+        "name": "E",
+        "depth": 10,
+        "deepest": {
+          "id": "${json-unit.ignore}",
+          "name": "B",
+          "depth": 10
+        },
+        "deepests": [
+          {
+            "id": "${json-unit.ignore}",
+            "name": "C",
+            "depth": 10
+          },
+          {
+            "id": "${json-unit.ignore}",
+            "name": "D",
+            "depth": 10
+          }
+        ]
+      },
+      "deepers": [
+        {
+          "id": "${json-unit.ignore}",
+          "name": "F",
+          "depth": 10,
+          "deepest": {
+            "id": "${json-unit.ignore}",
+            "name": "C",
+            "depth": 10
+          },
+          "deepests": [
+            {
+              "id": "${json-unit.ignore}",
+              "name": "D",
+              "depth": 10
+            },
+            {
+              "id": "${json-unit.ignore}",
+              "name": "E",
+              "depth": 10
+            }
+          ]
+        },
+        {
+          "id": "${json-unit.ignore}",
+          "name": "G",
+          "depth": 10,
+          "deepest": {
+            "id": "${json-unit.ignore}",
+            "name": "D",
+            "depth": 10
+          },
+          "deepests": [
+            {
+              "id": "${json-unit.ignore}",
+              "name": "E",
+              "depth": 10
+            },
+            {
+              "id": "${json-unit.ignore}",
+              "name": "F",
+              "depth": 10
+            }
+          ]
+        }
+      ]
+    },
+    "deeps": [
+      {
+        "id": "${json-unit.ignore}",
+        "name": "F",
+        "depth": 10,
+        "deeper": {
+          "id": "${json-unit.ignore}",
+          "name": "F",
+          "depth": 10,
+          "deepest": {
+            "id": "${json-unit.ignore}",
+            "name": "C",
+            "depth": 10
+          },
+          "deepests": [
+            {
+              "id": "${json-unit.ignore}",
+              "name": "D",
+              "depth": 10
+            },
+            {
+              "id": "${json-unit.ignore}",
+              "name": "E",
+              "depth": 10
+            }
+          ]
+        },
+        "deepers": [
+          {
+            "id": "${json-unit.ignore}",
+            "name": "G",
+            "depth": 10,
+            "deepest": {
+              "id": "${json-unit.ignore}",
+              "name": "D",
+              "depth": 10
+            },
+            "deepests": [
+              {
+                "id": "${json-unit.ignore}",
+                "name": "E",
+                "depth": 10
+              },
+              {
+                "id": "${json-unit.ignore}",
+                "name": "F",
+                "depth": 10
+              }
+            ]
+          },
+          {
+            "id": "${json-unit.ignore}",
+            "name": "H",
+            "depth": 10,
+            "deepest": {
+              "id": "${json-unit.ignore}",
+              "name": "E",
+              "depth": 10
+            },
+            "deepests": [
+              {
+                "id": "${json-unit.ignore}",
+                "name": "F",
+                "depth": 10
+              },
+              {
+                "id": "${json-unit.ignore}",
+                "name": "G",
+                "depth": 10
+              }
+            ]
+          }
+        ]
+      },
+      {
+        "id": "${json-unit.ignore}",
+        "name": "G",
+        "depth": 10,
+        "deeper": {
+          "id": "${json-unit.ignore}",
+          "name": "G",
+          "depth": 10,
+          "deepest": {
+            "id": "${json-unit.ignore}",
+            "name": "D",
+            "depth": 10
+          },
+          "deepests": [
+            {
+              "id": "${json-unit.ignore}",
+              "name": "E",
+              "depth": 10
+            },
+            {
+              "id": "${json-unit.ignore}",
+              "name": "F",
+              "depth": 10
+            }
+          ]
+        },
+        "deepers": [
+          {
+            "id": "${json-unit.ignore}",
+            "name": "H",
+            "depth": 10,
+            "deepest": {
+              "id": "${json-unit.ignore}",
+              "name": "E",
+              "depth": 10
+            },
+            "deepests": [
+              {
+                "id": "${json-unit.ignore}",
+                "name": "F",
+                "depth": 10
+              },
+              {
+                "id": "${json-unit.ignore}",
+                "name": "G",
+                "depth": 10
+              }
+            ]
+          },
+          {
+            "id": "${json-unit.ignore}",
+            "name": "I",
+            "depth": 10,
+            "deepest": {
+              "id": "${json-unit.ignore}",
+              "name": "F",
+              "depth": 10
+            },
+            "deepests": [
+              {
+                "id": "${json-unit.ignore}",
+                "name": "G",
+                "depth": 10
+              },
+              {
+                "id": "${json-unit.ignore}",
+                "name": "H",
+                "depth": 10
+              }
+            ]
+          }
+        ]
+      }
+    ],
+    "depth": 10,
+    "name": "A"
+  }
+}

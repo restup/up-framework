@@ -1,0 +1,50 @@
+{
+  "universities": [
+    {
+      "id": "1",
+      "name": "Harvard"
+    },
+    {
+      "id": "2",
+      "name": "MIT"
+    }
+  ],
+  "courses": [
+    {
+      "id": "1",
+      "universityId": "1",
+      "name": "Physics",
+      "nameLowerCase": "physics"
+    },
+    {
+      "id": "2",
+      "universityId": "1",
+      "name": "Spanish 101",
+      "nameLowerCase": "spanish 101"
+    },
+    {
+      "id": "3",
+      "universityId": "1",
+      "name": "French 101",
+      "nameLowerCase": "french 101"
+    },
+    {
+      "id": "4",
+      "universityId": "2",
+      "name": "Computer Science",
+      "nameLowerCase": "computer science"
+    },
+    {
+      "id": "5",
+      "universityId": "2",
+      "name": "Algebra",
+      "nameLowerCase": "algebra"
+    },
+    {
+      "id": "6",
+      "universityId": "2",
+      "name": "Calculus",
+      "nameLowerCase": "calculus"
+    }
+  ]
+}

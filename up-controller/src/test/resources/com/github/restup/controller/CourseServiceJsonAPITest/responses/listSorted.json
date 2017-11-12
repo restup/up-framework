@@ -1,0 +1,29 @@
+{
+  "links": {
+    "self": "http://localhost/courses?fields=name&sort=-universityId%2Cname&limit=2&offset=0",
+    "next": "http://localhost/courses?fields=name&sort=-universityId%2Cname&limit=2&offset=1",
+    "last": "http://localhost/courses?fields=name&sort=-universityId%2Cname&limit=2&offset=2"
+  },
+  "data": [
+    {
+      "id": "5",
+      "type": "course",
+      "attributes": {
+        "name": "Algebra"
+      },
+      "links": {
+        "self": "http://localhost/courses/5"
+      }
+    },
+    {
+      "id": "6",
+      "type": "course",
+      "attributes": {
+        "name": "Calculus"
+      },
+      "links": {
+        "self": "http://localhost/courses/6"
+      }
+    }
+  ]
+}

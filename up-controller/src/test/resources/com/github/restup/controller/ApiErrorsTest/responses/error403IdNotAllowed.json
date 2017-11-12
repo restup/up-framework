@@ -1,0 +1,15 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "ID_NOT_ALLOWED_ON_CREATE",
+      "title": "Id not allowed",
+      "detail": "Id is auto generated and may not be specified",
+      "meta": {
+        "resource": "university",
+        "id": 1
+      },
+      "status": "403"
+    }
+  ]
+}

@@ -1,0 +1,15 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "INVALID_RELATIONSHIP_TYPE",
+      "title": "Invalid relationship",
+      "detail": "Relationship between course and university exists, but not of requested type. Did you mean to request /university",
+      "meta": {
+        "resource": "course",
+        "requestedRelationship": "university"
+      },
+      "status": "400"
+    }
+  ]
+}

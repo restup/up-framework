@@ -1,0 +1,20 @@
+{
+  "data": {
+    "id": "1",
+    "type": "course",
+    "attributes": {
+      "name": "Physics"
+    },
+    "relationships": {
+      "university": {
+        "links": {
+          "related": "http://localhost/courses/1/university"
+        },
+        "data": {
+          "type": "university",
+          "id": "1"
+        }
+      }
+    }
+  }
+}

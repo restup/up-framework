@@ -1,0 +1,9 @@
+{
+  "data": {
+    "type": "course",
+    "attributes": {
+      "name": "Bar",
+      "universityId": 1
+    }
+  }
+}

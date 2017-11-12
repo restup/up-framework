@@ -1,0 +1,14 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "INVALID_RESOURCE_PATH",
+      "title": "Not Found",
+      "detail": "foos is not a valid resource",
+      "meta": {
+        "resource": "foos"
+      },
+      "status": "404"
+    }
+  ]
+}

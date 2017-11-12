@@ -1,0 +1,20 @@
+{
+  "data": {
+    "id": "2",
+    "type": "university",
+    "attributes": {
+      "name": "MIT"
+    },
+    "relationships": {
+      "courses": {
+        "links": {
+          "related": "http://localhost/universities/2/courses"
+        }
+      }
+    },
+    "links": {
+      "self": "http://localhost/courses/5/university",
+      "related": "http://localhost/courses/5"
+    }
+  }
+}

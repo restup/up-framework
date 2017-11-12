@@ -1,0 +1,31 @@
+{
+  "links": {
+    "first": "http://localhost/courses?fields=name&limit=2&offset=0",
+    "prev": "http://localhost/courses?fields=name&limit=2&offset=0",
+    "self": "http://localhost/courses?fields=name&limit=2&offset=1",
+    "next": "http://localhost/courses?fields=name&limit=2&offset=2",
+    "last": "http://localhost/courses?fields=name&limit=2&offset=2"
+  },
+  "data": [
+    {
+      "id": "3",
+      "type": "course",
+      "attributes": {
+        "name": "French 101"
+      },
+      "links": {
+        "self": "http://localhost/courses/3"
+      }
+    },
+    {
+      "id": "4",
+      "type": "course",
+      "attributes": {
+        "name": "Computer Science"
+      },
+      "links": {
+        "self": "http://localhost/courses/4"
+      }
+    }
+  ]
+}

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "id": "2",
+    "type": "course",
+    "attributes": {
+      "name": "Spanish 101"
+    },
+    "links": {
+      "self": "http://localhost/courses/2"
+    },
+    "relationships": {
+      "university": {
+        "links": {
+          "related": "http://localhost/courses/2/university"
+        },
+        "data": {
+          "type": "university",
+          "id": "1"
+        }
+      }
+    }
+  }
+}

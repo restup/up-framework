@@ -1,0 +1,23 @@
+{
+  "data": {
+    "id": "${json-unit.ignore}",
+    "type": "course",
+    "attributes": {
+      "name": "Bar"
+    },
+    "relationships": {
+      "university": {
+        "links": {
+          "related": "${json-unit.regex}http://localhost/courses/[0-9]+/university"
+        },
+        "data": {
+          "type": "university",
+          "id": "1"
+        }
+      }
+    },
+    "links": {
+      "self": "${json-unit.regex}http://localhost/courses/[0-9]+"
+    }
+  }
+}

@@ -1,0 +1,23 @@
+{
+  "data": {
+    "id": "1",
+    "type": "course",
+    "attributes": {
+      "name": "foo"
+    },
+    "links": {
+      "self": "http://localhost/courses/1"
+    },
+    "relationships": {
+      "university": {
+        "links": {
+          "related": "http://localhost/courses/1/university"
+        },
+        "data": {
+          "type": "university",
+          "id": "1"
+        }
+      }
+    }
+  }
+}

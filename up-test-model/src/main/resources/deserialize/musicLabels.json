@@ -1,0 +1,62 @@
+{
+  "data": [
+    {
+      "name": "Geffen",
+      "albums": [
+        {
+          "name": "Nevermind",
+          "artist": {
+            "name": "Nirvana"
+          },
+          "tracks": [
+            {
+              "number": 1,
+              "name": "Smells Like Teen Spirit"
+            },
+            {
+              "number": 2,
+              "name": "In Bloom"
+            }
+          ]
+        },
+        {
+          "name": "In Utero",
+          "artist": {
+            "name": "Nirvana"
+          },
+          "tracks": [
+            {
+              "number": 1,
+              "name": "Serve the Servants"
+            },
+            {
+              "number": 3,
+              "name": "Heart-Shaped Box"
+            }
+          ]
+        }
+      ]
+    },
+    {
+      "name": "American Recordings",
+      "albums": [
+        {
+          "name": "American IV: The Man Comes Around",
+          "artist": {
+            "name": "Johnny Cash"
+          },
+          "tracks": [
+            {
+              "number": 1,
+              "name": "The Man Comes Around"
+            },
+            {
+              "number": 2,
+              "name": "Hurt"
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}

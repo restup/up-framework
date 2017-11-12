@@ -1,0 +1,9 @@
+{
+  "data": {
+    "attributes": {
+      "universityId": 1
+    },
+    "name": "foo",
+    "description": "bar"
+  }
+}

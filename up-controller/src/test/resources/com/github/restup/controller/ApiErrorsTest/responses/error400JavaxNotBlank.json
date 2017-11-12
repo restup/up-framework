@@ -1,0 +1,18 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "UNIVERSITY_NAME_ERROR",
+      "title": "Invalid field value",
+      "detail": "name may not be empty",
+      "source": {
+        "pointer": "/data/name"
+      },
+      "meta": {
+        "resource": "university",
+        "value": null
+      },
+      "status": "400"
+    }
+  ]
+}

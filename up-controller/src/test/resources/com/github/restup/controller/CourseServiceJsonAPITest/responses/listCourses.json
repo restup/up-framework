@@ -1,0 +1,67 @@
+{
+  "links": {
+    "self": "http://localhost/courses?fields=name&limit=10&offset=0"
+  },
+  "data": [
+    {
+      "id": "1",
+      "type": "course",
+      "attributes": {
+        "name": "Physics"
+      },
+      "links": {
+        "self": "http://localhost/courses/1"
+      }
+    },
+    {
+      "id": "2",
+      "type": "course",
+      "attributes": {
+        "name": "Spanish 101"
+      },
+      "links": {
+        "self": "http://localhost/courses/2"
+      }
+    },
+    {
+      "id": "3",
+      "type": "course",
+      "attributes": {
+        "name": "French 101"
+      },
+      "links": {
+        "self": "http://localhost/courses/3"
+      }
+    },
+    {
+      "id": "4",
+      "type": "course",
+      "attributes": {
+        "name": "Computer Science"
+      },
+      "links": {
+        "self": "http://localhost/courses/4"
+      }
+    },
+    {
+      "id": "5",
+      "type": "course",
+      "attributes": {
+        "name": "Algebra"
+      },
+      "links": {
+        "self": "http://localhost/courses/5"
+      }
+    },
+    {
+      "id": "6",
+      "type": "course",
+      "attributes": {
+        "name": "Calculus"
+      },
+      "links": {
+        "self": "http://localhost/courses/6"
+      }
+    }
+  ]
+}

@@ -1,0 +1,14 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "BODY_REQUIRED",
+      "title": "Body is required",
+      "detail": "Body may not be empty",
+      "meta": {
+        "resource": "university"
+      },
+      "status": "400"
+    }
+  ]
+}

@@ -1,0 +1,16 @@
+{
+  "data": {
+    "id": "${json-unit.ignore}",
+    "type": "com.deep.Shallow",
+    "name": "A",
+    "deep": {
+      "deeper": {
+        "name": "E",
+        "deepest": {
+          "name": "B"
+        }
+      },
+      "name": "E"
+    }
+  }
+}
