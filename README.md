@@ -25,7 +25,7 @@ Up! Framework aims to simplify building and testing RESTful services.
 
 Up Framework is still a work in progress and has not yet been released.
 
-Check out the [Spring Boot Demo App](../up-framework-demo/tree/master/up-demo-spring-boot)
+Check out the [Spring Boot Demo App](https://github.com/restup/up-framework-demo/tree/master/up-demo-spring-boot)
 
 This documentation is also a work in progress
 
