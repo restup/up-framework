@@ -9,5 +9,5 @@ import java.io.Serializable;
 public interface DeletableResource<T, ID extends Serializable> {
 
     @DeleteResource
-    public PersistenceResult<T> delete(DeleteRequest<T, ID> request);
+    PersistenceResult<T> delete(DeleteRequest<T, ID> request);
 }

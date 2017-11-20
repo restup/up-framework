@@ -10,6 +10,7 @@ import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.service.MethodCommandOperations;
 import com.github.restup.service.ResourceService;
 import com.github.restup.service.model.request.ListRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;

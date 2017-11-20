@@ -3,12 +3,15 @@ package com.github.restup.service;
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.annotations.filter.Validation;
+import com.github.restup.annotations.operations.AutoWrapDisabled;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.errors.ErrorFactory;
+import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.response.ResourceResultConverter;
 import com.github.restup.service.model.response.ResourceResultConverterFactory;
+import com.github.restup.util.ReflectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -51,13 +54,16 @@ public class AnnotatedOperationMethodCommand implements MethodCommand<Object> {
         this.errorFactory = registry.getSettings().getErrorFactory();
         this.argumentFactory = registry.getSettings().getMethodArgumentFactory();
 
+        boolean disableAutoWrap = ReflectionUtils.isAutoWrapDisabled(repositoryMethod);
+
         // build the set of unique method argument types
         MethodArgumentsBuilder builder = new MethodArgumentsBuilder();
         builder.addArgument(repositoryMethod);
         argumentTypes = builder.build();
 
         this.repositoryMethod = new AnnotatedRepositoryMethodCommand(resource, objectInstance, repoAnnotation, repositoryMethod, argumentTypes);
-        this.resultConverter = ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
+        this.resultConverter = disableAutoWrap ? new ResourceResultConverterFactory.NoOpResourceResultConverter() :
+                ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
     }
 
     public final Object execute(Object... state) {

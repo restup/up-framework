@@ -3,6 +3,7 @@ package com.github.restup.jackson.serializer;
 import com.deep.Shallow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.service.model.response.BasicReadResult;
 import com.many.fields.A2J;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.result.JsonResult;
@@ -59,7 +60,7 @@ public class JsonResultSerializerTest {
     }
 
     private JsonResult result(Object object) {
-        return new JsonResult(request, object);
+        return new JsonResult(request, new BasicReadResult(object));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
@@ -83,11 +84,8 @@ public class JsonResultSerializerTest {
 
     @Test
     public void testNull() throws JsonProcessingException {
-        // this basically should never happen
         a2j().result(result(null))
                 .matches("{\"data\":null}");
-
-        a2j().result(result(new BasicListResult<String>(null))).matches("{\"data\":null}");
     }
 
     @Test

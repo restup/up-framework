@@ -12,7 +12,7 @@ import java.io.Serializable;
  * @param <T>
  * @param <ID>
  */
-public interface CrudRepository<T, ID extends Serializable> extends Repository, CreatableResource<T, ID>,
-        ReadableResource<T, ID>, UpdatableResource<T, ID>, DeletableResource<T, ID>, ListableResource<T, ID> {
+public interface CrudRepository<T, ID extends Serializable> extends Repository, CreatableResource<T>,
+        ReadableResource<T, ID>, UpdatableResource<T, ID>, DeletableResource<T, ID>, ListableResource<T> {
 
 }

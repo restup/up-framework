@@ -2,7 +2,7 @@ package com.github.restup.controller.method;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
-import com.github.restup.service.ResourceService;
+import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.request.UpdateRequest;
@@ -25,7 +25,7 @@ public class PutMethodController<T, ID extends Serializable> extends BulkMethodC
         super(factory);
     }
 
-    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceService<T, ID> service) {
+    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         if (isBulk(request)) {
             // update multiple documents
             BulkRequest<UpdateRequest<T, ID>> updateRequest = getIdentifiedBulkRequest(resource, request);

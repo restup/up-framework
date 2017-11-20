@@ -11,11 +11,9 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.registry.settings.ServiceMethodAccess;
 import com.github.restup.repository.RepositoryFactory;
-import com.github.restup.repository.ResourceRepository;
-import com.github.restup.repository.UntypedResourceRepository;
-import com.github.restup.service.FilteredService;
-import com.github.restup.service.ResourceService;
-import com.github.restup.service.UntypedService;
+import com.github.restup.repository.ResourceRepositoryOperations;
+import com.github.restup.repository.AnnotatedResourceRepository;
+import com.github.restup.service.*;
 import com.github.restup.util.Assert;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
@@ -31,7 +29,7 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
  * @param <T>
  * @param <ID>
  */
-public class Resource<T, ID extends Serializable> {
+public class Resource<T, ID extends Serializable> implements Comparable<Resource> {
 
     private final Class<T> type;
     private final String name;
@@ -47,8 +45,9 @@ public class Resource<T, ID extends Serializable> {
     private final Pagination defaultPagination;
     private final ResourcePathsProvider defaultSparseFields;
     private final ResourcePathsProvider restrictedFields;
-    private ResourceService<T, ID> service;
-    private ResourceRepository<T,ID> repository;
+    private ResourceServiceOperations serviceOperations;
+    private ResourceRepositoryOperations repositoryOperations;
+    private ResourceService<T,ID> service;
 
     public Resource(Class<T> type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, IdentityField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
         Assert.notNull(type, "type is required");
@@ -209,22 +208,31 @@ public class Resource<T, ID extends Serializable> {
         return identityField;
     }
 
-    public ResourceService<T, ID> getService() {
+    public ResourceService<T,ID> getService() {
         return service;
     }
 
-    protected void setService(ResourceService<T, ID> service) {
+    protected final void setService(ResourceService<T,ID> service) {
         Assert.isNull(this.service, "service is immutable");
         this.service = service;
     }
 
-    public ResourceRepository<T, ID> getRepository() {
-        return repository;
+    public ResourceServiceOperations getServiceOperations() {
+        return serviceOperations;
     }
 
-    protected void setRepository(ResourceRepository<T, ID> repository) {
-        Assert.isNull(this.repository, "repository is immutable");
-        this.repository = repository;
+    protected final void setServiceOperations(ResourceServiceOperations serviceOperations) {
+        Assert.isNull(this.serviceOperations, "serviceOperations is immutable");
+        this.serviceOperations = serviceOperations;
+    }
+
+    public ResourceRepositoryOperations getRepositoryOperations() {
+        return repositoryOperations;
+    }
+
+    protected final void setRepositoryOperations(ResourceRepositoryOperations repositoryOperations) {
+        Assert.isNull(this.repositoryOperations, "repositoryOperations is immutable");
+        this.repositoryOperations = repositoryOperations;
     }
 
     public ControllerMethodAccess getControllerAccess() {
@@ -302,6 +310,8 @@ public class Resource<T, ID extends Serializable> {
         private Pagination defaultPagination;
         private ResourcePathsProvider sparseFieldsDefaultsProvider;
         private ResourcePathsProvider restrictedFieldsProvider;
+        private MappedClass mappedClass;
+        private MappedClassFactory mappedClassFactory;
 
         public Builder(Class<T> resourceClass) {
             Assert.notNull(resourceClass, "resource class must not be null");
@@ -393,6 +403,16 @@ public class Resource<T, ID extends Serializable> {
             return defaultPagination(new Pagination(pageLimit, pageOffset, pagingDisabled, withTotalsDisabled));
         }
 
+        public Builder<T, ID> mappedClassFactory(MappedClassFactory mappedClassFactory) {
+            this.mappedClassFactory = mappedClassFactory;
+            return me();
+        }
+
+        public Builder<T, ID> mappedClass(MappedClass mappedClass) {
+            this.mappedClass = mappedClass;
+            return me();
+        }
+
         /**
          * {@link #defaultPagination(Integer, Integer, boolean, boolean)} with offset of 0, paging and totals enabled.
          *
@@ -422,10 +442,17 @@ public class Resource<T, ID extends Serializable> {
                 serviceMethodAccess = registrySettings.getDefaultServiceAccess();
             }
 
-            MappedClassFactory mappedClassFactory = registrySettings.getMappedClassFactory();
-            Assert.notNull(mappedClassFactory, "mappedClassFactory must not be null");
+            MappedClass<T> mapping = this.mappedClass;
+            if ( mapping == null ) {
+                MappedClassFactory mappedClassFactory = this.mappedClassFactory;
+                if (mappedClassFactory == null) {
+                    mappedClassFactory = registrySettings.getMappedClassFactory();
+                }
+                Assert.notNull(mappedClassFactory, "mappedClassFactory must not be null");
 
-            MappedClass<T> mapping = mappedClassFactory.getMappedClass(this.type);
+                mapping = mappedClassFactory.getMappedClass(this.type);
+            }
+
             Assert.notNull(mapping, "mapping must not be null");
             Assert.notNull(mapping.getAttributes(), "attributes must not be null");
 
@@ -476,31 +503,47 @@ public class Resource<T, ID extends Serializable> {
                 }
                 Assert.notNull(repository, "operations and service may not both be null.");
 
-                service = new FilteredService<T, ID>(resource, repository, filters);
+                service = new FilteredService(resource, repository, filters);
             }
 
-            ResourceService resourceService = null;
-            if (service instanceof ResourceService) {
+            ResourceServiceOperations resourceServiceOperations = null;
+            if (service instanceof ResourceServiceOperations){
+                resourceServiceOperations = (ResourceServiceOperations) service;
+            } else {
+                resourceServiceOperations = new AnnotatedService(resource, service);
+            }
+
+            ResourceService<T,ID> resourceService = null;
+            if ( service instanceof ResourceService ) {
                 resourceService = (ResourceService) service;
             } else {
-                resourceService = new UntypedService(resource, service);
+                resourceService = new DelegatingResourceService(resourceServiceOperations);
             }
 
             resource.setService(resourceService);
-            resource.setRepository(toResourceRepository(resource, repository));
+            resource.setServiceOperations(resourceServiceOperations);
+            resource.setRepositoryOperations(toResourceRepository(resource, repository));
             return resource;
         }
 
-        private ResourceRepository toResourceRepository(Resource resource, Object repository) {
+        private ResourceRepositoryOperations toResourceRepository(Resource resource, Object repository) {
             if ( repository == null ) {
                 return null;
-            } else if ( repository instanceof  ResourceRepository ) {
-                return (ResourceRepository) repository;
+            } else if ( repository instanceof  ResourceRepositoryOperations ) {
+                return (ResourceRepositoryOperations) repository;
             } else {
-                return new UntypedResourceRepository(resource, repository);
+                return new AnnotatedResourceRepository(resource, repository);
             }
         }
 
+    }
+
+    @Override
+    public int compareTo(Resource o) {
+        if ( o == null ) {
+            return -1;
+        }
+        return getName().compareTo(o.getName());
     }
 
 }

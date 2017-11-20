@@ -4,23 +4,20 @@ import com.github.restup.registry.Resource;
 import com.github.restup.service.*;
 import org.apache.commons.lang3.tuple.Pair;
 
-import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
  * A resource repository may include annotated methods only.  In this case,
- * The repository may need to be wrapped with {@link UntypedResourceRepository} to
+ * The repository may need to be wrapped with {@link AnnotatedResourceRepository} to
  * execute annotated methods with correct arguments.
  *
- * @param <T>
- * @param <ID>
  */
-public class UntypedResourceRepository<T, ID extends Serializable> extends MethodCommandOperations<T,ID> implements ResourceRepository<T,ID> {
+public class AnnotatedResourceRepository extends MethodCommandOperations implements ResourceRepositoryOperations {
 
     private final Object repository;
 
-    public UntypedResourceRepository(Resource<?,?> resource, Object repository) {
+    public AnnotatedResourceRepository(Resource<?,?> resource, Object repository) {
         super(new RepositoryMethodCommandOperationFactory(resource, repository));
         this.repository = repository;
     }

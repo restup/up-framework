@@ -141,7 +141,7 @@ public class FilteredServiceTest {
     }
 
     @SuppressWarnings({"rawtypes"})
-    private FilteredService<?, ?> getService(Object repo, Object... filters) {
+    private ResourceServiceOperations getService(Object repo, Object... filters) {
         Resource<?, ?> resource = Resource.builder(Company.class)
                 .registry(ResourceRegistryTest.registry()).repository(repo)
                 .excludeDefaultServiceFilters(true)
@@ -269,12 +269,12 @@ public class FilteredServiceTest {
                         assertEquals("boundValue", bar.getName());
                     }
                 }, filters).build();
-        return (FilteredService) resource.getService();
+        return resource.getServiceOperations();
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void test(Object repo, boolean create, boolean find, boolean update, boolean delete, boolean list) {
-        FilteredService service = getService(repo);
+        ResourceServiceOperations service = getService(repo);
         ParameterProvider parameterProvider = mock(ParameterProvider.class);
 
         when(parameterProvider.getParameterNames()).thenReturn(Arrays.asList("barName"));

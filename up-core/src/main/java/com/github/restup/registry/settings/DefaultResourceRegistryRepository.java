@@ -58,6 +58,10 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
         return (MappedClass) mappings.get(resourceClass);
     }
 
+    public Collection<Resource<?,?>> getResources() {
+        return resources.values();
+    }
+
     public boolean hasResource(String resourceName) {
         return null != getResource(resourceName);
     }

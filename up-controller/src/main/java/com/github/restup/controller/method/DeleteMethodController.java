@@ -2,7 +2,9 @@ package com.github.restup.controller.method;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
+import com.github.restup.service.MethodCommandOperations;
 import com.github.restup.service.ResourceService;
+import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
@@ -29,7 +31,7 @@ public class DeleteMethodController<T, ID extends Serializable> extends BulkMeth
         super(factory);
     }
 
-    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceService<T, ID> service) {
+    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         int ids = CollectionUtils.size(request.getIds());
         if (ids == 1) {
             // delete a document

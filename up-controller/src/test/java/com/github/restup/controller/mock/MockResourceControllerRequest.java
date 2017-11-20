@@ -14,6 +14,7 @@ import java.util.*;
  * Mock {@link ResourceControllerRequest} for testing
  */
 public class MockResourceControllerRequest extends ResourceControllerRequest {
+    private final static String LOCALHOST = "http://localhost";
     private final Map<String, String[]> parameters;
 
     protected MockResourceControllerRequest(Map<String, String[]> parameters
@@ -32,6 +33,10 @@ public class MockResourceControllerRequest extends ResourceControllerRequest {
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public static String getUrl(String path) {
+        return LOCALHOST+(path.startsWith("/")?"":"/")+path;
     }
 
     public List<String> getParameterNames() {
@@ -79,10 +84,9 @@ public class MockResourceControllerRequest extends ResourceControllerRequest {
                     : (Map) Collections.emptyMap();
 
             String path = parts[0];
-            String host = "http://localhost";
-            String url = host+path;
+            String url = getUrl(path);
             String contentType = headers.get("Content-Type")[0].split(";")[0];
-            setBaseRequestUrl(host);
+            setBaseRequestUrl(LOCALHOST);
             setRequestPath(path);
             setMethod(method);
             parsePath();

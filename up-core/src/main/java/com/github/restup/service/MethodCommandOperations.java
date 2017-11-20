@@ -1,31 +1,25 @@
 package com.github.restup.service;
 
 import com.github.restup.service.model.request.*;
-import com.github.restup.service.model.response.PersistenceResult;
-import com.github.restup.service.model.response.ReadResult;
 
 import java.io.Serializable;
-import java.util.List;
 
 /**
  * Executes annotated methods for a {@link com.github.restup.repository.ResourceRepository}
  * or {@link ResourceService}
- *
- * @param <T>
- * @param <ID>
  */
-public abstract class MethodCommandOperations<T, ID extends Serializable> {
+public abstract class MethodCommandOperations {
 
-    private final MethodCommand<PersistenceResult<T>> create;
-    private final MethodCommand<PersistenceResult<T>> update;
-    private final MethodCommand<PersistenceResult<T>> delete;
-    private final MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> bulkCreate;
-    private final MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> bulkUpdate;
-    private final MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> bulkDelete;
-    private final MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> updateByQuery;
-    private final MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> deleteByQuery;
-    private final MethodCommand<ReadResult<List<T>>> list;
-    private final MethodCommand<ReadResult<T>> find;
+    private final MethodCommand create;
+    private final MethodCommand update;
+    private final MethodCommand delete;
+    private final MethodCommand bulkCreate;
+    private final MethodCommand bulkUpdate;
+    private final MethodCommand bulkDelete;
+    private final MethodCommand updateByQuery;
+    private final MethodCommand deleteByQuery;
+    private final MethodCommand list;
+    private final MethodCommand find;
 
     public MethodCommandOperations(MethodCommandOperationFactory factory) {
         create = factory.getCreateOperation();
@@ -44,44 +38,44 @@ public abstract class MethodCommandOperations<T, ID extends Serializable> {
         return cmd.execute(args);
     }
 
-    public PersistenceResult<T> create(CreateRequest<T> request) {
-        return execute(create, request);
+    public Object create(Object... args) {
+        return execute(create, args);
     }
 
-    public PersistenceResult<T> update(UpdateRequest<T, ID> request) {
-        return execute(update, request);
+    public Object update(Object... args) {
+        return execute(update, args);
     }
 
-    public PersistenceResult<T> delete(DeleteRequest<T, ID> request) {
-        return execute(delete, request);
+    public Object delete(Object... args) {
+        return execute(delete, args);
     }
 
-    public PersistenceResult<List<PersistenceResult<T>>> create(BulkRequest<CreateRequest<T>> request) {
-        return execute(bulkCreate, request);
+    public Object bulkCreate(Object... args) {
+        return execute(bulkCreate, args);
     }
 
-    public PersistenceResult<List<PersistenceResult<T>>> update(BulkRequest<UpdateRequest<T, ID>> request) {
-        return execute(bulkUpdate, request);
+    public Object bulkUpdate(Object... args) {
+        return execute(bulkUpdate, args);
     }
 
-    public PersistenceResult<List<PersistenceResult<T>>> delete(BulkRequest<DeleteRequest<T, ID>> request) {
-        return execute(bulkDelete, request);
+    public Object bulkDelete(Object... args) {
+        return execute(bulkDelete, args);
     }
 
-    public PersistenceResult<List<PersistenceResult<T>>> updateByQueryCriteria(UpdateRequest<T, ID> request) {
-        return execute(updateByQuery, request);
+    public Object updateByQueryCriteria(Object... args) {
+        return execute(updateByQuery, args);
     }
 
-    public PersistenceResult<List<PersistenceResult<T>>> deleteByQueryCriteria(DeleteRequest<T, ID> request) {
-        return execute(deleteByQuery, request);
+    public Object deleteByQueryCriteria(Object... args) {
+        return execute(deleteByQuery, args);
     }
 
-    public ReadResult<List<T>> list(ListRequest<T> request) {
-        return execute(list, request);
+    public Object list(Object... args) {
+        return execute(list, args);
     }
 
-    public ReadResult<T> find(ReadRequest<T, ID> request) {
-        return execute(find, request);
+    public Object find(Object... args) {
+        return execute(find, args);
     }
 
 

@@ -2,7 +2,7 @@ package com.github.restup.controller.method;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
-import com.github.restup.service.ResourceService;
+import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
@@ -25,7 +25,7 @@ public class PostMethodController<T, ID extends Serializable> extends BulkMethod
         super(factory);
     }
 
-    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceService<T, ID> service) {
+    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         if (isBulk(request)) {
             // create multiple documents
             BulkRequest<CreateRequest<T>> createRequest = getBulkRequest(request);

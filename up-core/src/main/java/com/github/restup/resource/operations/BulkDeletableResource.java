@@ -11,6 +11,6 @@ import java.util.List;
 public interface BulkDeletableResource<T, ID extends Serializable> {
 
     @BulkDeleteResource
-    public PersistenceResult<List<PersistenceResult<T>>> delete(BulkRequest<DeleteRequest<T, ID>> request);
+    PersistenceResult<List<PersistenceResult<T>>> delete(BulkRequest<DeleteRequest<T, ID>> request);
 
 }

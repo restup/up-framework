@@ -7,9 +7,9 @@ import com.github.restup.service.model.response.ReadResult;
 import java.io.Serializable;
 import java.util.List;
 
-public interface ListableResource<T, ID extends Serializable> {
+public interface ListableResource<T> {
 
     @ListResource
-    public ReadResult<List<T>> list(ListRequest<T> request);
+    ReadResult<List<T>> list(ListRequest<T> request);
 
 }

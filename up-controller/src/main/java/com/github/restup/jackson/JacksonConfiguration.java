@@ -1,6 +1,7 @@
 package com.github.restup.jackson;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.controller.linking.LinksResult;
 import com.github.restup.controller.model.MediaType;
 import com.github.restup.controller.model.result.JsonApiResult;
 import com.github.restup.controller.model.result.JsonResult;
@@ -12,6 +13,7 @@ import com.github.restup.errors.RequestError;
 import com.github.restup.jackson.mixins.*;
 import com.github.restup.jackson.parser.JacksonJsonApiRequestBodyParser;
 import com.github.restup.jackson.parser.JacksonRequestBodyParser;
+import com.github.restup.jackson.serializer.LinksSerializer;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.BasicPagedResult;
@@ -31,6 +33,7 @@ public class JacksonConfiguration {
         mapper.addMixIn(RequestError.class, RequestErrorMixin.class);
         mapper.addMixIn(ErrorObjectException.class, ErrorObjectExceptionMixin.class);
         mapper.addMixIn(ResourcePath.class, ResourcePathMixin.class);
+        mapper.addMixIn(LinksResult.class, LinksResultMixin.class);
 
         mapper.addMixIn(BasicPagedResult.class, BasicPagedResultMixin.class);
         mapper.addMixIn(ResourceData.class, ResourceDataMixin.class);

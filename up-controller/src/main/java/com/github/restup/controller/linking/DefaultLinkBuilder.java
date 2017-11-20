@@ -31,6 +31,12 @@ public class DefaultLinkBuilder implements LinkBuilder {
         this.serviceDiscovery = serviceDiscovery;
     }
 
+    @Override
+    public Link getCollectionEndpoint(ParsedResourceControllerRequest<?> request, Resource resource) {
+        String baseUrl = serviceDiscovery.locateResourceUrl(request, resource);
+        return new BasicLink(resource.getPluralName(), baseUrl);
+    }
+
     public List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> resource, Object id) {
         if (HttpMethod.DELETE == request.getMethod()) {
             return Collections.emptyList();

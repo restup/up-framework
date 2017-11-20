@@ -49,7 +49,7 @@ public class ResourceResultConverterFactory {
         return converter != null ? converter : noOpResourceResultConverter;
     }
 
-    private final static class NoOpResourceResultConverter implements ResourceResultConverter {
+    public final static class NoOpResourceResultConverter implements ResourceResultConverter {
         public Object convert(Object o) {
             return o;
         }

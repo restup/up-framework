@@ -2,7 +2,6 @@ package com.github.restup.jackson.serializer;
 
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
-import com.github.restup.controller.linking.BasicLink;
 import com.github.restup.controller.linking.Link;
 import com.github.restup.controller.model.result.JsonApiResult;
 import com.github.restup.mapping.fields.MappedField;
@@ -18,6 +17,8 @@ import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+
+import static com.github.restup.jackson.serializer.LinksSerializer.writeLinksObject;
 
 /**
  * Custom serialization for JSON API content.
@@ -162,18 +163,10 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         return false;
     }
 
-    protected void writeLinks(JsonGenerator jgen, List<Link> links) throws IOException {
+    protected void writeLinks(JsonGenerator jgen, Collection<Link> links) throws IOException {
         if (CollectionUtils.isNotEmpty(links)) {
             jgen.writeFieldName(JsonApiResult.LINKS);
-            jgen.writeStartObject();
-            for (Link link : links) {
-                if (link instanceof BasicLink) {
-                    jgen.writeStringField(link.getName(), link.getHref());
-                } else {
-                    jgen.writeObjectField(link.getName(), link);
-                }
-            }
-            jgen.writeEndObject();
+            writeLinksObject(jgen, links);
         }
     }
 

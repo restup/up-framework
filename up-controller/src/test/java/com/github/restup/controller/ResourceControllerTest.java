@@ -9,6 +9,8 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.service.MethodCommandOperations;
+import com.github.restup.service.ResourceServiceOperations;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
 import com.github.restup.errors.ErrorObjectException;
@@ -43,7 +45,7 @@ import static org.mockito.Mockito.*;
 public class ResourceControllerTest {
 
     @Mock
-    private FilteredService service;
+    private ResourceServiceOperations service;
     @Mock
     private ResourceControllerRequest request;
     @Mock

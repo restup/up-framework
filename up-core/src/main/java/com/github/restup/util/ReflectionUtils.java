@@ -1,5 +1,6 @@
 package com.github.restup.util;
 
+import com.github.restup.annotations.operations.AutoWrapDisabled;
 import com.googlecode.gentyref.GenericTypeReflector;
 import com.github.restup.errors.ErrorBuilder;
 import org.apache.commons.lang3.StringUtils;
@@ -196,6 +197,15 @@ public class ReflectionUtils {
             }
         }
         return result;
+    }
+
+    public static boolean isAutoWrapDisabled(Method repositoryMethod) {
+        AutoWrapDisabled autoWrapDisabled = getAnnotation(repositoryMethod, AutoWrapDisabled.class);
+        boolean disableAutoWrap = false;
+        if ( autoWrapDisabled != null ) {
+            disableAutoWrap = autoWrapDisabled.value();
+        }
+        return disableAutoWrap;
     }
 
     /**

@@ -7,20 +7,28 @@ import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.DefaultContentNegotiator;
 import com.github.restup.controller.content.negotiation.JsonApiContentNegotiator;
 import com.github.restup.controller.content.negotiation.JsonContentNegotiator;
-import com.github.restup.controller.linking.LinkBuilderFactory;
-import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
-import com.github.restup.controller.request.parser.*;
-import com.google.gson.Gson;
 import com.github.restup.controller.interceptor.NoOpRequestInterceptor;
 import com.github.restup.controller.interceptor.RequestInterceptor;
 import com.github.restup.controller.interceptor.RequestInterceptorChain;
 import com.github.restup.controller.linking.DefaultLinkBuilderFactory;
+import com.github.restup.controller.linking.LinkBuilderFactory;
+import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.DefaultServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.controller.request.parser.*;
 import com.github.restup.jackson.JacksonConfiguration;
+import com.github.restup.mapping.DefaultMappedClass;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.AutoDetectConstants;
+import com.github.restup.service.registry.DiscoveryService;
+import com.google.gson.Gson;
 import org.apache.commons.lang3.ArrayUtils;
+
+import java.util.Arrays;
+
+import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
 
 public class ControllerSettings {
 
@@ -128,6 +136,7 @@ public class ControllerSettings {
                     arr = ArrayUtils.addAll(arr, new JsonContentNegotiator()
                             , new JsonApiContentNegotiator(factory));
                 }
+                linkBuilderFactory = factory;
             }
             if (defaultMediaType != null) {
                 DefaultContentNegotiator defaultContentNegotiator = new DefaultContentNegotiator(defaultMediaType, arr);
@@ -226,7 +235,21 @@ public class ControllerSettings {
             if (exceptionHandler == null) {
                 exceptionHandler = new DefaultExceptionHandler();
             }
+
+
+            registry.registerResource(
+                    Resource.builder(Resource.class)
+                        .service(new DiscoveryService(linkBuilderFactory))
+                            .excludeDefaultServiceFilters(true)
+                        .mappedClass(new DefaultMappedClass(UP_RESOURCE_DISCOVERY,"resources",
+                            Resource.class, null, Arrays.asList(
+                            MappedField.builder(String.class)
+                                .setIdField(true)
+                            .setApiName("name").build()
+                    )))
+            );
             return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler);
         }
     }
+
 }

@@ -20,6 +20,8 @@ import com.github.restup.service.model.request.DefaultRequestObjectFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.request.UpdateRequest;
 import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.util.Arrays;
 import java.util.List;
@@ -32,6 +34,8 @@ import static com.github.restup.errors.ErrorBuilder.ErrorCodeStatus.INTERNAL_SER
 import static org.junit.Assert.*;
 
 public class FilteredServiceMethodCommandTest {
+
+    private final static Logger log = LoggerFactory.getLogger(FilteredServiceMethodCommandTest.class);
 
     private ResourceRegistry registry;
 
@@ -174,10 +178,11 @@ public class FilteredServiceMethodCommandTest {
         try {
             Company c = new Company();
             c.setName("foo");
-            FilteredService service = getService(repository);
+            ResourceServiceOperations service = getService(repository);
             List<ResourcePath> paths = Arrays.asList(ResourcePath.path(registry, Company.class, "name"));
             service.update((UpdateRequest) getInstance().getUpdateRequest(null, 1l, c, paths, null, null));
         } catch (ErrorObjectException e) {
+            log.debug("Error",e.getCause());
             assertEquals(1, e.getErrors().size());
             function.apply(e.getErrors().iterator().next());
             throw e;
@@ -186,7 +191,7 @@ public class FilteredServiceMethodCommandTest {
 
 
     @SuppressWarnings({"rawtypes"})
-    private FilteredService<?, ?> getService(Object repo, Object... filters) {
+    private ResourceServiceOperations getService(Object repo, Object... filters) {
         registry = ResourceRegistryTest.registry();
         Resource<?, ?> resource = Resource.builder(Company.class)
                 .registry(registry)
@@ -194,6 +199,6 @@ public class FilteredServiceMethodCommandTest {
                 .serviceFilters(repo)
                 .build();
         registry.registerResource(resource);
-        return (FilteredService) resource.getService();
+        return resource.getServiceOperations();
     }
 }

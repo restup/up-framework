@@ -32,6 +32,11 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
         unknown = new HashMap<Object, List<Resource<?, ?>>>(3);
     }
 
+    @Override
+    public Collection<Resource<?,?>> getResources() {
+        return resourceRepository.getResources();
+    }
+
     public Resource<?, ?> getResource(String resourceName) {
         return StringUtils.isEmpty(resourceName) ? null : resourceRepository.getResource(resourceName);
     }
@@ -84,7 +89,7 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
         Assert.notNull(resource, "resource is required");
         Assert.notNull(resource.getName(), "resource name must not be null");
         Assert.notNull(resource.getType(), "resource type must not be null");
-        Assert.notNull(resource.getService(), "resource service must not be null");
+        Assert.notNull(resource.getServiceOperations(), "resource service must not be null");
         Assert.notNull(resource.getControllerAccess(), "resource httpAccess must not be null");
         Assert.notNull(resource.getServiceAccess(), "resource internalAccess must not be null");
         Assert.notNull(resource.getIdentityField(), "resource identityField must not be null");

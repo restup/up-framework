@@ -90,4 +90,7 @@ public interface ResourceRegistryRepository {
      * @return
      */
     Collection<ResourceRelationship> getRelationships(String resourceName);
+
+    Collection<Resource<?,?>> getResources();
+
 }

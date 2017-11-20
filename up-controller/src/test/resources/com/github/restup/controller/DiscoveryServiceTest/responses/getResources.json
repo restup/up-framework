@@ -1,0 +1,5 @@
+{
+  "courses": "http://localhost/courses",
+  "students": "http://localhost/students",
+  "universities": "http://localhost/universities"
+}

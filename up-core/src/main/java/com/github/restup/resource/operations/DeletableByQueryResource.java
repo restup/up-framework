@@ -10,6 +10,6 @@ import java.util.List;
 public interface DeletableByQueryResource<T, ID extends Serializable> {
 
     @DeleteResourceByQuery
-    public PersistenceResult<List<PersistenceResult<T>>> deleteByQueryCriteria(DeleteRequest<T, ID> request);
+    PersistenceResult<List<PersistenceResult<T>>> deleteByQueryCriteria(DeleteRequest<T, ID> request);
 
 }

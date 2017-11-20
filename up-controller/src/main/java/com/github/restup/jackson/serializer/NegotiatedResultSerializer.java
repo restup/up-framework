@@ -12,6 +12,7 @@ import com.github.restup.mapping.fields.ReadableField;
 import com.github.restup.path.*;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.response.PagedResult;
+import com.github.restup.service.model.response.ResourceResult;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -19,25 +20,33 @@ import java.io.IOException;
 import java.util.Iterator;
 import java.util.Map;
 
-public class NegotiatedResultSerializer<T extends NegotiatedResult> extends JsonSerializer<T> {
+public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> extends JsonSerializer<T> {
 
     private final static Logger log = LoggerFactory.getLogger(JsonResultSerializer.class);
 
     @Override
     public void serialize(T result, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
-        try {
-            jgen.writeStartObject();
-            writeLinking(result, jgen, provider);
-            writeData(result, jgen, provider);
-            writeIncluded(result, jgen, provider);
-            jgen.writeEndObject();
-        } catch (Exception e) {
-            log.error("Resource Object Serialization error", e);
-            ErrorBuilder.error(result.getRequest().getResource(), e)
-                    .code(ErrorBuilder.ErrorCode.SERIALIZATION_ERROR)
-                    .throwError();
+        if ( accept(result) ) {
+            try {
+                jgen.writeStartObject();
+                writeLinking(result, jgen, provider);
+                writeData(result, jgen, provider);
+                writeIncluded(result, jgen, provider);
+                jgen.writeEndObject();
+            } catch (Exception e) {
+                log.error("Resource Object Serialization error", e);
+                ErrorBuilder.error(result.getRequest().getResource(), e)
+                        .code(ErrorBuilder.ErrorCode.SERIALIZATION_ERROR)
+                        .throwError();
+            }
+        } else {
+            jgen.writeObject(result.getResult());
         }
+    }
+
+    protected boolean accept(T result) {
+        return result.getResult() instanceof ResourceResult;
     }
 
     /**

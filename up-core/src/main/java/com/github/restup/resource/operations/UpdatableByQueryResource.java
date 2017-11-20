@@ -10,5 +10,5 @@ import java.util.List;
 public interface UpdatableByQueryResource<T, ID extends Serializable> {
 
     @UpdateResourceByQuery
-    public PersistenceResult<List<PersistenceResult<T>>> updateByQueryCriteria(UpdateRequest<T, ID> request);
+    PersistenceResult<List<PersistenceResult<T>>> updateByQueryCriteria(UpdateRequest<T, ID> request);
 }

@@ -11,7 +11,7 @@ import static com.github.restup.util.UpUtils.unmodifiableList;
  *
  * @param <T>
  */
-class DefaultMappedClass<T> implements MappedClass<T> {
+public class DefaultMappedClass<T> implements MappedClass<T> {
 
     private final String name;
     private final String pluralName;
@@ -19,7 +19,7 @@ class DefaultMappedClass<T> implements MappedClass<T> {
     private final Class<?> parentType;
     private final List<MappedField<?>> attributes;
 
-    DefaultMappedClass(String name, String pluralName, Class<T> type, Class<?> parentType, List<MappedField<?>> attributes) {
+    public DefaultMappedClass(String name, String pluralName, Class<T> type, Class<?> parentType, List<MappedField<?>> attributes) {
         this.name = name;
         this.pluralName = pluralName;
         this.type = type;

@@ -11,6 +11,6 @@ import java.util.List;
 public interface BulkUpdatableResource<T, ID extends Serializable> {
 
     @BulkUpdateResource
-    public PersistenceResult<List<PersistenceResult<T>>> update(BulkRequest<UpdateRequest<T, ID>> request);
+    PersistenceResult<List<PersistenceResult<T>>> update(BulkRequest<UpdateRequest<T, ID>> request);
 
 }

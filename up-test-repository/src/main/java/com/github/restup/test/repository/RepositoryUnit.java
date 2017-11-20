@@ -5,20 +5,18 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.restup.bind.converter.ParameterConverter;
-import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.repository.ResourceRepository;
+import com.github.restup.repository.ResourceRepositoryOperations;
+import com.github.restup.service.MethodCommandOperations;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.test.resource.RelativeTestResource;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
-import sun.reflect.Reflection;
 
 import java.io.IOException;
-import java.rmi.registry.Registry;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
@@ -80,6 +78,7 @@ public class RepositoryUnit {
         }
 
         public void load(String fileName) {
+            Assert.notEmpty(fileName, "fileName is required");
             fileName(fileName).load();
         }
 
@@ -141,7 +140,7 @@ public class RepositoryUnit {
 
         private <T> void load(Resource<T, ?> resource, JsonNode node) {
             T t = readValue(resource, node);
-            ResourceRepository repository = resource.getRepository();
+            ResourceRepositoryOperations repository = resource.getRepositoryOperations();
             RequestObjectFactory factory = resource.getRegistry().getSettings().getRequestObjectFactory();
             CreateRequest<T> request = factory.getCreateRequest(resource, t, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null);
             repository.create(request);

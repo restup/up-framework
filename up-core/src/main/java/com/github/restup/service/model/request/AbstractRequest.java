@@ -50,4 +50,8 @@ public abstract class AbstractRequest implements QueryRequest, ParameterProvider
     public Resource<?, ?> getResource() {
         return requestedResource;
     }
+
+    public ParameterProvider getDelegate() {
+        return delegate;
+    }
 }

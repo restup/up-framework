@@ -1,32 +1,27 @@
 package com.github.restup.service;
 
-import com.github.restup.service.model.response.PersistenceResult;
-import com.github.restup.service.model.response.ReadResult;
-
-import java.util.List;
-
 /**
  * Provides operation specific {@link MethodCommand}s
  */
 public interface MethodCommandOperationFactory {
 
-    <T> MethodCommand<PersistenceResult<T>> getCreateOperation();
+    MethodCommand getCreateOperation();
 
-    <T> MethodCommand<PersistenceResult<T>> getUpdateOperation();
+    MethodCommand getUpdateOperation();
 
-    <T> MethodCommand<PersistenceResult<T>> getDeleteOperation();
+    MethodCommand getDeleteOperation();
 
-    <T> MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> getBulkUpdateOperation();
+    MethodCommand getBulkUpdateOperation();
 
-    <T> MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> getBulkCreateOperation();
+    MethodCommand getBulkCreateOperation();
 
-    <T> MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> getBulkDeleteOperation();
+    MethodCommand getBulkDeleteOperation();
 
-    <T> MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> getDeleteByQueryOperation();
+    MethodCommand getDeleteByQueryOperation();
 
-    <T> MethodCommand<PersistenceResult<List<PersistenceResult<T>>>> getUpdateByQueryOperation();
+    MethodCommand getUpdateByQueryOperation();
 
-    <T> MethodCommand<ReadResult<List<T>>> getListOperation();
+    MethodCommand getListOperation();
 
-    <T> MethodCommand<ReadResult<T>> getFindOperation();
+    MethodCommand getFindOperation();
 }

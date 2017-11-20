@@ -9,5 +9,5 @@ import java.io.Serializable;
 public interface UpdatableResource<T, ID extends Serializable> {
 
     @UpdateResource
-    public PersistenceResult<T> update(UpdateRequest<T, ID> request);
+    PersistenceResult<T> update(UpdateRequest<T, ID> request);
 }

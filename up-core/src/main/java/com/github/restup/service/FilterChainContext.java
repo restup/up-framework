@@ -8,10 +8,14 @@ import com.github.restup.query.PreparedResourceQueryStatement;
 import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
+import com.github.restup.service.model.request.AbstractRequest;
 import com.github.restup.service.model.request.PersistenceRequest;
 import com.github.restup.service.model.request.QueryRequest;
 import com.github.restup.service.model.request.ResourceRequest;
 import com.github.restup.util.Assert;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class FilterChainContext implements MethodArgumentFactory {
 
@@ -26,6 +30,7 @@ public class FilterChainContext implements MethodArgumentFactory {
     private Resource<?, ?> resource;
     private ResourceQueryStatement query;
     private ResourceQueryDefaults template;
+    private List<Object> added;
 
     public FilterChainContext(MethodArgumentFactory argumentFactory, ErrorFactory errorFactory, Class<?>[] argumentTypes) {
         super();
@@ -36,6 +41,7 @@ public class FilterChainContext implements MethodArgumentFactory {
         this.errorFactory = errorFactory;
         this.argumentTypes = argumentTypes;
         this.arguments = new Object[argumentTypes.length];
+        added = new ArrayList<>();
     }
 
     public Object getArgument(int i) {
@@ -93,6 +99,9 @@ public class FilterChainContext implements MethodArgumentFactory {
             if (arg instanceof ParameterProvider) {
                 this.parameterProvider = (ParameterProvider) arg;
             }
+            if (arg instanceof AbstractRequest) {
+                addArguments(((AbstractRequest) arg).getDelegate());
+            }
             if (arg instanceof ResourceRequest) {
                 ResourceRequest request = (ResourceRequest) arg;
                 addArgument(request.getResource());
@@ -107,6 +116,7 @@ public class FilterChainContext implements MethodArgumentFactory {
             if (arg instanceof ResourceQueryDefaults) {
                 this.template = (ResourceQueryDefaults) arg;
             }
+            added.add(arg);
         }
     }
 
@@ -132,6 +142,11 @@ public class FilterChainContext implements MethodArgumentFactory {
         } else if (clazz == ResourceQueryDefaults.class) {
             return (T) new ResourceQueryDefaults(resource, query);
         } else {
+            for ( Object o : added ) {
+                if ( clazz.isAssignableFrom(o.getClass())) {
+                    return (T)o;
+                }
+            }
             return newInstance(clazz, this, getErrors());
         }
     }

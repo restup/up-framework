@@ -3,7 +3,7 @@ package com.github.restup.controller.method;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
-import com.github.restup.service.ResourceService;
+import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.RequestObjectFactory;
 
 import java.io.Serializable;
@@ -25,11 +25,11 @@ public abstract class MethodController<T, ID extends Serializable> {
     @SuppressWarnings({"unchecked", "rawtypes"})
     public final Object request(ParsedResourceControllerRequest<T> request) {
         Resource<T, ID> resource = (Resource) request.getResource();
-        ResourceService<T, ID> service = resource.getService();
+        ResourceServiceOperations service = resource.getServiceOperations();
         return request(request, resource, service);
     }
 
-    abstract Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceService<T, ID> service);
+    abstract Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service);
 
     @SuppressWarnings("unchecked")
     ID getId(ParsedResourceControllerRequest<T> request) {

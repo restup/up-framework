@@ -1,14 +1,17 @@
 package com.github.restup.service;
-
+import static com.github.restup.service.model.response.ResourceResultConverterFactory.*;
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.annotations.filter.Validation;
+import com.github.restup.annotations.operations.AutoWrapDisabled;
 import com.github.restup.bind.MethodArgumentFactory;
+import com.github.restup.bind.converter.NoOpConverter;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.response.ResourceResultConverter;
 import com.github.restup.service.model.response.ResourceResultConverterFactory;
+import com.github.restup.util.ReflectionUtils;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 
@@ -62,6 +65,8 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
         FiltersBuilder filtersBuilder = new FiltersBuilder(resource, preAnnotation, postAnnotation);
         filtersBuilder.addFilters(filters);
 
+        boolean disableAutoWrap = ReflectionUtils.isAutoWrapDisabled(repositoryMethod);
+
         // build the set of unique method argument types
         MethodArgumentsBuilder builder = new MethodArgumentsBuilder();
         builder.addArguments(filtersBuilder.getMethods());
@@ -74,7 +79,8 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
         this.preFilters = filtersBuilder.buildPreFilters();
         this.postFilters = filtersBuilder.buildPostFilters();
         this.repositoryMethod = new AnnotatedRepositoryMethodCommand(resource, objectInstance, repoAnnotation, repositoryMethod, argumentTypes);
-        this.resultConverter = ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
+        this.resultConverter = disableAutoWrap ? new NoOpResourceResultConverter() :
+                ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
     }
 
     public final Object execute(Object... state) {

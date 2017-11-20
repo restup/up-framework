@@ -14,10 +14,9 @@ import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
+import java.util.*;
+
+import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
 
 /**
  * In an http request, this is a partially parsed details from the request, having
@@ -208,9 +207,16 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
             return me();
         }
 
+        protected boolean isDiscoveryPath(String requestPath) {
+            return StringUtils.isBlank(requestPath)
+                    || Objects.equals("/",requestPath);
+        }
+
         public void parsePath() {
-            if (StringUtils.isNotBlank(requestPath)) {
-                Assert.notNull(registry, "registry is required");
+            Assert.notNull(registry, "registry is required");
+            if ( isDiscoveryPath(requestPath) ) {
+                resource = registry.getResource(UP_RESOURCE_DISCOVERY);
+            } else {
                 String path = null;
                 String basePath = registry.getSettings().getBasePath();
                 if (basePath != null) {

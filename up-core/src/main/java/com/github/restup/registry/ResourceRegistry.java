@@ -86,6 +86,10 @@ public final class ResourceRegistry implements MappedClassFactory {
         return resourceRegistryMap.getResource(resourceClass);
     }
 
+    public Collection<Resource<?,?>> getResources() {
+        return resourceRegistryMap.getResources();
+    }
+
     public void registerResource(Resource<?, ?> resource) {
         resourceRegistryMap.registerResource(resource);
     }

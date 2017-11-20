@@ -12,6 +12,14 @@ import java.util.List;
 public interface LinkBuilder {
 
     /**
+     *
+     * @param request
+     * @param resource
+     * @return The collection endpoint for the resource
+     */
+    Link getCollectionEndpoint(ParsedResourceControllerRequest<?> request, Resource resource);
+
+    /**
      * @param request
      * @param result
      * @return the top level links to return for the document.

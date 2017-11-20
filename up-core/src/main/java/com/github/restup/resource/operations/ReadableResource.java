@@ -9,6 +9,6 @@ import java.io.Serializable;
 public interface ReadableResource<T, ID extends Serializable> {
 
     @ReadResource
-    public ReadResult<T> find(ReadRequest<T, ID> request);
+    ReadResult<T> find(ReadRequest<T, ID> request);
 
 }

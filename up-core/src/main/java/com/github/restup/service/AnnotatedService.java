@@ -1,23 +1,26 @@
 package com.github.restup.service;
 
 import com.github.restup.registry.Resource;
+import com.github.restup.service.model.response.PersistenceResult;
+import com.github.restup.service.model.response.ReadResult;
 import org.apache.commons.lang3.tuple.Pair;
 
+import javax.annotation.Resources;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
+import java.util.List;
 
 /**
  * A Resource may define an annotated service without a repository.
  * In this case, a {@link FilteredService} is not used.  However,
- * The service may still be annotated and must be wrapped by UntypedService
+ * The service may still be annotated and must be wrapped by AnnotatedService
  * to execute its annotated methods correctly
- * @param <T>
- * @param <ID>
+ *
  */
-public class UntypedService<T, ID extends Serializable> extends MethodCommandOperations<T,ID> implements ResourceService<T, ID> {
+public class AnnotatedService extends MethodCommandOperations implements ResourceServiceOperations {
 
-    public UntypedService(Resource<?, ?> resource, Object service) {
+    public AnnotatedService(Resource<?, ?> resource, Object service) {
         super(new ServiceMethodCommandOperationFactory(resource, service));
     }
 
@@ -41,7 +44,7 @@ public class UntypedService<T, ID extends Serializable> extends MethodCommandOpe
                 , Class<? extends Annotation> postAnnotation
                 , boolean disabledViaAccessSettings
                 , Object... repositories) {
-            Pair<Method,Object> pair = findAnnotatedRepositoryAndMethod(disabledViaAccessSettings, repoAnnotation, repositories);
+            Pair<Method, Object> pair = findAnnotatedRepositoryAndMethod(disabledViaAccessSettings, repoAnnotation, repositories);
             if (pair == null) {
                 return new UnsupportedMethodCommand(resource, operation);
             }
