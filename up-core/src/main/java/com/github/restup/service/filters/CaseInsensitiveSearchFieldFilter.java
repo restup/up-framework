@@ -1,16 +1,17 @@
 package com.github.restup.service.filters;
 
+import java.util.List;
+
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.fields.composition.CaseSensitivity;
 import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
-
-import java.util.List;
 
 public class CaseInsensitiveSearchFieldFilter {
 

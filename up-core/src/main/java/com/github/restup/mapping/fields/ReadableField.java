@@ -5,7 +5,7 @@ package com.github.restup.mapping.fields;
  *
  * @param <T>
  */
-public interface ReadableField<T> {
+public interface ReadableField {
 
     /**
      * Read a property's value

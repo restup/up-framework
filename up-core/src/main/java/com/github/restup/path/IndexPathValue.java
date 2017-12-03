@@ -12,7 +12,7 @@ import java.util.List;
 /**
  * {@link PathValue} indicating the index of a Collection or Array.
  */
-public class IndexPathValue implements PathValue, ReadableField<Object>, WritableField<Object> {
+public class IndexPathValue implements PathValue, ReadableField, WritableField<Object,Object> {
 
     private final int index;
     private final Class<?> type;
@@ -40,8 +40,13 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
     /**
      * @return a new instance of {@link #type}
      */
-    public Object getFieldInstance() {
+    public Object createDeclaringInstance() {
         return ReflectionUtils.newInstance(type);
+    }
+    
+    @Override
+    public Object createInstance() {
+    		return null;
     }
 
     /**

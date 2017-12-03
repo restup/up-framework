@@ -1,8 +1,20 @@
 package com.github.restup.registry;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
-import com.github.restup.mapping.fields.IdentityField;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.path.ResourcePathsProvider;
@@ -10,18 +22,15 @@ import com.github.restup.query.Pagination;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.registry.settings.ServiceMethodAccess;
+import com.github.restup.repository.AnnotatedResourceRepository;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.repository.ResourceRepositoryOperations;
-import com.github.restup.repository.AnnotatedResourceRepository;
-import com.github.restup.service.*;
+import com.github.restup.service.AnnotatedService;
+import com.github.restup.service.DelegatingResourceService;
+import com.github.restup.service.FilteredService;
+import com.github.restup.service.ResourceService;
+import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.util.Assert;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-
-import java.io.Serializable;
-import java.util.*;
-
-import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 /**
  * Resource meta data, defining resource name, type, service implementation, etc.
@@ -38,7 +47,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
 
     private final ResourceRegistry registry;
     private final MappedClass<T> mapping;
-    private final IdentityField<ID> identityField;
+    private final MappedField<ID> identityField;
 
     private final ControllerMethodAccess controllerAccess;
     private final ServiceMethodAccess serviceAccess;
@@ -49,7 +58,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
     private ResourceRepositoryOperations repositoryOperations;
     private ResourceService<T,ID> service;
 
-    public Resource(Class<T> type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, IdentityField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
+    public Resource(Class<T> type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
         Assert.notNull(type, "type is required");
         Assert.notNull(name, "name is required");
         Assert.notNull(pluralName, "pluralName is required");
@@ -106,10 +115,8 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
         if (size < 1) {
             result = Collections.emptySet();
         } else {
-            result = new HashSet<ID>(size);
-            for (T t : list) {
-                result.add(resource.getIdentityField().readValue(t));
-            }
+            result = (Set) list.stream().map(t -> resource.getIdentityField().readValue(t))
+            		.collect(Collectors.toSet());
         }
         return result;
     }
@@ -204,7 +211,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
         return mapping;
     }
 
-    public IdentityField<ID> getIdentityField() {
+    public MappedField<ID> getIdentityField() {
         return identityField;
     }
 
@@ -413,6 +420,10 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
             return me();
         }
 
+        public Builder<T, ID> mappedClass(MappedClass.Builder builder) {
+            return mappedClass(builder.build());
+        }
+
         /**
          * {@link #defaultPagination(Integer, Integer, boolean, boolean)} with offset of 0, paging and totals enabled.
          *
@@ -456,7 +467,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
             Assert.notNull(mapping, "mapping must not be null");
             Assert.notNull(mapping.getAttributes(), "attributes must not be null");
 
-            IdentityField<ID> identityField = (IdentityField<ID>) IdentityField.getIdentityField(mapping.getAttributes());
+            MappedField<ID> identityField = (MappedField) MappedField.getIdentityField(mapping.getAttributes());
 
             Assert.notNull(identityField, "identityfield not found.");
 

@@ -9,6 +9,7 @@ import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 
 import javax.persistence.*;
+import javax.validation.constraints.NotNull;
 
 import static com.university.University.*;
 

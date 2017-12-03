@@ -47,7 +47,7 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
                         Object value = collectValues(field, parameterProvider, errors);
                         // and apply the value to the instance if needed
                         if (value != null) {
-                            field.writeValue(instance, value);
+                        		writeValue(field, instance, value);
                         }
                     }
                 }
@@ -56,7 +56,12 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
         return instance;
     }
 
-    private <T> Object collectValues(MappedField<T> field, ParameterProvider parameterProvider, Errors errors) {
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	private <T> void writeValue(MappedField field, Object instance, Object value) {
+        field.writeValue(instance, value);
+	}
+
+	private <T> Object collectValues(MappedField<T> field, ParameterProvider parameterProvider, Errors errors) {
         Object result = null;
         String firstParameterNameForErrorDetail = null;
         Collection<Object> collection = null;

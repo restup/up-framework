@@ -1,10 +1,22 @@
 package com.github.restup.jackson.serializer;
 
+import static com.github.restup.test.ContentsTest.json;
+import static com.github.restup.util.ReflectionUtils.getAnnotation;
+import static org.mockito.Mockito.when;
+
+import java.util.Arrays;
+
+import javax.persistence.Transient;
+
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
+
 import com.deep.Shallow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.restup.service.model.response.BasicReadResult;
-import com.many.fields.A2J;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.result.JsonResult;
 import com.github.restup.jackson.JacksonConfiguration;
@@ -16,21 +28,10 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
-import com.github.restup.service.model.response.BasicListResult;
+import com.github.restup.service.model.response.BasicReadResult;
 import com.github.restup.test.ContentsTest.Builder;
 import com.github.restup.util.ReflectionUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.persistence.Transient;
-import java.util.Arrays;
-
-import static com.github.restup.test.ContentsTest.json;
-import static com.github.restup.util.ReflectionUtils.getAnnotation;
-import static org.mockito.Mockito.when;
+import com.many.fields.A2J;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JsonResultSerializerTest {
@@ -48,7 +49,7 @@ public class JsonResultSerializerTest {
                         new IdentityByConventionMappedFieldBuilderVisitor()
                         , new MappedFieldBuilderVisitor() {
                             public <T> void visit(MappedField.Builder<T> b, ReflectionUtils.BeanInfo<T> bi, ReflectionUtils.PropertyDescriptor pd) {
-                                b.setTransientField(null != getAnnotation(Transient.class, pd));
+                                b.transientField(null != getAnnotation(Transient.class, pd));
                             }
                         })
                 .repositoryFactory(new MapBackedRepositoryFactory()));
@@ -60,7 +61,7 @@ public class JsonResultSerializerTest {
     }
 
     private JsonResult result(Object object) {
-        return new JsonResult(request, new BasicReadResult(object));
+        return new JsonResult(request, new BasicReadResult<>(object));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

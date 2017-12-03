@@ -4,8 +4,8 @@ import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
-import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQuery;
 import com.github.restup.registry.Resource;
@@ -131,7 +131,7 @@ public class RelationshipValidationFilter {
 
     private Class<?> getRelationshipResource(ResourcePath path) {
         MappedField<?> mf = path.lastMappedField();
-        return mf == null ? null : mf.getRelationshipResource();
+        return mf.getRelationshipResource();
     }
 
 }

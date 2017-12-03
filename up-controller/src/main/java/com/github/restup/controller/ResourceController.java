@@ -1,21 +1,38 @@
 package com.github.restup.controller;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.restup.controller.linking.LinkBuilderFactory;
-import com.github.restup.controller.method.*;
-import com.github.restup.controller.model.*;
-import com.google.gson.Gson;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.interceptor.RequestInterceptor;
+import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.controller.method.DeleteMethodController;
+import com.github.restup.controller.method.GetMethodController;
+import com.github.restup.controller.method.MethodController;
+import com.github.restup.controller.method.PatchMethodController;
+import com.github.restup.controller.method.PostMethodController;
+import com.github.restup.controller.method.PutMethodController;
+import com.github.restup.controller.model.HttpHeader;
+import com.github.restup.controller.model.HttpMethod;
+import com.github.restup.controller.model.MediaType;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.settings.ControllerSettings;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.ErrorBuilder.ErrorCodeStatus;
 import com.github.restup.errors.ErrorObjectException;
-import com.github.restup.mapping.fields.IdentityField;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.registry.Resource;
@@ -23,14 +40,7 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Assert;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.google.gson.Gson;
 
 /**
  * <ol>
@@ -129,6 +139,10 @@ import java.util.List;
 public class ResourceController {
 
     private final static Logger log = LoggerFactory.getLogger(ResourceController.class);
+
+    public enum Feature {
+        DISCOVERY_ENDPOINT
+    }
 
     private final ResourceRegistry registry;
     private final ContentNegotiator[] contentNegotiators;
@@ -295,7 +309,7 @@ public class ResourceController {
     private static void addUpdateFields(ParsedResourceControllerRequest.Builder<?> builder, List<MappedField<?>> fields,
                                         Integer i) {
         for (MappedField<?> f : fields) {
-            if (!f.isReadOnly()) {
+            if (!f.isImmutable()) {
                 builder.addRequestedPath(i, f);
             }
         }
@@ -401,7 +415,7 @@ public class ResourceController {
         requestParser.parse(request, builder);
         if (CollectionUtils.size(request.getIds()) > 1) {
             // Add filter for ids
-            IdentityField<?> field = request.getResource().getIdentityField();
+            MappedField<?> field = request.getResource().getIdentityField();
             builder.addFilter("pathIds", request.getIds(), field.getApiName(), Operator.in, request.getIds());
         }
         if (HttpMethod.PUT == request.getMethod()) {

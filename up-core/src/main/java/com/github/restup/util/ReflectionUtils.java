@@ -30,6 +30,13 @@ public class ReflectionUtils {
         }
         return true;
     }
+    
+    public static <T extends AccessibleObject> T makeAccessible(T target) {
+		if (target != null && !target.isAccessible()) {
+			target.setAccessible(true);
+		}
+		return target;
+    }
 
     /**
      * Create a new instance, catching exceptions and rethrowing using
@@ -448,10 +455,7 @@ public class ReflectionUtils {
 
         @Override
         public int hashCode() {
-            final int prime = 31;
-            int result = 1;
-            result = prime * result + ((name == null) ? 0 : name.hashCode());
-            return result;
+            return Objects.hash(name);
         }
 
         @Override

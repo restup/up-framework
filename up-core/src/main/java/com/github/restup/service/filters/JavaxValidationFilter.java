@@ -1,5 +1,23 @@
 package com.github.restup.service.filters;
 
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+import javax.validation.metadata.ConstraintDescriptor;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.errors.ErrorBuilder;
@@ -15,22 +33,6 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-import javax.validation.metadata.ConstraintDescriptor;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
 
 public class JavaxValidationFilter {
 
@@ -83,7 +85,6 @@ public class JavaxValidationFilter {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     private void validatePath(ResourceRegistry registry, Errors errors, ResourcePath path, Object target) {
         MappedFieldPathValue<?> mfpv = path.lastMappedFieldPathValue();
         if (mfpv != null) {

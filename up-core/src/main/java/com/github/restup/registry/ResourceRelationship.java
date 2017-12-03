@@ -1,16 +1,20 @@
 package com.github.restup.registry;
 
+import static com.github.restup.annotations.field.RelationshipType.manyToOne;
+import static com.github.restup.annotations.field.RelationshipType.oneToMany;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Objects;
+import java.util.Set;
+
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.util.Assert;
-import java.util.Objects;
-
-import java.io.Serializable;
-import java.util.*;
-
-import static com.github.restup.annotations.field.RelationshipType.manyToOne;
-import static com.github.restup.annotations.field.RelationshipType.oneToMany;
 
 public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID extends Serializable> {
 
@@ -83,10 +87,8 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
         List<ResourcePath> result = new ArrayList<ResourcePath>();
         for (ResourcePath path : resource.getAllPaths()) {
             MappedField<?> mf = path.lastMappedField();
-            if (mf != null && mf.getRelationshipResource() != null) {
-                if (mf.getRelationshipResource() != null) {
-                    result.add(path);
-                }
+            if (mf.isRelationship()) {
+                result.add(path);
             }
         }
         return result;

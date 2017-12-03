@@ -1,5 +1,17 @@
 package com.github.restup.registry.settings;
 
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.restup.bind.DefaultMethodArgumentFactory;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ParameterConverter;
@@ -9,7 +21,10 @@ import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
-import com.github.restup.mapping.fields.*;
+import com.github.restup.mapping.fields.DefaultMappedFieldFactory;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.visitors.JacksonMappedFieldBuilderVisitor;
 import com.github.restup.path.AllResourcePathsProvider;
@@ -20,19 +35,16 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
-import com.github.restup.service.filters.*;
+import com.github.restup.service.filters.BulkOperationByQueryFilter;
+import com.github.restup.service.filters.CaseInsensitiveSearchFieldFilter;
+import com.github.restup.service.filters.ImmutableFieldValidationFilter;
+import com.github.restup.service.filters.IncludeFilter;
+import com.github.restup.service.filters.JavaxValidationFilter;
+import com.github.restup.service.filters.NotFoundFilter;
+import com.github.restup.service.filters.RelationshipValidationFilter;
+import com.github.restup.service.filters.SequencedIdValidationFilter;
 import com.github.restup.service.model.request.DefaultRequestObjectFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
 
 /**
  * Configures settings and implementations to be used by registry.
@@ -576,14 +588,15 @@ public class RegistrySettings {
     private static class MappedFieldComparator implements Comparator<MappedField<?>> {
 
         public int compare(MappedField<?> a, MappedField<?> b) {
-            if (a instanceof IdentityField) {
+            if (a == null) return 1;
+            if (a.isIdentifier()) {
                 return -10;
             }
-            if (b instanceof IdentityField) {
+            if (b == null) return -1;
+            if (b.isIdentifier()) {
                 return 1;
             }
-            if (a == null) return 1;
-            if (b == null) return -1;
+
             if (a.getApiName() != null) {
                 if (b.getApiName() != null) {
                     return a.getApiName().compareTo(b.getApiName());

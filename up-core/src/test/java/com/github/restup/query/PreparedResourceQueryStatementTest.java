@@ -1,6 +1,22 @@
 package com.github.restup.query;
 
-import com.many.fields.A2J;
+import static com.github.restup.path.ResourcePath.path;
+import static com.github.restup.query.PreparedResourceQueryStatement.criteria;
+import static com.github.restup.query.PreparedResourceQueryStatement.queryFields;
+import static com.github.restup.query.PreparedResourceQueryStatement.sparseFields;
+import static com.github.restup.util.ReflectionUtils.getAnnotation;
+import static com.github.restup.util.ResourceAssert.assertBeanPaths;
+import static org.junit.Assert.assertEquals;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import javax.persistence.Transient;
+
+import org.junit.Before;
+import org.junit.Test;
+
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
@@ -17,19 +33,7 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.util.ReflectionUtils;
-import org.junit.Before;
-import org.junit.Test;
-
-import javax.persistence.Transient;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static com.github.restup.path.ResourcePath.path;
-import static com.github.restup.query.PreparedResourceQueryStatement.*;
-import static com.github.restup.util.ReflectionUtils.getAnnotation;
-import static com.github.restup.util.ResourceAssert.assertBeanPaths;
-import static org.junit.Assert.assertEquals;
+import com.many.fields.A2J;
 
 public class PreparedResourceQueryStatementTest {
 
@@ -49,7 +53,7 @@ public class PreparedResourceQueryStatementTest {
                         new IdentityByConventionMappedFieldBuilderVisitor()
                         , new MappedFieldBuilderVisitor() {
                             public <T> void visit(MappedField.Builder<T> b, ReflectionUtils.BeanInfo<T> bi, ReflectionUtils.PropertyDescriptor pd) {
-                                b.setTransientField(null != getAnnotation(Transient.class, pd));
+                                b.transientField(null != getAnnotation(Transient.class, pd));
                             }
                         })
                 .repositoryFactory(new MapBackedRepositoryFactory()));

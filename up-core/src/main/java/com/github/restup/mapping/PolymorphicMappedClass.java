@@ -1,9 +1,15 @@
 package com.github.restup.mapping;
 
+import com.github.restup.mapping.fields.MappedField;
+
 import java.util.List;
 
-public interface PolymorphicMappedClass<T> extends MappedClass<T> {
+public abstract class PolymorphicMappedClass<T> extends BasicMappedClass<T> {
 
-    List<Class<?>> getSubTypes();
+    protected PolymorphicMappedClass(String name, String pluralName, Class<T> type, Class<?> parentType, List<MappedField<?>> attributes) {
+        super(name, pluralName, type, parentType, attributes);
+    }
+
+    public abstract List<Class<?>> getSubTypes();
 
 }

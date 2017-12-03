@@ -1,5 +1,12 @@
 package com.github.restup.jackson.serializer;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -7,18 +14,16 @@ import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.github.restup.controller.model.result.NegotiatedResult;
 import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.mapping.fields.IdentityField;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.ReadableField;
-import com.github.restup.path.*;
+import com.github.restup.path.DataPathValue;
+import com.github.restup.path.EmbeddedResourcePathValue;
+import com.github.restup.path.IndexPathValue;
+import com.github.restup.path.MappedFieldPathValue;
+import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.response.PagedResult;
 import com.github.restup.service.model.response.ResourceResult;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
 
 public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> extends JsonSerializer<T> {
 
@@ -173,7 +178,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
      */
     protected Object writeIdentifier(Resource<?, ?> resource, Object data, T result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         // TODO check if id was explicitly requested to be removed
-        IdentityField<?> field = resource.getIdentityField();
+        MappedField<?> field = resource.getIdentityField();
         Object id = field.readValue(data);
         writeIdentifier(jgen, field.getApiName(), id);
         return id;
@@ -194,7 +199,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
         for (Map.Entry<PathValue, ?> e : paths.entrySet()) {
             PathValue pv = e.getKey();
             if (pv instanceof ReadableField && (writeRelationships || !MappedFieldPathValue.isRelationshipField(pv))) {
-                ReadableField<?> readable = (ReadableField<?>) pv;
+                ReadableField readable = (ReadableField) pv;
                 String fieldName = pv.getApiPath();
                 Object value = readable.readValue(data);
 

@@ -9,7 +9,6 @@ import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.repository.ResourceRepositoryOperations;
-import com.github.restup.service.MethodCommandOperations;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.test.resource.RelativeTestResource;

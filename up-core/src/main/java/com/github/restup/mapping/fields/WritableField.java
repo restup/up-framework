@@ -3,9 +3,10 @@ package com.github.restup.mapping.fields;
 /**
  * A field which is modifiable
  *
- * @param <T>
+ * @param <TARGET>
+ * @param <VALUE>
  */
-public interface WritableField<T> {
+public interface WritableField<TARGET, VALUE> {
 
     /**
      * Set the the field's value on the instance provided
@@ -13,7 +14,7 @@ public interface WritableField<T> {
      * @param instance of the object whose property to set
      * @param value    the value to set
      */
-    void writeValue(Object instance, T value);
+    void writeValue(TARGET instance, VALUE value);
 
     /**
      * Returns a new instance of the object containing the field so that it may be
@@ -21,5 +22,8 @@ public interface WritableField<T> {
      *
      * @return
      */
-    Object getFieldInstance();
+    TARGET createDeclaringInstance();
+
+    VALUE createInstance();
+    
 }

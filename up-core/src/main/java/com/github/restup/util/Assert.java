@@ -1,11 +1,12 @@
 package com.github.restup.util;
 
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.collections4.MapUtils;
-
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.collections4.MapUtils;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Spring framework style assertions
@@ -40,6 +41,12 @@ public class Assert {
 
     public static void notEmpty(Map<?, ?> c, String message) {
         if (MapUtils.isEmpty(c)) {
+            throw new AssertionError(message);
+        }
+    }
+
+    public static void notEmpty(String s, String message) {
+        if (StringUtils.isEmpty(s)) {
             throw new AssertionError(message);
         }
     }

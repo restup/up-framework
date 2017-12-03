@@ -17,16 +17,13 @@ import com.github.restup.controller.linking.discovery.DefaultServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.request.parser.*;
 import com.github.restup.jackson.JacksonConfiguration;
-import com.github.restup.mapping.DefaultMappedClass;
-import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.AutoDetectConstants;
 import com.github.restup.service.registry.DiscoveryService;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.Arrays;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
 
@@ -236,17 +233,17 @@ public class ControllerSettings {
                 exceptionHandler = new DefaultExceptionHandler();
             }
 
-
+            //TODO
             registry.registerResource(
                     Resource.builder(Resource.class)
                         .service(new DiscoveryService(linkBuilderFactory))
                             .excludeDefaultServiceFilters(true)
-                        .mappedClass(new DefaultMappedClass(UP_RESOURCE_DISCOVERY,"resources",
-                            Resource.class, null, Arrays.asList(
-                            MappedField.builder(String.class)
-                                .setIdField(true)
-                            .setApiName("name").build()
-                    )))
+                        .mappedClass(
+                            MappedClass.builder()
+                                .name(UP_RESOURCE_DISCOVERY)
+                                .pluralName("resources")
+                                .addIdAttribute(String.class, "name")
+                        )
             );
             return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler);
         }

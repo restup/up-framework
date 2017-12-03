@@ -1,12 +1,13 @@
 package com.github.restup.path;
 
-import com.github.restup.mapping.fields.IdentityField;
+import java.util.Objects;
+
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.ReadableField;
 import com.github.restup.mapping.fields.WritableField;
 import com.github.restup.util.Assert;
 
-public class MappedFieldPathValue<T> implements PathValue, ReadableField<T>, WritableField<T> {
+public class MappedFieldPathValue<T> implements PathValue, ReadableField, WritableField<Object, T> {
 
     private final MappedField<T> mappedField;
 
@@ -19,16 +20,16 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField<T>, Wri
 
     public static boolean isRelationshipField(PathValue pv) {
         if (pv instanceof MappedFieldPathValue) {
-            return isRelationshipField((MappedFieldPathValue) pv);
+            return isRelationshipField((MappedFieldPathValue<?>) pv);
         }
         return false;
     }
 
 
-    public static boolean isRelationshipField(MappedFieldPathValue pv) {
+    public static boolean isRelationshipField(MappedFieldPathValue<?> pv) {
         if (pv != null) {
-            MappedField mf = pv.getMappedField();
-            return mf.getRelationshipType() != null;
+            MappedField<?> mf = pv.getMappedField();
+            return mf.isRelationship();
         }
         return false;
     }
@@ -39,7 +40,7 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField<T>, Wri
 
     @Override
     public boolean isReservedPath() {
-        return mappedField instanceof IdentityField;
+        return mappedField.isIdentifier();
     }
 
     public String getBeanPath() {
@@ -67,20 +68,22 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField<T>, Wri
         mappedField.writeValue(instance, value);
     }
 
-    public Object getFieldInstance() {
-        return mappedField.getFieldInstance();
+    public Object createDeclaringInstance() {
+        return mappedField.createDeclaringInstance();
+    }
+    
+    @Override
+    public T createInstance() {
+    		return mappedField.createInstance();
     }
 
     public boolean supportsType(Class<?> clazz) {
-        return clazz != null && mappedField.getDeclaringClass() == clazz;
+        return mappedField.isDeclaredBy(clazz);
     }
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((mappedField == null) ? 0 : mappedField.hashCode());
-        return result;
+        return Objects.hash(mappedField);
     }
 
     @SuppressWarnings("rawtypes")

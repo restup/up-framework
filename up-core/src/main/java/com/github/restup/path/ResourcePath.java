@@ -4,20 +4,17 @@ import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.ErrorSource;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.MappedClass;
-import com.github.restup.mapping.fields.IterableField;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.ReadableField;
-import com.github.restup.mapping.fields.WritableField;
+import com.github.restup.mapping.fields.*;
 import com.github.restup.path.ResourcePath.Builder.Mode;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
-import java.util.Objects;
 
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Function;
 
 /**
@@ -361,7 +358,7 @@ public class ResourcePath implements ErrorSource {
             Object o = readValue(instance);
             if (o == null && this.value instanceof WritableField) {
                 WritableField writable = (WritableField) value;
-                o = writable.getFieldInstance();
+                o = writable.createInstance();
                 writeValue(instance, o);
             }
             return o;
@@ -373,7 +370,6 @@ public class ResourcePath implements ErrorSource {
         return (instance != null && value.supportsType(instance.getClass()));
     }
 
-    @SuppressWarnings("rawtypes")
     private Object readValue(Object instance) {
         if (supportsType(instance)) {
             ReadableField readable = (ReadableField) value;
@@ -392,11 +388,7 @@ public class ResourcePath implements ErrorSource {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((next == null) ? 0 : next.hashCode());
-        result = prime * result + ((value == null) ? 0 : value.hashCode());
-        return result;
+        return Objects.hash(next, value);
     }
 
     @Override

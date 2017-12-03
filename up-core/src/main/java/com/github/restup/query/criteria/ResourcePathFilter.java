@@ -1,6 +1,7 @@
 package com.github.restup.query.criteria;
 
 import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 
@@ -88,15 +89,15 @@ public class ResourcePathFilter<T> implements ResourceQueryCriteria {
         Object b = this.value;
 
         if ( MappedField.isCaseInsensitive(mf) ) {
-            a = (Comparable) MappedField.toCaseInsensitive(mf.getCaseInsensitive(), a);
+            a = (Comparable) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), a);
             if ( b instanceof Collection ) {
                 List<Object> result = new ArrayList<>(((Collection) b).size());
                 for ( Object o : (Collection)b) {
-                    result.add( MappedField.toCaseInsensitive(mf.getCaseInsensitive(), o));
+                    result.add( MappedField.toCaseInsensitive(mf.getCaseSensitivity(), o));
                 }
                 b = result;
             } else {
-                b = (Comparable) MappedField.toCaseInsensitive(mf.getCaseInsensitive(), b);
+                b = (Comparable) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), b);
             }
         }
 

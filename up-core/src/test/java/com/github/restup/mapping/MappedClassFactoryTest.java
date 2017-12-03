@@ -1,16 +1,23 @@
 package com.github.restup.mapping;
 
-import com.model.test.company.*;
-import com.github.restup.mapping.fields.IdentityField;
-import com.github.restup.mapping.fields.IterableField;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.registry.ResourceRegistryTest;
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
 
 import java.util.Arrays;
 import java.util.List;
 
-import static org.junit.Assert.*;
+import org.junit.Test;
+
+import com.github.restup.mapping.fields.IterableField;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.registry.ResourceRegistryTest;
+import com.model.test.company.Address;
+import com.model.test.company.Company;
+import com.model.test.company.Contractor;
+import com.model.test.company.Employee;
+import com.model.test.company.Person;
 
 public class MappedClassFactoryTest {
 
@@ -32,13 +39,13 @@ public class MappedClassFactoryTest {
 
     private static MappedField<?> assertIdField(MappedClass<?> mappedClass, int i, String name, Class<?> type, boolean errorOnUpdate) {
         MappedField<?> f = readOnly(mappedClass, i, name, type, errorOnUpdate);
-        assertTrue(f instanceof IdentityField);
+        assertTrue(f.isIdentifier());
         return f;
     }
 
     private static MappedField<?> assertIdField(MappedClass<?> mappedClass, int i, String name, Class<?> type) {
-        MappedField<?> f = assertField(mappedClass, i, name, type, false, false, false, null);
-        assertTrue(f instanceof IdentityField);
+        MappedField<?> f = assertField(mappedClass, i, name, type, false, true, false, null);
+        assertTrue(f.isIdentifier());
         return f;
     }
 
@@ -46,8 +53,10 @@ public class MappedClassFactoryTest {
         return assertField(mappedClass, i, name, type, false, true, errorOnUpdate, null);
     }
 
-    private static MappedField<?> assertField(MappedClass<?> mappedClass, int i, String name, Class<?> type, boolean insensitive, boolean readOnly, boolean errorOnUpdate, Class<?> relationshipClass) {
-        MappedField<?> field = mappedClass.getAttributes().get(i);
+    
+	private static MappedField<?> assertField(MappedClass<?> mappedClass, int i, String name, Class<?> type, boolean insensitive, boolean readOnly, boolean errorOnUpdate, Class<?> relationshipClass) {
+        @SuppressWarnings({ "rawtypes", "unchecked" })
+		MappedField<Object> field = (MappedField)mappedClass.getAttributes().get(i);
         assertEquals(name, field.getApiName());
         assertEquals(name, field.getBeanName());
         assertEquals(name, field.getPersistedName());
@@ -55,9 +64,11 @@ public class MappedClassFactoryTest {
         assertEquals(type, field.getType());
         assertEquals(true, field.isApiProperty());
         assertEquals(false, field.isTransientField());
-        assertEquals(readOnly, field.isReadOnly());
-        assertEquals(errorOnUpdate, field.isErrorOnReadOnlyUpdateAttempt());
-        assertEquals(false, field.isIgnoreUpdateAttempt());
+        assertEquals(readOnly, field.isImmutable());
+        if ( field.isImmutable() ) {
+	        assertEquals("Immutability", errorOnUpdate, field.isImmutabilityErrorOnUpdateAttempt());
+	        assertEquals("Immutability", !errorOnUpdate, field.isImmutabilityIgnoreUpdateAttempt());
+        }
         assertEquals(insensitive, field.isCaseInsensitive());
 
         assertEquals(relationshipClass, field.getRelationshipResource());

@@ -1,5 +1,18 @@
 package com.github.restup.controller.model;
 
+import static com.github.restup.util.UpUtils.unmodifiableList;
+
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+
+import org.apache.commons.collections4.list.SetUniqueList;
+
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorBuilder;
@@ -18,13 +31,6 @@ import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
-import java.util.Objects;
-import org.apache.commons.collections4.list.SetUniqueList;
-
-import java.io.Serializable;
-import java.util.*;
-
-import static com.github.restup.util.UpUtils.unmodifiableList;
 
 /**
  * Contains result of parsing parameters

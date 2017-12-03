@@ -1,10 +1,10 @@
 package com.github.restup.controller;
 
+import org.junit.Before;
+import org.junit.Test;
+
 import com.github.restup.test.RestApiTest;
 import com.university.Course;
-import org.junit.Before;
-import org.junit.Ignore;
-import org.junit.Test;
 
 public class CourseServiceJsonAPITest extends AbstractMockTest {
 

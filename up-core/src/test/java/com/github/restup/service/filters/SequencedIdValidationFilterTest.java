@@ -2,7 +2,7 @@ package com.github.restup.service.filters;
 
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
-import com.github.restup.mapping.fields.IdentityField;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.CreateRequest;
 import org.junit.Test;
@@ -22,7 +22,7 @@ public class SequencedIdValidationFilterTest {
     @Mock
     CreateRequest<Object> request;
     @Mock
-    IdentityField<Long> idField;
+    MappedField<Long> idField;
 
     @Test
     public void testNullId() {

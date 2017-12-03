@@ -1,8 +1,8 @@
 package com.github.restup.mapping.fields;
 
+import com.github.restup.mapping.fields.MappedField.Builder;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
-
 /**
  * Allows visiting a builder while building a {@link MappedField} using
  * {@link DefaultMappedFieldFactory} for handling api, persistence, or
@@ -21,6 +21,6 @@ public interface MappedFieldBuilderVisitor {
      * @param pd  describing the property being mapped
      * @param <T> type of class being mapped
      */
-    <T> void visit(MappedField.Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd);
+    <T> void visit(Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd);
 
 }

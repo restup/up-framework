@@ -1,7 +1,7 @@
 package com.github.restup.repository.collections;
 
 import com.github.restup.annotations.operations.*;
-import com.github.restup.mapping.fields.IdentityField;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.Pagination;
 import com.github.restup.query.PreparedResourceQueryStatement;
@@ -41,7 +41,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
     @CreateResource
     public T create(Resource<?, ?> resource, CreateRequest<T> request) {
         T t = request.getData();
-        IdentityField idField = resource.getIdentityField();
+        MappedField<ID> idField = (MappedField) resource.getIdentityField();
         ID id = (ID) idField.readValue(t);
         if (id == null) {
             id = identityStrategy.getNextId();

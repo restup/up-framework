@@ -1,5 +1,15 @@
 package com.github.restup.jackson.serializer;
 
+import static com.github.restup.jackson.serializer.LinksSerializer.writeLinksObject;
+
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+
+import org.apache.commons.collections4.CollectionUtils;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.restup.controller.linking.Link;
@@ -10,15 +20,6 @@ import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
-import org.apache.commons.collections4.CollectionUtils;
-
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import static com.github.restup.jackson.serializer.LinksSerializer.writeLinksObject;
 
 /**
  * Custom serialization for JSON API content.
@@ -87,9 +88,9 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
                 PathValue pv = e.getKey();
                 if (MappedFieldPathValue.isRelationshipField(pv)) {
                     MappedFieldPathValue<?> mappedFieldPathValue = (MappedFieldPathValue) pv;
-                    MappedField mappedField = mappedFieldPathValue.getMappedField();
+                    MappedField<?> mappedField = mappedFieldPathValue.getMappedField();
 
-                    Resource rel = resource.getRegistry().getResource(mappedField.getRelationshipResource());
+                    Resource<?,?> rel = resource.getRegistry().getResource(mappedField.getRelationship().getResource());
                     Object value = mappedFieldPathValue.readValue(data);
 
                     // add the relationship key and start the relationship object

@@ -1,5 +1,25 @@
 package com.github.restup.repository.jpa;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
 import com.github.restup.bind.converter.StringToBooleanConverter;
@@ -19,19 +39,6 @@ import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.response.BasicPagedResult;
 import com.github.restup.service.model.response.BasicReadResult;
 import com.github.restup.service.model.response.ReadResult;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.*;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
 
 public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
@@ -200,16 +207,14 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
                     MappedField<?> mf = f.getPath().lastMappedField();
 
-                    if (MappedField.isCaseInsensitive(mf)) {
-                        String lowerCaseFieldName = mf.getCaseInsensitiveSearchField();
-//TODO							value = f.getLowerCaseValue();
-                        if (StringUtils.isNotEmpty(lowerCaseFieldName)) {
-                            // if there is a lowerCaseFieldName specified, lowercase the
-                            // value and set caseInsensitive to false treat it as a normal query
-                            key = lowerCaseFieldName;
-                            value = MappedField.toCaseInsensitive(mf.getCaseInsensitive(), value);
-                        }
+                    String lowerCaseFieldName = mf.getCaseInsensitiveSearchField();
+                    if (StringUtils.isNotEmpty(lowerCaseFieldName)) {
+                        // if there is a lowerCaseFieldName specified, lowercase the
+                        // value and set caseInsensitive to false treat it as a normal query
+                        key = lowerCaseFieldName;
+                        value = MappedField.toCaseInsensitive(mf.getCaseSensitivity(), value);
                     }
+                    
 
                     if (value instanceof Collection && !supportsCollection(operator)) {
                         for (Object o : (Collection) value) {

@@ -1,12 +1,16 @@
 package com.github.restup.mapping.fields;
 
+import static com.github.restup.util.ReflectionUtils.getAnnotation;
+import static com.github.restup.util.ReflectionUtils.getGenericReturnType;
+import static com.github.restup.util.ReflectionUtils.getReturnType;
+
 import com.github.restup.annotations.field.CaseInsensitive;
 import com.github.restup.annotations.field.Immutable;
 import com.github.restup.annotations.field.Param;
 import com.github.restup.annotations.field.Relationship;
-import com.github.restup.util.ReflectionUtils.*;
-
-import static com.github.restup.util.ReflectionUtils.*;
+import com.github.restup.mapping.fields.MappedField.Builder;
+import com.github.restup.util.ReflectionUtils.BeanInfo;
+import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 
 /**
  * Default {@link MappedFieldFactory} implementation.
@@ -28,17 +32,19 @@ public class DefaultMappedFieldFactory implements MappedFieldFactory {
     public <T> MappedField<T> getMappedField(BeanInfo<T> bi, PropertyDescriptor pd) {
         Class<T> type = (Class) getReturnType(pd, bi.getType());
 
-        MappedField.Builder<T> b = MappedField.builder(type)
-                .setField(pd.getField())
+        Builder<T> b = MappedField.builder(type)
+                .field(pd.getField())
+                .getter(pd.getGetter())
+                .setter(pd.getSetter())
                 // by default, bean, api, and persisted names are all the same.
-                .setBeanName(pd.getName())
-                .setApiName(pd.getName())
-                .setPersistedName(pd.getName())
-                .setGenericType(getGenericReturnType(pd))
-                .setCaseInsensitive(getAnnotation(CaseInsensitive.class, pd))
-                .setRelationship(getAnnotation(Relationship.class, pd))
-                .setImmutable(getAnnotation(Immutable.class, pd))
-                .setParam(getAnnotation(Param.class, pd));
+                .beanName(pd.getName())
+                .apiName(pd.getName())
+                .persistedName(pd.getName())
+                .genericType(getGenericReturnType(pd))
+                .caseInsensitive(getAnnotation(CaseInsensitive.class, pd))
+                .relationship(getAnnotation(Relationship.class, pd))
+                .immutable(getAnnotation(Immutable.class, pd))
+                .param(getAnnotation(Param.class, pd));
 
         b.accept(visitors, bi, pd);
 

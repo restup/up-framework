@@ -2,6 +2,8 @@ package com.github.restup.path;
 
 import com.github.restup.util.Assert;
 
+import java.util.Objects;
+
 /**
  * {@link PathValue} which is contstant
  */
@@ -48,10 +50,7 @@ class ConstantPathValue implements PathValue {
 
     @Override
     public int hashCode() {
-        final int prime = 31;
-        int result = 1;
-        result = prime * result + ((field == null) ? 0 : field.hashCode());
-        return result;
+        return Objects.hash(field);
     }
 
     @Override
