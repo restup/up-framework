@@ -3,13 +3,13 @@ package com.github.restup.service;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.registry.Resource;
 import com.github.restup.util.Assert;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-
 public class AnnotatedRepositoryMethodCommand extends FilterChainContextMethodCommand {
+
     private final static Logger log = LoggerFactory.getLogger(AnnotatedRepositoryMethodCommand.class);
 
     private final Resource<?, ?> resource;

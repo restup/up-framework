@@ -1,14 +1,5 @@
 package com.github.restup.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
@@ -41,121 +32,92 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Assert;
 import com.google.gson.Gson;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * <ol>
- * <li>Create A document
- * <p>
+ * <ol> <li>Create A document <p>
  * <pre>
  * POST /foo
  * { data : {} }
  * </pre>
- * <p>
- * <li>Create Multiple documents by passing an array.
- * <p>
+ * <p> <li>Create Multiple documents by passing an array. <p>
  * <pre>
  * POST /foo
  * { data : [{}] }
  * </pre>
- * <p>
- * <li>Update a document by id
- * <p>
+ * <p> <li>Update a document by id <p>
  * <pre>
  * PUT /foo/1 { data : {} }
  * </pre>
- * <p>
- * <li>Update multiple documents passing an array
- * <p>
+ * <p> <li>Update multiple documents passing an array <p>
  * <pre>
  * PUT /foo { data : [{}] }
  * </pre>
- * <p>
- * <li>Get a single document by id
- * <p>
+ * <p> <li>Get a single document by id <p>
  * <pre>
  * GET / foo / 1
  * </pre>
- * <p>
- * <li>List documents
- * <p>
+ * <p> <li>List documents <p>
  * <pre>
  * GET / foo
  * </pre>
- * <p>
- * <li>Get multiple documents by id
- * <p>
+ * <p> <li>Get multiple documents by id <p>
  * <pre>
  * GET /foo/1,2,3
  * </pre>
- * <p>
- * <li>Delete a document by id
- * <p>
+ * <p> <li>Delete a document by id <p>
  * <pre>
  * DELETE / foo / 1
  * </pre>
- * <p>
- * <li>Delete multiple documents by id
- * <p>
+ * <p> <li>Delete multiple documents by id <p>
  * <pre>
  * DELETE /foo/1,2,3
  * </pre>
- * <p>
- * <li>Delete multiple documents matching filter criteria
- * <p>
+ * <p> <li>Delete multiple documents matching filter criteria <p>
  * <pre>
  * DELETE /foo?filter[x]=y
  * </pre>
- * <p>
- * <li>Patch a document by id
- * <p>
+ * <p> <li>Patch a document by id <p>
  * <pre>
  * PATCH /foo/1 { data : {} }
  * </pre>
- * <p>
- * <li>Patch multiple documents by id
- * <p>
+ * <p> <li>Patch multiple documents by id <p>
  * <pre>
  * PATCH /foo/1,2,3
  * { data : {} }
  * </pre>
- * <p>
- * <li>Patch multiple documents matching filter criteria
- * <p>
+ * <p> <li>Patch multiple documents matching filter criteria <p>
  * <pre>
  * PATCH /foo?filter[x]=y
  * { data : {} }
  * </pre>
- * <p>
- * <li>Patch multiple documents passing an array
- * <p>
+ * <p> <li>Patch multiple documents passing an array <p>
  * <pre>
  * PATCH /foo { data : [{}] }
  * </pre>
- * <p>
- * </ol>
+ * <p> </ol>
  *
  * @author abuttaro
  */
 public class ResourceController {
 
     private final static Logger log = LoggerFactory.getLogger(ResourceController.class);
-
-    public enum Feature {
-        DISCOVERY_ENDPOINT
-    }
-
     private final ResourceRegistry registry;
     private final ContentNegotiator[] contentNegotiators;
     private final RequestParser requestParser;
     private final RequestInterceptor interceptor;
     private final ExceptionHandler exceptionHandler;
-
     private final GetMethodController<?, ?> getController;
     private final DeleteMethodController<?, ?> deleteController;
     private final PatchMethodController<?, ?> patchController;
     private final PostMethodController<?, ?> postController;
     private final PutMethodController<?, ?> putController;
-
     public ResourceController(ControllerSettings.Builder settings) {
         this(settings.build());
     }
@@ -188,7 +150,7 @@ public class ResourceController {
     }
 
     private static <T> void validateData(ParsedResourceControllerRequest<T> parsedRequest,
-                                         ResourceControllerRequest request, ControllerMethodAccess access, boolean itemOperation, int ids) {
+            ResourceControllerRequest request, ControllerMethodAccess access, boolean itemOperation, int ids) {
         final HttpMethod method = request.getMethod();
         final int items = count(parsedRequest.getData());
         if (items == 0) {
@@ -255,7 +217,7 @@ public class ResourceController {
     }
 
     private static ErrorObjectException itemResourceNotAllowed(ResourceControllerRequest request,
-                                                               ControllerMethodAccess access) {
+            ControllerMethodAccess access) {
         List<HttpMethod> supported = new ArrayList<HttpMethod>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
             if (m.supportsItemOperation(access)) {
@@ -266,7 +228,7 @@ public class ResourceController {
     }
 
     private static ErrorObjectException collectionResourceNotAllowed(ResourceControllerRequest request,
-                                                                     ControllerMethodAccess access) {
+            ControllerMethodAccess access) {
         List<HttpMethod> supported = new ArrayList<HttpMethod>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
             if (m.supportsCollectionOperation(access)) {
@@ -277,7 +239,7 @@ public class ResourceController {
     }
 
     private static ErrorObjectException methodNotAllowed(ResourceControllerRequest request,
-                                                         ControllerMethodAccess access, List<HttpMethod> supported) {
+            ControllerMethodAccess access, List<HttpMethod> supported) {
         return error(request).status(ErrorCodeStatus.METHOD_NOT_ALLOWED)
                 .code(ErrorCodeStatus.METHOD_NOT_ALLOWED.name()).meta(HttpHeader.Allow.name(), supported)
                 // TODO The response MUST query an Allow header containing a list of valid
@@ -294,7 +256,7 @@ public class ResourceController {
 
     @SuppressWarnings({"unused", "rawtypes"})
     private static void addUpdateFields(ParsedResourceControllerRequest.Builder<?> builder,
-                                        List<MappedField<?>> fields) {
+            List<MappedField<?>> fields) {
         if (builder.getData() instanceof Collection) {
             int i = 0;
             for (Object item : (Collection) builder.getData()) {
@@ -307,7 +269,7 @@ public class ResourceController {
     }
 
     private static void addUpdateFields(ParsedResourceControllerRequest.Builder<?> builder, List<MappedField<?>> fields,
-                                        Integer i) {
+            Integer i) {
         for (MappedField<?> f : fields) {
             if (!f.isImmutable()) {
                 builder.addRequestedPath(i, f);
@@ -320,11 +282,10 @@ public class ResourceController {
     }
 
     /**
-     * Handles exceptions when building {@link ResourceControllerRequest} and
-     * handling request
+     * Handles exceptions when building {@link ResourceControllerRequest} and handling request
      */
     public <T, ID extends Serializable> Object request(ResourceControllerRequest.AbstractBuilder<?, ?> builder,
-                                                       ResourceControllerResponse response) {
+            ResourceControllerResponse response) {
         ResourceControllerRequest request = null;
         try {
             request = builder.build();
@@ -340,7 +301,7 @@ public class ResourceController {
 
     @SuppressWarnings("unchecked")
     public <T, ID extends Serializable> Object request(ResourceControllerRequest request,
-                                                       ResourceControllerResponse response) {
+            ResourceControllerResponse response) {
         Assert.notNull(request, "request is required");
         Assert.notNull(response, "response is required");
         Assert.notNull(request.getMethod(), "method is required");
@@ -389,7 +350,7 @@ public class ResourceController {
 
     @SuppressWarnings({"rawtypes"})
     private MethodController getMethodController(ResourceControllerRequest request, ControllerMethodAccess access,
-                                                 boolean itemOperation) {
+            boolean itemOperation) {
         switch (request.getMethod()) {
             case GET:
                 return (MethodController) getController;
@@ -426,7 +387,12 @@ public class ResourceController {
         return builder.build();
     }
 
+    public enum Feature {
+        DISCOVERY_ENDPOINT
+    }
+
     public static class Builder {
+
         ControllerSettings.Builder settings;
 
         public Builder() {
@@ -498,11 +464,8 @@ public class ResourceController {
         }
 
         /**
-         * Use the content negotiator for the specified mediaType as the default content negotiator.
-         * This will allow the mediaType to be rendered in a browser by default if desired.
+         * Use the content negotiator for the specified mediaType as the default content negotiator. This will allow the mediaType to be rendered in a browser by default if desired.
          *
-         * @param mediaType
-         * @return
          * @throws IllegalArgumentException if the specified mediaType is not supported
          */
         public Builder defaultMediaType(String mediaType) {

@@ -1,25 +1,5 @@
 package com.github.restup.repository.jpa;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Collections;
-import java.util.List;
-
-import javax.persistence.EntityManager;
-import javax.persistence.TypedQuery;
-import javax.persistence.criteria.CriteriaBuilder;
-import javax.persistence.criteria.CriteriaQuery;
-import javax.persistence.criteria.Expression;
-import javax.persistence.criteria.Order;
-import javax.persistence.criteria.Predicate;
-import javax.persistence.criteria.Root;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.StringUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
 import com.github.restup.bind.converter.StringToBooleanConverter;
@@ -39,6 +19,23 @@ import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.response.BasicPagedResult;
 import com.github.restup.service.model.response.BasicReadResult;
 import com.github.restup.service.model.response.ReadResult;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.TypedQuery;
+import javax.persistence.criteria.CriteriaBuilder;
+import javax.persistence.criteria.CriteriaQuery;
+import javax.persistence.criteria.Expression;
+import javax.persistence.criteria.Order;
+import javax.persistence.criteria.Predicate;
+import javax.persistence.criteria.Root;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.StringUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
@@ -141,9 +138,6 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
         if (!pagination.isPagingEnabled()) {
             pagination = null;
             list = query.getResultList();
-            if (pagination.isWithTotalsEnabled()) {
-                totalCount = Long.valueOf(list.size());
-            }
         } else {
             if (pagination.isWithTotalsEnabled()) {
                 totalCount = count(resourceClass, predicates);
@@ -200,10 +194,8 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
                     ResourcePathFilter<?> f = (ResourcePathFilter) c;
                     String key = f.getPath().getPersistedPath();
 
-
                     Operator operator = f.getOperator();
                     Object value = f.getValue();
-
 
                     MappedField<?> mf = f.getPath().lastMappedField();
 
@@ -214,7 +206,6 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
                         key = lowerCaseFieldName;
                         value = MappedField.toCaseInsensitive(mf.getCaseSensitivity(), value);
                     }
-                    
 
                     if (value instanceof Collection && !supportsCollection(operator)) {
                         for (Object o : (Collection) value) {
@@ -265,7 +256,7 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private Predicate criteria(CriteriaBuilder cb, Root<T> root, String key,
-                               ResourcePathFilter.Operator operator, Object value, ResourcePathFilter<?> f) {
+            ResourcePathFilter.Operator operator, Object value, ResourcePathFilter<?> f) {
         Expression<?> keyPath = root.get(key);
 
         switch (operator) {

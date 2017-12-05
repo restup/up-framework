@@ -42,5 +42,4 @@ public class EmbeddedResourcePathValue implements PathValue {
         return resource;
     }
 
-
 }

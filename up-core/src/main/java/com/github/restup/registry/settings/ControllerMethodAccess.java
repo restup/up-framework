@@ -1,11 +1,7 @@
 package com.github.restup.registry.settings;
 
 /**
- * Configures Contoller method access.  Disabling methods will ensure
- * methods are not exposed over http, however they still may be available
- * internally depending up on {@link ServiceMethodAccess} settings.
- * Similarly, enabled methods may still be disabled if the service method setting is disabled.
- * By default, all are enabled.
+ * Configures Contoller method access.  Disabling methods will ensure methods are not exposed over http, however they still may be available internally depending up on {@link ServiceMethodAccess} settings. Similarly, enabled methods may still be disabled if the service method setting is disabled. By default, all are enabled.
  */
 public final class ControllerMethodAccess extends ServiceMethodAccess {
 
@@ -48,7 +44,6 @@ public final class ControllerMethodAccess extends ServiceMethodAccess {
         private boolean patchByIdsDisabled;
         private boolean updateByIdDisabled;
         private boolean updateMultipleDisabled;
-
 
         public Builder setAllDisabled(boolean b) {
             return super.setAllDisabled(b)

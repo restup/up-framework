@@ -1,13 +1,12 @@
 package com.github.restup.service.model.request;
 
+import static com.github.restup.util.UpUtils.unmodifiableList;
+
 import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
-
 import java.util.List;
-
-import static com.github.restup.util.UpUtils.unmodifiableList;
 
 public class AbstractPersistenceRequest<T> extends AbstractRequest implements PersistenceRequest<T> {
 

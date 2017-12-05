@@ -1,6 +1,10 @@
 package com.github.restup.repository.collections;
 
-import com.github.restup.annotations.operations.*;
+import com.github.restup.annotations.operations.CreateResource;
+import com.github.restup.annotations.operations.DeleteResource;
+import com.github.restup.annotations.operations.ListResource;
+import com.github.restup.annotations.operations.ReadResource;
+import com.github.restup.annotations.operations.UpdateResource;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.Pagination;
@@ -8,20 +12,25 @@ import com.github.restup.query.PreparedResourceQueryStatement;
 import com.github.restup.query.ResourceSort;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
-import com.github.restup.service.model.request.*;
+import com.github.restup.service.model.request.CreateRequest;
+import com.github.restup.service.model.request.DeleteRequest;
+import com.github.restup.service.model.request.ListRequest;
+import com.github.restup.service.model.request.ReadRequest;
+import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.BasicPagedResult;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * A repository backed by a {@link Map}
- *
- * @param <T>
- * @param <ID>
  */
 public class MapBackedRepository<T, ID extends Serializable> {
 
@@ -60,12 +69,10 @@ public class MapBackedRepository<T, ID extends Serializable> {
         return map.get(id);
     }
 
-
     @DeleteResource
     public T delete(DeleteRequest<T, ID> request) {
         return map.remove(request.getId());
     }
-
 
     @UpdateResource
     public T update(Resource<?, ?> resource, UpdateRequest<T, ID> request) {
@@ -81,9 +88,9 @@ public class MapBackedRepository<T, ID extends Serializable> {
         return existing;
     }
 
-    @ListResource
+    @SuppressWarnings("unchecked")
+	@ListResource
     public BasicPagedResult<T> list(ListRequest<T> request, PreparedResourceQueryStatement ps) {
-        // TODO filters, etc
         List<T> result = new ArrayList<T>(map.values());
 
         Pagination paging = ps.getPagination();
@@ -92,13 +99,13 @@ public class MapBackedRepository<T, ID extends Serializable> {
 
         Long totalCount = null;
 
-        if ( paging.isWithTotalsEnabled() ) {
+        if (paging.isWithTotalsEnabled()) {
             totalCount = Long.valueOf(result.size());
         }
 
         sort(ps, result);
 
-        if ( ! paging.isPagingEnabled() ) {
+        if (!paging.isPagingEnabled()) {
             paging = null;
         } else {
             Integer limit = paging.getLimit();
@@ -122,18 +129,18 @@ public class MapBackedRepository<T, ID extends Serializable> {
 
     private List<T> filter(PreparedResourceQueryStatement ps, List<T> result) {
         List<ResourceQueryCriteria> criteria = ps.getRequestedCriteria();
-        if (CollectionUtils.isNotEmpty(criteria) ) {
+        if (CollectionUtils.isNotEmpty(criteria)) {
             return result
                     .stream()
-                    .filter( t -> filter(criteria, t) )
+                    .filter(t -> filter(criteria, t))
                     .collect(Collectors.toList());
         }
         return result;
     }
 
     private boolean filter(List<ResourceQueryCriteria> list, T t) {
-        for ( ResourceQueryCriteria criteria : list ) {
-            if ( ! criteria.filter(t) ) {
+        for (ResourceQueryCriteria criteria : list) {
+            if (!criteria.filter(t)) {
                 return false;
             }
         }
@@ -145,24 +152,26 @@ public class MapBackedRepository<T, ID extends Serializable> {
         if (sortFields == null) {
             sortFields = Arrays.asList(new ResourceSort(ResourcePath.idPath(ps.getResource())));
         }
-        Collections.sort(result, new Sort(sortFields));
+        Collections.sort(result, new Sort<>(sortFields));
     }
 
     private static class Sort<T> implements Comparator<T> {
+
         final List<ResourceSort> sortFields;
 
         private Sort(List<ResourceSort> sortFields) {
             this.sortFields = sortFields;
         }
 
-        @Override
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		@Override
         public int compare(T a, T b) {
-            for ( ResourceSort sort : sortFields ) {
+            for (ResourceSort sort : sortFields) {
                 ResourcePath path = sort.getPath();
-                Comparable x = (Comparable)path.getValue(a);
-                Comparable y = (Comparable)path.getValue(b);
+                Comparable<Object> x = (Comparable) path.getValue(a);
+                Comparable<Object> y = (Comparable) path.getValue(b);
                 int i = x.compareTo(y);
-                if ( i != 0 ) {
+                if (i != 0) {
                     return sort.isAscending() ? i : -i;
                 }
             }

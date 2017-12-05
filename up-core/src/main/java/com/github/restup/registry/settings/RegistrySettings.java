@@ -1,17 +1,5 @@
 package com.github.restup.registry.settings;
 
-import java.util.ArrayList;
-import java.util.Comparator;
-import java.util.List;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.restup.bind.DefaultMethodArgumentFactory;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ParameterConverter;
@@ -45,6 +33,15 @@ import com.github.restup.service.filters.RelationshipValidationFilter;
 import com.github.restup.service.filters.SequencedIdValidationFilter;
 import com.github.restup.service.model.request.DefaultRequestObjectFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
+import java.util.ArrayList;
+import java.util.Comparator;
+import java.util.List;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configures settings and implementations to be used by registry.
@@ -109,7 +106,6 @@ public class RegistrySettings {
         this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
         this.defaultRestrictedFieldsProvider = defaultRestrictedFieldsProvider;
         this.basePath = basePath;
-
 
         MappedClassFactory factory = mappedClassFactory;
         if (mappedClassFactory == null) {
@@ -241,11 +237,7 @@ public class RegistrySettings {
         }
 
         /**
-         * If true, {@link ResourceRegistry} created using the resulting settings will be
-         * made the singleton instance.
-         *
-         * @param singleton
-         * @return
+         * If true, {@link ResourceRegistry} created using the resulting settings will be made the singleton instance.
          */
         public Builder primaryRegistry(boolean singleton) {
             this.primaryRegistry = singleton;
@@ -254,9 +246,6 @@ public class RegistrySettings {
 
         /**
          * Provided alternate storage for registry meta data
-         *
-         * @param resourceRegistryMap
-         * @return
          */
         public Builder resourceRegistryMap(ResourceRegistryRepository resourceRegistryMap) {
             this.resourceRegistryMap = resourceRegistryMap;
@@ -264,11 +253,7 @@ public class RegistrySettings {
         }
 
         /**
-         * This will behave as a default but will not override settings
-         * explicitly passed elsewhere
-         *
-         * @param packagesToScan
-         * @return
+         * This will behave as a default but will not override settings explicitly passed elsewhere
          */
         public Builder packagesToScan(String... packagesToScan) {
             this.packagesToScan = packagesToScan;
@@ -277,9 +262,6 @@ public class RegistrySettings {
 
         /**
          * Comparator for defining sort order of {@link MappedClass#getAttributes()}
-         *
-         * @param mappedFieldOrderComparator
-         * @return
          */
         public Builder mappedFieldOrderComparator(Comparator<MappedField<?>> mappedFieldOrderComparator) {
             this.mappedFieldOrderComparator = mappedFieldOrderComparator;
@@ -288,9 +270,6 @@ public class RegistrySettings {
 
         /**
          * Provide an alternate implementation for creating {@link MappedField}
-         *
-         * @param mappedFieldFactory
-         * @return
          */
         public Builder mappedFieldFactory(MappedFieldFactory mappedFieldFactory) {
             this.mappedFieldFactory = mappedFieldFactory;
@@ -298,11 +277,7 @@ public class RegistrySettings {
         }
 
         /**
-         * If {@link #mappedFieldFactory(MappedFieldFactory)} is not overridden, {@link MappedFieldBuilderVisitor}
-         * implementations may be specified to customize behavior of {@link DefaultMappedFieldFactory}
-         *
-         * @param visitors
-         * @return
+         * If {@link #mappedFieldFactory(MappedFieldFactory)} is not overridden, {@link MappedFieldBuilderVisitor} implementations may be specified to customize behavior of {@link DefaultMappedFieldFactory}
          */
         public Builder mappedFieldBuilderVisitors(MappedFieldBuilderVisitor... visitors) {
             this.mappedFieldVisitors = visitors;
@@ -311,9 +286,6 @@ public class RegistrySettings {
 
         /**
          * Overrides factory for providing default {@link com.github.restup.repository.Repository} implementations.
-         *
-         * @param repositoryFactory
-         * @return
          */
         public Builder repositoryFactory(RepositoryFactory repositoryFactory) {
             this.repositoryFactory = repositoryFactory;
@@ -322,9 +294,6 @@ public class RegistrySettings {
 
         /**
          * Overrides factory for providing error objects
-         *
-         * @param errorFactory
-         * @return
          */
         public Builder errorFactory(ErrorFactory errorFactory) {
             this.errorFactory = errorFactory;
@@ -342,9 +311,6 @@ public class RegistrySettings {
 
         /**
          * Defines default service method access for resources.  Resources may define their own.
-         *
-         * @param defaultServiceMethodAccess
-         * @return
          */
         public Builder serviceMethodAccess(ServiceMethodAccess defaultServiceMethodAccess) {
             this.defaultServiceMethodAccess = defaultServiceMethodAccess;
@@ -353,9 +319,6 @@ public class RegistrySettings {
 
         /**
          * Defines default service controller access for resources.  Resources may define their own.
-         *
-         * @param defaultControllerMethodAccess
-         * @return
          */
         public Builder controllerMethodAccess(ControllerMethodAccess defaultControllerMethodAccess) {
             this.defaultControllerMethodAccess = defaultControllerMethodAccess;
@@ -364,9 +327,6 @@ public class RegistrySettings {
 
         /**
          * Provide ParameterConverter implementations to be used for binding
-         *
-         * @param parameterConverters
-         * @return
          */
         public Builder parameterConverters(ParameterConverter<?, ?>... parameterConverters) {
             this.parameterConverters = parameterConverters;
@@ -375,8 +335,6 @@ public class RegistrySettings {
 
         /**
          * If set to true default Up! {@link ParameterConverter} implementations will not be used
-         *
-         * @param excludeDefaultParameterConverters
          */
         public Builder excludeDefaultParameterConverters(boolean excludeDefaultParameterConverters) {
             this.excludeDefaultParameterConverters = excludeDefaultParameterConverters;
@@ -385,9 +343,6 @@ public class RegistrySettings {
 
         /**
          * Overrides default {@link RequestObjectFactory}
-         *
-         * @param requestObjectFactory
-         * @return
          */
         public Builder requestObjectFactory(RequestObjectFactory requestObjectFactory) {
             this.requestObjectFactory = requestObjectFactory;
@@ -396,9 +351,6 @@ public class RegistrySettings {
 
         /**
          * Overrides default {@link MappedClassFactory}
-         *
-         * @param mappedClassFactory
-         * @return
          */
         public Builder mappedClassFactory(MappedClassFactory mappedClassFactory) {
             this.mappedClassFactory = mappedClassFactory;
@@ -406,11 +358,7 @@ public class RegistrySettings {
         }
 
         /**
-         * If true, default filters ({@link NotFoundFilter}, etc) will be excluded
-         * from default filters
-         *
-         * @param excludeFrameworkFilters
-         * @return
+         * If true, default filters ({@link NotFoundFilter}, etc) will be excluded from default filters
          */
         public Builder excludeFrameworkFilters(boolean excludeFrameworkFilters) {
             this.excludeFrameworkFilters = excludeFrameworkFilters;
@@ -418,12 +366,7 @@ public class RegistrySettings {
         }
 
         /**
-         * Define default service filters to be used for resources relying on filter based services.
-         * This will add to default Up! filters unless, {@link #excludeFrameworkFilters(boolean)}
-         * is set to true
-         *
-         * @param filters
-         * @return
+         * Define default service filters to be used for resources relying on filter based services. This will add to default Up! filters unless, {@link #excludeFrameworkFilters(boolean)} is set to true
          */
         public Builder defaultServiceFilters(Object... filters) {
             this.defaultServiceFilters = filters;
@@ -450,9 +393,6 @@ public class RegistrySettings {
 
         /**
          * Default implementation to be used when resource does not specify it's own implementation
-         *
-         * @param restrictedFieldsProvider
-         * @return
          */
         public Builder defaultRestrictedFieldsProvider(ResourcePathsProvider restrictedFieldsProvider) {
             this.defaultRestrictedFieldsProvider = restrictedFieldsProvider;
@@ -461,9 +401,6 @@ public class RegistrySettings {
 
         /**
          * Default implementation to be used when resource does not specify it's own implementation
-         *
-         * @param defaultSparseFieldsProvider
-         * @return
          */
         public Builder defaultSparseFieldsProvider(ResourcePathsProvider defaultSparseFieldsProvider) {
             this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
@@ -472,9 +409,6 @@ public class RegistrySettings {
 
         /**
          * The default base path for all resources
-         *
-         * @param basePath
-         * @return
          */
         public Builder basePath(String basePath) {
             this.basePath = basePath;
@@ -588,11 +522,15 @@ public class RegistrySettings {
     private static class MappedFieldComparator implements Comparator<MappedField<?>> {
 
         public int compare(MappedField<?> a, MappedField<?> b) {
-            if (a == null) return 1;
+            if (a == null) {
+                return 1;
+            }
             if (a.isIdentifier()) {
                 return -10;
             }
-            if (b == null) return -1;
+            if (b == null) {
+                return -1;
+            }
             if (b.isIdentifier()) {
                 return 1;
             }
@@ -602,8 +540,12 @@ public class RegistrySettings {
                     return a.getApiName().compareTo(b.getApiName());
                 }
             }
-            if (a.getBeanName() == null) return 1;
-            if (b.getBeanName() == null) return 1;
+            if (a.getBeanName() == null) {
+                return 1;
+            }
+            if (b.getBeanName() == null) {
+                return 1;
+            }
             return a.getBeanName().compareTo(b.getBeanName());
         }
 

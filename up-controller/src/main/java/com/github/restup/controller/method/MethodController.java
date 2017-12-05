@@ -5,7 +5,6 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.RequestObjectFactory;
-
 import java.io.Serializable;
 
 /**

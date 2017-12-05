@@ -11,12 +11,11 @@ import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.BasicPersistenceResult;
 import com.github.restup.service.model.response.PersistenceResult;
-import java.util.Objects;
-
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import java.io.Serializable;
 import java.util.List;
+import java.util.Objects;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaRepository<T, ID> {
 
@@ -59,7 +58,6 @@ public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaReposi
         save(t);
         return new BasicPersistenceResult<T>(t);
     }
-
 
     private void applyUpdate(T t, T update, List<ResourcePath> requestedPaths) {
         if (requestedPaths != null) {

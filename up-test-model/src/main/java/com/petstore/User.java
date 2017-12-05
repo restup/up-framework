@@ -1,7 +1,6 @@
 package com.petstore;
 
 import com.github.restup.annotations.ApiName;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -9,6 +8,7 @@ import javax.persistence.Id;
 @ApiName("user")
 @Entity
 public class User {
+
     @Id
     @GeneratedValue
     private Long id;

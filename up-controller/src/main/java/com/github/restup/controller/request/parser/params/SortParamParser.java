@@ -1,17 +1,11 @@
 package com.github.restup.controller.request.parser.params;
 
-import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
+import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.query.ResourceSort;
 
 /**
- * Parses a parameter of delimited field names specifying sort order. ','
- * delimited and named sort by default. By default sort order is ascending, but
- * can be changed by using '-' prefix ahead of a field name
- * <p>
- * <p>
- * Ex: For a resource with fields named foo & bar
- * <p>
+ * Parses a parameter of delimited field names specifying sort order. ',' delimited and named sort by default. By default sort order is ascending, but can be changed by using '-' prefix ahead of a field name <p> <p> Ex: For a resource with fields named foo & bar <p>
  * <pre>
  * ?sort=foo,bar
  * ?sort=+foo,-bar

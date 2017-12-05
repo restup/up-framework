@@ -1,10 +1,10 @@
 package com.deep;
 
-import javax.validation.constraints.NotNull;
 import java.util.Arrays;
 import java.util.List;
 import java.util.Random;
 import java.util.concurrent.atomic.AtomicLong;
+import javax.validation.constraints.NotNull;
 
 public class Shallow extends BaseObject {
 

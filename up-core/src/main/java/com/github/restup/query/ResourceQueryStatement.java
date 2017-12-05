@@ -1,5 +1,7 @@
 package com.github.restup.query;
 
+import static com.github.restup.util.UpUtils.unmodifiableList;
+
 import com.github.restup.errors.Errors;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.path.ResourcePath.Builder.Mode;
@@ -8,13 +10,10 @@ import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
-import java.util.Objects;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
-import static com.github.restup.util.UpUtils.unmodifiableList;
+import java.util.Objects;
 
 /**
  * Represents a resource query including all fields, criteria, paging behavior and sort criteria.
@@ -29,9 +28,9 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
     private final List<ResourcePath> requestedPathsAdded;
 
     ResourceQueryStatement(Type type, Resource<?, ?> resource, List<ResourcePath> requestedPaths, List<ResourcePath> requiredRelationshipPaths,
-                           List<ResourcePath> requestedPathsExcluded, List<ResourcePath> requestedPathsAdded,
-                           List<ResourceQueryCriteria> requestedFilters, List<ResourceSort> requestedSort,
-                           Pagination pagination) {
+            List<ResourcePath> requestedPathsExcluded, List<ResourcePath> requestedPathsAdded,
+            List<ResourceQueryCriteria> requestedFilters, List<ResourceSort> requestedSort,
+            Pagination pagination) {
         super(resource, requestedFilters, requestedSort, pagination);
         this.type = type;
         this.requestedPaths = unmodifiableList(requestedPaths);
@@ -81,8 +80,6 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
 
     /**
      * Basic requested paths... foo, bar
-     *
-     * @return
      */
     public List<ResourcePath> getRequestedPaths() {
         return requestedPaths;
@@ -90,8 +87,6 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
 
     /**
      * Paths required based upon a requested relationship
-     *
-     * @return
      */
     public List<ResourcePath> getRequiredRelationshipPaths() {
         return requiredRelationshipPaths;
@@ -99,8 +94,6 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
 
     /**
      * Paths requested to be excluded from response... fields=-bar
-     *
-     * @return
      */
     public List<ResourcePath> getRequestedPathsExcluded() {
         return requestedPathsExcluded;
@@ -108,8 +101,6 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
 
     /**
      * Paths requested to be included in response... fields=+foo
-     *
-     * @return
      */
     public List<ResourcePath> getRequestedPathsAdded() {
         return requestedPathsAdded;
@@ -183,7 +174,6 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
                     .addCriteria(query.getRequestedCriteria())
                     .addSort(query.getRequestedSort());
         }
-
 
         public Builder(Resource<?, ?> resource) {
             this(resource, null);
@@ -368,7 +358,6 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
             }
             return me();
         }
-
 
         public Builder addSort(Collection<ResourceSort> sorts) {
             if (sorts != null) {

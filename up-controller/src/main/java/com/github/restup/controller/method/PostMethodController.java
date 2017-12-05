@@ -6,18 +6,10 @@ import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
-
 import java.io.Serializable;
 
 /**
- * Handle POST operations
- * <ul>
- * <li>Multiple documents</li>
- * <li>A single document</li>
- * </ul>
- *
- * @param <T>
- * @param <ID>
+ * Handle POST operations <ul> <li>Multiple documents</li> <li>A single document</li> </ul>
  */
 public class PostMethodController<T, ID extends Serializable> extends BulkMethodController<T, ID, CreateRequest<T>> {
 

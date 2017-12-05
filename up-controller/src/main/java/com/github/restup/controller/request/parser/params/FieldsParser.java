@@ -6,9 +6,7 @@ import com.github.restup.query.ResourceQueryStatement.Type;
 import com.github.restup.registry.Resource;
 
 /**
- * Parses fields parameters.
- * <p>
- * Ex: For a resource foo with fields named a, b, & c
+ * Parses fields parameters. <p> Ex: For a resource foo with fields named a, b, & c
  * <pre>
  * ?fields=a,b
  * ?filter[foo]=a,b
@@ -32,7 +30,7 @@ public class FieldsParser extends AbstractDelimitedParamParser<Object[]> {
 
     @Override
     protected <T> Object[] getParsedParameter(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, String parameterName,
-                                              String[] parameterValues) {
+            String[] parameterValues) {
         Object value = parameterValues.length == 1 ? parameterValues[0] : parameterValues;
         Object[] parts = parseBracketedString(builder, parameterName, value, parameterName, 1, 2);
         return parts;

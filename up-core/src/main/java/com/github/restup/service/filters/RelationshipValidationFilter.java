@@ -4,20 +4,24 @@ import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
-import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.IterableField;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQuery;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
+import java.io.Serializable;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
-
-import java.io.Serializable;
-import java.util.*;
-import java.util.Map.Entry;
 
 public class RelationshipValidationFilter {
 
@@ -34,7 +38,7 @@ public class RelationshipValidationFilter {
     }
 
     private <T, ID extends Serializable> void validateReferences(ResourceRegistry registry, Errors errors, T data,
-                                                                 List<ResourcePath> requestedPaths) {
+            List<ResourcePath> requestedPaths) {
         Map<Class<?>, Set<Object>> idsByRelationship = getIdsByRelationship(requestedPaths, data);
         removeValidRelationshipsFromMap(registry, idsByRelationship);
         for (Entry<Class<?>, Set<Object>> e : idsByRelationship.entrySet()) {
@@ -92,8 +96,6 @@ public class RelationshipValidationFilter {
 
     /**
      * Get a list of ids by relationship for validation query by id
-     *
-     * @return
      */
     private Map<Class<?>, Set<Object>> getIdsByRelationship(List<ResourcePath> requestedPaths, Object data) {
         Map<Class<?>, Set<Object>> idsByRelationship = new HashMap<Class<?>, Set<Object>>();

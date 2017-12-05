@@ -6,7 +6,7 @@ import com.github.restup.service.model.ResourceData;
 /**
  * {@link PathValue} of objects implementing {@link ResourceData}, such as "data" from requests and responses
  */
-public class DataPathValue extends ConstantPathValue implements ReadableField {
+public class DataPathValue extends ConstantPathValue implements ReadableField<Object> {
 
     public static final String DATA = "data";
 

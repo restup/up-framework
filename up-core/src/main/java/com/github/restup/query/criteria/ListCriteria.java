@@ -16,8 +16,8 @@ public class ListCriteria implements ResourceQueryCriteria {
 
     @Override
     public boolean filter(Object t) {
-        for ( ResourceQueryCriteria c : criteria ) {
-            if ( ! c.filter(t) ) {
+        for (ResourceQueryCriteria c : criteria) {
+            if (!c.filter(t)) {
                 return false;
             }
         }

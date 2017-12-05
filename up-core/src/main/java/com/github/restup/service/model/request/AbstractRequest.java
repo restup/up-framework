@@ -1,13 +1,12 @@
 package com.github.restup.service.model.request;
 
+import static com.github.restup.util.UpUtils.unmodifiableList;
+
 import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
-
 import java.util.ArrayList;
 import java.util.List;
-
-import static com.github.restup.util.UpUtils.unmodifiableList;
 
 public abstract class AbstractRequest implements QueryRequest, ParameterProvider {
 

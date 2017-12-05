@@ -2,14 +2,6 @@ package com.github.restup.jackson.serializer;
 
 import static com.github.restup.jackson.serializer.LinksSerializer.writeLinksObject;
 
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
-import org.apache.commons.collections4.CollectionUtils;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.restup.controller.linking.Link;
@@ -20,12 +12,17 @@ import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Custom serialization for JSON API content.
  */
 public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiResult> {
-
 
     /**
      * add top level linking
@@ -78,7 +75,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
      */
     protected void writeRelationships(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, JsonApiResult result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         //TODO toMany relationshps
-        Collection<ResourceRelationship> relationships = resource.getRelationshipsTo();
+        Collection<ResourceRelationship<?,?,?,?>> relationships = resource.getRelationshipsTo();
         if (hasRelationships(paths) || CollectionUtils.isNotEmpty(relationships)) {
             jgen.writeFieldName(JsonApiResult.RELATIONSHIPS);
             jgen.writeStartObject();
@@ -87,10 +84,10 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             for (Map.Entry<PathValue, ?> e : paths.entrySet()) {
                 PathValue pv = e.getKey();
                 if (MappedFieldPathValue.isRelationshipField(pv)) {
-                    MappedFieldPathValue<?> mappedFieldPathValue = (MappedFieldPathValue) pv;
+                    MappedFieldPathValue<?> mappedFieldPathValue = (MappedFieldPathValue<?>) pv;
                     MappedField<?> mappedField = mappedFieldPathValue.getMappedField();
 
-                    Resource<?,?> rel = resource.getRegistry().getResource(mappedField.getRelationship().getResource());
+                    Resource<?, ?> rel = resource.getRegistry().getResource(mappedField.getRelationship().getResource());
                     Object value = mappedFieldPathValue.readValue(data);
 
                     // add the relationship key and start the relationship object
@@ -109,7 +106,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             //TODO should there be a sparse request to omit to relationships?
             // to relationships
             if (CollectionUtils.isNotEmpty(relationships)) {
-                for (ResourceRelationship relationship : relationships) {
+                for (ResourceRelationship<?,?,?,?> relationship : relationships) {
                     jgen.writeFieldName(ResourceRelationship.getRelationshipNameForToResource(relationship));
                     jgen.writeStartObject();
 
@@ -130,13 +127,13 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
      * "data": { "type": "people", "id": "9" }
      * </pre>
      */
-    protected Object writeResourceIdentifierObject(JsonGenerator jgen, Resource resource, Object value) throws Exception {
+    protected Object writeResourceIdentifierObject(JsonGenerator jgen, Resource<?,?> resource, Object value) throws Exception {
         jgen.writeFieldName(DataPathValue.DATA);
         String type = resource.getName();
         Object id = null;
         if (value instanceof Iterable) {
             jgen.writeStartArray();
-            Iterator it = ((Iterable) value).iterator();
+            Iterator<?> it = ((Iterable<?>) value).iterator();
             while (it.hasNext()) {
                 writeResourceIdentifierFields(jgen, type, it.next());
             }

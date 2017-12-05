@@ -1,11 +1,10 @@
 package com.github.restup.service;
 
-import org.junit.Test;
-
-import java.util.Date;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import java.util.Date;
+import org.junit.Test;
 
 public class IndexedVarArgsMethodExecutorTest {
 
@@ -24,6 +23,7 @@ public class IndexedVarArgsMethodExecutorTest {
     }
 
     public class Foo {
+
         public String bar(String message) {
             return message;
         }

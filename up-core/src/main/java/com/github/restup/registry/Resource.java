@@ -34,64 +34,102 @@ import com.github.restup.util.Assert;
 
 /**
  * Resource meta data, defining resource name, type, service implementation, etc.
- *
- * @param <T>
- * @param <ID>
  */
-public class Resource<T, ID extends Serializable> implements Comparable<Resource> {
+public interface Resource<T, ID extends Serializable> extends Comparable<Resource<T,ID>> {
 
-    private final Class<T> type;
-    private final String name;
-    private final String pluralName;
-    private final String basePath;
+    List<ResourcePath> getAllPaths();
 
-    private final ResourceRegistry registry;
-    private final MappedClass<T> mapping;
-    private final MappedField<ID> identityField;
+    Class<T> getType();
 
-    private final ControllerMethodAccess controllerAccess;
-    private final ServiceMethodAccess serviceAccess;
-    private final Pagination defaultPagination;
-    private final ResourcePathsProvider defaultSparseFields;
-    private final ResourcePathsProvider restrictedFields;
-    private ResourceServiceOperations serviceOperations;
-    private ResourceRepositoryOperations repositoryOperations;
-    private ResourceService<T,ID> service;
+    String getName();
 
-    public Resource(Class<T> type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
-        Assert.notNull(type, "type is required");
-        Assert.notNull(name, "name is required");
-        Assert.notNull(pluralName, "pluralName is required");
-        Assert.notNull(basePath, "basePath is required");
-        Assert.notNull(registry, "registry is required");
-        Assert.notNull(mapping, "mapping is required");
-        Assert.notNull(controllerAccess, "controllerAccess is required");
-        Assert.notNull(serviceAccess, "serviceAccess is required");
-        Assert.notNull(pagination, "pagination is required");
-        Assert.notNull(defaultSparseFields, "defaultSparseFields is required");
-        Assert.notNull(restrictedFields, "restrictedFields is required");
-        this.type = type;
-        this.name = name;
-        this.basePath = basePath;
-        this.pluralName = pluralName;
-        this.registry = registry;
-        this.mapping = mapping;
-        this.identityField = identityField;
-        this.controllerAccess = controllerAccess;
-        this.serviceAccess = serviceAccess;
-        this.defaultPagination = pagination;
-        this.defaultSparseFields = defaultSparseFields;
-        this.restrictedFields = restrictedFields;
-    }
+    String getPluralName();
+
+    MappedClass<T> getMapping();
+
+    MappedField<ID> getIdentityField();
+
+    ResourceService<T, ID> getService();
+
+    ResourceServiceOperations getServiceOperations();
+
+    ResourceRepositoryOperations getRepositoryOperations();
+
+    ControllerMethodAccess getControllerAccess();
+
+    ServiceMethodAccess getServiceAccess();
+
+    ResourceRegistry getRegistry();
+
+    Pagination getDefaultPagination();
 
     /**
-     * Ensures basepath always has leading and trailing / so it is prepared
-     * for url concatenation
-     *
-     * @param basePath
-     * @return
+     * @return the fields returned by default for sparse fields requests.
      */
-    public static String cleanBasePath(String basePath) {
+    List<ResourcePath> getDefaultSparseFields();
+
+    /**
+     * Returns any fields to which the requestor is not permitted to read
+     */
+    List<ResourcePath> getRestrictedFields();
+
+    String getBasePath();
+
+    Collection<ResourceRelationship<?,?,?,?>> getRelationships();
+
+    default List<ResourceRelationship<?,?,?,?>> getRelationshipsTo() {
+        List<ResourceRelationship<?,?,?,?>> result = new ArrayList<>();
+        Collection<ResourceRelationship<?,?,?,?>> relationships = getRelationships();
+        if (relationships != null) {
+            for (ResourceRelationship<?,?,?,?> relationship : relationships) {
+                if (relationship.isTo(this)) {
+                    result.add(relationship);
+                }
+            }
+        }
+        return result;
+    }
+
+    default MappedField<?> findApiField(String field) {
+        return ResourcePath.findApiField(getMapping(), field);
+    }
+
+    default MappedField<?> findPersistedField(String field) {
+        return ResourcePath.findPersistedField(getMapping(), field);
+    }
+
+    default MappedField<?> findBeanField(String field) {
+        return ResourcePath.findBeanField(getMapping(), field);
+    }
+
+    default boolean hasApiField(String field) {
+        return findApiField(field) != null;
+    }
+
+    default boolean hasPersistedField(String field) {
+        return findPersistedField(field) != null;
+    }
+
+    default boolean hasBeanField(String field) {
+        return findBeanField(field) != null;
+    }
+    
+    default List<ResourcePath> getPaths(boolean includeTransient) {
+        return getPaths(this, includeTransient, false);
+    }
+
+    @Override
+    default int compareTo(Resource<T,ID> o) {
+        if (o == null) {
+            return -1;
+        }
+        return getName().compareTo(o.getName());
+    }
+    
+    /**
+     * Ensures basepath always has leading and trailing / so it is prepared for url concatenation
+     */
+    static String cleanBasePath(String basePath) {
         String result = basePath;
         if (result != null) {
             if (!result.startsWith("/")) {
@@ -105,23 +143,24 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
-    public static List<ResourcePath> getAllPaths(Resource<?, ?> resource) {
+    static List<ResourcePath> getAllPaths(Resource<?, ?> resource) {
         return resource == null ? (List) Collections.emptyList() : resource.getAllPaths();
     }
 
-    public static <T, ID extends Serializable> Set<ID> getIds(Resource<T, ID> resource, List<T> list) {
+    static <T, ID extends Serializable> Set<ID> getIds(Resource<T, ID> resource, List<T> list) {
         Set<ID> result;
         int size = CollectionUtils.size(list);
         if (size < 1) {
             result = Collections.emptySet();
         } else {
-            result = (Set) list.stream().map(t -> resource.getIdentityField().readValue(t))
-            		.collect(Collectors.toSet());
+            result = list.stream()
+            			.map(t -> resource.getIdentityField().readValue(t))
+                    .collect(Collectors.toSet());
         }
         return result;
     }
 
-    public static List<ResourcePath> getPaths(Resource<?, ?> resource, boolean includeTransient, boolean apiFieldsOnly) {
+    static List<ResourcePath> getPaths(Resource<?, ?> resource, boolean includeTransient, boolean apiFieldsOnly) {
         //TODO better to cache immutable paths?
         List<ResourcePath> paths = new ArrayList<ResourcePath>();
         for (MappedField<?> mf : resource.getMapping().getAttributes()) {
@@ -140,167 +179,15 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
         return paths;
     }
 
-    public static <T, ID extends Serializable> Builder<T, ID> builder(Class<T> resourceClass) {
+    static <T, ID extends Serializable> Builder<T, ID> builder(Class<T> resourceClass) {
         return new Builder<T, ID>(resourceClass);
     }
 
-    public static <T, ID extends Serializable> Builder<T, ID> builder(Class<T> resourceClass, Class<ID> idClass) {
+    static <T, ID extends Serializable> Builder<T, ID> builder(Class<T> resourceClass, Class<ID> idClass) {
         return new Builder<T, ID>(resourceClass);
     }
 
-    public MappedField<?> findApiField(String field) {
-        return ResourcePath.findApiField(mapping, field);
-    }
-
-    public MappedField<?> findPersistedField(String field) {
-        return ResourcePath.findPersistedField(mapping, field);
-    }
-
-    public MappedField<?> findBeanField(String field) {
-        return ResourcePath.findBeanField(mapping, field);
-    }
-
-    public boolean hasApiField(String field) {
-        return findApiField(field) != null;
-    }
-
-    public boolean hasPersistedField(String field) {
-        return findPersistedField(field) != null;
-    }
-
-    public boolean hasBeanField(String field) {
-        return findBeanField(field) != null;
-    }
-
-    public List<ResourcePath> getAllPaths() {
-        //TODO better to cache immutable paths?
-        List<ResourcePath> paths = new ArrayList<ResourcePath>();
-        appendPaths(paths, mapping, null);
-        return paths;
-    }
-
-    private void appendPaths(List<ResourcePath> target, MappedClass<?> mapping, ResourcePath parent) {
-        //TODO better to cache immutable paths?
-        for (MappedField<?> mf : mapping.getAttributes()) {
-            ResourcePath path = parent == null ? ResourcePath.path(this, mf) : ResourcePath.path(parent, mf);
-            target.add(path);
-            MappedClass<?> subPath = registry.getMappedClass(mf.getType());
-            if (subPath != null) {
-                appendPaths(target, subPath, path);
-            }
-        }
-    }
-
-    public List<ResourcePath> getPaths(boolean includeTransient) {
-        return getPaths(this, includeTransient, false);
-    }
-
-    public Class<T> getType() {
-        return type;
-    }
-
-    public String getName() {
-        return name;
-    }
-
-    public String getPluralName() {
-        return pluralName;
-    }
-
-    public MappedClass<T> getMapping() {
-        return mapping;
-    }
-
-    public MappedField<ID> getIdentityField() {
-        return identityField;
-    }
-
-    public ResourceService<T,ID> getService() {
-        return service;
-    }
-
-    protected final void setService(ResourceService<T,ID> service) {
-        Assert.isNull(this.service, "service is immutable");
-        this.service = service;
-    }
-
-    public ResourceServiceOperations getServiceOperations() {
-        return serviceOperations;
-    }
-
-    protected final void setServiceOperations(ResourceServiceOperations serviceOperations) {
-        Assert.isNull(this.serviceOperations, "serviceOperations is immutable");
-        this.serviceOperations = serviceOperations;
-    }
-
-    public ResourceRepositoryOperations getRepositoryOperations() {
-        return repositoryOperations;
-    }
-
-    protected final void setRepositoryOperations(ResourceRepositoryOperations repositoryOperations) {
-        Assert.isNull(this.repositoryOperations, "repositoryOperations is immutable");
-        this.repositoryOperations = repositoryOperations;
-    }
-
-    public ControllerMethodAccess getControllerAccess() {
-        return controllerAccess;
-    }
-
-    public ServiceMethodAccess getServiceAccess() {
-        return serviceAccess;
-    }
-
-    public ResourceRegistry getRegistry() {
-        return registry;
-    }
-
-    public Pagination getDefaultPagination() {
-        return defaultPagination;
-    }
-
-    /**
-     * @return the fields returned by default for sparse fields requests.
-     */
-    public List<ResourcePath> getDefaultSparseFields() {
-        return defaultSparseFields.getPaths(this);
-    }
-
-    /**
-     * Returns any fields to which the requestor is not permitted to read
-     *
-     * @return
-     */
-    public List<ResourcePath> getRestrictedFields() {
-        return restrictedFields.getPaths(this);
-    }
-
-    public String getBasePath() {
-        return basePath;
-    }
-
-    @Override
-    public String toString() {
-        return name;
-    }
-
-    public Collection<ResourceRelationship> getRelationships() {
-        return registry.getRelationships(name);
-    }
-
-    public List<ResourceRelationship> getRelationshipsTo() {
-        List<ResourceRelationship> result = new ArrayList<ResourceRelationship>();
-        Collection<ResourceRelationship> relationships = getRelationships();
-        if (relationships != null) {
-            for (ResourceRelationship relationship : relationships) {
-                if (relationship.isTo(this)) {
-                    result.add(relationship);
-                }
-            }
-        }
-        return result;
-    }
-
-    public final static class Builder<T, ID extends Serializable> {
+    final class Builder<T, ID extends Serializable> {
 
         private final Class<T> type;
         private ResourceRegistry registry;
@@ -317,7 +204,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
         private Pagination defaultPagination;
         private ResourcePathsProvider sparseFieldsDefaultsProvider;
         private ResourcePathsProvider restrictedFieldsProvider;
-        private MappedClass mappedClass;
+        private MappedClass<T> mappedClass;
         private MappedClassFactory mappedClassFactory;
 
         public Builder(Class<T> resourceClass) {
@@ -400,11 +287,8 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
         }
 
         /**
-         * @param pageLimit
-         * @param pageOffset
-         * @param pagingDisabled     so that no paging information is returned and full result set is returned.
+         * @param pagingDisabled so that no paging information is returned and full result set is returned.
          * @param withTotalsDisabled so that last page cannot be determined
-         * @return
          */
         public Builder<T, ID> defaultPagination(Integer pageLimit, Integer pageOffset, boolean pagingDisabled, boolean withTotalsDisabled) {
             return defaultPagination(new Pagination(pageLimit, pageOffset, pagingDisabled, withTotalsDisabled));
@@ -415,20 +299,17 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
             return me();
         }
 
-        public Builder<T, ID> mappedClass(MappedClass mappedClass) {
+        public Builder<T, ID> mappedClass(MappedClass<T> mappedClass) {
             this.mappedClass = mappedClass;
             return me();
         }
 
-        public Builder<T, ID> mappedClass(MappedClass.Builder builder) {
+        public Builder<T, ID> mappedClass(MappedClass.Builder<T> builder) {
             return mappedClass(builder.build());
         }
 
         /**
          * {@link #defaultPagination(Integer, Integer, boolean, boolean)} with offset of 0, paging and totals enabled.
-         *
-         * @param pageLimit
-         * @return
          */
         public Builder<T, ID> defaultPagination(Integer pageLimit) {
             return defaultPagination(pageLimit, 0, false, false);
@@ -454,7 +335,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
             }
 
             MappedClass<T> mapping = this.mappedClass;
-            if ( mapping == null ) {
+            if (mapping == null) {
                 MappedClassFactory mappedClassFactory = this.mappedClassFactory;
                 if (mappedClassFactory == null) {
                     mappedClassFactory = registrySettings.getMappedClassFactory();
@@ -502,7 +383,7 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
                 restrictedFields = registrySettings.getDefaultRestrictedFieldsProvider();
             }
 
-            Resource<T, ID> resource = new Resource<T, ID>(type, name, pluralName, basePath, registry, mapping, identityField, controllerMethodAccess, serviceMethodAccess, pagination, defaultSparseFields, restrictedFields);
+            BasicResource<T, ID> resource = new BasicResource<T, ID>(type, name, pluralName, basePath, registry, mapping, identityField, controllerMethodAccess, serviceMethodAccess, pagination, defaultSparseFields, restrictedFields);
             Object service = this.service;
             Object repository = this.repository;
             if (service == null) {
@@ -518,14 +399,14 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
             }
 
             ResourceServiceOperations resourceServiceOperations = null;
-            if (service instanceof ResourceServiceOperations){
+            if (service instanceof ResourceServiceOperations) {
                 resourceServiceOperations = (ResourceServiceOperations) service;
             } else {
                 resourceServiceOperations = new AnnotatedService(resource, service);
             }
 
-            ResourceService<T,ID> resourceService = null;
-            if ( service instanceof ResourceService ) {
+            ResourceService<T, ID> resourceService = null;
+            if (service instanceof ResourceService) {
                 resourceService = (ResourceService) service;
             } else {
                 resourceService = new DelegatingResourceService(resourceServiceOperations);
@@ -537,24 +418,16 @@ public class Resource<T, ID extends Serializable> implements Comparable<Resource
             return resource;
         }
 
-        private ResourceRepositoryOperations toResourceRepository(Resource resource, Object repository) {
-            if ( repository == null ) {
+        private ResourceRepositoryOperations toResourceRepository(Resource<?,?> resource, Object repository) {
+            if (repository == null) {
                 return null;
-            } else if ( repository instanceof  ResourceRepositoryOperations ) {
+            } else if (repository instanceof ResourceRepositoryOperations) {
                 return (ResourceRepositoryOperations) repository;
             } else {
                 return new AnnotatedResourceRepository(resource, repository);
             }
         }
 
-    }
-
-    @Override
-    public int compareTo(Resource o) {
-        if ( o == null ) {
-            return -1;
-        }
-        return getName().compareTo(o.getName());
     }
 
 }

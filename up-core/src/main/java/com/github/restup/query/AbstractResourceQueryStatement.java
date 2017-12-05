@@ -1,14 +1,12 @@
 package com.github.restup.query;
 
-import com.github.restup.query.criteria.ResourceQueryCriteria;
-import com.github.restup.registry.Resource;
-
-import java.util.List;
-
 import static com.github.restup.util.UpUtils.unmodifiableList;
 
-abstract class AbstractResourceQueryStatement {
+import com.github.restup.query.criteria.ResourceQueryCriteria;
+import com.github.restup.registry.Resource;
+import java.util.List;
 
+abstract class AbstractResourceQueryStatement {
 
     final Resource<?, ?> resource;
     // query criteria
@@ -19,7 +17,7 @@ abstract class AbstractResourceQueryStatement {
     private final Pagination pagination;
 
     public AbstractResourceQueryStatement(Resource<?, ?> resource, List<ResourceQueryCriteria> requestedCriteria,
-                                          List<ResourceSort> requestedSort, Pagination pagination) {
+            List<ResourceSort> requestedSort, Pagination pagination) {
         super();
         this.resource = resource;
         this.requestedCriteria = unmodifiableList(requestedCriteria);

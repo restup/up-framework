@@ -19,8 +19,6 @@ public class ErrorObjectException extends RuntimeException {
 
     /**
      * Sorts errors by httpStatus, cause
-     *
-     * @param errors
      */
     public ErrorObjectException(List<RequestError> errors) {
         super(isEmpty(errors) ? null : errors.iterator().next().getDetail(), cause(errors));
@@ -30,8 +28,6 @@ public class ErrorObjectException extends RuntimeException {
 
     /**
      * Converts array to {@link List}, calls {@link #ErrorObjectException(List)}
-     *
-     * @param errors
      */
     public ErrorObjectException(RequestError... errors) {
         this(Arrays.asList(errors));
@@ -39,15 +35,12 @@ public class ErrorObjectException extends RuntimeException {
 
     /**
      * builds a new {@link RequestError}, calls {@link #ErrorObjectException(RequestError...)}
-     *
-     * @param t
      */
     public ErrorObjectException(Throwable t) {
         this(ErrorBuilder.error(null, t).build());
     }
 
     /**
-     * @param errors
      * @return the first non null cause from the list of errors, null if none
      */
     private static Throwable cause(List<RequestError> errors) {
@@ -86,6 +79,7 @@ public class ErrorObjectException extends RuntimeException {
      * Sorts errors by http status desc, then naturally ordered by source
      */
     private final class RequestErrorComparator implements Comparator<RequestError> {
+
         public int compare(RequestError a, RequestError b) {
             if (a.getStatus() != b.getStatus()) {
                 return a.getHttpStatus() > b.getHttpStatus() ? -1 : 1;

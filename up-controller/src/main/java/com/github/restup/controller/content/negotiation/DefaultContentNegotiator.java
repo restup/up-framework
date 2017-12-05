@@ -5,8 +5,7 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 
 /**
- * Provides a default content negotiator to handle any request, delegating to
- * another content negotiator
+ * Provides a default content negotiator to handle any request, delegating to another content negotiator
  */
 public class DefaultContentNegotiator implements ContentNegotiator {
 
@@ -17,11 +16,8 @@ public class DefaultContentNegotiator implements ContentNegotiator {
     }
 
     /**
-     * Delegates to the {@link ContentTypeNegotiation} found for the specified media
-     * type
+     * Delegates to the {@link ContentTypeNegotiation} found for the specified media type
      *
-     * @param mediaType
-     * @param negotiators
      * @throws IllegalArgumentException if mediaType is not found in the provided negotiators
      */
     public DefaultContentNegotiator(String mediaType, ContentNegotiator... negotiators) throws IllegalArgumentException {

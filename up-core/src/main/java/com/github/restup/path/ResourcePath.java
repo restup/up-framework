@@ -4,13 +4,15 @@ import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.ErrorSource;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.MappedClass;
-import com.github.restup.mapping.fields.*;
+import com.github.restup.mapping.fields.IterableField;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.fields.ReadableField;
+import com.github.restup.mapping.fields.WritableField;
 import com.github.restup.path.ResourcePath.Builder.Mode;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -372,7 +374,7 @@ public class ResourcePath implements ErrorSource {
 
     private Object readValue(Object instance) {
         if (supportsType(instance)) {
-            ReadableField readable = (ReadableField) value;
+            ReadableField<?> readable = (ReadableField<?>) value;
             return readable.readValue(instance);
         }
         return null;
@@ -393,12 +395,15 @@ public class ResourcePath implements ErrorSource {
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         ResourcePath other = (ResourcePath) obj;
         if (!equalsValue(other)) {
             return false;
@@ -408,16 +413,15 @@ public class ResourcePath implements ErrorSource {
 
     private boolean equalsValue(ResourcePath other) {
         if (value == null) {
-            if (other.value != null)
+            if (other.value != null) {
                 return false;
+            }
         }
         return value.equals(other.value);
     }
 
     /**
-     * @param other
-     * @return true if this path subsequent paths is the same as other path and
-     * subsequent values. Does not consider prior.
+     * @return true if this path subsequent paths is the same as other path and subsequent values. Does not consider prior.
      */
     public boolean equalsPath(ResourcePath other) {
         if (other == null) {
@@ -471,7 +475,6 @@ public class ResourcePath implements ErrorSource {
         return sb.toString();
     }
 
-
     private String getPath(Mode mode) {
         switch (mode) {
             case PERSISTED:
@@ -519,7 +522,6 @@ public class ResourcePath implements ErrorSource {
 //	}
 
     /**
-     * @param other
      * @return true if this path matches or is a sub path of other. ex "foo.bar" is a sub path of "foo"
      */
     public boolean isSubPathOf(ResourcePath other) {
@@ -550,6 +552,7 @@ public class ResourcePath implements ErrorSource {
     }
 
     public final static class Builder {
+
         private final static Function<PathValue, Boolean> NOT_NULL = new Function<PathValue, Boolean>() {
             public Boolean apply(PathValue t) {
                 return t != null;
@@ -716,7 +719,6 @@ public class ResourcePath implements ErrorSource {
             return ResourcePath.findField(mode, currentMappedClass, field);
         }
 
-
         public Builder append(PathValue... pathValues) {
             for (PathValue value : pathValues) {
                 append(value);
@@ -761,9 +763,6 @@ public class ResourcePath implements ErrorSource {
 
         /**
          * If true errors will be ignored
-         *
-         * @param quiet
-         * @return
          */
         public Builder setQuiet(boolean quiet) {
             this.quiet = quiet;

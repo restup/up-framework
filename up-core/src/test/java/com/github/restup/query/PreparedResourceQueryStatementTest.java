@@ -8,15 +8,6 @@ import static com.github.restup.util.ReflectionUtils.getAnnotation;
 import static com.github.restup.util.ResourceAssert.assertBeanPaths;
 import static org.junit.Assert.assertEquals;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import javax.persistence.Transient;
-
-import org.junit.Before;
-import org.junit.Test;
-
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
@@ -34,6 +25,12 @@ import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.util.ReflectionUtils;
 import com.many.fields.A2J;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.Transient;
+import org.junit.Before;
+import org.junit.Test;
 
 public class PreparedResourceQueryStatementTest {
 
@@ -108,7 +105,6 @@ public class PreparedResourceQueryStatementTest {
                 Arrays.asList(Operator.eq, Operator.in),
                 3, Arrays.asList(1, 2));
     }
-
 
     @SuppressWarnings("unused")
     private void assertCriteria(List<ResourceQueryCriteria> result, List<String> paths, Object... values) {

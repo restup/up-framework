@@ -1,10 +1,7 @@
 package com.github.restup.registry.settings;
 
 /**
- * Settings which define which methods are exposed internally by service implementations.
- * Disabling these service will disallow executing them internally as well as via http endpoints.
- * However, if enabled, they may still be disabled by {@link ControllerMethodAccess}.
- * By default all are enabled.
+ * Settings which define which methods are exposed internally by service implementations. Disabling these service will disallow executing them internally as well as via http endpoints. However, if enabled, they may still be disabled by {@link ControllerMethodAccess}. By default all are enabled.
  */
 public class ServiceMethodAccess {
 

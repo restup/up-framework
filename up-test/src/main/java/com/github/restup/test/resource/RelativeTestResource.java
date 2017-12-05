@@ -2,16 +2,16 @@ package com.github.restup.test.resource;
 
 import com.github.restup.test.ApiExecutor;
 import com.github.restup.test.utils.TestResourceUtils;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-
 public class RelativeTestResource implements ResourceContents {
+
     public static final String REQUESTS = "requests";
     public static final String RESPONSES = "responses";
     public static final String RESULTS = "results";
@@ -46,7 +46,6 @@ public class RelativeTestResource implements ResourceContents {
     }
 
     /**
-     *
      * @return first non Up! test element from the stack
      */
     public static StackTraceElement getCallingStackElement() {

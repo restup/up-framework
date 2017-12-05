@@ -1,15 +1,14 @@
 package com.github.restup.path;
 
-import com.model.test.company.Address;
-import com.model.test.company.Person;
-import com.github.restup.registry.ResourceRegistry;
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-public class MappedFieldPathValueTest {
+import com.github.restup.registry.ResourceRegistry;
+import com.model.test.company.Address;
+import com.model.test.company.Person;
+import org.junit.Test;
 
+public class MappedFieldPathValueTest {
 
     @Test
     @SuppressWarnings("unchecked")

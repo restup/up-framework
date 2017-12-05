@@ -1,9 +1,7 @@
 package com.github.restup.controller.linking;
 
 /**
- * Standard link relations
- * https://www.iana.org/assignments/link-relations/link-relations.xhtml
- * http://jsonapi.org/format/#fetching-pagination
+ * Standard link relations https://www.iana.org/assignments/link-relations/link-relations.xhtml http://jsonapi.org/format/#fetching-pagination
  */
 public enum LinkRelations {
     first("first"),

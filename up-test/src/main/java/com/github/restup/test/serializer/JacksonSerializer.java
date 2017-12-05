@@ -29,5 +29,4 @@ public class JacksonSerializer implements SerializationProvider {
         }
     }
 
-
 }

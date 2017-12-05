@@ -5,8 +5,7 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.util.Assert;
 
 /**
- * Iterates over an array of {@link RequestParser}s executing {@link #parse(ResourceControllerRequest, ParsedResourceControllerRequest.Builder)}
- * for each
+ * Iterates over an array of {@link RequestParser}s executing {@link #parse(ResourceControllerRequest, ParsedResourceControllerRequest.Builder)} for each
  *
  * @author abuttaro
  */

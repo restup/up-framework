@@ -8,8 +8,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 /**
- * {@link MethodCommand} which always throws an {@link ErrorObjectException} indicating
- * that the operation is not supported.  Serves as a placeholder for services with missing operations
+ * {@link MethodCommand} which always throws an {@link ErrorObjectException} indicating that the operation is not supported.  Serves as a placeholder for services with missing operations
  *
  * @author abuttaro
  */

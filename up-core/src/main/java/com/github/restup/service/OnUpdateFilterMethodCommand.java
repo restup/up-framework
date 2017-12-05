@@ -15,15 +15,13 @@ import java.io.Serializable;
 import java.lang.reflect.Method;
 
 /**
- * {@link AnnotatedFilterMethodCommand} for {@link Validation} annotated filter methods
- * handling update operations only.
+ * {@link AnnotatedFilterMethodCommand} for {@link Validation} annotated filter methods handling update operations only.
  *
- * When fields absent in the request are required for a validation, persisted state will be
- * merged with request state so that validations may be performed correctly.
+ * When fields absent in the request are required for a validation, persisted state will be merged with request state so that validations may be performed correctly.
  */
 public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
-    private final static Logger log = LoggerFactory.getLogger(OnUpdateFilterMethodCommand.class);
 
+    private final static Logger log = LoggerFactory.getLogger(OnUpdateFilterMethodCommand.class);
 
     private final ResourceRegistry registry;
 
@@ -31,7 +29,6 @@ public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
         super(resource, objectInstance, validation, method, arguments);
         this.registry = resource.getRegistry();
     }
-
 
     /**
      * Only validate path if the path is included in the PersistenceRequest
@@ -44,7 +41,6 @@ public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
         }
         return result;
     }
-
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private <T, ID extends Serializable> void mergePersistedState(FilterChainContext ctx) {
@@ -90,7 +86,6 @@ public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
         return false;
     }
 
-
     private <T, ID extends Serializable> boolean isMergeAtPath(PersistenceRequest<T> request, ResourcePath path) {
         if (!request.hasPath(path)) {
             // request does not have path at all
@@ -103,7 +98,6 @@ public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
 //		! request.hasPath(path) || (validation..isPartialUpdateSupported() && !request.hasField(path) ) 
         return false;
     }
-
 
     @SuppressWarnings({"rawtypes", "unchecked"})
     private Object loadResourceById(FilterChainContext ctx) {
@@ -120,7 +114,6 @@ public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
         }
         return null;
     }
-
 
     private <T> T getData(PersistenceRequest<T> request) {
         return request == null ? null : request.getData();

@@ -1,11 +1,11 @@
 package com.github.restup.bind.converter;
 
 import com.github.restup.errors.ErrorFactory;
+import java.time.LocalDateTime;
 import org.apache.commons.lang3.StringUtils;
 
-import java.time.LocalDateTime;
-
 public class StringToLocalDateTimeConverter extends StringConverter<LocalDateTime> {
+
     private static final String DEFAULT_TIME = "T00:00:00Z";
 
     private final boolean lenient;

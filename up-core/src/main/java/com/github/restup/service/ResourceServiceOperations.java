@@ -1,11 +1,9 @@
 package com.github.restup.service;
 
 /**
- * Resource service operations which wrap annotated service methods
- * with flexible signatures
+ * Resource service operations which wrap annotated service methods with flexible signatures
  */
 public interface ResourceServiceOperations {
-
 
     Object create(Object... args);
 
@@ -26,6 +24,5 @@ public interface ResourceServiceOperations {
     Object list(Object... args);
 
     Object find(Object... args);
-
 
 }

@@ -1,15 +1,14 @@
 package com.github.restup.service.model.request;
 
-import com.model.test.company.Person;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+
 import com.github.restup.bind.param.NoOpParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.ResourceRegistry;
-import org.junit.Test;
-
+import com.model.test.company.Person;
 import java.util.Arrays;
-
-import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import org.junit.Test;
 
 public class BasicPersistenceRequestTest {
 

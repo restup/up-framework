@@ -1,5 +1,10 @@
 package com.github.restup.service.filters;
 
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.deep.Shallow;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
@@ -10,16 +15,12 @@ import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
+import javax.validation.Validation;
+import javax.validation.Validator;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import javax.validation.Validation;
-import javax.validation.Validator;
-
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JavaxValidationFilterTest {
@@ -54,7 +55,6 @@ public class JavaxValidationFilterTest {
         testUpdate(shallow);
         verify(errors, times(0)).addError(any(ErrorBuilder.class));
         verify(validator, times(0)).validateProperty(any(Object.class), any(String.class));
-
 
         testUpdate(validator, shallow, "deeps.0.deepers.1.name", "name", "deeps.0.deeper.deepest.depth", "depth");
         verify(errors, times(0)).addError(any(ErrorBuilder.class));

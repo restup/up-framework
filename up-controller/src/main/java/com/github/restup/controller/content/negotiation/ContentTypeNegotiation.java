@@ -1,10 +1,9 @@
 package com.github.restup.controller.content.negotiation;
 
+import com.github.restup.controller.model.MediaType;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
-import com.github.restup.controller.model.MediaType;
-
 import java.util.Objects;
 
 public abstract class ContentTypeNegotiation implements ContentNegotiator {
@@ -28,7 +27,7 @@ public abstract class ContentTypeNegotiation implements ContentNegotiator {
     }
 
     public final <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response,
-                                           Object result) {
+            Object result) {
         response.setHeader(CONTENT_TYPE, headerValue);
         return format(request, response, result);
     }

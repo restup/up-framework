@@ -1,8 +1,8 @@
 package com.github.restup.registry;
 
-import org.junit.Test;
-
 import static org.junit.Assert.assertEquals;
+
+import org.junit.Test;
 
 public class ResourceTest {
 
@@ -31,6 +31,7 @@ public class ResourceTest {
 
     @SuppressWarnings("unused")
     private final static class Foo {
+
         private String id;
         private String foo;
         private String bar;

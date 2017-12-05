@@ -1,5 +1,7 @@
 package com.github.restup.controller.method;
 
+import static com.github.restup.util.UpUtils.getFirst;
+
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
@@ -9,22 +11,12 @@ import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.response.BasicReadResult;
 import com.github.restup.service.model.response.ReadResult;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.List;
-
-import static com.github.restup.util.UpUtils.getFirst;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
- * Handle GET operations
- * <ul>
- * <li>List documents (matching optional query criteria)</li>
- * <li>A single document</li>
- * </ul>
- *
- * @param <T>
- * @param <ID>
+ * Handle GET operations <ul> <li>List documents (matching optional query criteria)</li> <li>A single document</li> </ul>
  */
 public class GetMethodController<T, ID extends Serializable> extends MethodController<T, ID> {
 

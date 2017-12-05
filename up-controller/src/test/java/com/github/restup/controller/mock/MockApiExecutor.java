@@ -1,5 +1,7 @@
 package com.github.restup.controller.mock;
 
+import static com.github.restup.controller.mock.MockResourceControllerRequest.getUrl;
+
 import com.github.restup.controller.ResourceController;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
@@ -11,11 +13,8 @@ import com.github.restup.test.resource.Contents;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import static com.github.restup.controller.mock.MockResourceControllerRequest.getUrl;
-
 /**
- * Mock {@link ApiExecutor} for testing {@link ResourceController} directly outside
- * of a container or other framework support
+ * Mock {@link ApiExecutor} for testing {@link ResourceController} directly outside of a container or other framework support
  */
 public class MockApiExecutor implements ApiExecutor {
 
@@ -32,7 +31,6 @@ public class MockApiExecutor implements ApiExecutor {
     }
 
     public ApiResponse<String[]> execute(RpcApiTest settings) {
-        ApiResponse.Builder response = ApiResponse.builder();
 
         MockResourceControllerRequest.Builder mockRequest = MockResourceControllerRequest.builder();
         ApiRequest request = settings.getRequest();
@@ -42,20 +40,19 @@ public class MockApiExecutor implements ApiExecutor {
         mockRequest.headers(request.getHeaders());
         mockRequest.setRegistry(registry);
 
-        ResourceData body = contentNegotiation.getBody(request.getBody());
+        ResourceData<?> body = contentNegotiation.getBody(request.getBody());
         mockRequest.setBody(body);
 
         MockResourceControllerResponse mockResponse = new MockResourceControllerResponse();
         Object result = controller.request(mockRequest, mockResponse);
 
-
         Contents resultContents = serialize(mockResponse, result);
 
-        if ( log.isDebugEnabled() ) {
+        if (log.isDebugEnabled()) {
             log.debug("\n\nRequest:\n{} {}"
                             + "\n\nResponse:\n{}\n\n"
                     , request.getMethod(), getUrl(request.getUrl()),
-                resultContents.getContentAsString());
+                    resultContents.getContentAsString());
         }
 
         return new ApiResponse<String[]>(mockResponse.getStatus(), mockResponse.getHeaders(), resultContents);

@@ -1,17 +1,19 @@
 package com.github.restup.path;
 
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
+import static org.junit.Assert.assertTrue;
+
+import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.service.model.request.BasicUpdateRequest;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
 import com.music.Label;
-import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.service.model.request.BasicUpdateRequest;
-import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
-
 import java.util.Arrays;
 import java.util.HashSet;
-
-import static org.junit.Assert.*;
+import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 
 public class ResourcePathTest {
 

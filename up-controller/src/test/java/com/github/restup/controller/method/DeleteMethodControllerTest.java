@@ -1,16 +1,16 @@
 package com.github.restup.controller.method;
 
-import com.github.restup.bind.param.ParameterProvider;
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.registry.Resource;
-import com.github.restup.service.model.request.DefaultRequestObjectFactory;
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
+
+import com.github.restup.bind.param.ParameterProvider;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.registry.Resource;
+import com.github.restup.service.model.request.DefaultRequestObjectFactory;
+import org.junit.Test;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class DeleteMethodControllerTest {

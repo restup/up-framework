@@ -1,13 +1,12 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.RpcApiTest.HttpMethod;
+
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
 
-import static com.github.restup.test.RpcApiTest.HttpMethod;
-
 /**
- * Provides a {@link Builder} for RESTful apis with test methods
- * for collection and item resource aligned with http verbs.
+ * Provides a {@link Builder} for RESTful apis with test methods for collection and item resource aligned with http verbs.
  */
 public class RestApiTest {
 
@@ -54,7 +53,6 @@ public class RestApiTest {
             return me();
         }
 
-
         public Builder jsonapi() {
             return mediaType(RpcApiTest.MediaType.APPLICATION_JSON_API);
         }
@@ -87,11 +85,7 @@ public class RestApiTest {
         }
 
         /**
-         * If true, the test name will be detected and applied automatically based upon the
-         * calling method's name
-         *
-         * @param testNameAsMethodName
-         * @return
+         * If true, the test name will be detected and applied automatically based upon the calling method's name
          */
         public Builder testNameAsMethodName(boolean testNameAsMethodName) {
             this.testNameAsMethodName = testNameAsMethodName;
@@ -178,7 +172,6 @@ public class RestApiTest {
         }
 
         private RpcApiTest.Builder build() {
-
 
             String testPath = path;
             if (testPath.contains("}")) {

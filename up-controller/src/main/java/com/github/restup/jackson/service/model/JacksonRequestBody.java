@@ -6,8 +6,7 @@ import com.github.restup.path.DataPathValue;
 import com.github.restup.service.model.ResourceData;
 
 /**
- * {@link ResourceData} implementation that deserializes a "data" field to a
- * JsonNode to be handled by {@link com.github.restup.jackson.parser.JacksonRequestBodyParser}
+ * {@link ResourceData} implementation that deserializes a "data" field to a JsonNode to be handled by {@link com.github.restup.jackson.parser.JacksonRequestBodyParser}
  */
 public class JacksonRequestBody implements ResourceData<JsonNode> {
 

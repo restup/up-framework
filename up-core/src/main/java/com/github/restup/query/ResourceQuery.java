@@ -10,16 +10,14 @@ import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.service.MethodCommandOperations;
 import com.github.restup.service.ResourceService;
 import com.github.restup.service.model.request.ListRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.response.ReadResult;
 import com.github.restup.util.Assert;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.Arrays;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Provides a ResourceQuery Builder for building and executing resource queries programmatically.
@@ -35,10 +33,10 @@ public class ResourceQuery {
     /**
      * Convenience method for finding a resource by id
      *
-     * @param registry      containing meta data about the resource
+     * @param registry containing meta data about the resource
      * @param resourceClass resource to find
-     * @param id            the id of the resource to find
-     * @param <T>           type of class to be found
+     * @param id the id of the resource to find
+     * @param <T> type of class to be found
      * @return resource found
      */
     public static <T> T find(ResourceRegistry registry, Class<T> resourceClass, Object id) {
@@ -52,10 +50,9 @@ public class ResourceQuery {
     /**
      * Create a new query builder
      *
-     * @param registry      containing meta data about the resource
+     * @param registry containing meta data about the resource
      * @param resourceClass resource to find
-     * @param <T>           type of class to be found
-     * @return
+     * @param <T> type of class to be found
      */
     public static <T> Builder<T> query(ResourceRegistry registry, Class<T> resourceClass) {
         return new Builder<T>(registry, resourceClass);

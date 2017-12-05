@@ -1,5 +1,9 @@
 package com.github.restup.jackson.parser;
 
+import static com.github.restup.controller.model.result.JsonApiResult.ATTRIBUTES;
+import static com.github.restup.controller.model.result.JsonApiResult.ID;
+import static com.github.restup.controller.model.result.JsonApiResult.TYPE;
+
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -10,13 +14,10 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
-
 import java.util.Iterator;
-import static  com.github.restup.controller.model.result.JsonApiResult.*;
 
 /**
- * Jackson implementation for parsing request body per JSON API spec, taking into account id, type, attributes
- * structure and validating any spec violations.
+ * Jackson implementation for parsing request body per JSON API spec, taking into account id, type, attributes structure and validating any spec violations.
  */
 public class JacksonJsonApiRequestBodyParser extends JacksonRequestBodyParser {
 
@@ -76,7 +77,7 @@ public class JacksonJsonApiRequestBodyParser extends JacksonRequestBodyParser {
             Resource<?, ?> resource = details.getResource();
             ObjectNode attributes = (ObjectNode) node.get(ATTRIBUTES);
             attributes.set(ID, node.get(ID));
-            if ( resource.hasApiField(TYPE)) {
+            if (resource.hasApiField(TYPE)) {
                 attributes.set(TYPE, node.get(TYPE));
             }
             return mapper.treeToValue(attributes, resource.getType());

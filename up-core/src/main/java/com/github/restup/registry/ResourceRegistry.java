@@ -4,16 +4,10 @@ import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
-
 import java.util.Collection;
 
 /**
- * A registry of application {@link Resource}s, containing a {@link Resource}, containing
- * meta data, field mappings, repository, and service details for each registered
- * each resource
- * <p>
- * A singleton instance exists for convenience, but it is possible to construct
- * multiple {@link ResourceRegistry}s instances if needed.
+ * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data, field mappings, repository, and service details for each registered each resource <p> A singleton instance exists for convenience, but it is possible to construct multiple {@link ResourceRegistry}s instances if needed.
  *
  * @author andy.buttaro
  */
@@ -24,7 +18,6 @@ public final class ResourceRegistry implements MappedClassFactory {
     private final RegistrySettings settings;
     private final ResourceRegistryRepository resourceRegistryMap;
     private final MappedClassFactory mappedClassFactory;
-
 
     public ResourceRegistry() {
         this(RegistrySettings.builder().build());
@@ -58,7 +51,6 @@ public final class ResourceRegistry implements MappedClassFactory {
         return instance;
     }
 
-
     @SuppressWarnings("rawtypes")
     public void registerResource(Resource.Builder b) {
         registerResource(b.registry(this).build());
@@ -86,7 +78,7 @@ public final class ResourceRegistry implements MappedClassFactory {
         return resourceRegistryMap.getResource(resourceClass);
     }
 
-    public Collection<Resource<?,?>> getResources() {
+    public Collection<Resource<?, ?>> getResources() {
         return resourceRegistryMap.getResources();
     }
 
@@ -126,7 +118,7 @@ public final class ResourceRegistry implements MappedClassFactory {
         return getRelationship(from.getName(), to.getName());
     }
 
-    public Collection<ResourceRelationship> getRelationships(String resourceName) {
+    public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
         return resourceRegistryMap.getRelationships(resourceName);
     }
 }

@@ -4,8 +4,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.util.Assert;
 
 /**
- * Iterates over an array of {@link RequestInterceptor}s for {@link #before(ParsedResourceControllerRequest)}
- * and {@link #after(ParsedResourceControllerRequest)}
+ * Iterates over an array of {@link RequestInterceptor}s for {@link #before(ParsedResourceControllerRequest)} and {@link #after(ParsedResourceControllerRequest)}
  *
  * @author abuttaro
  */

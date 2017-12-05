@@ -5,26 +5,20 @@ import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Base implementation supporting bulk operations updating multiple documents
- *
- * @param <T>
- * @param <ID>
- * @param <R>
  */
 abstract class BulkMethodController<T, ID extends Serializable, R> extends MethodController<T, ID> {
 
     public BulkMethodController(RequestObjectFactory factory) {
         super(factory);
     }
-
 
     abstract R getRequest(Resource<T, ID> resource, T data, ID id, ParsedResourceControllerRequest<T> request);
 

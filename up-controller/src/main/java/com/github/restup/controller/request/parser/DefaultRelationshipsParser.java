@@ -4,7 +4,6 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.query.ResourceQuery;
 import com.github.restup.registry.ResourceRelationship;
-
 import java.util.Collection;
 
 /**

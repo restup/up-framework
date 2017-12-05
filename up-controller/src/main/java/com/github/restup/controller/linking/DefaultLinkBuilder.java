@@ -1,29 +1,29 @@
 package com.github.restup.controller.linking;
 
-import com.github.restup.controller.model.HttpMethod;
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.controller.model.HttpMethod;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.request.parser.params.PageLimitParser;
 import com.github.restup.controller.request.parser.params.PageOffsetParser;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
-import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link LinkBuilder}
  */
 public class DefaultLinkBuilder implements LinkBuilder {
+
     private final static Logger log = LoggerFactory.getLogger(DefaultLinkBuilder.class);
     private final ServiceDiscovery serviceDiscovery;
 
@@ -32,7 +32,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
     }
 
     @Override
-    public Link getCollectionEndpoint(ParsedResourceControllerRequest<?> request, Resource resource) {
+    public Link getCollectionEndpoint(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource) {
         String baseUrl = serviceDiscovery.locateResourceUrl(request, resource);
         return new BasicLink(resource.getPluralName(), baseUrl);
     }
@@ -68,11 +68,11 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return links;
     }
 
-    public List<Link> getTopLevelLinks(ParsedResourceControllerRequest request, Object result) {
+    public List<Link> getTopLevelLinks(ParsedResourceControllerRequest<?> request, Object result) {
         List<Link> links = new ArrayList<Link>();
         String baseUrl = buildResourceRequestBaseUrl(request);
         if (result instanceof PagedResult) {
-            PagedResult paged = (PagedResult) result;
+            PagedResult<?> paged = (PagedResult<?>) result;
             Integer offset = paged.getOffset();
             Integer limit = paged.getLimit();
             if (offset != null && limit != null) {
@@ -106,14 +106,14 @@ public class DefaultLinkBuilder implements LinkBuilder {
 
     private boolean isList(Object result) {
         if (result instanceof ResourceData) {
-            if (((ResourceData) result).getData() instanceof Iterable) {
+            if (((ResourceData<?>) result).getData() instanceof Iterable) {
                 return true;
             }
         }
         return false;
     }
 
-    private void paging(String baseUrl, ParsedResourceControllerRequest request, List<Link> links, LinkRelations rel, int offset, int limit) {
+    private void paging(String baseUrl, ParsedResourceControllerRequest<?> request, List<Link> links, LinkRelations rel, int offset, int limit) {
         StringBuilder sb = new StringBuilder();
         sb.append(baseUrl);
         char delimiter = baseUrl.contains("?") ? '&' : '?';
@@ -125,7 +125,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
     /**
      * @return A url representing the request including all accepted parameters, less paging params
      */
-    public String buildResourceRequestBaseUrl(ParsedResourceControllerRequest request) {
+    public String buildResourceRequestBaseUrl(ParsedResourceControllerRequest<?> request) {
         StringBuilder sb = new StringBuilder();
         sb.append(request.getRequestUrl());
         char delimiter = '?';
@@ -145,7 +145,6 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return sb.toString();
     }
 
-
     private void param(StringBuilder sb, String param, Integer value) {
         param(sb, '&', param, value);
     }
@@ -154,10 +153,6 @@ public class DefaultLinkBuilder implements LinkBuilder {
         if (value != null) {
             param(sb, delimiter, param, String.valueOf(value));
         }
-    }
-
-    private void param(StringBuilder sb, String param, String value) {
-        param(sb, '&', param, value);
     }
 
     private void param(StringBuilder sb, char delimiter, String param, String value) {
@@ -172,12 +167,12 @@ public class DefaultLinkBuilder implements LinkBuilder {
         }
     }
 
-    private boolean includeParam(ParsedResourceControllerRequest request, String param) {
+    private boolean includeParam(ParsedResourceControllerRequest<?> request, String param) {
         return !Objects.equals(param, getPageLimitParameterName(request))
                 && !Objects.equals(param, getPageOffsetParameterName(request));
     }
 
-    public String getPageLimitParameterName(ParsedResourceControllerRequest request) {
+    public String getPageLimitParameterName(ParsedResourceControllerRequest<?> request) {
         String result = request.getPageLimitParameterName();
         if (result == null) {
             //TODO default to a configured name
@@ -186,7 +181,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return result;
     }
 
-    public String getPageOffsetParameterName(ParsedResourceControllerRequest request) {
+    public String getPageOffsetParameterName(ParsedResourceControllerRequest<?> request) {
         String result = request.getPageOffsetParameterName();
         if (result == null) {
             //TODO default to a configured name
@@ -195,11 +190,11 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return result;
     }
 
-    private Link link(ParsedResourceControllerRequest request, LinkRelations rel, Resource<?, ?> resource, Object... path) {
+    private Link link(ParsedResourceControllerRequest<?> request, LinkRelations rel, Resource<?, ?> resource, Object... path) {
         return new BasicLink(rel, getUrl(request, resource, path));
     }
 
-    private String getUrl(ParsedResourceControllerRequest request, Resource<?, ?> resource, Object... path) {
+    private String getUrl(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource, Object... path) {
         String baseUrl = serviceDiscovery.locateResourceUrl(request, resource);
         StringBuilder sb = new StringBuilder();
         sb.append(baseUrl);

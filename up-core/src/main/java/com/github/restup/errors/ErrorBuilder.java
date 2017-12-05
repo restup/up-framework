@@ -4,10 +4,13 @@ import com.github.restup.path.DataPathValue;
 import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
-import org.apache.commons.lang3.StringUtils;
-
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * {@link RequestError} Builder
@@ -325,7 +328,6 @@ public class ErrorBuilder {
             return defaultDetail;
         }
     }
-
 
     public enum ErrorCode {
         BODY_REQUIRED("Body is required", "Body may not be empty"),

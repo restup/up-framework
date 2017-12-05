@@ -9,7 +9,6 @@ public class ApiErrorsTest extends AbstractMockTest {
         super("/universities", 1);
     }
 
-
     @Test
     public void error400BodyInvalid() {
         api.add("{\"data\":{\"foo\":1,\"bar\":1,\"name\":1}}").error400();

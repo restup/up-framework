@@ -1,12 +1,11 @@
 package com.github.restup.test;
 
-import org.junit.Test;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
-public class ApiRequestTest {
+import org.junit.Test;
 
+public class ApiRequestTest {
 
     private ApiRequest test(String path, Object... args) {
         ApiRequest.Builder b = new ApiRequest.Builder(path, args);

@@ -4,9 +4,7 @@ import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
- * A method executor that assumes that args will be of consistent type
- * and order as is frequently the case. Rather than iterate through methods,
- * The arguments will be assigned by index
+ * A method executor that assumes that args will be of consistent type and order as is frequently the case. Rather than iterate through methods, The arguments will be assigned by index
  *
  * @author andy.buttaro
  */
@@ -21,16 +19,13 @@ public abstract class AbstractIndexedVarArgsMethodCommand extends VarArgsMethodC
     }
 
     /**
-     * @param method
      * @param varArgs passed as arguments to {@link #execute(Object...)}
      * @return the mapped indexes of passed args to executed args
      */
     abstract protected Integer[] getIndexes(Method method, Object[] varArgs);
 
     /**
-     * Maps values from args based upon the indexes retruned by {@link #getIndexes(Method, Object[])}.
-     * So, arguments may be [ String.class, Long.class ] and the method may accept Long as
-     * an argument, thus index[0] is expected to be 1 and [Long] will be returned.
+     * Maps values from args based upon the indexes retruned by {@link #getIndexes(Method, Object[])}. So, arguments may be [ String.class, Long.class ] and the method may accept Long as an argument, thus index[0] is expected to be 1 and [Long] will be returned.
      */
     @Override
     protected Object[] mapArgs(Method method, Object[] args) {
@@ -54,7 +49,7 @@ public abstract class AbstractIndexedVarArgsMethodCommand extends VarArgsMethodC
 
     /**
      * @param args passed as arguments to {@link #execute(Object...)}
-     * @param idx  obtained by method argument index for the args index
+     * @param idx obtained by method argument index for the args index
      * @return args[idx]
      */
     protected Object getArg(Object[] args, Integer idx) {
@@ -78,6 +73,5 @@ public abstract class AbstractIndexedVarArgsMethodCommand extends VarArgsMethodC
         }
         return indexes;
     }
-
 
 }

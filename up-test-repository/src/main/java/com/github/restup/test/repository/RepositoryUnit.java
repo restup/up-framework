@@ -14,7 +14,6 @@ import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.test.resource.RelativeTestResource;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
-
 import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
@@ -37,8 +36,8 @@ public class RepositoryUnit {
 
     public static void load(ResourceRegistry registry, String fileName) {
         loader().registry(registry)
-            .fileName(fileName)
-            .load();
+                .fileName(fileName)
+                .load();
     }
 
     public static Loader loader() {
@@ -82,16 +81,16 @@ public class RepositoryUnit {
         }
 
         public void load() {
-            if ( mapper == null ) {
+            if (mapper == null) {
                 mapper = getMapper();
             }
-            if ( fileName == null ) {
+            if (fileName == null) {
                 fileName = RelativeTestResource.getCallingStackElement().getMethodName();
             }
-            if ( registry == null ) {
+            if (registry == null) {
                 registry = ResourceRegistry.getInstance();
             }
-            if ( relativeTo == null ) {
+            if (relativeTo == null) {
                 relativeTo = RelativeTestResource.getClassFromStack();
             }
             RelativeTestResource contents = RelativeTestResource.dump(relativeTo, fileName);
@@ -108,17 +107,16 @@ public class RepositoryUnit {
         }
 
         private void load(JsonNode node) {
-            if ( node instanceof  ObjectNode ) {
-                ObjectNode o = (ObjectNode) node;
-                Iterator<Entry<String,JsonNode>> iterator = node.fields();
-                while ( iterator.hasNext() ) {
-                    Entry<String,JsonNode> e = iterator.next();
-                    Resource<?,?> resource = registry.getResourceByPluralName(e.getKey());
-                    Assert.notNull(resource, e.getKey()+" is not a valid resource");
-                    if ( e.getValue() instanceof ArrayNode ) {
+            if (node instanceof ObjectNode) {
+                Iterator<Entry<String, JsonNode>> iterator = node.fields();
+                while (iterator.hasNext()) {
+                    Entry<String, JsonNode> e = iterator.next();
+                    Resource<?, ?> resource = registry.getResourceByPluralName(e.getKey());
+                    Assert.notNull(resource, e.getKey() + " is not a valid resource");
+                    if (e.getValue() instanceof ArrayNode) {
                         loadAll(resource, (ArrayNode) e.getValue());
                     } else {
-                        error(e.getKey()+" must be an array");
+                        error(e.getKey() + " must be an array");
                     }
                 }
             } else {
@@ -132,7 +130,7 @@ public class RepositoryUnit {
 
         private void loadAll(Resource<?, ?> resource, ArrayNode value) {
             Iterator<JsonNode> iterator = value.elements();
-            while ( iterator.hasNext() ) {
+            while (iterator.hasNext()) {
                 load(resource, iterator.next());
             }
         }
@@ -141,23 +139,24 @@ public class RepositoryUnit {
             T t = readValue(resource, node);
             ResourceRepositoryOperations repository = resource.getRepositoryOperations();
             RequestObjectFactory factory = resource.getRegistry().getSettings().getRequestObjectFactory();
-            CreateRequest<T> request = factory.getCreateRequest(resource, t, Collections.EMPTY_LIST, Collections.EMPTY_LIST, null);
+            CreateRequest<T> request = factory.getCreateRequest(resource, t, Collections.emptyList(), Collections.emptyList(), null);
             repository.create(request);
         }
 
-        private <T> T readValue(Resource<T, ?> resource, JsonNode node) {
+        @SuppressWarnings({ "unchecked", "rawtypes" })
+		private <T> T readValue(Resource<T, ?> resource, JsonNode node) {
             T result = ReflectionUtils.newInstance(resource.getMapping().getType());
-            Iterator<Entry<String,JsonNode>> iterator = node.fields();
-            while ( iterator.hasNext() ) {
-                Entry<String,JsonNode> e = iterator.next();
+            Iterator<Entry<String, JsonNode>> iterator = node.fields();
+            while (iterator.hasNext()) {
+                Entry<String, JsonNode> e = iterator.next();
                 String persistentName = e.getKey();
-                MappedField f = resource.findPersistedField(persistentName);
-                if ( f != null ) {
+                MappedField<Object> f = (MappedField) resource.findPersistedField(persistentName);
+                if (f != null) {
                     Object value = null;
-                    if ( e.getValue().isArray() || e.getValue().isObject() ) {
+                    if (e.getValue().isArray() || e.getValue().isObject()) {
                         //TODO complex types
                     } else {
-                        ParameterConverter converter = registry.getSettings().getParameterConverterFactory().getConverter(String.class, f.getType());
+                        ParameterConverter<String,Object> converter = (ParameterConverter) registry.getSettings().getParameterConverterFactory().getConverter(String.class, f.getType());
                         value = converter.convert(null, e.getValue().textValue(), null);
                     }
                     f.writeValue(result, value);

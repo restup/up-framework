@@ -1,12 +1,5 @@
 package com.github.restup.jackson.serializer;
 
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -24,6 +17,11 @@ import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.response.PagedResult;
 import com.github.restup.service.model.response.ResourceResult;
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> extends JsonSerializer<T> {
 
@@ -32,7 +30,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     @Override
     public void serialize(T result, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
-        if ( accept(result) ) {
+        if (accept(result)) {
             try {
                 jgen.writeStartObject();
                 writeLinking(result, jgen, provider);
@@ -119,7 +117,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
      * Write an array from an iterable object
      */
     protected void writeIterable(Resource<?, ?> resource, Map<PathValue, ?> paths, Iterable<?> data, T result,
-                                 JsonGenerator jgen, SerializerProvider provider) throws Exception {
+            JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartArray();
         boolean indexed = writeIndexed(resource, paths, data, result, jgen, provider);
         if (!indexed) {
@@ -135,7 +133,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
      * Write an array from an array object
      */
     protected void writeArray(Resource<?, ?> resource, Map<PathValue, ?> paths, Object[] data, T result,
-                              JsonGenerator jgen, SerializerProvider provider) throws Exception {
+            JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartArray();
         boolean indexed = writeIndexed(resource, paths, data, result, jgen, provider);
         if (!indexed) {
@@ -150,14 +148,14 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
      * Write all indexes of path (assumes data is an array or iterable if so)
      */
     protected boolean writeIndexed(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, T result,
-                                   JsonGenerator jgen, SerializerProvider provider) throws Exception {
+            JsonGenerator jgen, SerializerProvider provider) throws Exception {
         boolean indexed = false;
         for (Map.Entry<PathValue, ?> e : paths.entrySet()) {
             PathValue pv = e.getKey();
             if (pv instanceof IndexPathValue && e.getValue() instanceof Map) {
                 IndexPathValue i = (IndexPathValue) pv;
                 Object value = i.readValue(data);
-                writeObject(getResource(pv), (Map) e.getValue(), value, result, jgen, provider);
+                writeObject(getResource(pv), asMap(e.getValue()), value, result, jgen, provider);
                 indexed = true;
             }
         }
@@ -173,8 +171,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     }
 
     /**
-     * writes the "id" fieldName, calls {@link #writeIdentifier(JsonGenerator, String, Object)}
-     * to write value
+     * writes the "id" fieldName, calls {@link #writeIdentifier(JsonGenerator, String, Object)} to write value
      */
     protected Object writeIdentifier(Resource<?, ?> resource, Object data, T result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         // TODO check if id was explicitly requested to be removed
@@ -195,11 +192,11 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     /**
      * writes object attributes
      */
-    protected void writeAttributes(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, T result, JsonGenerator jgen, SerializerProvider provider, boolean writeRelationships) throws Exception {
+	protected void writeAttributes(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, T result, JsonGenerator jgen, SerializerProvider provider, boolean writeRelationships) throws Exception {
         for (Map.Entry<PathValue, ?> e : paths.entrySet()) {
             PathValue pv = e.getKey();
             if (pv instanceof ReadableField && (writeRelationships || !MappedFieldPathValue.isRelationshipField(pv))) {
-                ReadableField readable = (ReadableField) pv;
+                ReadableField<?> readable = (ReadableField<?>) pv;
                 String fieldName = pv.getApiPath();
                 Object value = readable.readValue(data);
 
@@ -217,13 +214,18 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
                     }
                 } else if (e.getValue() instanceof Map) { // always should be
                     Resource<?, ?> pathResource = getResource(pv);
-                    writeObjectField(fieldName, pathResource, (Map) e.getValue(), value, result, jgen, provider);
+                    writeObjectField(fieldName, pathResource, asMap(e.getValue()), value, result, jgen, provider);
                 }
             }
         }
     }
 
-    protected Resource<?, ?> getResource(PathValue pv) {
+    @SuppressWarnings({ "unchecked", "rawtypes" })
+	private Map<PathValue, ?> asMap(Object value) {
+		return (Map) value;
+	}
+
+	protected Resource<?, ?> getResource(PathValue pv) {
         if (pv instanceof EmbeddedResourcePathValue) {
             return ((EmbeddedResourcePathValue) pv).getResource();
         }
@@ -245,7 +247,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     }
 
     private JsonSerializer<Object> findCustomSerializer(PathValue pv, Object data, JsonGenerator jgen,
-                                                        SerializerProvider provider) {
+            SerializerProvider provider) {
         // TODO ensure custom serializers are used
         return null;
     }

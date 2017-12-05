@@ -9,13 +9,9 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.ResourceData;
 
 /**
- * Abstract implementation for handling request body, providing commons support for detecting
- * error conditions.
- *
- * @param <T>
+ * Abstract implementation for handling request body, providing commons support for detecting error conditions.
  */
 public abstract class AbstractRequestBodyParser<T> implements RequestParser {
-
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder builder) {
@@ -47,56 +43,32 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
     }
 
     /**
-     * @param t
      * @return true if t is an array
      */
     abstract protected boolean isArray(T t);
 
     /**
-     * @param t
      * @return true if t is an object
      */
     abstract protected boolean isObject(T t);
 
     /**
      * Deserialize an array of documents.  should iterate and call {@link #deserializeObject(ResourceControllerRequest, ParsedResourceControllerRequest.Builder, Object)}
-     *
-     * @param request
-     * @param builder
-     * @param body
-     * @return
      */
     abstract protected Object deserializeArray(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, T body);
 
     /**
      * Deserialize the document to the correct type for the resource requested
-     *
-     * @param request
-     * @param builder
-     * @param body
-     * @return
      */
     abstract protected Object deserializeObject(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, T body);
 
     /**
      * Iterate over the array and {@link #graphObject(ResourceControllerRequest, ParsedResourceControllerRequest.Builder, Resource, ResourcePath, Object)}
-     *
-     * @param builder
-     * @param resource
-     * @param parent
-     * @param node
      */
     abstract protected void graphArray(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, Resource<?, ?> resource, ResourcePath parent, T node);
 
     /**
-     * Implementation should iterate over object fields, building a path for each.
-     * At each path the {@link #graph(ResourceControllerRequest, ParsedResourceControllerRequest.Builder, Resource, ResourcePath, Object)}
-     * should be called with the resulting {@link ResourcePath} and value of the field.
-     *
-     * @param builder
-     * @param resource
-     * @param parent
-     * @param node
+     * Implementation should iterate over object fields, building a path for each. At each path the {@link #graph(ResourceControllerRequest, ParsedResourceControllerRequest.Builder, Resource, ResourcePath, Object)} should be called with the resulting {@link ResourcePath} and value of the field.
      */
     abstract protected void graphObject(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, Resource<?, ?> resource, ResourcePath parent, T node);
 

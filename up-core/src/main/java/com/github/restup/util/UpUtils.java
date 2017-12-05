@@ -1,9 +1,12 @@
 package com.github.restup.util;
 
 import com.github.restup.path.ResourcePath;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
-
-import java.util.*;
 
 public class UpUtils {
 
@@ -12,8 +15,6 @@ public class UpUtils {
     }
 
     /**
-     * @param list
-     * @param <T>
      * @return unmodifiable list, never null
      */
     @SuppressWarnings("unchecked")

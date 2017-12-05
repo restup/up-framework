@@ -5,7 +5,6 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 public enum HttpMethod {
     GET, POST, PATCH, PUT, DELETE, OPTIONS; //, HEAD, TRACE, CONNECT;
 
-
     public static HttpMethod of(String method) {
         if (method != null) {
             for (HttpMethod m : values()) {
@@ -18,7 +17,6 @@ public enum HttpMethod {
     }
 
     /**
-     * @param method
      * @return true if method is supported for multiple ids
      */
     public boolean supportsAccessByIds(ControllerMethodAccess access) {
@@ -35,7 +33,6 @@ public enum HttpMethod {
     }
 
     /**
-     * @param method
      * @return true if method is supported for single ids
      */
     public boolean supportsItemOperation(ControllerMethodAccess access) {

@@ -2,7 +2,6 @@ package com.github.restup.controller;
 
 import com.github.restup.test.RestApiTest;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class CourseServiceTest extends AbstractMockTest {
@@ -47,7 +46,6 @@ public class CourseServiceTest extends AbstractMockTest {
     public void createCourse() {
         api.add().ok();
     }
-
 
     @Test
     public void patchCourse() {

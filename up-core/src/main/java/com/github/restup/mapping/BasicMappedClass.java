@@ -10,7 +10,6 @@ import com.github.restup.mapping.fields.MappedField;
 /**
  * Provides an api to object to persistence mapping.
  *
- * @param <T>
  * @author andy.buttaro
  */
 public class BasicMappedClass<T> implements MappedClass<T> {
@@ -31,8 +30,6 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     /**
      * The name of the object
-     *
-     * @return
      */
     public String getName() {
         return name;
@@ -40,8 +37,6 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     /**
      * The pluralized name of the object
-     *
-     * @return
      */
     public String getPluralName() {
         return pluralName;
@@ -49,8 +44,6 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     /**
      * The type of the object
-     *
-     * @return
      */
     public Class<T> getType() {
         return type;
@@ -58,8 +51,6 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     /**
      * The type of the object's parent
-     *
-     * @return
      */
     public Class<?> getParentType() {
         return parentType;
@@ -67,8 +58,6 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     /**
      * The attributes of the object
-     *
-     * @return
      */
 
     public List<MappedField<?>> getAttributes() {
@@ -82,15 +71,19 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     @Override
     public int hashCode() {
-    		return Objects.hash(name);
+        return Objects.hash(name);
     }
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
         BasicMappedClass<?> that = (BasicMappedClass<?>) o;
         return name == that.name &&
-        		type == that.type;
+                type == that.type;
     }
 }

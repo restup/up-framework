@@ -1,11 +1,10 @@
 package com.github.restup;
 
+import static org.hamcrest.Matchers.is;
+
 import com.github.restup.test.resource.RelativeTestResource;
 import org.hamcrest.MatcherAssert;
 import org.junit.Test;
-
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 public class RelativeTestResourceTest {
 

@@ -1,22 +1,27 @@
 package com.university;
 
+import static com.university.University.PLURAL_NAME;
+import static com.university.University.RESOURCE_NAME;
+import static com.university.University.TABLE_NAME;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
 import com.github.restup.annotations.field.CaseInsensitive;
+import javax.persistence.Column;
+import javax.persistence.Entity;
+import javax.persistence.GeneratedValue;
+import javax.persistence.GenerationType;
+import javax.persistence.Id;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
-
-import javax.persistence.*;
-import javax.validation.constraints.NotNull;
-
-import static com.university.University.*;
 
 @Entity(name = TABLE_NAME)
 @ApiName(value = RESOURCE_NAME)
 @Plural(PLURAL_NAME)
 public class University {
+
     public static final String RESOURCE_NAME = "university";
     public static final String PLURAL_NAME = "universities";
     public static final String TABLE_NAME = RESOURCE_NAME;

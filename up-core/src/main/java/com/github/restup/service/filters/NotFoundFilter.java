@@ -5,7 +5,6 @@ import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.response.ReadResult;
-
 import java.io.Serializable;
 
 /**
@@ -15,10 +14,6 @@ public class NotFoundFilter {
 
     /**
      * Requires ResourceRepository to return a {@link ReadResult}
-     *
-     * @param resource
-     * @param request
-     * @param result
      */
     @PostReadFilter
     public <T, ID extends Serializable> void assertResourceNotFound(Resource<T, ID> resource, ReadRequest<T, ID> request, ReadResult<T> result) {

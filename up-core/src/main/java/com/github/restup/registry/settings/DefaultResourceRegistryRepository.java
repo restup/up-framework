@@ -4,14 +4,14 @@ import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.registry.ResourceRelationship;
-
-import java.util.*;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.IdentityHashMap;
+import java.util.Map;
 
 /**
- * A simple {@link ResourceRegistryRepository} using {@link IdentityHashMap}. This does not use
- * thread safe collections. However, the expectation is that maps are
- * initialized at startup and then are read only. Under these circumstances,
- * this will be thread safe
+ * A simple {@link ResourceRegistryRepository} using {@link IdentityHashMap}. This does not use thread safe collections. However, the expectation is that maps are initialized at startup and then are read only. Under these circumstances, this will be thread safe
  *
  * @author andy.buttaro
  */
@@ -28,7 +28,7 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
     }
 
     public void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
-                                ResourceRelationship<?, ?, ?, ?> relationship) {
+            ResourceRelationship<?, ?, ?, ?> relationship) {
         Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.get(from.getName());
         if (map == null) {
             map = new HashMap<String, ResourceRelationship<?, ?, ?, ?>>();
@@ -38,9 +38,9 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
     }
 
     @Override
-    public Collection<ResourceRelationship> getRelationships(String resourceName) {
+    public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
         Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.get(resourceName);
-        return map == null ? (Collection) Collections.emptySet() : (Collection) map.values();
+        return map == null ? Collections.emptySet() : map.values();
     }
 
     public ResourceRelationship<?, ?, ?, ?> getRelationship(String from, String to) {
@@ -58,7 +58,7 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
         return (MappedClass) mappings.get(resourceClass);
     }
 
-    public Collection<Resource<?,?>> getResources() {
+    public Collection<Resource<?, ?>> getResources() {
         return resources.values();
     }
 

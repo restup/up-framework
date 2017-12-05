@@ -4,11 +4,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 
 /**
- * Parses an integer limit for number of records returned by pagination.
- * <p>
- * <p>
- * Ex:
- * <p>
+ * Parses an integer limit for number of records returned by pagination. <p> <p> Ex: <p>
  * <pre>
  * ?limit=100
  * </pre>

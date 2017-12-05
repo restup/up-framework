@@ -5,7 +5,6 @@ import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 
 public class TestRegistry {
 
-
     public static ResourceRegistry registry(String... packagesToScan) {
         return new ResourceRegistry(RegistrySettings.builder()
                 .repositoryFactory(new MapBackedRepositoryFactory())

@@ -12,12 +12,10 @@ import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.service.FilterChainContext;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
-
 import java.util.Collection;
 
 /**
- * Default {@link MethodArgumentFactory} used to instantiate filter method arguments
- * and bind (http) request parameters to the instantiated objects.
+ * Default {@link MethodArgumentFactory} used to instantiate filter method arguments and bind (http) request parameters to the instantiated objects.
  */
 public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
 
@@ -47,7 +45,7 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
                         Object value = collectValues(field, parameterProvider, errors);
                         // and apply the value to the instance if needed
                         if (value != null) {
-                        		writeValue(field, instance, value);
+                            writeValue(field, instance, value);
                         }
                     }
                 }
@@ -56,12 +54,12 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
         return instance;
     }
 
-    @SuppressWarnings({ "rawtypes", "unchecked" })
-	private <T> void writeValue(MappedField field, Object instance, Object value) {
+    @SuppressWarnings({"rawtypes", "unchecked"})
+    private <T> void writeValue(MappedField field, Object instance, Object value) {
         field.writeValue(instance, value);
-	}
+    }
 
-	private <T> Object collectValues(MappedField<T> field, ParameterProvider parameterProvider, Errors errors) {
+    private <T> Object collectValues(MappedField<T> field, ParameterProvider parameterProvider, Errors errors) {
         Object result = null;
         String firstParameterNameForErrorDetail = null;
         Collection<Object> collection = null;
@@ -118,6 +116,5 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
         }
         return null;
     }
-
 
 }

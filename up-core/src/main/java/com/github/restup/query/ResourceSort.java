@@ -47,8 +47,6 @@ public class ResourceSort {
 
     /**
      * true if ascending, false if descending, null if unspecified
-     *
-     * @return
      */
     public Boolean getAscending() {
         return ascending;

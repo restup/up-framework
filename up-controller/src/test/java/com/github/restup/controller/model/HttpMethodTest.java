@@ -1,13 +1,12 @@
 package com.github.restup.controller.model;
 
-import com.github.restup.registry.settings.ControllerMethodAccess;
-import org.junit.Test;
-
-import java.util.Arrays;
-import java.util.List;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
+
+import com.github.restup.registry.settings.ControllerMethodAccess;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Test;
 
 public class HttpMethodTest {
 

@@ -11,16 +11,11 @@ import java.lang.annotation.Annotation;
 import java.util.List;
 
 /**
- * A {@link ResourceService} which wraps {@link ResourceServiceOperations} providing
- * typed method signatures for calling annotate methods with lenient signatures.
+ * A {@link ResourceService} which wraps {@link ResourceServiceOperations} providing typed method signatures for calling annotate methods with lenient signatures.
  *
- * Each wrapped method ensures the appropriate return type that is not necessarily
- * returned by the underlying annotated method.
- *
- * @param <T>
- * @param <ID>
+ * Each wrapped method ensures the appropriate return type that is not necessarily returned by the underlying annotated method.
  */
-public class DelegatingResourceService<T, ID extends Serializable> implements ResourceService<T,ID> {
+public class DelegatingResourceService<T, ID extends Serializable> implements ResourceService<T, ID> {
 
     private final ResourceServiceOperations delegate;
 
@@ -28,8 +23,9 @@ public class DelegatingResourceService<T, ID extends Serializable> implements Re
         this.delegate = delegate;
     }
 
-    public <T> T result(Class<? extends Annotation> annotation, Object result) {
-        return (T) ResourceResultConverterFactory.getInstance()
+    @SuppressWarnings("unchecked")
+	protected <R> R result(Class<? extends Annotation> annotation, Object result) {
+        return (R) ResourceResultConverterFactory.getInstance()
                 .getConverter(annotation)
                 .convert(result);
     }

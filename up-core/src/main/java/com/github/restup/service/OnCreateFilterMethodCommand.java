@@ -10,11 +10,10 @@ import org.slf4j.LoggerFactory;
 import java.lang.reflect.Method;
 
 /**
- * {@link AnnotatedFilterMethodCommand} for {@link Validation} annotated methods
- * handling create operations only.
- *
+ * {@link AnnotatedFilterMethodCommand} for {@link Validation} annotated methods handling create operations only.
  */
 public class OnCreateFilterMethodCommand extends AnnotatedFilterMethodCommand {
+
     private final static Logger log = LoggerFactory.getLogger(OnCreateFilterMethodCommand.class);
 
     private final Validation validation;

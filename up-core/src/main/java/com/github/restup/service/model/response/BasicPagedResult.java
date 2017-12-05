@@ -1,7 +1,6 @@
 package com.github.restup.service.model.response;
 
 import com.github.restup.query.Pagination;
-
 import java.util.List;
 
 public class BasicPagedResult<T> extends BasicListResult<T> implements PagedResult<T> {

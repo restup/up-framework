@@ -3,7 +3,6 @@ package com.petstore;
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
 import com.github.restup.annotations.field.CaseInsensitive;
-
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
@@ -12,6 +11,7 @@ import javax.persistence.Id;
 @Plural("categories")
 @Entity
 public class Category {
+
     @Id
     @GeneratedValue
     private Long id;

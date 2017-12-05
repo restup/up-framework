@@ -4,15 +4,13 @@ import static com.github.restup.util.ReflectionUtils.getBeanInfo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
 
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.junit.MockitoJUnitRunner;
-
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedField.Builder;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
-
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings("rawtypes")
@@ -39,13 +37,14 @@ public class JacksonMappedFieldBuilderVisitorTest {
         return builder;
     }
 
-
     private final class Foo {
+
         @SuppressWarnings("unused")
         private String name;
     }
 
     private final class Bar {
+
         @JsonProperty("nombre")
         private String name;
     }

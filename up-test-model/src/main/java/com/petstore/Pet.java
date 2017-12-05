@@ -1,12 +1,11 @@
 package com.petstore;
 
 import com.github.restup.annotations.ApiName;
-
+import java.util.List;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
 import javax.persistence.Id;
 import javax.persistence.Transient;
-import java.util.List;
 
 @ApiName("pet")
 @Entity

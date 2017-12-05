@@ -22,8 +22,6 @@ public abstract class ErrorFactory {
 
     /**
      * Register an instance to be used by default by {@link ErrorBuilder}
-     *
-     * @param factory
      */
     public synchronized static void registerErrorFactory(ErrorFactory factory) {
         instance = factory;
@@ -39,8 +37,6 @@ public abstract class ErrorFactory {
     public abstract Errors createErrors();
 
     /**
-     * @param parameterName
-     * @param parameterValue
      * @return A new {@link ParameterError} instance
      */
     public abstract ParameterError createParameterError(String parameterName, Object parameterValue);

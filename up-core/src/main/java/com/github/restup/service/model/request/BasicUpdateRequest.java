@@ -4,7 +4,6 @@ import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
-
 import java.io.Serializable;
 import java.util.List;
 

@@ -1,13 +1,12 @@
 package com.github.restup.jackson.parser;
 
-import com.github.restup.path.ResourcePath;
-
-import java.util.Collection;
-import java.util.List;
-
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.hasSize;
 import static org.junit.Assert.assertEquals;
+
+import com.github.restup.path.ResourcePath;
+import java.util.Collection;
+import java.util.List;
 
 public class ResourceAssert {
 

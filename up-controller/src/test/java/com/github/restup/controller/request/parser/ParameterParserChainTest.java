@@ -1,20 +1,20 @@
 package com.github.restup.controller.request.parser;
 
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.params.PageLimitParser;
 import com.github.restup.controller.request.parser.params.PageNumberParser;
 import com.github.restup.controller.request.parser.params.PageOffsetParser;
 import com.github.restup.controller.request.parser.params.SortParamParser;
+import java.util.Arrays;
 import org.junit.Test;
 import org.mockito.Mockito;
 
-import java.util.Arrays;
-
-import static org.mockito.Mockito.*;
-
 public class ParameterParserChainTest {
-
 
     @SuppressWarnings({"rawtypes"})
     @Test

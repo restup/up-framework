@@ -1,16 +1,30 @@
 package com.github.restup.util;
 
 import com.github.restup.annotations.operations.AutoWrapDisabled;
-import com.googlecode.gentyref.GenericTypeReflector;
 import com.github.restup.errors.ErrorBuilder;
+import com.googlecode.gentyref.GenericTypeReflector;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.AccessibleObject;
+import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Modifier;
+import java.lang.reflect.Parameter;
+import java.lang.reflect.ParameterizedType;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.lang.annotation.Annotation;
-import java.lang.reflect.*;
-import java.util.*;
 
 public class ReflectionUtils {
 
@@ -30,19 +44,17 @@ public class ReflectionUtils {
         }
         return true;
     }
-    
+
     public static <T extends AccessibleObject> T makeAccessible(T target) {
-		if (target != null && !target.isAccessible()) {
-			target.setAccessible(true);
-		}
-		return target;
+        if (target != null && !target.isAccessible()) {
+            target.setAccessible(true);
+        }
+        return target;
     }
 
     /**
-     * Create a new instance, catching exceptions and rethrowing using
-     * {@link ErrorBuilder#throwError(Throwable)}
+     * Create a new instance, catching exceptions and rethrowing using {@link ErrorBuilder#throwError(Throwable)}
      *
-     * @param c
      * @return a new instance of c
      */
     public final static <T> T newInstance(Class<T> c) {
@@ -82,8 +94,9 @@ public class ReflectionUtils {
         Method setter = pd.getSetter();
         if (setter != null) {
             Type[] types = GenericTypeReflector.getExactParameterTypes(setter, clazz);
-            if (types != null && types.length == 1)
+            if (types != null && types.length == 1) {
                 return GenericTypeReflector.erase(types[0]);
+            }
         }
         Field f = pd.getField();
         if (f != null) {
@@ -101,8 +114,9 @@ public class ReflectionUtils {
         Method setter = pd.getSetter();
         if (setter != null) {
             Parameter[] params = setter.getParameters();
-            if (params != null && params.length == 1)
+            if (params != null && params.length == 1) {
                 return getActualType(setter.getParameters()[0].getParameterizedType());
+            }
         }
         Field f = pd.getField();
         if (f != null) {
@@ -119,8 +133,7 @@ public class ReflectionUtils {
     }
 
     /**
-     * @return true if the annotation exists on any of the
-     * {@link AnnotatedElement}s
+     * @return true if the annotation exists on any of the {@link AnnotatedElement}s
      */
     public static <T extends Annotation> boolean hasAnnotation(Class<T> annClass, PropertyDescriptor p) {
         return getAnnotation(annClass, p) != null;
@@ -160,10 +173,6 @@ public class ReflectionUtils {
 
     /**
      * get an {@link Annotation} from the {@link AnnotatedElement}
-     *
-     * @param f
-     * @param annotationClass
-     * @return
      */
     public static <T extends Annotation> T getAnnotation(AnnotatedElement f, Class<T> annotationClass) {
         if (f != null) {
@@ -209,20 +218,19 @@ public class ReflectionUtils {
     public static boolean isAutoWrapDisabled(Method repositoryMethod) {
         AutoWrapDisabled autoWrapDisabled = getAnnotation(repositoryMethod, AutoWrapDisabled.class);
         boolean disableAutoWrap = false;
-        if ( autoWrapDisabled != null ) {
+        if (autoWrapDisabled != null) {
             disableAutoWrap = autoWrapDisabled.value();
         }
         return disableAutoWrap;
     }
 
     /**
-     * Because Jackson is more lenient than java bean convention, we can't
-     * reliably use {@link java.beans.PropertyDescriptor}. We have to examine
-     * the fields and methods directly.
+     * Because Jackson is more lenient than java bean convention, we can't reliably use {@link java.beans.PropertyDescriptor}. We have to examine the fields and methods directly.
      *
      * @author andybuttaro
      */
     public final static class BeanInfo<T> {
+
         private final Class<T> type;
         private Map<String, PropertyDescriptor> map = new HashMap<String, ReflectionUtils.PropertyDescriptor>();
 
@@ -390,6 +398,7 @@ public class ReflectionUtils {
     }
 
     public final static class PropertyDescriptor {
+
         private String name;
         private Field field;
         private Method getter;
@@ -460,18 +469,23 @@ public class ReflectionUtils {
 
         @Override
         public boolean equals(Object obj) {
-            if (this == obj)
+            if (this == obj) {
                 return true;
-            if (obj == null)
+            }
+            if (obj == null) {
                 return false;
-            if (getClass() != obj.getClass())
+            }
+            if (getClass() != obj.getClass()) {
                 return false;
+            }
             PropertyDescriptor other = (PropertyDescriptor) obj;
             if (name == null) {
-                if (other.name != null)
+                if (other.name != null) {
                     return false;
-            } else if (!name.equals(other.name))
+                }
+            } else if (!name.equals(other.name)) {
                 return false;
+            }
             return true;
         }
 

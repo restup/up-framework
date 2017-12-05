@@ -1,7 +1,6 @@
 package com.github.restup.bind.converter;
 
 import com.github.restup.errors.ErrorFactory;
-
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;

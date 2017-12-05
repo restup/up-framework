@@ -39,5 +39,4 @@ public class BaseObject {
         this.depth = depth;
     }
 
-
 }

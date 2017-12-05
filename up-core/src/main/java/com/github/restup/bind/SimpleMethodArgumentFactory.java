@@ -5,9 +5,7 @@ import com.github.restup.service.FilterChainContext;
 import com.github.restup.util.ReflectionUtils;
 
 /**
- * Creates a new instance of method arguments using reflection.
- * <p>
- * Does not bind request parameters to instantiated objects.
+ * Creates a new instance of method arguments using reflection. <p> Does not bind request parameters to instantiated objects.
  */
 public class SimpleMethodArgumentFactory implements MethodArgumentFactory {
 

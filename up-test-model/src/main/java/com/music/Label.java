@@ -1,7 +1,6 @@
 package com.music;
 
 import com.github.restup.annotations.ApiName;
-
 import java.util.List;
 
 @ApiName("label")

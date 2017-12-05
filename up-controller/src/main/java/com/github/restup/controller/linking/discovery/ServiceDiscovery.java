@@ -11,7 +11,7 @@ public interface ServiceDiscovery {
     /**
      * Locate the url of the requested resource.
      *
-     * @param request  details of the current request
+     * @param request details of the current request
      * @param resource to discover service location
      * @return The fully qualified url of the resource
      */

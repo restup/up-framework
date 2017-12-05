@@ -1,7 +1,6 @@
 package com.github.restup.http.model;
 
 import com.github.restup.controller.model.ResourceControllerResponse;
-
 import javax.servlet.http.HttpServletResponse;
 
 public class HttpServletResourceControllerResponse implements ResourceControllerResponse {

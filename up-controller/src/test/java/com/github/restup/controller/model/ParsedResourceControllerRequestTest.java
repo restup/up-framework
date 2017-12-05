@@ -1,7 +1,12 @@
 package com.github.restup.controller.model;
 
-import com.model.test.company.Company;
-import com.model.test.company.Person;
+import static com.github.restup.controller.model.ParsedResourceControllerRequest.builder;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.fail;
+import static org.mockito.Mockito.when;
+
 import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.RequestError;
@@ -9,18 +14,15 @@ import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.TestRegistry;
+import com.model.test.company.Company;
+import com.model.test.company.Person;
+import java.util.Collection;
 import org.apache.commons.collections4.CollectionUtils;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import java.util.Collection;
-
-import static com.github.restup.controller.model.ParsedResourceControllerRequest.builder;
-import static org.junit.Assert.*;
-import static org.mockito.Mockito.when;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"rawtypes", "unchecked"})

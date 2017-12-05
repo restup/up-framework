@@ -5,23 +5,23 @@ package com.github.restup.service;
  */
 public interface MethodCommandOperationFactory {
 
-    MethodCommand getCreateOperation();
+    MethodCommand<?> getCreateOperation();
 
-    MethodCommand getUpdateOperation();
+    MethodCommand<?> getUpdateOperation();
 
-    MethodCommand getDeleteOperation();
+    MethodCommand<?> getDeleteOperation();
 
-    MethodCommand getBulkUpdateOperation();
+    MethodCommand<?> getBulkUpdateOperation();
 
-    MethodCommand getBulkCreateOperation();
+    MethodCommand<?> getBulkCreateOperation();
 
-    MethodCommand getBulkDeleteOperation();
+    MethodCommand<?> getBulkDeleteOperation();
 
-    MethodCommand getDeleteByQueryOperation();
+    MethodCommand<?> getDeleteByQueryOperation();
 
-    MethodCommand getUpdateByQueryOperation();
+    MethodCommand<?> getUpdateByQueryOperation();
 
-    MethodCommand getListOperation();
+    MethodCommand<?> getListOperation();
 
-    MethodCommand getFindOperation();
+    MethodCommand<?> getFindOperation();
 }

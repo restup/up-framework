@@ -14,8 +14,6 @@ public interface Errors {
 
     /**
      * Add an error to the list of errors.
-     *
-     * @param error
      */
     void addError(ErrorBuilder error);
 

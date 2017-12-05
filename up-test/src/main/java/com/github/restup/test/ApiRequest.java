@@ -1,20 +1,18 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.RpcApiTest.HttpMethod;
+
 import com.github.restup.test.resource.ByteArrayContents;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
 import com.github.restup.test.resource.StringContents;
-import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
-
-import static com.github.restup.test.RpcApiTest.HttpMethod;
+import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 
 public class ApiRequest {
-
 
     private final HttpMethod method;
     private final Map<String, String[]> headers;
@@ -110,7 +108,6 @@ public class ApiRequest {
             return headers;
         }
 
-
         protected abstract String getTestDir();
 
         protected boolean isDefaultTestResourceAllowed() {
@@ -142,7 +139,6 @@ public class ApiRequest {
         private boolean https;
         private Object[] pathArgs;
         private Map<String, String[]> params = new LinkedHashMap<String, String[]>();
-
 
         public Builder(String path, Object... args) {
             this.path = path;
@@ -261,7 +257,6 @@ public class ApiRequest {
                     }
                 }
             }
-
 
             return new ApiRequest(method, getHeaders(), url.toString(), getBody(), https);
         }

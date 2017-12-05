@@ -2,7 +2,6 @@ package com.github.restup.controller.mock;
 
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.util.UpUtils;
-
 import java.util.HashMap;
 import java.util.Map;
 

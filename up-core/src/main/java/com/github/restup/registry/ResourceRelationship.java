@@ -3,6 +3,10 @@ package com.github.restup.registry;
 import static com.github.restup.annotations.field.RelationshipType.manyToOne;
 import static com.github.restup.annotations.field.RelationshipType.oneToMany;
 
+import com.github.restup.annotations.field.RelationshipType;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.util.Assert;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,13 +15,7 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 
-import com.github.restup.annotations.field.RelationshipType;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.util.Assert;
-
 public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID extends Serializable> {
-
 
 //	private class Example {
 //		// field on Foo is id (default value of "joinField")
@@ -36,7 +34,6 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
 //		private Example example;
 //	}
 
-
     private final Resource<FROM, FROM_ID> from;
     private final Resource<TO, TO_ID> to;
     private final RelationshipType fromType;
@@ -44,7 +41,6 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
 
     private final List<ResourcePath> fromPaths;
     private final List<ResourcePath> toPaths;
-
 
     public ResourceRelationship(Resource<FROM, FROM_ID> from, Resource<TO, TO_ID> to
             , List<ResourcePath> fromPaths) {
@@ -70,9 +66,9 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
         this.toType = converse(type, fromPaths);
     }
 
-    public static String getRelationshipNameForToResource(ResourceRelationship relationship) {
-        Resource to = relationship.getTo();
-        Resource from = relationship.getFrom();
+    public static String getRelationshipNameForToResource(ResourceRelationship<?,?,?,?> relationship) {
+        Resource<?,?> to = relationship.getTo();
+        Resource<?,?> from = relationship.getFrom();
         if (relationship.isToOneRelationship(to)) {
             return from.getName();
         }
@@ -80,7 +76,6 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
     }
 
     /**
-     * @param resource
      * @return A list of *all* relationships defined from this resource, including nested objects
      */
     public static List<ResourcePath> getAllRelationshipPaths(Resource<?, ?> resource) {

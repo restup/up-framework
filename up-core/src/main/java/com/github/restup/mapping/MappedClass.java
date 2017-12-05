@@ -14,47 +14,9 @@ import com.github.restup.util.Assert;
 /**
  * Provides an api to object to persistence mapping.
  *
- * @param <T>
  * @author andy.buttaro
  */
 public interface MappedClass<T> {
-
-
-    /**
-     * The name of the object
-     *
-     * @return
-     */
-    String getName();
-
-    /**
-     * The pluralized name of the object
-     *
-     * @return
-     */
-    String getPluralName();
-
-    /**
-     * The type of the object
-     *
-     * @return
-     */
-    Class<T> getType();
-
-    /**
-     * The type of the object's parent
-     *
-     * @return
-     */
-    Class<?> getParentType();
-
-    /**
-     * The attributes of the object
-     *
-     * @return
-     */
-
-    List<MappedField<?>> getAttributes();
 
     static Builder<?> builder() {
         return new Builder<>();
@@ -63,6 +25,32 @@ public interface MappedClass<T> {
     static <T> Builder<T> builder(Class<T> type) {
         return new Builder<T>().type(type);
     }
+
+    /**
+     * The name of the object
+     */
+    String getName();
+
+    /**
+     * The pluralized name of the object
+     */
+    String getPluralName();
+
+    /**
+     * The type of the object
+     */
+    Class<T> getType();
+
+    /**
+     * The type of the object's parent
+     */
+    Class<?> getParentType();
+
+    /**
+     * The attributes of the object
+     */
+
+    List<MappedField<?>> getAttributes();
 
     final static class Builder<T> {
 
@@ -106,12 +94,12 @@ public interface MappedClass<T> {
         }
 
         public Builder<T> addAttribute(Class<?> type, String name) {
-            return addAttribute(attribute(type,name));
+            return addAttribute(attribute(type, name));
         }
 
         public Builder<T> addIdAttribute(Class<?> type, String name) {
-            return addAttribute(attribute(type,name)
-                        .idField(true));
+            return addAttribute(attribute(type, name)
+                    .idField(true));
         }
 
         private MappedField.Builder<?> attribute(Class<?> type, String name) {
@@ -136,18 +124,18 @@ public interface MappedClass<T> {
             return me();
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-		public MappedClass<T> build() {
-            Assert.notEmpty(name,"name is required");
+        @SuppressWarnings({"unchecked", "rawtypes"})
+        public MappedClass<T> build() {
+            Assert.notEmpty(name, "name is required");
             String pluralName = this.pluralName;
-            if (StringUtils.isEmpty(pluralName) ) {
-                pluralName = name+"s";
+            if (StringUtils.isEmpty(pluralName)) {
+                pluralName = name + "s";
             }
             Class<T> type = this.type;
-            if ( type == null ) {
-                type = (Class)HashMap.class;
+            if (type == null) {
+                type = (Class) HashMap.class;
             }
-            if ( fieldComparator != null ) {
+            if (fieldComparator != null) {
                 Collections.sort(attributes, fieldComparator);
             }
             return new BasicMappedClass<T>(name, pluralName, type, parentType, attributes);

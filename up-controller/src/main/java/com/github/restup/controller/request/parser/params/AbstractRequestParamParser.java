@@ -9,11 +9,8 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * provides base implementation and support for parameter parsing
- *
- * @param <P>
  */
 public abstract class AbstractRequestParamParser<P> implements RequestParamParser {
-
 
     private final String parameterName;
     private final boolean ignoreNull;
@@ -32,15 +29,11 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
     }
 
     /**
-     * parses a parameter with brackets to a String array, validating
-     * the number of resulting parts.
-     * <p> ex filter[foo][gt] -> ['filter', 'foo', 'gt' ]
+     * parses a parameter with brackets to a String array, validating the number of resulting parts. <p> ex filter[foo][gt] -> ['filter', 'foo', 'gt' ]
      *
-     * @param builder
      * @param rawParameterName to be parsed
-     * @param rawValue
-     * @param minPartSize      minimum allowed paths
-     * @param maxPartSize      maximum allowed paths
+     * @param minPartSize minimum allowed paths
+     * @param maxPartSize maximum allowed paths
      * @return null if any errors occur and are added to builder, path parts otherwise
      */
     public static <T> String[] parseBracketedString(ParsedResourceControllerRequest.Builder<T> builder, String rawParameterName, Object rawValue, String targetString, int minPartSize, int maxPartSize) {
@@ -70,10 +63,6 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
     }
 
     /**
-     * @param details
-     * @param builder
-     * @param parameterName
-     * @param parameterValues
      * @return null if any errors with parameter. Any other value will be passed to #app
      */
     @SuppressWarnings("unchecked")
@@ -83,13 +72,6 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
 
     /**
      * Apply the param/value to builder
-     *
-     * @param details
-     * @param builder
-     * @param parsedParameterName
-     * @param value
-     * @param rawParamName
-     * @param rawValue
      */
     abstract <T> void apply(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, P parsedParameterName, String value, String rawParamName, String rawValue);
 

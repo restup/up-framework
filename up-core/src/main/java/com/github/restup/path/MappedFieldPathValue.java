@@ -1,13 +1,12 @@
 package com.github.restup.path;
 
-import java.util.Objects;
-
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.ReadableField;
 import com.github.restup.mapping.fields.WritableField;
 import com.github.restup.util.Assert;
+import java.util.Objects;
 
-public class MappedFieldPathValue<T> implements PathValue, ReadableField, WritableField<Object, T> {
+public class MappedFieldPathValue<T> implements PathValue, ReadableField<T>, WritableField<Object, T> {
 
     private final MappedField<T> mappedField;
 
@@ -17,14 +16,12 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField, Writab
         this.mappedField = mappedField;
     }
 
-
     public static boolean isRelationshipField(PathValue pv) {
         if (pv instanceof MappedFieldPathValue) {
             return isRelationshipField((MappedFieldPathValue<?>) pv);
         }
         return false;
     }
-
 
     public static boolean isRelationshipField(MappedFieldPathValue<?> pv) {
         if (pv != null) {
@@ -60,7 +57,7 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField, Writab
         return mappedField.toString();
     }
 
-    public Object readValue(Object instance) {
+    public T readValue(Object instance) {
         return mappedField.readValue(instance);
     }
 
@@ -71,10 +68,10 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField, Writab
     public Object createDeclaringInstance() {
         return mappedField.createDeclaringInstance();
     }
-    
+
     @Override
     public T createInstance() {
-    		return mappedField.createInstance();
+        return mappedField.createInstance();
     }
 
     public boolean supportsType(Class<?> clazz) {
@@ -89,18 +86,23 @@ public class MappedFieldPathValue<T> implements PathValue, ReadableField, Writab
     @SuppressWarnings("rawtypes")
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         MappedFieldPathValue other = (MappedFieldPathValue) obj;
         if (mappedField == null) {
-            if (other.mappedField != null)
+            if (other.mappedField != null) {
                 return false;
-        } else if (!mappedField.equals(other.mappedField))
+            }
+        } else if (!mappedField.equals(other.mappedField)) {
             return false;
+        }
         return true;
     }
 

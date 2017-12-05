@@ -1,7 +1,6 @@
 package com.github.restup.path;
 
 import com.github.restup.registry.Resource;
-
 import java.util.Collections;
 import java.util.List;
 

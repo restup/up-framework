@@ -15,8 +15,7 @@ import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 public class JacksonMappedFieldBuilderVisitor implements MappedFieldBuilderVisitor {
 
     /**
-     * Checks for {@link JsonProperty} and applies the api property name to builder
-     * if the annotation exists
+     * Checks for {@link JsonProperty} and applies the api property name to builder if the annotation exists
      */
     public <T> void visit(Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
         JsonIgnore ignore = getAnnotation(JsonIgnore.class, pd);

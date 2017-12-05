@@ -3,10 +3,9 @@ package com.github.restup.bind.converter;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.errors.Errors;
-import org.apache.commons.lang3.StringUtils;
-
 import java.util.HashSet;
 import java.util.Set;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringToBooleanConverter extends StringConverter<Boolean> {
 

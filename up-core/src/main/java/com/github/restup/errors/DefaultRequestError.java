@@ -1,6 +1,5 @@
 package com.github.restup.errors;
 
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -26,11 +25,7 @@ class DefaultRequestError implements RequestError, DebugRequestError {
     private final StackTraceElement[] stackTrace;
 
     /**
-     * Since {@link RequestError}s are added to {@link Errors} and often thrown
-     * as detail in {@link ErrorObjectException}, the stack detail of the {@link ErrorObjectException}
-     * is not meaningful.  So, when this {@link RequestError} is instantiated and DEBUG
-     * logging is enabled, the stacktrace from the current Thread is captured for later
-     * logging using {@link #logStackTrace()}
+     * Since {@link RequestError}s are added to {@link Errors} and often thrown as detail in {@link ErrorObjectException}, the stack detail of the {@link ErrorObjectException} is not meaningful.  So, when this {@link RequestError} is instantiated and DEBUG logging is enabled, the stacktrace from the current Thread is captured for later logging using {@link #logStackTrace()}
      */
     DefaultRequestError(String id, String code, String title, String detail, String detailPattern, Object[] detailPatternArgs, ErrorSource source, Object meta, int httpStatus, Throwable cause) {
         this.id = id;

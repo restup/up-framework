@@ -1,10 +1,9 @@
 package com.github.restup.service;
 
-import org.junit.Test;
+import static org.junit.Assert.assertEquals;
 
 import java.util.Date;
-
-import static org.junit.Assert.assertEquals;
+import org.junit.Test;
 
 public class VarArgsMethodExecutorTest {
 
@@ -19,6 +18,7 @@ public class VarArgsMethodExecutorTest {
     }
 
     public class Foo {
+
         public String bar(String message) {
             return message;
         }

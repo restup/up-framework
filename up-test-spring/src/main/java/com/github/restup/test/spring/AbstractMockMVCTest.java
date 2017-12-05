@@ -8,8 +8,7 @@ import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
 
 /**
- * Abstract implementation for convenience, autowiring mockMvc
- * and setting up a {@link Builder}
+ * Abstract implementation for convenience, autowiring mockMvc and setting up a {@link Builder}
  */
 @RunWith(SpringRunner.class)
 public abstract class AbstractMockMVCTest {

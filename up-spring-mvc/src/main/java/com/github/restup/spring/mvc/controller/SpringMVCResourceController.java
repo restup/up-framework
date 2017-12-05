@@ -5,12 +5,11 @@ import com.github.restup.http.model.HttpServletResourceControllerRequest;
 import com.github.restup.http.model.HttpServletResourceControllerResponse;
 import com.github.restup.jackson.service.model.JacksonRequestBody;
 import com.github.restup.registry.ResourceRegistry;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 
 /**
  * Implementation or example implementation for using Up! with Spring MVC

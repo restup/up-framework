@@ -4,11 +4,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 
 /**
- * Parses an integer offset for pagination. Named offset by default
- * <p>
- * <p>
- * Ex:
- * <p>
+ * Parses an integer offset for pagination. Named offset by default <p> <p> Ex: <p>
  * <pre>
  * ?offset=0
  * </pre>

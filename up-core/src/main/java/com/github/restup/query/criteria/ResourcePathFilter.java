@@ -1,18 +1,14 @@
 package com.github.restup.query.criteria;
 
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 
 /**
  * Represents query criteria for a path
- *
- * @param <T>
  */
 public class ResourcePathFilter<T> implements ResourceQueryCriteria {
 
@@ -39,6 +35,40 @@ public class ResourcePathFilter<T> implements ResourceQueryCriteria {
         this(ResourcePath.path(resource, field), value);
     }
 
+    private static boolean compare(Operator operator, Comparable<Object> a, Object b) {
+        switch (operator) {
+            case eq:
+                return a.compareTo(b) == 0;
+            case ne:
+                return a.compareTo(b) != 0;
+            case gt:
+                return a.compareTo(b) > 0;
+            case gte:
+                return a.compareTo(b) > 0;
+            case lt:
+                return a.compareTo(b) < 0;
+            case lte:
+                return a.compareTo(b) <= 0;
+            case in:
+                if (b instanceof Collection) {
+                    return ((Collection<?>) b).contains(a);
+                } else {
+                    return compare(Operator.eq, a, b);
+                }
+            case nin:
+                if (b instanceof Collection) {
+                    return !((Collection<?>) b).contains(a);
+                } else {
+                    return compare(Operator.ne, a, b);
+                }
+            case exists:
+            case regex:
+            case like:
+                throw new UnsupportedOperationException(operator + " not supported");
+        }
+        return false;
+    }
+
     public ResourcePath getPath() {
         return path;
     }
@@ -49,6 +79,29 @@ public class ResourcePathFilter<T> implements ResourceQueryCriteria {
 
     public T getValue() {
         return value;
+    }
+
+    @SuppressWarnings({ "rawtypes", "unchecked" })
+	@Override
+    public boolean filter(Object t) {
+        MappedField<?> mf = path.lastMappedField();
+        Comparable<?> a = (Comparable<?>) path.getValue(t);
+        Object b = this.value;
+
+        if (MappedField.isCaseInsensitive(mf)) {
+            a = (Comparable<?>) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), a);
+            if (b instanceof Collection) {
+                List<Object> result = new ArrayList<>(((Collection<?>) b).size());
+                for (Object o : (Collection<?>) b) {
+                    result.add(MappedField.toCaseInsensitive(mf.getCaseSensitivity(), o));
+                }
+                b = result;
+            } else {
+                b = (Comparable<?>) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), b);
+            }
+        }
+
+        return compare(operator, (Comparable) a, b);
     }
 
     public enum Operator {
@@ -80,62 +133,6 @@ public class ResourcePathFilter<T> implements ResourceQueryCriteria {
         String[] getOperators() {
             return operators;
         }
-    }
-
-    @Override
-    public boolean filter(Object t) {
-        MappedField<?> mf = path.lastMappedField();
-        Comparable a = (Comparable) path.getValue(t);
-        Object b = this.value;
-
-        if ( MappedField.isCaseInsensitive(mf) ) {
-            a = (Comparable) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), a);
-            if ( b instanceof Collection ) {
-                List<Object> result = new ArrayList<>(((Collection) b).size());
-                for ( Object o : (Collection)b) {
-                    result.add( MappedField.toCaseInsensitive(mf.getCaseSensitivity(), o));
-                }
-                b = result;
-            } else {
-                b = (Comparable) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), b);
-            }
-        }
-
-        return compare(operator, a, b);
-    }
-
-    private static boolean compare(Operator operator, Comparable a, Object b) {
-        switch (operator) {
-            case eq:
-                return a.compareTo(b) == 0;
-            case ne:
-                return a.compareTo(b) != 0;
-            case gt:
-                return a.compareTo(b) > 0;
-            case gte:
-                return a.compareTo(b) > 0;
-            case lt:
-                return a.compareTo(b) < 0;
-            case lte:
-                return a.compareTo(b) <= 0;
-            case in:
-                if (b instanceof Collection) {
-                    return ((Collection) b).contains(a);
-                } else {
-                    return compare(Operator.eq, a, b);
-                }
-            case nin:
-                if (b instanceof Collection) {
-                    return !((Collection) b).contains(a);
-                } else {
-                    return compare(Operator.ne, a, b);
-                }
-            case exists:
-            case regex:
-            case like:
-                throw new UnsupportedOperationException(operator + " not supported");
-        }
-        return false;
     }
 
 }

@@ -1,14 +1,14 @@
 package com.github.restup.service;
 
+import static org.junit.Assert.assertEquals;
+
+import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRegistry;
 import com.model.test.company.Address;
 import com.model.test.company.Company;
 import com.model.test.company.Employee;
 import com.model.test.company.Person;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistry;
 import org.junit.Test;
-
-import static org.junit.Assert.assertEquals;
 
 public class MethodArgumentsBuilderTest {
 
@@ -38,7 +38,6 @@ public class MethodArgumentsBuilderTest {
         assertEquals(Company.class, types[3]);
         assertEquals(Address.class, types[4]);
     }
-
 
     public void foo(Person p, Company c) {
         // test Person/Employee used as same arg

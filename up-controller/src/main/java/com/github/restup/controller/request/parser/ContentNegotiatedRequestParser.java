@@ -4,7 +4,6 @@ import com.github.restup.controller.model.MediaType;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.util.Assert;
-
 import java.util.HashMap;
 import java.util.Map;
 
@@ -33,6 +32,7 @@ public class ContentNegotiatedRequestParser implements RequestParser {
     }
 
     public final static class Builder {
+
         private Map<String, RequestParser> parsers = new HashMap<String, RequestParser>();
         private RequestParser defaultParser;
 

@@ -1,8 +1,7 @@
 package com.github.restup.repository;
 
 /**
- * Repository operations which wrap annotated repository methods
- * with flexible signatures
+ * Repository operations which wrap annotated repository methods with flexible signatures
  */
 public interface ResourceRepositoryOperations {
 

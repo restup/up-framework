@@ -4,4 +4,5 @@ import com.github.restup.annotations.ApiName;
 
 @ApiName("zoo")
 public class Zoo {
+
 }

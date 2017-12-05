@@ -3,9 +3,8 @@ package com.github.restup.test;
 import com.github.restup.test.resource.ByteArrayContents;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
-import org.hamcrest.Matcher;
-
 import java.util.Map;
+import org.hamcrest.Matcher;
 
 public class ApiResponse<H> {
 
@@ -67,8 +66,8 @@ public class ApiResponse<H> {
             return RelativeTestResource.RESPONSES;
         }
 
-        public ApiResponse build() {
-            return new ApiResponse(status, getHeaders(), getBody());
+        public ApiResponse<Matcher<String[]>> build() {
+            return new ApiResponse<>(status, getHeaders(), getBody());
         }
     }
 }

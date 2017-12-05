@@ -6,20 +6,11 @@ import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.request.UpdateRequest;
+import java.io.Serializable;
 import org.apache.commons.collections4.CollectionUtils;
 
-import java.io.Serializable;
-
 /**
- * Handle PUT operations
- * <ul>
- * <li>Multiple documents</li>
- * <li>A single document</li>
- * <li>Multiple document matching query criteria</li>
- * </ul>
- *
- * @param <T>
- * @param <ID>
+ * Handle PUT operations <ul> <li>Multiple documents</li> <li>A single document</li> <li>Multiple document matching query criteria</li> </ul>
  */
 public class PatchMethodController<T, ID extends Serializable> extends BulkMethodController<T, ID, UpdateRequest<T, ID>> {
 

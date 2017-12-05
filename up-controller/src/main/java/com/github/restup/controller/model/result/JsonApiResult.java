@@ -1,11 +1,10 @@
 package com.github.restup.controller.model.result;
 
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.controller.linking.Link;
 import com.github.restup.controller.linking.LinkBuilder;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
-
 import java.util.List;
 
 /**

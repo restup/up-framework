@@ -5,11 +5,6 @@ import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 
-import java.util.Arrays;
-import java.util.List;
-
-import org.junit.Test;
-
 import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.ResourceRegistryTest;
@@ -18,6 +13,9 @@ import com.model.test.company.Company;
 import com.model.test.company.Contractor;
 import com.model.test.company.Employee;
 import com.model.test.company.Person;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Test;
 
 public class MappedClassFactoryTest {
 
@@ -53,10 +51,9 @@ public class MappedClassFactoryTest {
         return assertField(mappedClass, i, name, type, false, true, errorOnUpdate, null);
     }
 
-    
-	private static MappedField<?> assertField(MappedClass<?> mappedClass, int i, String name, Class<?> type, boolean insensitive, boolean readOnly, boolean errorOnUpdate, Class<?> relationshipClass) {
-        @SuppressWarnings({ "rawtypes", "unchecked" })
-		MappedField<Object> field = (MappedField)mappedClass.getAttributes().get(i);
+    private static MappedField<?> assertField(MappedClass<?> mappedClass, int i, String name, Class<?> type, boolean insensitive, boolean readOnly, boolean errorOnUpdate, Class<?> relationshipClass) {
+        @SuppressWarnings({"rawtypes", "unchecked"})
+        MappedField<Object> field = (MappedField) mappedClass.getAttributes().get(i);
         assertEquals(name, field.getApiName());
         assertEquals(name, field.getBeanName());
         assertEquals(name, field.getPersistedName());
@@ -65,9 +62,9 @@ public class MappedClassFactoryTest {
         assertEquals(true, field.isApiProperty());
         assertEquals(false, field.isTransientField());
         assertEquals(readOnly, field.isImmutable());
-        if ( field.isImmutable() ) {
-	        assertEquals("Immutability", errorOnUpdate, field.isImmutabilityErrorOnUpdateAttempt());
-	        assertEquals("Immutability", !errorOnUpdate, field.isImmutabilityIgnoreUpdateAttempt());
+        if (field.isImmutable()) {
+            assertEquals("Immutability", errorOnUpdate, field.isImmutabilityErrorOnUpdateAttempt());
+            assertEquals("Immutability", !errorOnUpdate, field.isImmutabilityIgnoreUpdateAttempt());
         }
         assertEquals(insensitive, field.isCaseInsensitive());
 

@@ -1,23 +1,5 @@
 package com.github.restup.service.filters;
 
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Set;
-
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-import javax.validation.metadata.ConstraintDescriptor;
-
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.errors.ErrorBuilder;
@@ -33,6 +15,21 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+import javax.validation.metadata.ConstraintDescriptor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 public class JavaxValidationFilter {
 
@@ -66,11 +63,6 @@ public class JavaxValidationFilter {
 
     /**
      * Applies javax validations to only fields specified in request
-     *
-     * @param registry
-     * @param errors
-     * @param request
-     * @param resource
      */
     @PreUpdateFilter
     public <T, ID extends Serializable> void validateUpdate(ResourceRegistry registry, Errors errors, UpdateRequest<T, ID> request, Resource<T, ID> resource) {
@@ -96,7 +88,7 @@ public class JavaxValidationFilter {
                     return;
                 }
                 if (current.value() instanceof ReadableField) {
-                    ReadableField read = (ReadableField) current.value();
+                    ReadableField<?> read = (ReadableField<?>) current.value();
                     validationTarget = read.readValue(validationTarget);
                 }
                 current = current.next();
@@ -152,7 +144,7 @@ public class JavaxValidationFilter {
     }
 
     protected <T, ID extends Serializable> void addViolationErrors(Errors errors, Set<ConstraintViolation<T>> violations,
-                                                                   ResourcePath path, Object value) {
+            ResourcePath path, Object value) {
         if (violations != null) {
             for (ConstraintViolation<?> v : violations) {
                 ErrorBuilder err = ErrorBuilder.builder()

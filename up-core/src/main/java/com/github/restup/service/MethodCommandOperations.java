@@ -1,25 +1,20 @@
 package com.github.restup.service;
 
-import com.github.restup.service.model.request.*;
-
-import java.io.Serializable;
-
 /**
- * Executes annotated methods for a {@link com.github.restup.repository.ResourceRepository}
- * or {@link ResourceService}
+ * Executes annotated methods for a {@link com.github.restup.repository.ResourceRepository} or {@link ResourceService}
  */
 public abstract class MethodCommandOperations {
 
-    private final MethodCommand create;
-    private final MethodCommand update;
-    private final MethodCommand delete;
-    private final MethodCommand bulkCreate;
-    private final MethodCommand bulkUpdate;
-    private final MethodCommand bulkDelete;
-    private final MethodCommand updateByQuery;
-    private final MethodCommand deleteByQuery;
-    private final MethodCommand list;
-    private final MethodCommand find;
+    private final MethodCommand<?> create;
+    private final MethodCommand<?> update;
+    private final MethodCommand<?> delete;
+    private final MethodCommand<?> bulkCreate;
+    private final MethodCommand<?> bulkUpdate;
+    private final MethodCommand<?> bulkDelete;
+    private final MethodCommand<?> updateByQuery;
+    private final MethodCommand<?> deleteByQuery;
+    private final MethodCommand<?> list;
+    private final MethodCommand<?> find;
 
     public MethodCommandOperations(MethodCommandOperationFactory factory) {
         create = factory.getCreateOperation();
@@ -77,6 +72,5 @@ public abstract class MethodCommandOperations {
     public Object find(Object... args) {
         return execute(find, args);
     }
-
 
 }

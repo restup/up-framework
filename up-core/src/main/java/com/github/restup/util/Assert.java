@@ -3,7 +3,6 @@ package com.github.restup.util;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.collections4.MapUtils;
 import org.apache.commons.lang3.StringUtils;
@@ -20,10 +19,9 @@ public class Assert {
     }
 
     /**
-     * Assert that an object is not {@code null}.
-     * <pre class="code">Assert.notNull(clazz, "The class must not be null");</pre>
+     * Assert that an object is not {@code null}. <pre class="code">Assert.notNull(clazz, "The class must not be null");</pre>
      *
-     * @param object  the object to check
+     * @param object the object to check
      * @param message the exception message to use if the assertion fails
      * @throws AssertionError if the object is {@code null}
      */

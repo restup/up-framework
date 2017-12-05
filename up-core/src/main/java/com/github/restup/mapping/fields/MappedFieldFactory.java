@@ -9,8 +9,8 @@ import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 public interface MappedFieldFactory {
 
     /**
-     * @param bi  describing the object being mapped
-     * @param pd  describing the property being mapped
+     * @param bi describing the object being mapped
+     * @param pd describing the property being mapped
      * @param <T> the type of the class being mapped
      * @return a {@link MappedField} instance describing the property
      */

@@ -1,19 +1,17 @@
 package com.github.restup.test;
 
-import com.github.restup.test.matchers.ContentTypeMatcher;
-import com.github.restup.test.resource.Contents;
-import com.github.restup.test.resource.RelativeTestResource;
-import org.hamcrest.Matcher;
-
-import java.util.Map;
-
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
+import com.github.restup.test.matchers.ContentTypeMatcher;
+import com.github.restup.test.resource.Contents;
+import com.github.restup.test.resource.RelativeTestResource;
+import java.util.Map;
+import org.hamcrest.Matcher;
+
 /**
- * Provides a {@link Builder} with some defaults and support for easy file
- * comparisons
+ * Provides a {@link Builder} with some defaults and support for easy file comparisons
  */
 public class RpcApiTest {
 
@@ -21,7 +19,7 @@ public class RpcApiTest {
     private final ApiRequest request;
     private final ApiResponse<Matcher<String[]>> expected;
 
-    private RpcApiTest(ApiRequest request, ApiResponse expected) {
+    private RpcApiTest(ApiRequest request, ApiResponse<Matcher<String[]>> expected) {
         this.request = request;
         this.expected = expected;
     }
@@ -30,7 +28,7 @@ public class RpcApiTest {
         return request;
     }
 
-    public ApiResponse getExpected() {
+    public ApiResponse<?> getExpected() {
         return expected;
     }
 
@@ -86,19 +84,13 @@ public class RpcApiTest {
 
         /**
          * Uses the calling method's name as the test name
-         *
-         * @return
          */
         public Builder test() {
             return test(RelativeTestResource.getCallingStackElement().getMethodName());
         }
 
         /**
-         * If true, the test name will be detected and applied automatically based upon the
-         * calling method's name
-         *
-         * @param testNameAsMethodName
-         * @return
+         * If true, the test name will be detected and applied automatically based upon the calling method's name
          */
         public Builder testNameAsMethodName(boolean testNameAsMethodName) {
             this.testNameAsMethodName = testNameAsMethodName;
@@ -195,37 +187,36 @@ public class RpcApiTest {
             return me();
         }
 
-        public ApiResponse error400() {
+        public ApiResponse<String[]> error400() {
             return error(400);
         }
 
-        public ApiResponse error401() {
+        public ApiResponse<String[]> error401() {
             return error(401);
         }
 
-        public ApiResponse error403() {
+        public ApiResponse<String[]> error403() {
             return error(403);
         }
 
-        public ApiResponse error404() {
+        public ApiResponse<String[]> error404() {
             return error(404);
         }
 
-        public ApiResponse error(int status) {
+        public ApiResponse<String[]> error(int status) {
             return expectStatus(status).build();
         }
 
-        public ApiResponse ok() {
+        public ApiResponse<String[]> ok() {
             return expectStatus(okStatus).build();
         }
-
 
         private Builder json(String contentType) {
             return requestHeader("Content-Type", contentType).requestHeader("Accept", contentType)
                     .expectHeader("Content-Type", new ContentTypeMatcher(contentType)).testFileExtension("json");
         }
 
-        public ApiResponse build() {
+        public ApiResponse<String[]> build() {
             if (mediaType != null) {
                 json(mediaType.getContentType());
             }
@@ -284,11 +275,11 @@ public class RpcApiTest {
             return assertUsingString ? body.getContentAsString() : body.getContentAsByteArray();
         }
 
-        private boolean isJson(ApiResponse response) {
+        private boolean isJson(ApiResponse<String[]> response) {
             return headerContains(response, "Content-Type", "json");
         }
 
-        private boolean isAssertByteAsString(ApiResponse response) {
+        private boolean isAssertByteAsString(ApiResponse<String[]> response) {
             return headerContains(response, "Content-Type", "json", "xml", "text");
         }
 
@@ -307,15 +298,10 @@ public class RpcApiTest {
         }
 
         /**
-         * Equivalent to
-         * <p>
+         * Equivalent to <p>
          * <pre>
          * param("offset", String.valueOf(offset)).param("limit", String.valueOf(limit))
          * </pre>
-         *
-         * @param offset
-         * @param limit
-         * @return
          */
         public Builder page(int offset, int limit) {
             return param("offset", String.valueOf(offset)).param("limit", String.valueOf(limit));

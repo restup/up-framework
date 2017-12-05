@@ -3,16 +3,15 @@ package com.github.restup.path;
 import com.github.restup.mapping.fields.ReadableField;
 import com.github.restup.mapping.fields.WritableField;
 import com.github.restup.util.ReflectionUtils;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * {@link PathValue} indicating the index of a Collection or Array.
  */
-public class IndexPathValue implements PathValue, ReadableField, WritableField<Object,Object> {
+public class IndexPathValue implements PathValue, ReadableField<Object>, WritableField<Object, Object> {
 
     private final int index;
     private final Class<?> type;
@@ -20,7 +19,7 @@ public class IndexPathValue implements PathValue, ReadableField, WritableField<O
     /**
      * {@link #toString()}
      *
-     * @param type  the expected type
+     * @param type the expected type
      * @param index the index for this {@link PathValue}
      */
     public IndexPathValue(Class<?> type, int index) {
@@ -43,10 +42,10 @@ public class IndexPathValue implements PathValue, ReadableField, WritableField<O
     public Object createDeclaringInstance() {
         return ReflectionUtils.newInstance(type);
     }
-    
+
     @Override
     public Object createInstance() {
-    		return null;
+        return null;
     }
 
     /**
@@ -79,7 +78,6 @@ public class IndexPathValue implements PathValue, ReadableField, WritableField<O
     }
 
     /**
-     * @param clazz
      * @return true for Collection implementations or Object[], false otherwise
      */
     public boolean supportsType(Class<?> clazz) {
@@ -118,15 +116,19 @@ public class IndexPathValue implements PathValue, ReadableField, WritableField<O
 
     @Override
     public boolean equals(Object obj) {
-        if (this == obj)
+        if (this == obj) {
             return true;
-        if (obj == null)
+        }
+        if (obj == null) {
             return false;
-        if (getClass() != obj.getClass())
+        }
+        if (getClass() != obj.getClass()) {
             return false;
+        }
         IndexPathValue other = (IndexPathValue) obj;
-        if (index != other.index)
+        if (index != other.index) {
             return false;
+        }
         return true;
     }
 

@@ -8,7 +8,6 @@ import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
-
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;

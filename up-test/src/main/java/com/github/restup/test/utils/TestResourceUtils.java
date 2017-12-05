@@ -1,8 +1,7 @@
 package com.github.restup.test.utils;
 
-import org.apache.commons.lang3.StringUtils;
-
 import java.net.URL;
+import org.apache.commons.lang3.StringUtils;
 
 public class TestResourceUtils {
 

@@ -1,14 +1,14 @@
 package com.github.restup.controller.request.parser.params;
 
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.query.ResourceQueryStatement.Type;
-import org.junit.Test;
-import org.mockito.Mockito;
-
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.query.ResourceQueryStatement.Type;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class IncludeParserTest {
 

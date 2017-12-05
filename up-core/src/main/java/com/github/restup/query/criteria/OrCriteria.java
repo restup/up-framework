@@ -10,8 +10,8 @@ public class OrCriteria extends ListCriteria {
 
     @Override
     public boolean filter(Object t) {
-        for ( ResourceQueryCriteria c : getCriteria() ) {
-            if ( c.filter(t) ) {
+        for (ResourceQueryCriteria c : getCriteria()) {
+            if (c.filter(t)) {
                 return true;
             }
         }

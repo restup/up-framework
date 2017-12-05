@@ -2,28 +2,17 @@ package com.github.restup.controller.method;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
-import com.github.restup.service.MethodCommandOperations;
-import com.github.restup.service.ResourceService;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
-import org.apache.commons.collections4.CollectionUtils;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
- * Handle DELETE operations
- * <ul>
- * <li>Multiple documents</li>
- * <li>A single document</li>
- * <li>Multiple document matching query criteria</li>
- * </ul>
- *
- * @param <T>
- * @param <ID>
+ * Handle DELETE operations <ul> <li>Multiple documents</li> <li>A single document</li> <li>Multiple document matching query criteria</li> </ul>
  */
 public class DeleteMethodController<T, ID extends Serializable> extends BulkMethodController<T, ID, DeleteRequest<T, ID>> {
 
@@ -51,7 +40,6 @@ public class DeleteMethodController<T, ID extends Serializable> extends BulkMeth
     DeleteRequest<T, ID> getRequest(Resource<T, ID> resource, T data, ID id, ParsedResourceControllerRequest<T> request) {
         return factory.getDeleteRequest(resource, id, request.getRequestedQueries(), request);
     }
-
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     BulkRequest<DeleteRequest<T, ID>> getBulkRequestIds(ParsedResourceControllerRequest<T> request) {

@@ -7,15 +7,13 @@ import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provides support for parameters that may contain a delimited list
- *
- * @param <P>
  */
 public abstract class AbstractDelimitedParamParser<P> extends AbstractRequestParamParser<P> {
 
     private final String delimiter;
 
     public AbstractDelimitedParamParser(String parameterName, String delimiter, boolean ignoreNull,
-                                        boolean ignoreBlank) {
+            boolean ignoreBlank) {
         super(parameterName, ignoreNull, ignoreBlank);
         Assert.notNull(delimiter, "delimiter is required");
         this.delimiter = delimiter;
@@ -23,7 +21,7 @@ public abstract class AbstractDelimitedParamParser<P> extends AbstractRequestPar
 
     @Override
     public final <T> void apply(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<T> builder, P parsedParameterName, String parameterValue,
-                                final String rawParamName, final String rawValue) {
+            final String rawParamName, final String rawValue) {
         String[] values = parameterValue.split(delimiter);
         for (String value : values) {
             if (StringUtils.isBlank(value)) {
@@ -37,5 +35,5 @@ public abstract class AbstractDelimitedParamParser<P> extends AbstractRequestPar
     }
 
     abstract <T> void applyDelimitedValue(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<T> builder, P parsedParameterName,
-                                          String value, String rawParamName, String rawValue);
+            String value, String rawParamName, String rawValue);
 }

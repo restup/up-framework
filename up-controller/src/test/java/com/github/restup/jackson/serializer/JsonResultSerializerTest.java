@@ -4,16 +4,6 @@ import static com.github.restup.test.ContentsTest.json;
 import static com.github.restup.util.ReflectionUtils.getAnnotation;
 import static org.mockito.Mockito.when;
 
-import java.util.Arrays;
-
-import javax.persistence.Transient;
-
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
-
 import com.deep.Shallow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -32,6 +22,13 @@ import com.github.restup.service.model.response.BasicReadResult;
 import com.github.restup.test.ContentsTest.Builder;
 import com.github.restup.util.ReflectionUtils;
 import com.many.fields.A2J;
+import java.util.Arrays;
+import javax.persistence.Transient;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JsonResultSerializerTest {

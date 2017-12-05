@@ -1,14 +1,14 @@
 package com.github.restup.bind.converter;
 
 import com.github.restup.errors.ErrorFactory;
-import org.apache.commons.lang3.StringUtils;
-
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import org.apache.commons.lang3.StringUtils;
 
 public class StringToZonedDateTimeConverter extends StringConverter<ZonedDateTime> {
+
     private static final String DEFAULT_ZONE = "Z";
     private static final String DEFAULT_TIME = "T00:00:00Z";
 

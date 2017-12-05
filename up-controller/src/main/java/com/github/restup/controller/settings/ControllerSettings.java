@@ -1,5 +1,7 @@
 package com.github.restup.controller.settings;
 
+import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.DefaultExceptionHandler;
 import com.github.restup.controller.ExceptionHandler;
@@ -15,7 +17,11 @@ import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.DefaultServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
-import com.github.restup.controller.request.parser.*;
+import com.github.restup.controller.request.parser.DefaultRelationshipsParser;
+import com.github.restup.controller.request.parser.ParameterParserChain;
+import com.github.restup.controller.request.parser.RequestParamParser;
+import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.controller.request.parser.RequestParserChain;
 import com.github.restup.jackson.JacksonConfiguration;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
@@ -24,8 +30,6 @@ import com.github.restup.registry.settings.AutoDetectConstants;
 import com.github.restup.service.registry.DiscoveryService;
 import com.google.gson.Gson;
 import org.apache.commons.lang3.ArrayUtils;
-
-import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
 
 public class ControllerSettings {
 
@@ -36,8 +40,8 @@ public class ControllerSettings {
     private final ExceptionHandler exceptionHandler;
 
     protected ControllerSettings(ResourceRegistry registry, ContentNegotiator[] contentNegotiators,
-                                 RequestInterceptor requestInterceptor, RequestParser requestParsers,
-                                 ExceptionHandler exceptionHandler) {
+            RequestInterceptor requestInterceptor, RequestParser requestParsers,
+            ExceptionHandler exceptionHandler) {
         super();
         this.registry = registry;
         this.contentNegotiators = contentNegotiators;
@@ -236,14 +240,14 @@ public class ControllerSettings {
             //TODO
             registry.registerResource(
                     Resource.builder(Resource.class)
-                        .service(new DiscoveryService(linkBuilderFactory))
+                            .service(new DiscoveryService(linkBuilderFactory))
                             .excludeDefaultServiceFilters(true)
-                        .mappedClass(
-                            MappedClass.builder()
-                                .name(UP_RESOURCE_DISCOVERY)
-                                .pluralName("resources")
-                                .addIdAttribute(String.class, "name")
-                        )
+                            .mappedClass(
+                                    MappedClass.builder(Resource.class)
+                                            .name(UP_RESOURCE_DISCOVERY)
+                                            .pluralName("resources")
+                                            .addIdAttribute(String.class, "name")
+                            )
             );
             return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler);
         }

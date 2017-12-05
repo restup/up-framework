@@ -1,9 +1,33 @@
 package com.github.restup.service;
 
-import com.model.test.company.Company;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNotNull;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.restup.annotations.field.Param;
-import com.github.restup.annotations.filter.*;
-import com.github.restup.annotations.operations.*;
+import com.github.restup.annotations.filter.PostCreateFilter;
+import com.github.restup.annotations.filter.PostDeleteFilter;
+import com.github.restup.annotations.filter.PostListFilter;
+import com.github.restup.annotations.filter.PostReadFilter;
+import com.github.restup.annotations.filter.PostUpdateFilter;
+import com.github.restup.annotations.filter.PreCreateFilter;
+import com.github.restup.annotations.filter.PreDeleteFilter;
+import com.github.restup.annotations.filter.PreListFilter;
+import com.github.restup.annotations.filter.PreReadFilter;
+import com.github.restup.annotations.filter.PreUpdateFilter;
+import com.github.restup.annotations.filter.Rank;
+import com.github.restup.annotations.filter.Validation;
+import com.github.restup.annotations.operations.CreateResource;
+import com.github.restup.annotations.operations.DeleteResource;
+import com.github.restup.annotations.operations.ListResource;
+import com.github.restup.annotations.operations.ReadResource;
+import com.github.restup.annotations.operations.UpdateResource;
 import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.Errors;
@@ -12,18 +36,28 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRegistryTest;
 import com.github.restup.repository.Repository;
-import com.github.restup.resource.operations.*;
-import com.github.restup.service.model.request.*;
+import com.github.restup.resource.operations.CreatableResource;
+import com.github.restup.resource.operations.DeletableResource;
+import com.github.restup.resource.operations.ListableResource;
+import com.github.restup.resource.operations.ReadableResource;
+import com.github.restup.resource.operations.UpdatableResource;
+import com.github.restup.service.model.request.BasicCreateRequest;
+import com.github.restup.service.model.request.BasicDeleteRequest;
+import com.github.restup.service.model.request.BasicListRequest;
+import com.github.restup.service.model.request.BasicReadRequest;
+import com.github.restup.service.model.request.BasicUpdateRequest;
+import com.github.restup.service.model.request.CreateRequest;
+import com.github.restup.service.model.request.DeleteRequest;
+import com.github.restup.service.model.request.ListRequest;
+import com.github.restup.service.model.request.PersistenceRequest;
+import com.github.restup.service.model.request.ReadRequest;
+import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PersistenceResult;
 import com.github.restup.service.model.response.ReadResult;
-import org.junit.Test;
-
+import com.model.test.company.Company;
 import java.io.Serializable;
 import java.util.Arrays;
-
-import static org.junit.Assert.*;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.Mockito.*;
+import org.junit.Test;
 
 public class FilteredServiceTest {
 
@@ -219,7 +253,7 @@ public class FilteredServiceTest {
                     @PreListFilter
                     @PreReadFilter
                     public Foo ccc(ResourceRegistry registry, Foo foo, Resource resource, Bar bar,
-                                   FilterChainContext ctx) {
+                            FilterChainContext ctx) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         assertNotNull(ctx);
@@ -248,7 +282,7 @@ public class FilteredServiceTest {
                     @PostReadFilter
                     @Rank(-1)
                     public void zzz(Foo foo, Bar bar, FilterChainContext ctx, Resource resource,
-                                    ResourceRegistry registry) {
+                            ResourceRegistry registry) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         assertNotNull(ctx);
@@ -315,6 +349,7 @@ public class FilteredServiceTest {
     }
 
     public final static class Foo {
+
         private String _name;
 
         public Foo(String name) {
@@ -333,6 +368,7 @@ public class FilteredServiceTest {
     }
 
     public final static class Bar {
+
         private String _name;
 
         public String getName() {

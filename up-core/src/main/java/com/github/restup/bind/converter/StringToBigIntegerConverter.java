@@ -1,7 +1,6 @@
 package com.github.restup.bind.converter;
 
 import com.github.restup.errors.ErrorFactory;
-
 import java.math.BigInteger;
 
 public class StringToBigIntegerConverter extends StringConverter<BigInteger> {

@@ -1,5 +1,7 @@
 package com.github.restup.controller.model;
 
+import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
+
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
@@ -12,15 +14,15 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-
-import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
-
 /**
- * In an http request, this is a partially parsed details from the request, having
- * parsed the request path to obtain resource info and ids.
+ * In an http request, this is a partially parsed details from the request, having parsed the request path to obtain resource info and ids.
  */
 public abstract class ResourceControllerRequest implements ParameterProvider {
 
@@ -209,12 +211,12 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
 
         protected boolean isDiscoveryPath(String requestPath) {
             return StringUtils.isBlank(requestPath)
-                    || Objects.equals("/",requestPath);
+                    || Objects.equals("/", requestPath);
         }
 
         public void parsePath() {
             Assert.notNull(registry, "registry is required");
-            if ( isDiscoveryPath(requestPath) ) {
+            if (isDiscoveryPath(requestPath)) {
                 resource = registry.getResource(UP_RESOURCE_DISCOVERY);
             } else {
                 String path = null;
@@ -290,7 +292,6 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
                     }
                 }
 
-
                 if (resource == null) {
                     throw invalidPath(requestPath, arr);
                 }
@@ -302,7 +303,6 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
                 } else {
                     setResource(resource);
                 }
-
 
                 if (idString != null) {
                     Class<?> type = resource.getIdentityField().getType();

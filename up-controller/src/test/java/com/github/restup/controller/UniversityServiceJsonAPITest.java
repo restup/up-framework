@@ -4,7 +4,6 @@ import com.university.University;
 import org.junit.Before;
 import org.junit.Test;
 
-
 public class UniversityServiceJsonAPITest extends AbstractMockTest {
 
     public UniversityServiceJsonAPITest() {

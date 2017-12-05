@@ -1,5 +1,13 @@
 package com.github.restup.controller;
 
+import static org.junit.Assert.assertEquals;
+import static org.mockito.ArgumentMatchers.any;
+import static org.mockito.ArgumentMatchers.nullable;
+import static org.mockito.Mockito.doAnswer;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.NoOpContentNegotiator;
 import com.github.restup.controller.interceptor.NoOpRequestInterceptor;
@@ -9,17 +17,23 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParser;
-import com.github.restup.service.MethodCommandOperations;
-import com.github.restup.service.ResourceServiceOperations;
-import com.model.test.company.Company;
-import com.model.test.company.Person;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.TestRegistry;
-import com.github.restup.service.FilteredService;
-import com.github.restup.service.model.request.*;
+import com.github.restup.service.ResourceServiceOperations;
+import com.github.restup.service.model.request.BulkRequest;
+import com.github.restup.service.model.request.CreateRequest;
+import com.github.restup.service.model.request.DeleteRequest;
+import com.github.restup.service.model.request.ListRequest;
+import com.github.restup.service.model.request.ReadRequest;
+import com.github.restup.service.model.request.UpdateRequest;
+import com.model.test.company.Company;
+import com.model.test.company.Person;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.junit.Before;
@@ -30,15 +44,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-
-import static org.junit.Assert.assertEquals;
-import static org.mockito.ArgumentMatchers.any;
-import static org.mockito.ArgumentMatchers.nullable;
-import static org.mockito.Mockito.*;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @RunWith(MockitoJUnitRunner.class)

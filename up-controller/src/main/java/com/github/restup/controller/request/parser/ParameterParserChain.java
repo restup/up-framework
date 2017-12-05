@@ -2,15 +2,18 @@ package com.github.restup.controller.request.parser;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
-import com.github.restup.controller.request.parser.params.*;
-import com.github.restup.controller.request.parser.params.*;
+import com.github.restup.controller.request.parser.params.FieldsParser;
+import com.github.restup.controller.request.parser.params.FilterParser;
+import com.github.restup.controller.request.parser.params.IncludeParser;
+import com.github.restup.controller.request.parser.params.PageLimitParser;
+import com.github.restup.controller.request.parser.params.PageNumberParser;
+import com.github.restup.controller.request.parser.params.PageOffsetParser;
+import com.github.restup.controller.request.parser.params.SortParamParser;
 import com.github.restup.util.Assert;
-
 import java.util.List;
 
 /**
- * Iterates over all parameter names executing the first
- * {@link RequestParamParser} that accepts the parameter for each
+ * Iterates over all parameter names executing the first {@link RequestParamParser} that accepts the parameter for each
  *
  * @author abuttaro
  */
@@ -25,13 +28,7 @@ public class ParameterParserChain implements RequestParser {
     }
 
     /**
-     * By default adds {@link PageOffsetParser}, {@link PageLimitParser} ,
-     * {@link SortParamParser}, {@link FilterParser}, {@link IncludeParser} ,
-     * {@link FieldsParser} and adds a number of fuzzy parameter parsers as well:
-     * {@link PageNumberParser} for "page", "count", "pageNo", "pageNum",
-     * "pageNumber" parameters and {@link PageOffsetParser} for "start" parameters
-     * and {@link PageLimitParser} with "rpp" and "pageSize" parameters and
-     * {@link FilterParser} for "f" and "q" filter parameters
+     * By default adds {@link PageOffsetParser}, {@link PageLimitParser} , {@link SortParamParser}, {@link FilterParser}, {@link IncludeParser} , {@link FieldsParser} and adds a number of fuzzy parameter parsers as well: {@link PageNumberParser} for "page", "count", "pageNo", "pageNum", "pageNumber" parameters and {@link PageOffsetParser} for "start" parameters and {@link PageLimitParser} with "rpp" and "pageSize" parameters and {@link FilterParser} for "f" and "q" filter parameters
      */
     public ParameterParserChain() {
         this(new PageOffsetParser()

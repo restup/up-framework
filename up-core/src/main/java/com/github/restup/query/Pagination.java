@@ -65,5 +65,4 @@ public class Pagination {
         return withTotalsDisabled;
     }
 
-
 }

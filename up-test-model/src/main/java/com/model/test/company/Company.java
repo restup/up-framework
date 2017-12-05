@@ -3,7 +3,6 @@ package com.model.test.company;
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.field.Relationship;
 import com.github.restup.annotations.field.RelationshipType;
-
 import java.util.List;
 
 @ApiName("company")

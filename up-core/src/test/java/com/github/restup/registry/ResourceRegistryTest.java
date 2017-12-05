@@ -1,12 +1,20 @@
 package com.github.restup.registry;
 
-import com.model.test.company.*;
+import static com.github.restup.mapping.MappedClassFactoryTest.assertAddress;
+import static com.github.restup.mapping.MappedClassFactoryTest.assertCompany;
+import static com.github.restup.mapping.MappedClassFactoryTest.assertContractor;
+import static com.github.restup.mapping.MappedClassFactoryTest.assertEmployee;
+import static com.github.restup.mapping.MappedClassFactoryTest.assertPerson;
+
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
+import com.model.test.company.Address;
+import com.model.test.company.Company;
+import com.model.test.company.Contractor;
+import com.model.test.company.Employee;
+import com.model.test.company.Person;
 import org.junit.Test;
-
-import static com.github.restup.mapping.MappedClassFactoryTest.*;
 
 public class ResourceRegistryTest {
 

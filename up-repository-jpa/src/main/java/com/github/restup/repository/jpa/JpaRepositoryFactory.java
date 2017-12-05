@@ -2,9 +2,8 @@ package com.github.restup.repository.jpa;
 
 import com.github.restup.registry.Resource;
 import com.github.restup.repository.RepositoryFactory;
-
-import javax.persistence.EntityManager;
 import java.io.Serializable;
+import javax.persistence.EntityManager;
 
 public class JpaRepositoryFactory implements RepositoryFactory {
 

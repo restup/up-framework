@@ -1,8 +1,9 @@
 package com.github.restup.jackson.parser;
 
+import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.when;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.model.test.company.Person;
-import com.music.Label;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
@@ -13,13 +14,11 @@ import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.test.utils.TestResourceUtils;
-import org.junit.Test;
-
+import com.model.test.company.Person;
+import com.music.Label;
 import java.io.IOException;
 import java.net.URL;
-
-import static org.mockito.Mockito.mock;
-import static org.mockito.Mockito.when;
+import org.junit.Test;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class JacksonRequestBodyParserTest {
@@ -79,7 +78,6 @@ public class JacksonRequestBodyParserTest {
         when(details.getResource()).thenReturn((Resource) registry.getResource(resourceClass));
 
         ParsedResourceControllerRequest.Builder<?> builder = ParsedResourceControllerRequest.builder(registry, details);
-
 
         JacksonRequestBodyParser parser = new JacksonRequestBodyParser(mapper);
         parser.parse(details, builder);

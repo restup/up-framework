@@ -3,28 +3,29 @@ package com.github.restup.registry.settings;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.PolymorphicMappedClass;
-import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.IterableField;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.util.Assert;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
 import org.apache.commons.lang3.StringUtils;
 
-import java.util.*;
-import java.util.Map.Entry;
-
 /**
- * Registry implementation of {@link MappedClassFactory} and {@link ResourceRegistryRepository}
- * allowing implementation to be shared with other Up! implementations without reference to registry itself
+ * Registry implementation of {@link MappedClassFactory} and {@link ResourceRegistryRepository} allowing implementation to be shared with other Up! implementations without reference to registry itself
  */
 class RegistryOperations implements MappedClassFactory, ResourceRegistryRepository {
 
     private final ResourceRegistryRepository resourceRepository;
     private final MappedClassFactory mappedClassFactory;
     private Map<Object, List<Resource<?, ?>>> unknown;
-
 
     RegistryOperations(ResourceRegistryRepository resourceRegistryMap, MappedClassFactory mappedClassFactory) {
         this.resourceRepository = resourceRegistryMap;
@@ -33,7 +34,7 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
     }
 
     @Override
-    public Collection<Resource<?,?>> getResources() {
+    public Collection<Resource<?, ?>> getResources() {
         return resourceRepository.getResources();
     }
 
@@ -147,21 +148,17 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
     }
 
     public void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
-                                ResourceRelationship<?, ?, ?, ?> relationship) {
+            ResourceRelationship<?, ?, ?, ?> relationship) {
         resourceRepository.addRelationship(from, to, relationship);
     }
 
     @Override
-    public Collection<ResourceRelationship> getRelationships(String resourceName) {
+    public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
         return resourceRepository.getRelationships(resourceName);
     }
 
     /**
-     * Since a relationship to a resource can exist at multiple paths,
-     * we map paths by resource class
-     *
-     * @param resource
-     * @return
+     * Since a relationship to a resource can exist at multiple paths, we map paths by resource class
      */
     private Map<Class<?>, List<ResourcePath>> mapRelationships(Resource<?, ?> resource) {
         Map<Class<?>, List<ResourcePath>> relationshipsToClass = new HashMap<Class<?>, List<ResourcePath>>();

@@ -1,16 +1,15 @@
 package com.github.restup.registry;
 
-import com.university.Course;
-import com.university.University;
-import com.github.restup.annotations.field.RelationshipType;
-import com.github.restup.path.ResourcePath;
-import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
-
-import java.util.Arrays;
-
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
+
+import com.github.restup.annotations.field.RelationshipType;
+import com.github.restup.path.ResourcePath;
+import com.university.Course;
+import com.university.University;
+import java.util.Arrays;
+import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 
 public class ResourceRelationshipTest {
 

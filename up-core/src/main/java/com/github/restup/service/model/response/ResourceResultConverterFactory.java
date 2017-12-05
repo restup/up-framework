@@ -1,13 +1,26 @@
 package com.github.restup.service.model.response;
 
-import com.github.restup.annotations.operations.*;
-
+import com.github.restup.annotations.operations.BulkCreateResource;
+import com.github.restup.annotations.operations.BulkDeleteResource;
+import com.github.restup.annotations.operations.BulkUpdateResource;
+import com.github.restup.annotations.operations.CreateResource;
+import com.github.restup.annotations.operations.DeleteResource;
+import com.github.restup.annotations.operations.DeleteResourceByQuery;
+import com.github.restup.annotations.operations.ListResource;
+import com.github.restup.annotations.operations.ReadResource;
+import com.github.restup.annotations.operations.UpdateResource;
+import com.github.restup.annotations.operations.UpdateResourceByQuery;
 import java.lang.annotation.Annotation;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.IdentityHashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
- * Factory for providing correct {@link ResourceResultConverter}
- * implementation for appropriate annotated methods
+ * Factory for providing correct {@link ResourceResultConverter} implementation for appropriate annotated methods
  */
 public class ResourceResultConverterFactory {
 
@@ -16,19 +29,8 @@ public class ResourceResultConverterFactory {
     private final NoOpResourceResultConverter noOpResourceResultConverter = new NoOpResourceResultConverter();
     private final Map<Class<? extends Annotation>, ResourceResultConverter> converters;
 
-    public static ResourceResultConverterFactory getInstance() {
-        if (instance == null) {
-            synchronized (ResourceResultConverterFactory.class) {
-                if (instance == null) {
-                    instance = new ResourceResultConverterFactory();
-                }
-            }
-        }
-        return instance;
-    }
-
     private ResourceResultConverterFactory() {
-        Map map = new IdentityHashMap(10);
+        Map<Class<? extends Annotation>, ResourceResultConverter> map = new IdentityHashMap<>(10);
         PersistenceResultConverter persistenceResultConverter = new PersistenceResultConverter();
         PersistenceListResultConverter persistenceListResultConverter = new PersistenceListResultConverter();
         map.put(CreateResource.class, persistenceResultConverter);
@@ -44,57 +46,15 @@ public class ResourceResultConverterFactory {
         converters = Collections.unmodifiableMap(map);
     }
 
-    public ResourceResultConverter getConverter(Class<? extends Annotation> annotation) {
-        ResourceResultConverter converter = converters.get(annotation);
-        return converter != null ? converter : noOpResourceResultConverter;
-    }
-
-    public final static class NoOpResourceResultConverter implements ResourceResultConverter {
-        public Object convert(Object o) {
-            return o;
-        }
-    }
-
-    private final static class PersistenceResultConverter implements ResourceResultConverter {
-        public Object convert(Object result) {
-            if (result instanceof PersistenceResult) {
-                return (PersistenceResult) result;
-            } else {
-                return new BasicPersistenceResult(result);
+    public static ResourceResultConverterFactory getInstance() {
+        if (instance == null) {
+            synchronized (ResourceResultConverterFactory.class) {
+                if (instance == null) {
+                    instance = new ResourceResultConverterFactory();
+                }
             }
         }
-    }
-
-    private final static class PersistenceListResultConverter implements ResourceResultConverter {
-        public Object convert(Object result) {
-            if (result instanceof PersistenceResult) {
-                return (PersistenceResult) result;
-            } else {
-                List<?> list = asList(result);
-                return new BasicPersistenceResult(list);
-            }
-        }
-    }
-
-    private final static class ListResourceResultConverter implements ResourceResultConverter {
-        public Object convert(Object result) {
-            if (result instanceof ReadResult) {
-                return (ReadResult) result;
-            } else {
-                List<?> list = asList(result);
-                return new BasicListResult(list);
-            }
-        }
-    }
-
-    private final static class ReadResourceResultConverter implements ResourceResultConverter {
-        public Object convert(Object result) {
-            if (result instanceof ReadResult) {
-                return (ReadResult) result;
-            } else {
-                return new BasicReadResult(result);
-            }
-        }
+        return instance;
     }
 
     @SuppressWarnings({"unchecked", "rawtypes"})
@@ -107,6 +67,64 @@ public class ResourceResultConverterFactory {
             return Arrays.asList(result);
         } else {
             return Collections.emptyList();
+        }
+    }
+
+    public ResourceResultConverter getConverter(Class<? extends Annotation> annotation) {
+        ResourceResultConverter converter = converters.get(annotation);
+        return converter != null ? converter : noOpResourceResultConverter;
+    }
+
+    public final static class NoOpResourceResultConverter implements ResourceResultConverter {
+
+        public Object convert(Object o) {
+            return o;
+        }
+    }
+
+    private final static class PersistenceResultConverter implements ResourceResultConverter {
+
+        public Object convert(Object result) {
+            if (result instanceof PersistenceResult) {
+                return (PersistenceResult<?>) result;
+            } else {
+                return new BasicPersistenceResult<>(result);
+            }
+        }
+    }
+
+    private final static class PersistenceListResultConverter implements ResourceResultConverter {
+
+        public Object convert(Object result) {
+            if (result instanceof PersistenceResult) {
+                return (PersistenceResult<?>) result;
+            } else {
+                List<?> list = asList(result);
+                return new BasicPersistenceResult<>(list);
+            }
+        }
+    }
+
+    private final static class ListResourceResultConverter implements ResourceResultConverter {
+
+        public Object convert(Object result) {
+            if (result instanceof ReadResult) {
+                return (ReadResult<?>) result;
+            } else {
+                List<?> list = asList(result);
+                return new BasicListResult<>(list);
+            }
+        }
+    }
+
+    private final static class ReadResourceResultConverter implements ResourceResultConverter {
+
+        public Object convert(Object result) {
+            if (result instanceof ReadResult) {
+                return (ReadResult<?>) result;
+            } else {
+                return new BasicReadResult<>(result);
+            }
         }
     }
 

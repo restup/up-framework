@@ -16,5 +16,4 @@ public class HalJsonContentNegotiator extends ContentTypeNegotiation {
         return new HalJsonResult(request, result);
     }
 
-
 }

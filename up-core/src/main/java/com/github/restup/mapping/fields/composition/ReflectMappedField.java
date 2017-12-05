@@ -1,29 +1,29 @@
 package com.github.restup.mapping.fields.composition;
 
-import java.lang.reflect.Field;
-import java.util.Objects;
-
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.mapping.fields.ReadWriteField;
 import com.github.restup.util.ReflectionUtils;
+import java.lang.reflect.Field;
+import java.util.Objects;
 
 public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET, VALUE> {
 
     private final Field field;
 
     ReflectMappedField(Field field) {
-    		field.setAccessible(true);
+        field.setAccessible(true);
         this.field = field;
     }
 
-    public static ReflectMappedField<?,?> of(Field field) {
+    public static ReflectMappedField<?, ?> of(Field field) {
         return new ReflectMappedField<>(field);
     }
 
+    @SuppressWarnings("unchecked")
     @Override
-    public Object readValue(Object o) {
+    public VALUE readValue(Object o) {
         try {
-            return o == null ? null : field.get(o);
+            return o == null ? null : (VALUE) field.get(o);
         } catch (IllegalAccessException e) {
             throw ErrorBuilder.buildException(e);
         } catch (IllegalArgumentException e) {
@@ -48,22 +48,22 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
         return field;
     }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public TARGET createDeclaringInstance() {
-		return (TARGET) ReflectionUtils.newInstance(field.getDeclaringClass());
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public TARGET createDeclaringInstance() {
+        return (TARGET) ReflectionUtils.newInstance(field.getDeclaringClass());
+    }
 
-	@SuppressWarnings("unchecked")
-	@Override
-	public VALUE createInstance() {
-		return (VALUE) ReflectionUtils.newInstance(field.getType());
-	}
-	
-	@Override
-	public boolean isDeclaredBy(Class<?> clazz) {
-		return field.getDeclaringClass() == clazz;
-	}
+    @SuppressWarnings("unchecked")
+    @Override
+    public VALUE createInstance() {
+        return (VALUE) ReflectionUtils.newInstance(field.getType());
+    }
+
+    @Override
+    public boolean isDeclaredBy(Class<?> clazz) {
+        return field.getDeclaringClass() == clazz;
+    }
 
     @Override
     public int hashCode() {
@@ -72,9 +72,13 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ReflectMappedField<?,?> that = (ReflectMappedField<?,?>) o;
+        if (this == o) {
+            return true;
+        }
+        if (o == null || getClass() != o.getClass()) {
+            return false;
+        }
+        ReflectMappedField<?, ?> that = (ReflectMappedField<?, ?>) o;
         return Objects.equals(field, that.field);
     }
 

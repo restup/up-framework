@@ -1,19 +1,23 @@
 package com.github.restup.controller.mock;
 
-import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
+import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
 import com.github.restup.util.UpUtils;
-
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Mock {@link ResourceControllerRequest} for testing
  */
 public class MockResourceControllerRequest extends ResourceControllerRequest {
+
     private final static String LOCALHOST = "http://localhost";
     private final Map<String, String[]> parameters;
 
@@ -36,7 +40,7 @@ public class MockResourceControllerRequest extends ResourceControllerRequest {
     }
 
     public static String getUrl(String path) {
-        return LOCALHOST+(path.startsWith("/")?"":"/")+path;
+        return LOCALHOST + (path.startsWith("/") ? "" : "/") + path;
     }
 
     public List<String> getParameterNames() {
@@ -54,7 +58,6 @@ public class MockResourceControllerRequest extends ResourceControllerRequest {
         private HttpMethod method;
         private String url;
         private Map<String, String[]> headers = new HashMap<String, String[]>();
-
 
         public Builder method(HttpMethod method) {
             this.method = method;
@@ -81,7 +84,7 @@ public class MockResourceControllerRequest extends ResourceControllerRequest {
 
             Map<String, String[]> parameters = parts.length > 1 ?
                     parseParams(parts[1])
-                    : (Map) Collections.emptyMap();
+                    : Collections.emptyMap();
 
             String path = parts[0];
             String url = getUrl(path);

@@ -7,12 +7,11 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
-import org.apache.commons.lang3.StringUtils;
-
-import javax.servlet.http.HttpServletRequest;
 import java.util.Collections;
 import java.util.Enumeration;
 import java.util.List;
+import javax.servlet.http.HttpServletRequest;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Wraps {@link HttpServletRequest} to pass parameter details for Filtereds
@@ -62,6 +61,7 @@ public class HttpServletResourceControllerRequest extends ResourceControllerRequ
     }
 
     public static class Builder extends AbstractBuilder<Builder, HttpServletResourceControllerRequest> {
+
         private final HttpServletRequest httpRequest;
 
         public Builder(HttpServletRequest httpRequest) {

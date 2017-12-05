@@ -4,8 +4,6 @@ import java.io.Serializable;
 
 /**
  * Strategy for id generation.
- *
- * @param <ID>
  */
 public interface IdentityStrategy<ID extends Serializable> {
 

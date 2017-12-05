@@ -1,5 +1,10 @@
 package com.github.restup.service.filters;
 
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.fields.MappedField;
@@ -9,8 +14,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
-import static org.mockito.Mockito.*;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SequencedIdValidationFilterTest {

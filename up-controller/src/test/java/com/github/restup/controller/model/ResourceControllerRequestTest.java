@@ -1,19 +1,18 @@
 package com.github.restup.controller.model;
 
-import com.model.test.company.Company;
-import com.model.test.company.Person;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.fail;
+
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.TestRegistry;
-import org.junit.Test;
-
+import com.model.test.company.Company;
+import com.model.test.company.Person;
 import java.util.Arrays;
 import java.util.Map;
-
-import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
+import org.junit.Test;
 
 @SuppressWarnings({"rawtypes"})
 public class ResourceControllerRequestTest {
@@ -24,7 +23,6 @@ public class ResourceControllerRequestTest {
         assertEquals("person", b.resource.getName());
         assertEquals(Arrays.asList(123l), b.ids);
     }
-
 
     @Test
     public void testErrorUnknownResource() {
@@ -80,7 +78,6 @@ public class ResourceControllerRequestTest {
         return b;
     }
 
-
     private void pathError(String code, String path, String resourceName) {
         try {
             path(path);
@@ -92,7 +89,6 @@ public class ResourceControllerRequestTest {
             assertEquals(resourceName, m.get("resource"));
         }
     }
-
 
     private final static class Builder extends ResourceControllerRequest.AbstractBuilder<Builder, ParsedResourceControllerRequest> {
 

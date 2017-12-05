@@ -1,6 +1,5 @@
 package com.github.restup.controller;
 
-import com.fasterxml.jackson.core.JsonParser;
 import org.junit.Test;
 
 public class DiscoveryServiceTest extends AbstractMockTest {

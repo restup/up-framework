@@ -9,7 +9,6 @@ import com.github.restup.controller.request.parser.AbstractRequestBodyParser;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
-
 import java.util.ArrayList;
 import java.util.Iterator;
 import java.util.List;

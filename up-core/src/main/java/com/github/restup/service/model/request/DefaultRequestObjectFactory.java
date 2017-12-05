@@ -4,13 +4,11 @@ import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
-
 import java.io.Serializable;
 import java.util.List;
 
 /**
- * Default {@link RequestObjectFactory} implementation returning default, basic request
- * object implementations.
+ * Default {@link RequestObjectFactory} implementation returning default, basic request object implementations.
  */
 public class DefaultRequestObjectFactory implements RequestObjectFactory {
 

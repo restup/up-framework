@@ -28,5 +28,4 @@ public class GsonSerializer implements SerializationProvider {
         }
     }
 
-
 }

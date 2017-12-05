@@ -7,6 +7,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 public abstract class StringConverter<T> implements ParameterConverter<String, T> {
+
     private final static Logger log = LoggerFactory.getLogger(StringConverter.class);
 
     private final Class<?>[] convertsTo;

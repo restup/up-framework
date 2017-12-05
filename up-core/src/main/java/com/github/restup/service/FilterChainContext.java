@@ -142,9 +142,9 @@ public class FilterChainContext implements MethodArgumentFactory {
         } else if (clazz == ResourceQueryDefaults.class) {
             return (T) new ResourceQueryDefaults(resource, query);
         } else {
-            for ( Object o : added ) {
-                if ( clazz.isAssignableFrom(o.getClass())) {
-                    return (T)o;
+            for (Object o : added) {
+                if (clazz.isAssignableFrom(o.getClass())) {
+                    return (T) o;
                 }
             }
             return newInstance(clazz, this, getErrors());

@@ -18,15 +18,7 @@ import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 
 /**
- * Default {@link MappedClassFactory} which will accept and build a {@link MappedClass}
- * for any type contained within packages defined by {@link RegistrySettings#packagesToScan}.
- * <p>
- * Fields will be mapped using {@link RegistrySettings#mappedFieldFactory} and sorted using
- * {@link RegistrySettings#mappedFieldOrderComparator}.
- * <p>
- * {@link MappedClass} names will be {@link Class#getName()} by default or {@link ApiName#value()} if present.
- * Plural {@link MappedClass} name will be {@link Plural#value()} if present or use default pluralization, appending
- * 's' to {@link MappedClass#getName()}
+ * Default {@link MappedClassFactory} which will accept and build a {@link MappedClass} for any type contained within packages defined by {@link RegistrySettings#packagesToScan}. <p> Fields will be mapped using {@link RegistrySettings#mappedFieldFactory} and sorted using {@link RegistrySettings#mappedFieldOrderComparator}. <p> {@link MappedClass} names will be {@link Class#getName()} by default or {@link ApiName#value()} if present. Plural {@link MappedClass} name will be {@link Plural#value()} if present or use default pluralization, appending 's' to {@link MappedClass#getName()}
  */
 public class DefaultMappedClassFactory implements MappedClassFactory {
 
@@ -38,10 +30,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     private final MappedFieldFactory mappedFieldFactory;
 
     /**
-     * Requires settings to define packagesToScan, fieldComparator,
-     * and mappedFieldFactory.
-     *
-     * @param settings
+     * Requires settings to define packagesToScan, fieldComparator, and mappedFieldFactory.
      */
     public DefaultMappedClassFactory(RegistrySettings settings) {
         Assert.notNull(settings.getMappedFieldFactory(), "mappedFieldFactory is required");
@@ -54,7 +43,6 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     }
 
     /**
-     * @param type
      * @return true if type is in one of the packages defined by {@link #packagesToScan}, false otherwise
      */
     public boolean isMappable(Class<?> type) {
@@ -80,9 +68,9 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
 
             MappedClass.Builder<T> builder =
                     MappedClass.builder(clazz)
-                        .name(getName(clazz))
-                        .pluralName(getPluralName(clazz))
-                        .sortAttributesWith(fieldComparator);
+                            .name(getName(clazz))
+                            .pluralName(getPluralName(clazz))
+                            .sortAttributesWith(fieldComparator);
 
             if (isMappable(clazz.getSuperclass())) {
                 builder.parentType(clazz.getSuperclass());

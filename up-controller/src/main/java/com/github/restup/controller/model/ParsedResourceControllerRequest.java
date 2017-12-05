@@ -2,17 +2,6 @@ package com.github.restup.controller.model;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-
-import org.apache.commons.collections4.list.SetUniqueList;
-
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorBuilder;
@@ -31,11 +20,18 @@ import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import org.apache.commons.collections4.list.SetUniqueList;
 
 /**
  * Contains result of parsing parameters
- *
- * @param <T>
  */
 public class ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
 
@@ -49,7 +45,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
     private final boolean pageOffsetOneBased;
 
     public ParsedResourceControllerRequest(T data, List<ResourcePath> requestedPaths,
-                                           List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request, ResourceData<?> body, List<String> acceptedParameterNames, String pageLimitParameterName, String pageOffsetParameterName, boolean pageOffsetOneBased) {
+            List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request, ResourceData<?> body, List<String> acceptedParameterNames, String pageLimitParameterName, String pageOffsetParameterName, boolean pageOffsetOneBased) {
         super(request.getMethod(), request.getResource(), request.getIds(), request.getRelationship(), request.getResourceRelationship(), body, request.getContentType(), request.getBaseRequestUrl(), request.getRequestUrl());
         this.data = data;
         this.dataPaths = unmodifiableList(requestedPaths);
@@ -195,14 +191,13 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         private Builder<T> addSort(String rawParameterName, String rawParameterValue, Resource<?, ?> resource,
-                                   String field, Boolean asc) {
+                String field, Boolean asc) {
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
             }
             return addSort(new ResourceSort(path, asc));
         }
-
 
         public void addFilter(List<ResourcePath> paths, Collection<Object> joinIds) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(getResource());
@@ -222,19 +217,19 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public Builder<T> setFieldRequest(String rawParameterName, String rawParameterValue, Resource<?, ?> resource,
-                                          Type type) {
+                Type type) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             return setType(rawParameterName, rawParameterValue, builder, type);
         }
 
         public Builder<T> setFieldRequest(String rawParameterName, String rawParameterValue, String resource,
-                                          Type type) {
+                Type type) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
             return setType(rawParameterName, rawParameterValue, builder, type);
         }
 
         private Builder<T> setType(String rawParameterName, String rawParameterValue,
-                                   ResourceQueryStatement.Builder builder, Type type) {
+                ResourceQueryStatement.Builder builder, Type type) {
             if (builder != null) {
                 builder.setType(type);
             }
@@ -242,7 +237,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public Builder<T> addIncludeJoinPaths(String rawParameterName, String rawParameterValue, String resource,
-                                              String field) {
+                String field) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
             if (builder != null) {
                 builder.addIncludeJoinPaths(getResource(), field);
@@ -251,7 +246,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public Builder<T> addRequestedField(String rawParameterName, String rawParameterValue, String resource,
-                                            String field) {
+                String field) {
             // TODO handle *,**, +, -, embedded fields, embedded paths
             ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
             if (builder != null) {
@@ -261,7 +256,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public Builder<T> addAdditionalField(String rawParameterName, String rawParameterValue, String resource,
-                                             String field) {
+                String field) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
             if (builder != null) {
                 builder.addRequestedPathsAdded(field);
@@ -270,7 +265,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public Builder<T> addExcludedField(String rawParameterName, String rawParameterValue, String resource,
-                                           String field) {
+                String field) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
             if (builder != null) {
                 builder.addRequestedPathsExcluded(field);
@@ -288,7 +283,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         private ResourceQueryStatement.Builder getOrCreateQuery(String rawParameterName, String rawParameterValue,
-                                                                String resourceName) {
+                String resourceName) {
             ResourceQueryStatement.Builder builder = getQuery(resourceName);
             if (builder == null) {
                 Resource<?, ?> resource = getResource(rawParameterName, rawParameterValue, resourceName);
@@ -322,7 +317,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public Builder<T> addFilter(String rawParameterName, String rawParameterValue, String field, String operator,
-                                    String value) {
+                String value) {
             Operator op = Operator.of(operator);
             if (op == null) {
                 addError(getParameterError(rawParameterName, value).code("INVALID_OPERATOR")
@@ -335,7 +330,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
 
         @SuppressWarnings({"unchecked", "rawtypes"})
         public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
-                                    Object value) {
+                Object value) {
             Resource<?, ?> resource = getResource();
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
@@ -364,7 +359,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         private <ID extends Serializable> boolean validatePath(String rawParameterName, Object rawParameterValue,
-                                                               ResourcePath path, Resource<?, ?> resource, String field) {
+                ResourcePath path, Resource<?, ?> resource, String field) {
             if (!path.isValid()) {
                 addError(getParameterError(rawParameterName, rawParameterValue).code("INVALID_PARAMETER_PATH")
                         .title("Invalid path specified ")
@@ -441,7 +436,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         private void addDuplicateParameter(String parameterName, Integer value, String existingParameterName,
-                                           Integer existingValue) {
+                Integer existingValue) {
             addError(getParameterError(parameterName, value).code("DUPLICATE_PARAMETER")
                     .title("Parameter value already specified")
                     .detail("{0} was already specified using '{1}={2}'", parameterName, existingParameterName,

@@ -3,13 +3,7 @@ package com.github.restup.repository;
 import java.io.Serializable;
 
 /**
- * Provides simple, default implementation of bulk operations.
- * <p>
- * These implementations are written to be functional and correct, but not necessarily
- * to perform optimally.  Consider optimized implementation if necessary or desirable.
- *
- * @param <T>
- * @param <ID>
+ * Provides simple, default implementation of bulk operations. <p> These implementations are written to be functional and correct, but not necessarily to perform optimally.  Consider optimized implementation if necessary or desirable.
  */
 public class DefaultBulkRepository<T, ID extends Serializable> {
 

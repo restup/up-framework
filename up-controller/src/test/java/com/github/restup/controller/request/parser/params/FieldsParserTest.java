@@ -1,16 +1,18 @@
 package com.github.restup.controller.request.parser.params;
 
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.times;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
+
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
-import com.model.test.company.Company;
 import com.github.restup.query.ResourceQueryStatement.Type;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.TestRegistry;
+import com.model.test.company.Company;
 import org.junit.Test;
 import org.mockito.Mockito;
-
-import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.*;
 
 public class FieldsParserTest {
 
@@ -53,6 +55,5 @@ public class FieldsParserTest {
         parser.parse(details, b, param, new String[]{"**"});
         verify(b, times(1)).setFieldRequest(param, "**", "company", Type.Every);
     }
-
 
 }

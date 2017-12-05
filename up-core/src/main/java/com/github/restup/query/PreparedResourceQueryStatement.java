@@ -1,24 +1,27 @@
 package com.github.restup.query;
 
+import static com.github.restup.util.UpUtils.removeAll;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import org.apache.commons.collections4.list.SetUniqueList;
-
-import java.util.*;
-
-import static com.github.restup.util.UpUtils.removeAll;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
 public class PreparedResourceQueryStatement extends AbstractResourceQueryStatement {
 
     private final List<ResourcePath> fields;
 
     public PreparedResourceQueryStatement(Resource<?, ?> resource, ResourceQueryStatement query,
-                                          ResourceQueryDefaults template) {
+            ResourceQueryDefaults template) {
         super(resource, criteria(query, template), sort(query, template), pagination(query, resource));
         this.fields = queryFields(resource, query, template);
     }
@@ -35,7 +38,7 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
     }
 
     public static List<ResourceQueryCriteria> criteria(ResourceQueryStatement query, ResourceQueryDefaults defaults,
-                                                       boolean groupEq) {
+            boolean groupEq) {
         List<ResourceQueryCriteria> result = new ArrayList<ResourceQueryCriteria>();
         if (ResourceQueryDefaults.hasCriteria(defaults)) {
             result.addAll(defaults.getCriteria());
@@ -112,12 +115,10 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
     }
 
     /**
-     * @param query
-     * @param defaults
      * @return All of the fields required for
      */
     public static List<ResourcePath> queryFields(Resource<?, ?> resource, ResourceQueryStatement query,
-                                                 ResourceQueryDefaults defaults) {
+            ResourceQueryDefaults defaults) {
         List<ResourcePath> result = SetUniqueList.setUniqueList(new ArrayList<ResourcePath>());
         result.add(ResourcePath.idPath(resource));
         switch (ResourceQueryStatement.getType(query)) {
@@ -140,8 +141,6 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
     }
 
     /**
-     * @param query
-     * @param defaults
      * @return All of the fields required for rendering sparse fields
      */
     public static List<ResourcePath> sparseFields(Resource<?, ?> resource, ResourceQueryStatement query) {
@@ -164,7 +163,7 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
     }
 
     private static void addAndRemove(Resource<?, ?> resource, List<ResourcePath> result, ResourceQueryStatement query,
-                                     boolean includeTransient) {
+            boolean includeTransient) {
         // add relationship paths required which are implied by requested includes
         if (query != null) {
             addAll(result, query.getRequiredRelationshipPaths(), includeTransient);

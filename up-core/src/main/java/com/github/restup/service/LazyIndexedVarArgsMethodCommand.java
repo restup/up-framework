@@ -3,8 +3,7 @@ package com.github.restup.service;
 import java.lang.reflect.Method;
 
 /**
- * Determines the index mapping of method parameters to the
- * array of available arguments on first execution of the method, lazily as needed.
+ * Determines the index mapping of method parameters to the array of available arguments on first execution of the method, lazily as needed.
  */
 public class LazyIndexedVarArgsMethodCommand extends AbstractIndexedVarArgsMethodCommand {
 

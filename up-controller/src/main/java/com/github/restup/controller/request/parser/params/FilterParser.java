@@ -4,9 +4,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 
 /**
- * Parses filter parameters.
- * <p>
- * Ex: For a resource with fields named foo & bar
+ * Parses filter parameters. <p> Ex: For a resource with fields named foo & bar
  * <pre>
  * ?filter[foo]=foo
  * ?filter[bar][gt]=1
@@ -40,7 +38,7 @@ public class FilterParser extends AbstractRequestParamParser<String[]> {
 
     @Override
     protected <T> String[] getParsedParameter(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, String parameterName,
-                                              String[] parameterValues) {
+            String[] parameterValues) {
         String[] parts = parseBracketedString(builder, parameterName, parameterValues, parameterName, 2, 3);
         return parts;
     }

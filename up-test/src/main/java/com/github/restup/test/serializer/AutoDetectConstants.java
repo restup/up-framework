@@ -9,7 +9,6 @@ public class AutoDetectConstants {
     public static final boolean GSON_EXISTS =
             classesExist("com.google.gson.Gson");
 
-
     private AutoDetectConstants() {
 
     }

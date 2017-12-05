@@ -4,6 +4,18 @@ import com.github.restup.annotations.field.Immutable;
 
 public interface Immutability {
 
+    static Immutability getImmutability(Immutable immutable) {
+        return immutable == null ? null
+                : builder()
+                        .immutable(immutable.value())
+                        .errorOnUpdateAttempt(immutable.errorOnUpdateAttempt())
+                        .build();
+    }
+
+    static Builder builder() {
+        return new Builder();
+    }
+
     boolean isImmutable();
 
     /**
@@ -15,25 +27,13 @@ public interface Immutability {
         return !isErrorOnUpdateAttempt();
     }
 
-    static Immutability getImmutability(Immutable immutable) {
-        return immutable == null ? null
-                : builder()
-                .immutable(immutable.value())
-                .errorOnUpdateAttempt(immutable.errorOnUpdateAttempt())
-                .build();
-    }
-
-    static Builder builder() {
-    		return new Builder();
-    }
-
     public static class Builder {
-    	
+
         private boolean immutable;
         private boolean errorOnUpdateAttempt;
-        
+
         Builder() {
-        		immutable = true;
+            immutable = true;
         }
 
         private Builder me() {
@@ -41,16 +41,16 @@ public interface Immutability {
         }
 
         public Builder immutable(boolean immutable) {
-			this.immutable = immutable;
-			return me();
-		}
+            this.immutable = immutable;
+            return me();
+        }
 
-		public Builder errorOnUpdateAttempt(boolean errorOnUpdateAttempt) {
-			this.errorOnUpdateAttempt = errorOnUpdateAttempt;
-			return me();
-		}
+        public Builder errorOnUpdateAttempt(boolean errorOnUpdateAttempt) {
+            this.errorOnUpdateAttempt = errorOnUpdateAttempt;
+            return me();
+        }
 
-		public Immutability build() {
+        public Immutability build() {
             return new BasicImmutability(immutable, errorOnUpdateAttempt);
         }
     }
