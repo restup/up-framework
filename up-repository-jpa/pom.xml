@@ -17,7 +17,7 @@
         <dependency>
             <groupId>com.github.restup</groupId>
             <artifactId>up-core</artifactId>
-            <version>0.0.1-SNAPSHOT</version>
+            <version>${project.version}</version>
         </dependency>
         <dependency>
             <groupId>javax.persistence</groupId>

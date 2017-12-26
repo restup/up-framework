@@ -1,23 +1,26 @@
 package com.github.restup.registry;
 
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.Collection;
+
 import com.github.restup.mapping.MappedClass;
-import com.github.restup.mapping.MappedClassFactory;
+import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
-import java.util.Collection;
+import com.github.restup.util.Streams;
 
 /**
  * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data, field mappings, repository, and service details for each registered each resource <p> A singleton instance exists for convenience, but it is possible to construct multiple {@link ResourceRegistry}s instances if needed.
  *
  * @author andy.buttaro
  */
-public final class ResourceRegistry implements MappedClassFactory {
+public final class ResourceRegistry implements MappedClassRegistry {
 
     private static volatile ResourceRegistry instance = null;
 
     private final RegistrySettings settings;
-    private final ResourceRegistryRepository resourceRegistryMap;
-    private final MappedClassFactory mappedClassFactory;
+    private final ResourceRegistryRepository registryRepository;
 
     public ResourceRegistry() {
         this(RegistrySettings.builder().build());
@@ -30,9 +33,7 @@ public final class ResourceRegistry implements MappedClassFactory {
     public ResourceRegistry(RegistrySettings settings) {
         Assert.notNull(settings, "settings is required");
         Assert.notNull(settings.getResourceRegistryMap(), "resourceRegistryMap is required");
-        Assert.notNull(settings.getMappedClassFactory(), "mappedClassFactory is required");
-        this.resourceRegistryMap = settings.getResourceRegistryMap();
-        this.mappedClassFactory = settings.getMappedClassFactory();
+        this.registryRepository = settings.getResourceRegistryMap();
         this.settings = settings;
         // set singleton instance
         if (settings.isPrimaryRegistry() || instance == null) {
@@ -56,10 +57,12 @@ public final class ResourceRegistry implements MappedClassFactory {
         registerResource(b.registry(this).build());
     }
 
+    public void registerResource(Class<?> resourceClass) {
+        registerResource(Resource.builder(resourceClass));
+    }
+
     public void registerResource(Class<?>... resourceClasses) {
-        for (Class<?> resourceClass : resourceClasses) {
-            registerResource(Resource.builder(resourceClass));
-        }
+    		Streams.forEach(resourceClasses, this::registerResource);
     }
 
     public RegistrySettings getSettings() {
@@ -67,51 +70,48 @@ public final class ResourceRegistry implements MappedClassFactory {
     }
 
     public Resource<?, ?> getResource(String resourceName) {
-        return resourceRegistryMap.getResource(resourceName);
+        return registryRepository.getResource(resourceName);
     }
 
     public Resource<?, ?> getResourceByPluralName(String pluralName) {
-        return resourceRegistryMap.getResourceByPluralName(pluralName);
+        return registryRepository.getResourceByPluralName(pluralName);
     }
 
     public <T> Resource<T, ?> getResource(Class<T> resourceClass) {
-        return resourceRegistryMap.getResource(resourceClass);
+        return registryRepository.getResource(resourceClass);
     }
 
     public Collection<Resource<?, ?>> getResources() {
-        return resourceRegistryMap.getResources();
+        return registryRepository.getResources();
     }
 
     public void registerResource(Resource<?, ?> resource) {
-        resourceRegistryMap.registerResource(resource);
+        registryRepository.registerResource(resource);
     }
 
     public boolean hasResource(String resourceName) {
-        return resourceRegistryMap.hasResource(resourceName);
+        return registryRepository.hasResource(resourceName);
     }
 
     public boolean hasResource(Class<?> resourceClass) {
-        return resourceRegistryMap.hasResource(resourceClass);
+        return registryRepository.hasResource(resourceClass);
     }
 
-    public <T> MappedClass<T> getMappedClass(Class<T> resourceClass) {
-        return resourceRegistryMap.getMappedClass(resourceClass);
-    }
-
-    public boolean isMappable(Class<?> type) {
-        return mappedClassFactory.isMappable(type);
+    @Override
+    public MappedClass<?> getMappedClass(Type resourceClass) {
+        return registryRepository.getMappedClass(resourceClass);
     }
 
     public boolean hasMappedClass(Class<?> mappedClass) {
-        return resourceRegistryMap.hasMappedClass(mappedClass);
+        return registryRepository.hasMapping(mappedClass);
     }
 
     public void registerMappedClass(MappedClass<?> mappedClass) {
-        resourceRegistryMap.registerMappedClass(mappedClass);
+        registryRepository.registerMappedClass(mappedClass);
     }
 
     public ResourceRelationship<?, ?, ?, ?> getRelationship(String from, String to) {
-        return resourceRegistryMap.getRelationship(from, to);
+        return registryRepository.getRelationship(from, to);
     }
 
     public ResourceRelationship<?, ?, ?, ?> getRelationship(Resource<?, ?> from, Resource<?, ?> to) {
@@ -119,6 +119,6 @@ public final class ResourceRegistry implements MappedClassFactory {
     }
 
     public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
-        return resourceRegistryMap.getRelationships(resourceName);
+        return registryRepository.getRelationships(resourceName);
     }
 }

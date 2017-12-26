@@ -1,7 +1,10 @@
 package com.github.restup.mapping.fields.composition;
 
+import static com.github.restup.util.UpUtils.nvl;
+
 import com.github.restup.annotations.field.Relationship;
 import com.github.restup.annotations.field.RelationshipType;
+import com.github.restup.registry.ResourceRegistry;
 
 public interface Relation {
 
@@ -20,26 +23,27 @@ public interface Relation {
         return new Builder();
     }
 
-    public String getName();
+    String getName();
 
-    public RelationshipType getType();
+    RelationshipType getType();
 
-    public String getJoinField();
+    String getJoinField();
 
-    public boolean isIncludable();
+    boolean isIncludable();
 
-    public boolean isValidateReferences();
+    boolean isValidateReferences();
 
-    public Class<?> getResource();
+    String getResource(ResourceRegistry registry);
 
-    public static class Builder {
+    final static class Builder {
 
         private String name;
         private RelationshipType type;
         private String joinField;
         private boolean includable;
         private boolean validateReferences;
-        private Class<?> resource;
+        private String resourceName;
+        private Class<?> resourceClass;
 
         private Builder me() {
             return this;
@@ -70,13 +74,24 @@ public interface Relation {
             return me();
         }
 
+        public Builder resource(String resource) {
+            this.resourceName = resource;
+            return me();
+        }
+
         public Builder resource(Class<?> resource) {
-            this.resource = resource;
+            this.resourceClass = resource;
             return me();
         }
 
         public Relation build() {
-            return new BasicRelation(name, type, joinField, includable, validateReferences, resource);
+        		String joinField = nvl(this.joinField,"id");
+        		RelationshipType type = nvl(this.type, RelationshipType.manyToOne);
+        		String resourceName = this.resourceName;
+        		if ( resourceClass != null ) {
+        			return new BasicTypedRelation(name, type, joinField, includable, validateReferences, resourceClass);
+        	    }
+            return new BasicNamedRelation(name, type, joinField, includable, validateReferences, resourceName);
         }
     }
 }

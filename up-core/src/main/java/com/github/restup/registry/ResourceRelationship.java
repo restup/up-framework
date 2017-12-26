@@ -14,6 +14,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Objects;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID extends Serializable> {
 
@@ -54,8 +55,9 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
         List<ResourcePath> toPaths = new ArrayList<ResourcePath>();
         RelationshipType type = RelationshipType.manyToOne;
         for (ResourcePath path : fromPaths) {
+        	
             MappedField<?> mf = path.lastMappedField();
-            if (to.getType() == mf.getRelationshipResource()) {
+            if (Objects.equals(to.getName(), mf.getRelationshipResource(from.getRegistry()))) {
                 type = mf.getRelationshipType();
                 ResourcePath toPath = ResourcePath.path(to, mf.getRelationshipJoinField());
                 toPaths.add(toPath);
@@ -79,14 +81,9 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
      * @return A list of *all* relationships defined from this resource, including nested objects
      */
     public static List<ResourcePath> getAllRelationshipPaths(Resource<?, ?> resource) {
-        List<ResourcePath> result = new ArrayList<ResourcePath>();
-        for (ResourcePath path : resource.getAllPaths()) {
-            MappedField<?> mf = path.lastMappedField();
-            if (mf.isRelationship()) {
-                result.add(path);
-            }
-        }
-        return result;
+        return resource.getAllPaths().stream()
+        		.filter(path -> path.lastMappedField().isRelationship())
+        		.collect(Collectors.toList());
     }
 
     private RelationshipType converse(RelationshipType type, List<ResourcePath> fromPaths) {
@@ -117,6 +114,7 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
     }
 
     private Set<Object> collect(Object instance, List<ResourcePath> list) {
+    		//TODO Collector
         Set<Object> result = new HashSet<Object>();
         for (ResourcePath path : list) {
             path.collectValues(result, instance);

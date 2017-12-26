@@ -1,79 +1,77 @@
 package com.github.restup.bind.converter;
 
-import com.github.restup.errors.ErrorFactory;
-import java.util.Collections;
+import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Function;
+
+import com.github.restup.errors.ErrorFactory;
+import com.google.common.collect.ImmutableMap;
 
 public class ParameterConverterFactory {
+	
+	private final Map<Type,ParameterConverter<String,?>> converters;
+	private final ParameterConverter<String,?> noOpConverter;
 
-    private final Map<Class<?>, Map<Class<?>, ParameterConverter<?, ?>>> converters;
-    private final NoOpConverter noOpConverter;
+	private ParameterConverterFactory(Map<Type,ParameterConverter<String,?>> converters
+			, ParameterConverter<String,?> noOpConverter) {
+		this.converters = ImmutableMap.copyOf(converters);
+		this.noOpConverter = noOpConverter;
+	}
 
-    public ParameterConverterFactory(ErrorFactory errorFactory, ParameterConverter<?, ?>... converters) {
-        this(errorFactory, true, converters);
-    }
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public <T> ParameterConverter<String,T> getConverter(Type to) {
+		ParameterConverter<String,?> converter = converters.get(to);
+		if ( converter == null ) {
+			if ( String.class == to ) {
+				return (ParameterConverter) noOpConverter;
+			}
+			throw new UnsupportedOperationException("Converter does not exist from String to "+to);
+		}
+		return (ParameterConverter) converter;
+	}
+	
+	public static Builder builder(ErrorFactory errorFactory) {
+		return new Builder(errorFactory);
+	}
 
-    public ParameterConverterFactory(ErrorFactory errorFactory, boolean includeDefaults, ParameterConverter<?, ?>... converters) {
-        Map<Class<?>, Map<Class<?>, ParameterConverter<?, ?>>> map = new HashMap<Class<?>, Map<Class<?>, ParameterConverter<?, ?>>>();
-        if (includeDefaults) {
-            // add defaults, they will be overwritten by any passed
-            // math
-            add(map, new StringToBigDecimalConverter(errorFactory));
-            add(map, new StringToBigIntegerConverter(errorFactory));
+	public final static class Builder {
+		private Map<Type,ParameterConverter<String,?>> converters = new HashMap<>();
+		private ErrorFactory errorFactory;
+		
+		private Builder(ErrorFactory errorFactory) {
+			this.errorFactory = errorFactory;
+		}
+		
+		private Builder me() {
+			return this;
+		}
 
-            // primitives
-            add(map, new StringToBooleanConverter(errorFactory));
-            add(map, new StringToByteConverter(errorFactory));
-            add(map, new StringToCharConverter(errorFactory));
-            add(map, new StringToDoubleConverter(errorFactory));
-            add(map, new StringToFloatConverter(errorFactory));
-            add(map, new StringToIntegerConverter(errorFactory));
-            add(map, new StringToLongConverter(errorFactory));
-            add(map, new StringToShortConverter(errorFactory));
+		public Builder addAll(Map<Type, Function<String, ?>> converters) {
+			if ( converters != null ) {
+				converters.entrySet().forEach( e -> add(e.getKey(), e.getValue()));
+			}
+			return me();
+		}
 
-            // dates & time
-            StringToZonedDateTimeConverter zdt = new StringToZonedDateTimeConverter(errorFactory);
-            add(map, zdt);
-            add(map, new StringToDateConverter(errorFactory, zdt));
-            add(map, new StringToLocalDateConverter(errorFactory));
-            add(map, new StringToLocalDateTimeConverter(errorFactory));
-            add(map, new StringToLocalTimeConverter(errorFactory));
-        }
-        if (converters != null) {
-            for (ParameterConverter<?, ?> converter : converters) {
-                add(map, converter);
-            }
-        }
-        // finalize maps
-        for (Map.Entry<Class<?>, Map<Class<?>, ParameterConverter<?, ?>>> e : map.entrySet()) {
-            map.put(e.getKey(), Collections.unmodifiableMap(e.getValue()));
-        }
-        this.converters = Collections.unmodifiableMap(map);
-        noOpConverter = new NoOpConverter();
-    }
+		public Builder add(Type to, Function<String, ?> f) {
+			return add(to, toConverter(f));
+		}
 
-    public void add(Map<Class<?>, Map<Class<?>, ParameterConverter<?, ?>>> map, ParameterConverter<?, ?> converter) {
-        for (Class<?> from : converter.getConvertsFrom()) {
-            Map<Class<?>, ParameterConverter<?, ?>> toMap = map.get(from);
-            if (toMap == null) {
-                toMap = new HashMap<Class<?>, ParameterConverter<?, ?>>();
-                map.put(from, toMap);
-            }
-            for (Class<?> to : converter.getConvertsTo()) {
-                toMap.put(to, converter);
-            }
-        }
-    }
+		public Builder add(Type to, ParameterConverter<String,?> converter) {
+			converters.put(to, converter);
+			return me();
+		}
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <F, T> ParameterConverter<F, T> getConverter(Class<F> from, Class<T> to) {
-        Map<Class<?>, ParameterConverter<?, ?>> toMap = converters.get(from);
-        if (toMap == null) {
-            return noOpConverter;
-        }
-        ParameterConverter converter = toMap.get(to);
-        return converter == null ? noOpConverter : converter;
-    }
-
+		@SuppressWarnings({ "unchecked", "rawtypes" })
+		private <T> ParameterConverter<T, ?> toConverter(Function<T, ?> f) {
+			return new FunctionalParameterConverter(f, errorFactory);
+		}
+		
+		public ParameterConverterFactory build() {
+			ParameterConverter<String,?> noOpConverter = toConverter(a -> a);
+			return new ParameterConverterFactory(converters, noOpConverter);
+		}
+	}
+	
 }

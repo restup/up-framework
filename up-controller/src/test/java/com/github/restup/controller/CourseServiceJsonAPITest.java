@@ -2,13 +2,18 @@ package com.github.restup.controller;
 
 import com.github.restup.test.RestApiTest;
 import com.university.Course;
+import com.university.Student;
+import com.university.University;
+
 import org.junit.Before;
 import org.junit.Test;
 
 public class CourseServiceJsonAPITest extends AbstractMockTest {
 
     public CourseServiceJsonAPITest() {
-        super(Course.PLURAL_NAME, 1);
+        super(Course.PLURAL_NAME, Course.class
+                , Student.class
+                , University.class);
         jsonapi();
     }
 

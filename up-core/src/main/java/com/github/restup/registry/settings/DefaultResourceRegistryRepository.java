@@ -1,14 +1,19 @@
 package com.github.restup.registry.settings;
 
-import com.github.restup.mapping.MappedClass;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistryRepository;
-import com.github.restup.registry.ResourceRelationship;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.function.Predicate;
+
+import com.github.restup.mapping.MappedClass;
+import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRegistryRepository;
+import com.github.restup.registry.ResourceRelationship;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 /**
  * A simple {@link ResourceRegistryRepository} using {@link IdentityHashMap}. This does not use thread safe collections. However, the expectation is that maps are initialized at startup and then are read only. Under these circumstances, this will be thread safe
@@ -17,45 +22,34 @@ import java.util.Map;
  */
 class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
 
-    private final Map<Class<?>, Resource<?, ?>> resources;
-    private final Map<Class<?>, MappedClass<?>> mappings;
-    private final Map<String, Map<String, ResourceRelationship<?, ?, ?, ?>>> relationships;
+    private final Map<String, Resource<?, ?>> resources;
+    private final Map<Type, MappedClass<?>> mappings;
+    
+    private final Table<String, String, ResourceRelationship<?, ?, ?, ?>> relationships;
 
     DefaultResourceRegistryRepository() {
-        resources = new IdentityHashMap<Class<?>, Resource<?, ?>>();
-        mappings = new IdentityHashMap<Class<?>, MappedClass<?>>();
-        relationships = new HashMap<String, Map<String, ResourceRelationship<?, ?, ?, ?>>>();
+        resources = new HashMap<>();
+        mappings = new IdentityHashMap<>();
+        relationships = HashBasedTable.create();
     }
 
     public void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
             ResourceRelationship<?, ?, ?, ?> relationship) {
-        Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.get(from.getName());
-        if (map == null) {
-            map = new HashMap<String, ResourceRelationship<?, ?, ?, ?>>();
-            relationships.put(from.getName(), map);
-        }
-        map.put(to.getName(), relationship);
+        relationships.put(from.getName(), to.getName(), relationship);
     }
 
     @Override
     public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
-        Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.get(resourceName);
+        Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.column(resourceName);
         return map == null ? Collections.emptySet() : map.values();
     }
 
     public ResourceRelationship<?, ?, ?, ?> getRelationship(String from, String to) {
-        Map<String, ResourceRelationship<?, ?, ?, ?>> relations = relationships.get(from);
-        return relations == null ? null : relations.get(to);
+        return relationships.get(from, to);
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> Resource<T, ?> getResource(Class<T> resourceClass) {
-        return (Resource) resources.get(resourceClass);
-    }
-
-    @SuppressWarnings({"unchecked", "rawtypes"})
-    public <T> MappedClass<T> getMappedClass(Class<T> resourceClass) {
-        return (MappedClass) mappings.get(resourceClass);
+    public MappedClass<?> getMappedClass(Type resourceClass) {
+        return mappings.get(resourceClass);
     }
 
     public Collection<Resource<?, ?>> getResources() {
@@ -70,33 +64,32 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
         return null != getResource(resourceClass);
     }
 
+    @SuppressWarnings({"unchecked", "rawtypes"})
+    public <T> Resource<T, ?> getResource(Class<T> resourceClass) {
+		return (Resource) getResource(resourceClass, r->resourceClass == r.getType() );
+    }
+
     public Resource<?, ?> getResource(String resourceName) {
-        if (resourceName != null) {
-            for (Resource<?, ?> resource : resources.values()) {
-                if (resourceName.equals(resource.getName())) {
-                    return resource;
-                }
-            }
-        }
-        return null;
+		return resources.get(resourceName);
     }
 
     public Resource<?, ?> getResourceByPluralName(String pluralName) {
-        if (pluralName != null) {
-            for (Resource<?, ?> resource : resources.values()) {
-                if (pluralName.equals(resource.getPluralName())) {
-                    return resource;
-                }
-            }
-        }
-        return null;
+		return getResource(pluralName, r->pluralName.equals(r.getPluralName()));
+    }
+
+    private Resource<?, ?> getResource(Object value, Predicate<Resource<?,?>> filter) {
+    		return value == null ? null : getResources()
+    				.stream()
+    				.filter(filter)
+    				.findAny()
+    				.orElse(null);
     }
 
     public void registerResource(Resource<?, ?> resource) {
-        resources.put(resource.getType(), resource);
+        resources.put(resource.getName(), resource);
     }
 
-    public boolean hasMappedClass(Class<?> mappedClass) {
+    public boolean hasMapping(Type mappedClass) {
         return mappings.containsKey(mappedClass);
     }
 

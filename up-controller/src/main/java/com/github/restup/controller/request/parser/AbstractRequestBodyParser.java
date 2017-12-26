@@ -34,12 +34,18 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
         graph(request, builder, resource, path, body);
 
         if (!builder.hasErrors()) {
-            builder.setData(deserializeBody(request, builder, body));
+        		Object deserialized = deserializeBody(request, builder, body);
+        		deserialized = Resource.validate(resource, deserialized);
+            builder.setData(deserialized);
         }
     }
 
-    protected ResourcePath.Builder path(ResourcePath parent, ParsedResourceControllerRequest.Builder<?> builder, String fieldName) {
+	protected static ResourcePath.Builder path(ResourcePath parent, ParsedResourceControllerRequest.Builder<?> builder, String fieldName) {
         return path(parent).setErrors(builder).append(fieldName);
+    }
+
+    protected static ResourcePath.Builder path(ResourcePath parent) {
+        return ResourcePath.builder(parent).setMode(ResourcePath.Builder.Mode.API).setQuiet(true);
     }
 
     /**
@@ -96,10 +102,6 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
         } else {
             builder.addRequestedPath(parent);
         }
-    }
-
-    protected ResourcePath.Builder path(ResourcePath parent) {
-        return ResourcePath.builder(parent).setMode(ResourcePath.Builder.Mode.API).setQuiet(true);
     }
 
     @SuppressWarnings("unchecked")

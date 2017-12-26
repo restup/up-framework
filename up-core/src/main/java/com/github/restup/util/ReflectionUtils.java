@@ -2,11 +2,14 @@ package com.github.restup.util;
 
 import com.github.restup.annotations.operations.AutoWrapDisabled;
 import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.mapping.UntypedClass;
 import com.googlecode.gentyref.GenericTypeReflector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -56,22 +59,32 @@ public class ReflectionUtils {
      * Create a new instance, catching exceptions and rethrowing using {@link ErrorBuilder#throwError(Throwable)}
      *
      * @return a new instance of c
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
      */
     public final static <T> T newInstance(Class<T> c) {
         if (c != null) {
             try {
-                return c.newInstance();
-            } catch (InstantiationException e) {
-                if (!c.isInterface()) {
-                    ErrorBuilder.throwError(e);
-                }
-            } catch (IllegalAccessException e) {
+                Constructor<T> constructor = c.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                return constructor.newInstance();
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
                 if (!c.isInterface()) {
                     ErrorBuilder.throwError(e);
                 }
             }
         }
         return null;
+    }
+    
+    @SuppressWarnings("unchecked")
+	public final static <T> T newInstance(Type c) {
+    		if ( c instanceof Class) {
+    			return newInstance((Class<T>) c);
+    		} else if ( c instanceof UntypedClass<?> ) {
+    			return (T) ((UntypedClass<?>) c).newInstance();
+    		}
+    		throw new IllegalArgumentException("Unable to create an instance of type");
     }
 
     public static <T> BeanInfo<T> getBeanInfo(Class<T> c) {
@@ -88,6 +101,7 @@ public class ReflectionUtils {
     public static Class<?> getReturnType(PropertyDescriptor pd, Class<?> clazz) {
         Method getter = pd.getGetter();
         if (getter != null) {
+        	
             Type type = GenericTypeReflector.getExactReturnType(getter, clazz);
             return GenericTypeReflector.erase(type);
         }

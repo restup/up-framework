@@ -1,13 +1,11 @@
 package com.github.restup.bind.converter;
 
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorFactory;
-import com.github.restup.errors.Errors;
 import java.util.HashSet;
 import java.util.Set;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class StringToBooleanConverter extends StringConverter<Boolean> {
+public class StringToBooleanConverter {
 
     private static final Set<String> trueValues;
     private static final Set<String> falseValues;
@@ -30,9 +28,6 @@ public class StringToBooleanConverter extends StringConverter<Boolean> {
         falseValues.add("f");
     }
 
-    protected StringToBooleanConverter(ErrorFactory errorFactory) {
-        super(errorFactory, Boolean.class, Boolean.TYPE);
-    }
 
     public static boolean isTrue(Object value) {
         if (value instanceof Boolean) {
@@ -44,11 +39,9 @@ public class StringToBooleanConverter extends StringConverter<Boolean> {
         return false;
     }
 
-    @Override
-    protected Boolean convertValue(String parameterName, String source, Errors errors) {
-
-        String value = source.trim();
-        if (!StringUtils.isEmpty(source)) {
+    public static Boolean toBoolean(String from) {
+        String value = from.trim();
+        if (!StringUtils.isEmpty(from)) {
             value = value.toLowerCase();
             if (trueValues.contains(value)) {
                 return Boolean.TRUE;
@@ -56,18 +49,7 @@ public class StringToBooleanConverter extends StringConverter<Boolean> {
                 return Boolean.FALSE;
             }
         }
-        errors.addError(
-                ErrorBuilder.builder()
-                        .source(
-                                getErrorFactory()
-                                        .createParameterError(parameterName, value))
-
-        );
-        return null;
+        throw new IllegalArgumentException(from+" is not a valid boolean value");
     }
 
-    @Override
-    Boolean convertValue(String from) {
-        return null;
-    }
 }

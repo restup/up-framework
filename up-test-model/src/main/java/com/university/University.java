@@ -22,46 +22,46 @@ import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 @Plural(PLURAL_NAME)
 public class University {
 
-    public static final String RESOURCE_NAME = "university";
-    public static final String PLURAL_NAME = "universities";
-    public static final String TABLE_NAME = RESOURCE_NAME;
+	public static final String RESOURCE_NAME = "university";
+	public static final String PLURAL_NAME = "universities";
+	public static final String TABLE_NAME = RESOURCE_NAME;
 
-    @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
-    private Long id;
+	@Id
+	@GeneratedValue(strategy = GenerationType.AUTO)
+	private final Long id;
 
-    // use javax validations
-    @SafeHtml(whitelistType = WhiteListType.NONE)
-    @NotBlank
-    @CaseInsensitive(searchField = "nameUpperCase", lowerCased = false)
-    private String name;
+	// use javax validations
+	@SafeHtml(whitelistType = WhiteListType.NONE)
+	@NotBlank
+	@CaseInsensitive(searchField = "nameUpperCase", lowerCased = false)
+	private final String name;
 
-    @Column(name = "name_upper_case")
-    @JsonIgnore
-    private String nameUpperCase;
+	@Column(name = "name_upper_case")
+	@JsonIgnore
+	private final String nameUpperCase;
 
-    public Long getId() {
-        return id;
-    }
+	public University(Long id, String name, String nameUpperCase) {
+		super();
+		this.id = id;
+		this.name = name;
+		this.nameUpperCase = nameUpperCase;
+	}
 
-    public void setId(Long id) {
-        this.id = id;
-    }
+	public University() {
+		// for Jackson deserialization
+		this(null, null, null);
+	}
 
-    public String getName() {
-        return name;
-    }
+	public Long getId() {
+		return id;
+	}
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public String getNameUpperCase() {
-        return nameUpperCase;
-    }
-
-    public void setNameUpperCase(String nameUpperCase) {
-        this.nameUpperCase = nameUpperCase;
-    }
+	public String getNameUpperCase() {
+		return nameUpperCase;
+	}
 
 }

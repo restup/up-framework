@@ -1,13 +1,14 @@
 package com.github.restup.bind.converter;
 
-import com.github.restup.errors.ErrorFactory;
 import java.time.Instant;
 import java.time.ZoneOffset;
 import java.time.ZonedDateTime;
 import java.time.format.DateTimeParseException;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class StringToZonedDateTimeConverter extends StringConverter<ZonedDateTime> {
+public class StringToZonedDateTimeConverter implements Function<String, ZonedDateTime> {
 
     private static final String DEFAULT_ZONE = "Z";
     private static final String DEFAULT_TIME = "T00:00:00Z";
@@ -16,12 +17,12 @@ public class StringToZonedDateTimeConverter extends StringConverter<ZonedDateTim
     private final boolean acceptEpochMillis;
     private final boolean acceptEpochSeconds;
 
-    public StringToZonedDateTimeConverter(ErrorFactory errorFactory) {
-        this(errorFactory, true, true, false);
+    public StringToZonedDateTimeConverter() {
+        this(true, true, false);
     }
 
-    public StringToZonedDateTimeConverter(ErrorFactory errorFactory, boolean lenient, boolean acceptEpochMillis, boolean acceptEpochSeconds) {
-        super(errorFactory, ZonedDateTime.class);
+    public StringToZonedDateTimeConverter(boolean lenient, boolean acceptEpochMillis, boolean acceptEpochSeconds) {
+        super();
         this.lenient = lenient;
         this.acceptEpochMillis = acceptEpochMillis;
         this.acceptEpochSeconds = acceptEpochSeconds;
@@ -31,7 +32,7 @@ public class StringToZonedDateTimeConverter extends StringConverter<ZonedDateTim
     }
 
     @Override
-    ZonedDateTime convertValue(String s) {
+    public ZonedDateTime apply(String s) {
         String d = s;
         if (lenient) {
             int l = s.length();

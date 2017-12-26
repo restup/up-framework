@@ -1,11 +1,13 @@
 package com.github.restup.bind.converter;
 
+import java.util.function.Function;
+
 import com.github.restup.errors.Errors;
 
 /**
  * Interface for converting a parameter from input type to the appropriate field type
  */
-public interface ParameterConverter<F, T> {
+public interface ParameterConverter<T,R> extends Function<T, R> {
 
     /**
      * Convert a parameter, appending any errors to provided errors object
@@ -14,16 +16,6 @@ public interface ParameterConverter<F, T> {
      * @param from value of the parameter requiring conversion
      * @param errors to append any conversion errors to
      */
-    T convert(String parameterName, F from, Errors errors);
-
-    /**
-     * @return the types the implementation supports conversion from.  For binding, should always be String
-     */
-    Class<?>[] getConvertsFrom();
-
-    /**
-     * @return the types the implementation supports conversion to.  Typically expected to be 1 type, but in the case of primitives and their wrappers expected to be 2
-     */
-    Class<?>[] getConvertsTo();
+    R convert(String parameterName, T from, Errors errors);
 
 }

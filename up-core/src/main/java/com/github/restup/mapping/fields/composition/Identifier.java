@@ -2,7 +2,7 @@ package com.github.restup.mapping.fields.composition;
 
 public interface Identifier {
 
-    static Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 

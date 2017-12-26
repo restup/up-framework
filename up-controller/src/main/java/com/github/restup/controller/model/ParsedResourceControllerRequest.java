@@ -2,6 +2,18 @@ package com.github.restup.controller.model;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
+import java.util.stream.Collectors;
+
+import org.apache.commons.collections4.list.SetUniqueList;
+
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorBuilder;
@@ -20,15 +32,6 @@ import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import org.apache.commons.collections4.list.SetUniqueList;
 
 /**
  * Contains result of parsing parameters
@@ -327,10 +330,20 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
             }
             return addFilter(rawParameterName, rawParameterValue, field, op, value);
         }
+        
+        public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
+                Collection<?> value) {
+        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, (Collection<?>) value);
+        }
+        
+        public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
+                String value) {
+        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, value);
+        }
 
         @SuppressWarnings({"unchecked", "rawtypes"})
-        public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
-                Object value) {
+        private Builder<T> addFilterInternal(String rawParameterName, Object rawParameterValue, String field, Operator operator,
+                String value) {
             Resource<?, ?> resource = getResource();
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
@@ -340,16 +353,31 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
             Object converted = convertValue(path, value, rawParameterName);
             return addFilter(new ResourcePathFilter(path, operator, converted));
         }
+        
+        private Builder<T> addFilterInternal(String rawParameterName, Object rawParameterValue, String field, Operator operator,
+                Collection<?> value) {
+            Resource<?, ?> resource = getResource();
+            ResourcePath path = path(resource, field);
+            if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
+                return me();
+            }
+            // TODO check if field supports operator
+            Object converted = value.stream()
+            		.map( v -> convertValue(path, v, rawParameterName) )
+            		.collect(Collectors.toList());
+            
+            return addFilter(new ResourcePathFilter<>(path, operator, converted));
+        }
 
         @SuppressWarnings({"rawtypes", "unchecked"})
         private Object convertValue(ResourcePath path, Object value, String parameterName) {
-            if (value != null) {
+            if (value instanceof String) {
                 MappedField<?> mf = path.lastMappedField();
                 if (mf != null) {
-                    Class<?> type = mf.getType();
+                	java.lang.reflect.Type type = mf.getType();
 
                     ParameterConverterFactory factory = registry.getSettings().getParameterConverterFactory();
-                    ParameterConverter converter = factory.getConverter(value.getClass(), type);
+                    ParameterConverter converter = factory.getConverter(type);
                     if (converter != null) {
                         return converter.convert(parameterName, value, this);
                     }

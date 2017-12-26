@@ -1,19 +1,23 @@
 package com.github.restup.mapping.fields;
 
+import java.lang.reflect.Type;
+import java.util.Objects;
+
 import com.github.restup.annotations.field.Param;
 import com.github.restup.mapping.fields.composition.CaseSensitivity;
 import com.github.restup.mapping.fields.composition.Identifier;
 import com.github.restup.mapping.fields.composition.Immutability;
 import com.github.restup.mapping.fields.composition.Relation;
-import java.util.Objects;
+import com.github.restup.util.ReflectionUtils;
 
 class BasicMappedField<T> implements MappedField<T> {
 
-    private final Class<T> type;
+    private final Type type;
     private final String beanName;
     private final String apiName;
     private final String persistedName;
 
+    private final boolean collection;
     private final boolean apiProperty;
     private final boolean transientField;
 
@@ -22,17 +26,18 @@ class BasicMappedField<T> implements MappedField<T> {
     private final CaseSensitivity caseSensitivity;
     private final Immutability immutability;
     private final Relation relation;
-    private WritableField<Object, T> writer;
-    private ReadableField<T> reader;
+    private final WritableField<Object, T> writer;
+    private final ReadableField<T> reader;
 
-    BasicMappedField(Class<T> type, String beanName, String apiName, String persistedName,
-            Identifier identifier, boolean apiProperty, boolean transientField, CaseSensitivity caseSensitivity,
+    BasicMappedField(Type type, String beanName, String apiName, String persistedName,
+            Identifier identifier, boolean collection, boolean apiProperty, boolean transientField, CaseSensitivity caseSensitivity,
             Relation relationship, Immutability immutability, String[] parameterNames, ReadableField<T> reader,
             WritableField<Object, T> writer) {
         this.type = type;
         this.beanName = beanName;
         this.apiName = apiName;
         this.persistedName = persistedName;
+        this.collection = collection;
         this.apiProperty = apiProperty;
         this.transientField = transientField;
         this.parameterNames = parameterNames;
@@ -44,9 +49,15 @@ class BasicMappedField<T> implements MappedField<T> {
         this.immutability = immutability;
         this.relation = relationship;
     }
+    
+    @Override
+    public T newInstance() {
+    		return ReflectionUtils.newInstance(type);
+    }
+    
 
     @Override
-    public Class<T> getType() {
+    public Type getType() {
         return type;
     }
 
@@ -63,6 +74,11 @@ class BasicMappedField<T> implements MappedField<T> {
     @Override
     public String getPersistedName() {
         return persistedName;
+    }
+    
+    @Override
+    public boolean isCollection() {
+    		return collection;
     }
 
     @Override

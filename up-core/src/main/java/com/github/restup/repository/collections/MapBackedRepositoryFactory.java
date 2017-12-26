@@ -1,5 +1,7 @@
 package com.github.restup.repository.collections;
 
+import java.lang.reflect.Type;
+
 import com.github.restup.registry.Resource;
 import com.github.restup.repository.RepositoryFactory;
 
@@ -15,7 +17,7 @@ public class MapBackedRepositoryFactory implements RepositoryFactory {
     }
 
     @SuppressWarnings("rawtypes")
-    private IdentityStrategy getStrategy(Class type) {
+    private IdentityStrategy getStrategy(Type type) {
         if (type == String.class) {
             return new StringIdentityStrategy();
         }

@@ -87,7 +87,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
                     MappedFieldPathValue<?> mappedFieldPathValue = (MappedFieldPathValue<?>) pv;
                     MappedField<?> mappedField = mappedFieldPathValue.getMappedField();
 
-                    Resource<?, ?> rel = resource.getRegistry().getResource(mappedField.getRelationship().getResource());
+                    Resource<?, ?> rel = resource.getRegistry().getResource(mappedField.getRelationshipResource(resource.getRegistry()));
                     Object value = mappedFieldPathValue.readValue(data);
 
                     // add the relationship key and start the relationship object

@@ -1,10 +1,12 @@
 package com.github.restup.mapping;
 
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 import org.apache.commons.lang3.StringUtils;
 
@@ -18,12 +20,12 @@ import com.github.restup.util.Assert;
  */
 public interface MappedClass<T> {
 
-    static Builder<?> builder() {
-        return new Builder<>();
+    public static Builder<Object> builder() {
+        return new AnonymousBuilder();
     }
 
-    static <T> Builder<T> builder(Class<T> type) {
-        return new Builder<T>().type(type);
+    public static <T> Builder<T> builder(Class<T> type) {
+        return new Builder<T>(type);
     }
 
     /**
@@ -39,30 +41,56 @@ public interface MappedClass<T> {
     /**
      * The type of the object
      */
-    Class<T> getType();
+    Type getType();
 
     /**
      * The type of the object's parent
      */
-    Class<?> getParentType();
+    Type getParentType();
+
+    /**
+     * If nested properties of this mapping have a {@link Map} with typed properties
+     * then this should return true.
+     * @return true if the model contains a {@link Map} with typed properties
+     */
+	boolean containsTypedMap();
 
     /**
      * The attributes of the object
      */
-
     List<MappedField<?>> getAttributes();
 
-    final static class Builder<T> {
+    /**
+     * @return a new instance of {@link #getType()}
+     */
+	T newInstance();
+    
+    static class AnonymousBuilder extends Builder<Object> {
+
+			@Override
+    		public Builder<Object> addAttribute(MappedField.Builder<?> builder) {
+    			builder.anonymousMapping();
+    			return super.addAttribute(builder);
+    		}
+    }
+
+    static class Builder<T> {
 
         private String name;
         private String pluralName;
-        private Class<T> type;
-        private Class<?> parentType;
+        private final Type type;
+        private Type parentType;
         private List<MappedField<?>> attributes;
         private Comparator<MappedField<?>> fieldComparator;
 
-        Builder() {
+        Builder(Type type) {
+        		Assert.notNull(type, "type is required");
+            this.type = type;
             attributes = new ArrayList<>();
+        }
+        
+        Builder() {
+        		this(new UntypedClass<>());
         }
 
         private Builder<T> me() {
@@ -74,6 +102,13 @@ public interface MappedClass<T> {
             return me();
         }
 
+		public Builder<T> defaultName(String name) {
+			if ( StringUtils.isEmpty(this.name) ) {
+				return name(name);
+			}
+            return me();
+		}
+
         public Builder<T> pluralName(String pluralName) {
             this.pluralName = pluralName;
             return me();
@@ -84,7 +119,7 @@ public interface MappedClass<T> {
             return me();
         }
 
-        public Builder<T> addAttribute(MappedField<?> attribute) {
+        Builder<T> addAttribute(MappedField<?> attribute) {
             attributes.add(attribute);
             return me();
         }
@@ -97,7 +132,20 @@ public interface MappedClass<T> {
             return addAttribute(attribute(type, name));
         }
 
-        public Builder<T> addIdAttribute(Class<?> type, String name) {
+        public Builder<T> addCaseInsensitiveAttribute(String name, String lowerCaseNameField) {
+            return addAttribute(MappedField.builder(String.class)
+    				.apiName(name)
+    				.caseSensitiviteField(lowerCaseNameField))
+            		// add lowerCaseNameField
+            		.addAttribute(MappedField.builder(String.class)
+            				.beanName(lowerCaseNameField));
+        }
+
+        public Builder<T> id(Class<?> type) {
+            return id(type, "id");
+        }
+
+        public Builder<T> id(Class<?> type, String name) {
             return addAttribute(attribute(type, name)
                     .idField(true));
         }
@@ -119,26 +167,19 @@ public interface MappedClass<T> {
             return me();
         }
 
-        Builder<T> type(Class<T> type) {
-            this.type = type;
-            return me();
-        }
-
-        @SuppressWarnings({"unchecked", "rawtypes"})
         public MappedClass<T> build() {
             Assert.notEmpty(name, "name is required");
             String pluralName = this.pluralName;
+            boolean containsTypedMap = type instanceof UntypedClass;
             if (StringUtils.isEmpty(pluralName)) {
                 pluralName = name + "s";
-            }
-            Class<T> type = this.type;
-            if (type == null) {
-                type = (Class) HashMap.class;
             }
             if (fieldComparator != null) {
                 Collections.sort(attributes, fieldComparator);
             }
-            return new BasicMappedClass<T>(name, pluralName, type, parentType, attributes);
+            return new BasicMappedClass<T>(name, pluralName, type, parentType, attributes, containsTypedMap);
         }
+        
     }
+	
 }

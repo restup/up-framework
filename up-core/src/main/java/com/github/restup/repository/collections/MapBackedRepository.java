@@ -139,12 +139,10 @@ public class MapBackedRepository<T, ID extends Serializable> {
     }
 
     private boolean filter(List<ResourceQueryCriteria> list, T t) {
-        for (ResourceQueryCriteria criteria : list) {
-            if (!criteria.filter(t)) {
-                return false;
-            }
-        }
-        return true;
+    		return ! list.stream()
+    				.filter(c -> !c.filter(t))
+    				.findAny()
+    				.isPresent();
     }
 
     private void sort(PreparedResourceQueryStatement ps, List<T> result) {

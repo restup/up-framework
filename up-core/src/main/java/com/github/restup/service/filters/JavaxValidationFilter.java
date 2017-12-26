@@ -13,13 +13,16 @@ import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.service.ServiceFilter;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import java.io.Serializable;
 import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Map;
 import java.util.Set;
 import javax.validation.ConstraintViolation;
 import javax.validation.Validator;
@@ -31,7 +34,7 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public class JavaxValidationFilter {
+public class JavaxValidationFilter implements ServiceFilter {
 
     private final Logger log = LoggerFactory.getLogger(JavaxValidationFilter.class);
 
@@ -113,7 +116,7 @@ public class JavaxValidationFilter {
 
             Object o = mappedField.readValue(target);
             if (o != null) {
-                Class<?> type = mappedField.getType();
+                Type type = mappedField.getType();
                 if (mappedField instanceof IterableField) {
                     type = ((IterableField) mappedField).getGenericType();
                 }
@@ -174,5 +177,10 @@ public class JavaxValidationFilter {
             }
         }
     }
+
+	@Override
+	public <T, ID extends Serializable> boolean accepts(Resource<T, ID> resource) {
+		return resource.getType() instanceof Class;
+	}
 
 }

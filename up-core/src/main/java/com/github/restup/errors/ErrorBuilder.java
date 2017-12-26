@@ -1,16 +1,19 @@
 package com.github.restup.errors;
 
-import com.github.restup.path.DataPathValue;
-import com.github.restup.path.MappedFieldPathValue;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.registry.Resource;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+import static org.apache.commons.lang3.StringUtils.join;
+import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import org.apache.commons.lang3.StringUtils;
+import com.github.restup.path.DataPathValue;
+import com.github.restup.path.MappedFieldPathValue;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.registry.Resource;
 
 /**
  * {@link RequestError} Builder
@@ -189,8 +192,8 @@ public class ErrorBuilder {
             while (current != null) {
                 if (current.value() instanceof MappedFieldPathValue) {
                     MappedFieldPathValue pv = (MappedFieldPathValue) current.value();
-                    if (StringUtils.isNotEmpty(pv.getApiPath())) {
-                        String[] camelParts = StringUtils.splitByCharacterTypeCamelCase(pv.getApiPath());
+                    if (isNotEmpty(pv.getApiPath())) {
+                        String[] camelParts = splitByCharacterTypeCamelCase(pv.getApiPath());
                         for (String s : camelParts) {
                             parts.add(s);
                         }
@@ -207,7 +210,7 @@ public class ErrorBuilder {
             parts.add("ERROR");
         }
 
-        return StringUtils.join(parts, "_").toUpperCase();
+        return join(parts, "_").toUpperCase();
     }
 
     public ErrorObjectException buildException() {
@@ -275,11 +278,11 @@ public class ErrorBuilder {
             }
         }
         String code = this.code;
-        if (StringUtils.isEmpty(code)) {
+        if (isEmpty(code)) {
             code = getDefaultCode();
         }
         String title = this.title;
-        if (StringUtils.isEmpty(title)) {
+        if (isEmpty(title)) {
             if (errorCode != null) {
                 title = errorCode.getTitle();
             } else {
@@ -287,7 +290,7 @@ public class ErrorBuilder {
             }
         }
         String detail = this.detail;
-        if (StringUtils.isEmpty(detail)) {
+        if (isEmpty(detail)) {
             if (errorCode != null) {
                 detail = errorCode.getDetail();
             } else {

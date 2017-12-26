@@ -65,4 +65,8 @@ public class UpUtils {
         }
     }
 
+	public static <T> T nvl(T a, T b) {
+		return a == null ? b : a;
+	}
+
 }

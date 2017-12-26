@@ -17,7 +17,7 @@ import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
  */
 public class DefaultMappedFieldFactory implements MappedFieldFactory {
 
-    private MappedFieldBuilderVisitor[] visitors;
+    private final MappedFieldBuilderVisitor[] visitors;
 
     public DefaultMappedFieldFactory(MappedFieldBuilderVisitor... visitors) {
         this.visitors = visitors;

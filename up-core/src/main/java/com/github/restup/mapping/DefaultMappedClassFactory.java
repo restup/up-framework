@@ -2,7 +2,7 @@ package com.github.restup.mapping;
 
 import static com.github.restup.util.ReflectionUtils.getBeanInfo;
 
-import java.util.Collection;
+import java.util.Arrays;
 import java.util.Comparator;
 
 import org.slf4j.Logger;
@@ -15,7 +15,6 @@ import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
-import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 
 /**
  * Default {@link MappedClassFactory} which will accept and build a {@link MappedClass} for any type contained within packages defined by {@link RegistrySettings#packagesToScan}. <p> Fields will be mapped using {@link RegistrySettings#mappedFieldFactory} and sorted using {@link RegistrySettings#mappedFieldOrderComparator}. <p> {@link MappedClass} names will be {@link Class#getName()} by default or {@link ApiName#value()} if present. Plural {@link MappedClass} name will be {@link Plural#value()} if present or use default pluralization, appending 's' to {@link MappedClass#getName()}
@@ -45,22 +44,22 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     /**
      * @return true if type is in one of the packages defined by {@link #packagesToScan}, false otherwise
      */
+    @Override
     public boolean isMappable(Class<?> type) {
-        if (type == null) {
-            return false;
-        }
-        return contains(packagesToScan, type);
-    }
-
-    private boolean contains(String[] packages, Class<?> type) {
-        for (String pkg : packages) {
-            if (type.getName().startsWith(pkg)) {
-                return true;
-            }
+        if (type instanceof Class) {
+            return contains(packagesToScan, (Class<?>) type);
         }
         return false;
     }
 
+    private boolean contains(String[] packages, Class<?> type) {
+    		return Arrays.stream(packages)
+    			.filter(pkg -> type.getName().startsWith(pkg))
+    			.findFirst()
+    			.isPresent();
+    }
+
+    @Override
     public <T> MappedClass<T> getMappedClass(Class<T> clazz) {
 
         MappedClass<T> mappedClass = null;
@@ -78,11 +77,9 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
 
             BeanInfo<T> bi = getBeanInfo(clazz);
 
-            Collection<PropertyDescriptor> descriptors = bi.getPropertyDescriptors();
-
-            for (PropertyDescriptor pd : descriptors) {
+            bi.getPropertyDescriptors().forEach(pd -> {
                 builder.addAttribute(mappedFieldFactory.getMappedField(bi, pd));
-            }
+            });
 
             mappedClass = builder.build();
             log.debug("Created {}", mappedClass);
@@ -95,7 +92,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
         return mappedClass;
     }
 
-    protected String getName(Class<?> clazz) {
+    public static String getName(Class<?> clazz) {
         ApiName apiName = clazz.getAnnotation(ApiName.class);
         if (apiName != null) {
             return apiName.value();
@@ -103,7 +100,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
         return clazz.getName();
     }
 
-    protected String getPluralName(Class<?> clazz) {
+    public static String getPluralName(Class<?> clazz) {
         Plural plural = clazz.getAnnotation(Plural.class);
         if (plural != null) {
             return plural.value();

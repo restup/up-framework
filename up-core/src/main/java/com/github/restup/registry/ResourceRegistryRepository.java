@@ -1,6 +1,8 @@
 package com.github.restup.registry;
 
 import com.github.restup.mapping.MappedClass;
+
+import java.lang.reflect.Type;
 import java.util.Collection;
 
 /**
@@ -51,12 +53,12 @@ public interface ResourceRegistryRepository {
     /**
      * @return a mappedClass, never null
      */
-    <T> MappedClass<T> getMappedClass(Class<T> mappedClass);
+    MappedClass<?> getMappedClass(Type mappedClass);
 
     /**
      * @return true if a mappedClass with a class matching mappedClass exists, false otherwise
      */
-    boolean hasMappedClass(Class<?> mappedClass);
+    boolean hasMapping(Type mapping);
 
     /**
      * add a relationship between two objects
@@ -76,6 +78,10 @@ public interface ResourceRegistryRepository {
      */
     Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName);
 
+    /**
+     * 
+     * @return all registered resources
+     */
     Collection<Resource<?, ?>> getResources();
 
 }

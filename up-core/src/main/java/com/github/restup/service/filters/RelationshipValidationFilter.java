@@ -1,17 +1,5 @@
 package com.github.restup.service.filters;
 
-import com.github.restup.annotations.filter.PreCreateFilter;
-import com.github.restup.annotations.filter.PreUpdateFilter;
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.Errors;
-import com.github.restup.mapping.fields.IterableField;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.query.ResourceQuery;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.service.model.request.CreateRequest;
-import com.github.restup.service.model.request.UpdateRequest;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.HashMap;
@@ -19,9 +7,23 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.util.Objects;
 import java.util.Set;
+
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
+
+import com.github.restup.annotations.filter.PreCreateFilter;
+import com.github.restup.annotations.filter.PreUpdateFilter;
+import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.Errors;
+import com.github.restup.mapping.fields.IterableField;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.query.ResourceQuery;
+import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.service.model.request.CreateRequest;
+import com.github.restup.service.model.request.UpdateRequest;
 
 public class RelationshipValidationFilter {
 
@@ -39,12 +41,12 @@ public class RelationshipValidationFilter {
 
     private <T, ID extends Serializable> void validateReferences(ResourceRegistry registry, Errors errors, T data,
             List<ResourcePath> requestedPaths) {
-        Map<Class<?>, Set<Object>> idsByRelationship = getIdsByRelationship(requestedPaths, data);
+        Map<String, Set<Object>> idsByRelationship = getIdsByRelationship(registry, requestedPaths, data);
         removeValidRelationshipsFromMap(registry, idsByRelationship);
-        for (Entry<Class<?>, Set<Object>> e : idsByRelationship.entrySet()) {
+        for (Entry<String, Set<Object>> e : idsByRelationship.entrySet()) {
             Set<Object> invalidIds = e.getValue();
             if (CollectionUtils.isNotEmpty(invalidIds)) {
-                Map<ResourcePath, Set<Object>> idsByPath = getIdsByPath(e.getKey(), requestedPaths, data);
+                Map<ResourcePath, Set<Object>> idsByPath = getIdsByPath(registry, e.getKey(), requestedPaths, data);
                 for (Entry<ResourcePath, Set<Object>> ee : idsByPath.entrySet()) {
                     Set<Object> idsRequested = ee.getValue();
                     if (CollectionUtils.isNotEmpty(idsRequested)) {
@@ -78,8 +80,8 @@ public class RelationshipValidationFilter {
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})
-    private void removeValidRelationshipsFromMap(ResourceRegistry registry, Map<Class<?>, Set<Object>> idsByRelationship) {
-        for (Entry<Class<?>, Set<Object>> e : idsByRelationship.entrySet()) {
+    private void removeValidRelationshipsFromMap(ResourceRegistry registry, Map<String, Set<Object>> idsByRelationship) {
+        for (Entry<String, Set<Object>> e : idsByRelationship.entrySet()) {
             Set<Object> idsToValidate = e.getValue();
             if (CollectionUtils.isNotEmpty(idsToValidate)) {
                 Resource<?, ?> toResource = registry.getResource(e.getKey());
@@ -97,15 +99,15 @@ public class RelationshipValidationFilter {
     /**
      * Get a list of ids by relationship for validation query by id
      */
-    private Map<Class<?>, Set<Object>> getIdsByRelationship(List<ResourcePath> requestedPaths, Object data) {
-        Map<Class<?>, Set<Object>> idsByRelationship = new HashMap<Class<?>, Set<Object>>();
+    private Map<String, Set<Object>> getIdsByRelationship(ResourceRegistry registry, List<ResourcePath> requestedPaths, Object data) {
+        Map<String, Set<Object>> idsByRelationship = new HashMap<>();
         for (ResourcePath path : requestedPaths) {
-            Class<?> relationshipClass = getRelationshipResource(path);
-            if (relationshipClass != null) {
-                Set<Object> ids = idsByRelationship.get(relationshipClass);
+            String relationshipName = ResourcePath.getRelationshipResource(registry, path);
+            if (relationshipName != null) {
+                Set<Object> ids = idsByRelationship.get(relationshipName);
                 if (ids == null) {
                     ids = new HashSet<Object>();
-                    idsByRelationship.put(relationshipClass, ids);
+                    idsByRelationship.put(relationshipName, ids);
                 }
                 path.collectValues(ids, data);
             }
@@ -118,22 +120,17 @@ public class RelationshipValidationFilter {
      *
      * @return Map of relationship ids by path
      */
-    private Map<ResourcePath, Set<Object>> getIdsByPath(Class<?> forRelationship, List<ResourcePath> requestedPaths, Object data) {
+    private Map<ResourcePath, Set<Object>> getIdsByPath(ResourceRegistry registry, String forRelationship, List<ResourcePath> requestedPaths, Object data) {
         Map<ResourcePath, Set<Object>> idsByPath = new HashMap<ResourcePath, Set<Object>>();
         for (ResourcePath path : requestedPaths) {
-            Class<?> relationshipClass = getRelationshipResource(path);
-            if (relationshipClass == forRelationship) {
+            String relationshipClass = ResourcePath.getRelationshipResource(registry, path);
+            if ( Objects.equals(relationshipClass, forRelationship)) {
                 Set<Object> ids = new HashSet<Object>();
                 path.collectValues(ids, data);
                 idsByPath.put(path, ids);
             }
         }
         return idsByPath;
-    }
-
-    private Class<?> getRelationshipResource(ResourcePath path) {
-        MappedField<?> mf = path.lastMappedField();
-        return mf.getRelationshipResource();
     }
 
 }

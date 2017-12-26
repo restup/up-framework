@@ -13,13 +13,15 @@ import com.model.test.company.Company;
 import com.model.test.company.Contractor;
 import com.model.test.company.Employee;
 import com.model.test.company.Person;
+
+import java.lang.reflect.Type;
 import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 
 public class MappedClassFactoryTest {
 
-    MappedClassFactory factory = ResourceRegistryTest.registry();
+    MappedClassRegistry factory = ResourceRegistryTest.registry();
 
     public static MappedField<?> assertField(MappedClass<?> mappedClass, int i, String name, Class<?> type) {
         return assertField(mappedClass, i, name, type, false, false, false, null);
@@ -68,27 +70,23 @@ public class MappedClassFactoryTest {
         }
         assertEquals(insensitive, field.isCaseInsensitive());
 
-        assertEquals(relationshipClass, field.getRelationshipResource());
+//        assertEquals(relationshipClass, field.getRelationshipResource(null));
         assertEquals(relationshipClass == null ? null : "id", field.getRelationshipJoinField());
-        if (relationshipClass == null) {
-            assertNull(field.getRelationshipResource());
-        }
+//        if (relationshipClass == null) {
+//            assertNull(field.getRelationshipResource(null));
+//        }
         field.writeValue(null, null);
         assertNull(field.readValue(null));
-        try {
-            Object o = mappedClass.getType().newInstance();
-            field.writeValue(o, null);
-            assertNull(field.readValue(null));
-            Object value = getValue(field.getType());
-            field.writeValue(o, value);
-            assertEquals(value, field.readValue(o));
-        } catch (ReflectiveOperationException e) {
-            throw new RuntimeException(e);
-        }
+        Object o = mappedClass.newInstance();
+        field.writeValue(o, null);
+        assertNull(field.readValue(null));
+        Object value = getValue(field.getType());
+        field.writeValue(o, value);
+        assertEquals(value, field.readValue(o));
         return field;
     }
 
-    private static Object getValue(Class<?> type) {
+    private static Object getValue(Type type) {
         if (type.equals(Long.class)) {
             return Long.valueOf(1);
         }
@@ -101,7 +99,7 @@ public class MappedClassFactoryTest {
         if (type.equals(Address.class)) {
             return new Address();
         }
-        throw new UnsupportedOperationException(type.getName());
+        throw new UnsupportedOperationException(type.toString());
     }
 
     private static void assertMappedClass(MappedClass<?> mappedClass, Class<?> type, Class<?> parentType, int size) {
