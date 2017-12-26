@@ -5,7 +5,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public interface CaseSensitivity {
 
-    static Builder builder() {
+    public static Builder builder() {
         return new Builder();
     }
 
@@ -45,7 +45,7 @@ public interface CaseSensitivity {
         }
 
         public Builder searchField(String searchField) {
-            this.searchField = StringUtils.isEmpty(searchField) ? null : searchField;
+            this.searchField = StringUtils.isBlank(searchField) ? null : searchField;
             return me();
         }
 

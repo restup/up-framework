@@ -176,7 +176,7 @@ public class FilteredServiceMethodCommandTest {
             c.setName("foo");
             ResourceServiceOperations service = getService(repository);
             List<ResourcePath> paths = Arrays.asList(ResourcePath.path(registry, Company.class, "name"));
-            service.update((UpdateRequest) getInstance().getUpdateRequest(null, 1l, c, paths, null, null));
+            service.update((UpdateRequest) getInstance().getUpdateRequest((Resource)registry.getResource(c.getClass()), 1l, c, paths, null, null));
         } catch (ErrorObjectException e) {
             log.debug("Error", e.getCause());
             assertEquals(1, e.getErrors().size());

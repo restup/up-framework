@@ -54,8 +54,9 @@ public class ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID 
         List<ResourcePath> toPaths = new ArrayList<ResourcePath>();
         RelationshipType type = RelationshipType.manyToOne;
         for (ResourcePath path : fromPaths) {
+        	
             MappedField<?> mf = path.lastMappedField();
-            if (to.getType() == mf.getRelationshipResource()) {
+            if (Objects.equals(to.getName(), mf.getRelationshipResource(from.getRegistry()))) {
                 type = mf.getRelationshipType();
                 ResourcePath toPath = ResourcePath.path(to, mf.getRelationshipJoinField());
                 toPaths.add(toPath);

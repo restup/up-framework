@@ -1,26 +1,26 @@
 package com.github.restup.bind.converter;
 
-import com.github.restup.errors.ErrorFactory;
 import java.time.LocalDateTime;
+import java.util.function.Function;
+
 import org.apache.commons.lang3.StringUtils;
 
-public class StringToLocalDateTimeConverter extends StringConverter<LocalDateTime> {
+public class StringToLocalDateTimeConverter implements Function<String,LocalDateTime> {
 
     private static final String DEFAULT_TIME = "T00:00:00Z";
 
     private final boolean lenient;
 
-    public StringToLocalDateTimeConverter(ErrorFactory errorFactory) {
-        this(errorFactory, true);
+    public StringToLocalDateTimeConverter() {
+        this(true);
     }
 
-    public StringToLocalDateTimeConverter(ErrorFactory errorFactory, boolean lenient) {
-        super(errorFactory, LocalDateTime.class);
+    public StringToLocalDateTimeConverter(boolean lenient) {
         this.lenient = lenient;
     }
 
     @Override
-    LocalDateTime convertValue(String s) {
+    public LocalDateTime apply(String s) {
         String d = s;
         if (lenient) {
             if (s.length() == 10) {

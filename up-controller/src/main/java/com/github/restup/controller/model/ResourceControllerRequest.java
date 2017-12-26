@@ -2,6 +2,15 @@ package com.github.restup.controller.model;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Enumeration;
+import java.util.List;
+import java.util.Objects;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
@@ -14,12 +23,6 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Enumeration;
-import java.util.List;
-import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * In an http request, this is a partially parsed details from the request, having parsed the request path to obtain resource info and ids.
@@ -223,7 +226,7 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
                 String basePath = registry.getSettings().getBasePath();
                 if (basePath != null) {
                     int i = requestPath.indexOf(basePath);
-                    path = i <= 0 ? requestPath : requestPath.substring(i);
+                    path = i < 0 ? requestPath : requestPath.substring(i+basePath.length());
                 } else {
                     path = requestPath;
                 }
@@ -305,11 +308,11 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
                 }
 
                 if (idString != null) {
-                    Class<?> type = resource.getIdentityField().getType();
+                    Type type = resource.getIdentityField().getType();
                     String[] ids = idString.split(",");
                     List<Object> list = new ArrayList<Object>(ids.length);
                     ParameterConverterFactory f = registry.getSettings().getParameterConverterFactory();
-                    ParameterConverter<String, ?> converter = f.getConverter(String.class, type);
+                    ParameterConverter<String, ?> converter = f.getConverter(type);
                     Errors errors = null;
                     for (String s : ids) {
                         list.add(converter.convert("ids", s, errors));
@@ -320,7 +323,7 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
                 if (basePath != null) {
                     // if basePath is not null path is strict, so confirm there are not extra path parts
                     if (arr.length != resourcePathSize) {
-                        invalidPath(requestPath);
+                        throw invalidPath(requestPath);
                     }
                 }
             }

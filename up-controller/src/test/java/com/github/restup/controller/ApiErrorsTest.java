@@ -1,12 +1,18 @@
 package com.github.restup.controller;
 
 import com.github.restup.test.RestApiTest;
+import com.university.Course;
+import com.university.Student;
+import com.university.University;
+
 import org.junit.Test;
 
 public class ApiErrorsTest extends AbstractMockTest {
 
     public ApiErrorsTest() {
-        super("/universities", 1);
+        super("/universities", Course.class
+                , Student.class
+                , University.class);
     }
 
     @Test

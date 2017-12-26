@@ -39,12 +39,12 @@ public class ResourceQuery {
      * @param <T> type of class to be found
      * @return resource found
      */
-    public static <T> T find(ResourceRegistry registry, Class<T> resourceClass, Object id) {
-        return query(registry, resourceClass).filterById(id).get();
+    public static <T> T find(ResourceRegistry registry, String resourceName, Object id) {
+        return (T) query(registry, resourceName).filterById(id).get();
     }
 
     public static <T> T find(Resource<T, ?> resource, Object id) {
-        return new Builder<T>(resource.getRegistry(), resource.getType()).filterById(id).get();
+        return new Builder<T>(resource.getRegistry(), resource.getName()).filterById(id).get();
     }
 
     /**
@@ -54,12 +54,12 @@ public class ResourceQuery {
      * @param resourceClass resource to find
      * @param <T> type of class to be found
      */
-    public static <T> Builder<T> query(ResourceRegistry registry, Class<T> resourceClass) {
-        return new Builder<T>(registry, resourceClass);
+    public static <T> Builder<T> query(ResourceRegistry registry, String resourceName) {
+        return new Builder<T>(registry, resourceName);
     }
 
     public static <T> Builder<T> query(Resource<T, ?> resource) {
-        return new Builder<T>(resource.getRegistry(), resource.getType());
+        return query(resource.getRegistry(), resource.getName());
     }
 
     public static <T> Builder<T> query(ResourceQueryStatement query, Errors errors) {
@@ -76,11 +76,11 @@ public class ResourceQuery {
         private final RequestObjectFactory factory;
         private ResourceQueryStatement.Builder query;
 
-        Builder(ResourceRegistry registry, Class<T> resourceClass) {
+        Builder(ResourceRegistry registry, String resourceName) {
             super();
             Assert.notNull(registry, "registry is required");
-            Assert.notNull(resourceClass, "resourceClass is required");
-            this.resource = registry.getResource(resourceClass);
+            Assert.notNull(resourceName, "resourceName is required");
+            this.resource = (Resource) registry.getResource(resourceName);
             this.factory = registry.getSettings().getRequestObjectFactory();
             Assert.notNull(resource, "resource is required");
             query = ResourceQueryStatement.builder(resource);

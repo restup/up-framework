@@ -45,11 +45,12 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     /**
      * @return true if type is in one of the packages defined by {@link #packagesToScan}, false otherwise
      */
+    @Override
     public boolean isMappable(Class<?> type) {
-        if (type == null) {
-            return false;
+        if (type instanceof Class) {
+            return contains(packagesToScan, (Class<?>) type);
         }
-        return contains(packagesToScan, type);
+        return false;
     }
 
     private boolean contains(String[] packages, Class<?> type) {
@@ -61,6 +62,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
         return false;
     }
 
+    @Override
     public <T> MappedClass<T> getMappedClass(Class<T> clazz) {
 
         MappedClass<T> mappedClass = null;
@@ -95,7 +97,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
         return mappedClass;
     }
 
-    protected String getName(Class<?> clazz) {
+    public static String getName(Class<?> clazz) {
         ApiName apiName = clazz.getAnnotation(ApiName.class);
         if (apiName != null) {
             return apiName.value();
@@ -103,7 +105,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
         return clazz.getName();
     }
 
-    protected String getPluralName(Class<?> clazz) {
+    public static String getPluralName(Class<?> clazz) {
         Plural plural = clazz.getAnnotation(Plural.class);
         if (plural != null) {
             return plural.value();

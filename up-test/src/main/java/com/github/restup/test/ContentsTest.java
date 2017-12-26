@@ -1,7 +1,15 @@
 package com.github.restup.test;
 
+import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.is;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.restup.test.resource.*;
+import com.github.restup.test.resource.ByteArrayContents;
+import com.github.restup.test.resource.Contents;
+import com.github.restup.test.resource.RelativeTestResource;
+import com.github.restup.test.resource.ResourceContents;
+import com.github.restup.test.resource.StringContents;
 import com.github.restup.test.serializer.AutoDetectConstants;
 import com.github.restup.test.serializer.GsonSerializer;
 import com.github.restup.test.serializer.JacksonSerializer;
@@ -10,10 +18,6 @@ import org.apache.commons.lang3.StringUtils;
 import org.hamcrest.Matcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.is;
 
 public class ContentsTest {
 
@@ -104,6 +108,7 @@ public class ContentsTest {
                     body = GsonSerializer.convertToString(gson, value);
                 }
             }
+            //TODO xml
             if (body == null) {
                 throw new IllegalStateException("Unable to serialize value. Please add a supported serializer to classpath (Jackson, Gson))");
             }

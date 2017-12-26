@@ -102,7 +102,7 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
     }
 
     protected T findOne(Resource<T, ID> resource, ID id) {
-        return findOne(resource.getType(), id);
+        return findOne(resource.getClassType(), id);
     }
 
     protected T findOne(Class<T> resourceClass, Object id) {
@@ -115,7 +115,7 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
     public ReadResult<List<T>> list(ListRequest<T> request, PreparedResourceQueryStatement ps) {
         EntityManager em = getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        Class<T> resourceClass = (Class) request.getResource().getType();
+        Class<T> resourceClass = (Class) request.getResource().getClassType();
         CriteriaQuery<T> q = cb.createQuery(resourceClass);
 
         Root<T> root = q.from(resourceClass);

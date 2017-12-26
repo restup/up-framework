@@ -1,28 +1,34 @@
 package com.github.restup.bind.converter;
 
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorFactory;
-import com.github.restup.errors.Errors;
+import java.util.function.Function;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-public abstract class StringConverter<T> implements ParameterConverter<String, T> {
+import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.ErrorFactory;
+import com.github.restup.errors.Errors;
 
-    private final static Logger log = LoggerFactory.getLogger(StringConverter.class);
+public class FunctionalParameterConverter<T> implements ParameterConverter<String, T> {
 
-    private final Class<?>[] convertsTo;
+    private final static Logger log = LoggerFactory.getLogger(FunctionalParameterConverter.class);
 
     private final ErrorFactory errorFactory;
+    
+    private final Function<String,T> function;
 
-    protected StringConverter(ErrorFactory errorFactory, Class<?>... clazz) {
-        this.convertsTo = clazz;
+    protected FunctionalParameterConverter(Function<String,T> function, ErrorFactory errorFactory) {
         this.errorFactory = errorFactory;
+        this.function = function;
     }
 
-    abstract T convertValue(String from);
+	@Override
+	public final T apply(String from) {
+        return function.apply(from);
+	}
 
     protected T convertValue(String parameterName, String from, Errors errors) {
-        return convertValue(from);
+        return apply(from);
     }
 
     public final T convert(String parameterName, String from, Errors errors) {
@@ -39,14 +45,6 @@ public abstract class StringConverter<T> implements ParameterConverter<String, T
                             .meta(parameterName, from));
         }
         return null;
-    }
-
-    public Class<?>[] getConvertsFrom() {
-        return new Class[]{String.class};
-    }
-
-    public Class<?>[] getConvertsTo() {
-        return convertsTo;
     }
 
     public ErrorFactory getErrorFactory() {

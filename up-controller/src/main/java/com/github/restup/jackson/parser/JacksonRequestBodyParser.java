@@ -61,7 +61,7 @@ public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode
     @Override
     protected Object deserializeObject(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<?> builder, JsonNode node) {
         try {
-            return mapper.treeToValue(node, details.getResource().getType());
+            return mapper.treeToValue(node, details.getResource().getClassType());
         } catch (JsonProcessingException e) {
             builder.addError(ErrorBuilder.ErrorCode.BODY_INVALID);
             return null;

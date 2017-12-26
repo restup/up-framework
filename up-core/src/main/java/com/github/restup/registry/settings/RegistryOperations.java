@@ -1,7 +1,18 @@
 package com.github.restup.registry.settings;
 
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+
+import org.apache.commons.lang3.StringUtils;
+
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
+import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.PolymorphicMappedClass;
 import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.mapping.fields.MappedField;
@@ -10,18 +21,11 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.util.Assert;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Registry implementation of {@link MappedClassFactory} and {@link ResourceRegistryRepository} allowing implementation to be shared with other Up! implementations without reference to registry itself
  */
-class RegistryOperations implements MappedClassFactory, ResourceRegistryRepository {
+class RegistryOperations implements MappedClassRegistry, ResourceRegistryRepository {
 
     private final ResourceRegistryRepository resourceRepository;
     private final MappedClassFactory mappedClassFactory;
@@ -50,13 +54,15 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
         return resourceClass == null ? null : resourceRepository.getResource(resourceClass);
     }
 
-    public <T> MappedClass<T> getMappedClass(Class<T> resourceClass) {
-        MappedClass<T> result = null;
+    public MappedClass<?> getMappedClass(Type resourceClass) {
+        MappedClass<?> result = null;
         if (resourceClass != null) {
             result = resourceRepository.getMappedClass(resourceClass);
             if (result == null) {
-                result = mappedClassFactory.getMappedClass(resourceClass);
-                registerMappedClass(result);
+            		if ( resourceClass instanceof Class ) {
+	                result = mappedClassFactory.getMappedClass((Class<?>)resourceClass);
+	                registerMappedClass(result);
+            		}
             }
 
         }
@@ -71,12 +77,8 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
         return StringUtils.isEmpty(resourceName) ? false : resourceRepository.hasResource(resourceName);
     }
 
-    public boolean hasMappedClass(Class<?> mappedClass) {
-        return mappedClass == null ? false : resourceRepository.hasMappedClass(mappedClass);
-    }
-
-    public boolean isMappable(Class<?> type) {
-        return type == null ? false : mappedClassFactory.isMappable(type);
+    public boolean hasMapping(Type type) {
+        return type == null ? false : resourceRepository.hasMapping(type);
     }
 
     public synchronized void registerMappedClass(MappedClass<?> mappedClass) {
@@ -100,24 +102,30 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
 
         // build relationships defined by this resource
         buildRelationships(resource);
-        // check for and build relationshps defined from this resource
-        List<Resource<?, ?>> from = removeMissingResourceRelationship(resource.getType());
-        buildRelationships(from, resource);
+        // check for and build relationships defined from this resource
+        buildMissingRelationships(resource, resource.getName());
+        // see BasicTypedRelation
+        buildMissingRelationships(resource, resource.getType().getTypeName());
     }
 
-    private void buildRelationships(List<Resource<?, ?>> fromList, Resource<?, ?> to) {
+    private void buildMissingRelationships(Resource<?, ?> resource, String key) {
+        List<Resource<?, ?>> from = removeMissingResourceRelationship(key);
+        buildRelationships(from, resource);
+	}
+
+	private void buildRelationships(List<Resource<?, ?>> fromList, Resource<?, ?> to) {
         if (fromList != null) {
             for (Resource<?, ?> from : fromList) {
-                Map<Class<?>, List<ResourcePath>> relationshipPaths = mapRelationships(from);
-                List<ResourcePath> paths = relationshipPaths.get(to.getType());
+                Map<String, List<ResourcePath>> relationshipPaths = mapRelationships(from);
+                List<ResourcePath> paths = relationshipPaths.get(to.getName());
                 addRelationship(from, to, paths);
             }
         }
     }
 
     private void buildRelationships(Resource<?, ?> from) {
-        Map<Class<?>, List<ResourcePath>> relationshipPaths = mapRelationships(from);
-        for (Entry<Class<?>, List<ResourcePath>> e : relationshipPaths.entrySet()) {
+        Map<String, List<ResourcePath>> relationshipPaths = mapRelationships(from);
+        for (Entry<String, List<ResourcePath>> e : relationshipPaths.entrySet()) {
             Resource<?, ?> to = getResource(e.getKey());
             if (to == null) {
                 // hopefully this is a temporary condition at startup
@@ -158,27 +166,27 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
     }
 
     /**
-     * Since a relationship to a resource can exist at multiple paths, we map paths by resource class
+     * Since a relationship to a resource can exist at multiple paths, we map paths by resource name
      */
-    private Map<Class<?>, List<ResourcePath>> mapRelationships(Resource<?, ?> resource) {
-        Map<Class<?>, List<ResourcePath>> relationshipsToClass = new HashMap<Class<?>, List<ResourcePath>>();
+    private Map<String, List<ResourcePath>> mapRelationships(Resource<?, ?> resource) {
+        Map<String, List<ResourcePath>> relationshipsToClass = new HashMap<>();
         List<ResourcePath> relationships = ResourceRelationship.getAllRelationshipPaths(resource);
         for (ResourcePath path : relationships) {
-            Class<?> clazz = getRelationship(path);
-            List<ResourcePath> paths = relationshipsToClass.get(clazz);
+            String resourceName = getRelationship(resource, path);
+            List<ResourcePath> paths = relationshipsToClass.get(resourceName);
             if (paths == null) {
                 paths = new ArrayList<ResourcePath>();
-                relationshipsToClass.put(clazz, paths);
+                relationshipsToClass.put(resourceName, paths);
             }
             paths.add(path);
         }
         return relationshipsToClass;
     }
 
-    private Class<?> getRelationship(ResourcePath path) {
+    private String getRelationship(Resource<?, ?> resource, ResourcePath path) {
         MappedField<?> mf = path.lastMappedField();
         if (mf != null) {
-            return mf.getRelationshipResource();
+            return mf.getRelationshipResource(resource.getRegistry());
         }
         return null;
     }
@@ -220,13 +228,16 @@ class RegistryOperations implements MappedClassFactory, ResourceRegistryReposito
         }
     }
 
-    private void mapGraph(Class<?> type) {
-        if (mappedClassFactory.isMappable(type)) {
-            if (!hasMappedClass(type)) {
-                MappedClass<?> embeddedMappedClass = mappedClassFactory.getMappedClass(type);
-                registerMappedClass(embeddedMappedClass);
-            }
-        }
+    private void mapGraph(Type type) {
+    		if ( type instanceof Class ) {
+    			Class<?> clazz = (Class<?>) type;
+	        if (mappedClassFactory.isMappable(clazz)) {
+	            if (!hasMapping(type)) {
+	                MappedClass<?> embeddedMappedClass = mappedClassFactory.getMappedClass(clazz);
+	                registerMappedClass(embeddedMappedClass);
+	            }
+	        }
+    		}
     }
 
 }

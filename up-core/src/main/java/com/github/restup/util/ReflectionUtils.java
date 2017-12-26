@@ -2,6 +2,7 @@ package com.github.restup.util;
 
 import com.github.restup.annotations.operations.AutoWrapDisabled;
 import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.mapping.UntypedClass;
 import com.googlecode.gentyref.GenericTypeReflector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
@@ -73,6 +74,16 @@ public class ReflectionUtils {
         }
         return null;
     }
+    
+    @SuppressWarnings("unchecked")
+	public final static <T> T newInstance(Type c) {
+    		if ( c instanceof Class) {
+    			return newInstance((Class<T>) c);
+    		} else if ( c instanceof UntypedClass<?> ) {
+    			return (T) ((UntypedClass<?>) c).newInstance();
+    		}
+    		throw new IllegalArgumentException("Unable to create an instance of type");
+    }
 
     public static <T> BeanInfo<T> getBeanInfo(Class<T> c) {
         BeanInfo<T> beanInfo = new BeanInfo<T>(c);
@@ -88,6 +99,7 @@ public class ReflectionUtils {
     public static Class<?> getReturnType(PropertyDescriptor pd, Class<?> clazz) {
         Method getter = pd.getGetter();
         if (getter != null) {
+        	
             Type type = GenericTypeReflector.getExactReturnType(getter, clazz);
             return GenericTypeReflector.erase(type);
         }

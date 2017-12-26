@@ -1,31 +1,31 @@
 package com.github.restup.bind;
 
+import java.util.Collection;
+
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.MappedClass;
-import com.github.restup.mapping.MappedClassFactory;
+import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.service.FilterChainContext;
 import com.github.restup.util.Assert;
-import com.github.restup.util.ReflectionUtils;
-import java.util.Collection;
 
 /**
  * Default {@link MethodArgumentFactory} used to instantiate filter method arguments and bind (http) request parameters to the instantiated objects.
  */
 public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
 
-    private final MappedClassFactory mappedClassFactory;
+    private final MappedClassRegistry mappedClassRegistry;
     private final ParameterConverterFactory parameterConverterFactory;
 
     public DefaultMethodArgumentFactory(RegistrySettings settings) {
-        this.mappedClassFactory = settings.getMappedClassFactory();
+        this.mappedClassRegistry = settings.getMappedClassRegistry();
         this.parameterConverterFactory = settings.getParameterConverterFactory();
-        Assert.notNull(mappedClassFactory, "mappedClassFactory is required");
+        Assert.notNull(mappedClassRegistry, "mappedClassRegistry is required");
         Assert.notNull(parameterConverterFactory, "parameterConverterFactory is required");
     }
 
@@ -35,7 +35,7 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
         ParameterProvider parameterProvider = ctx.getParameterProvider();
         if (parameterProvider != null) {
             // get class mapping for the parameter
-            MappedClass<T> mappedClass = mappedClassFactory.getMappedClass(clazz);
+            MappedClass<?> mappedClass = mappedClassRegistry.getMappedClass(clazz);
             if (mappedClass != null && mappedClass.getAttributes() != null) {
                 // check all mapped fields for (those annotated as allowing)
                 // parameterNames.
@@ -99,7 +99,7 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private <T> Object convert(String parameterName, MappedField<T> field, Errors errors, String value) {
-        ParameterConverter converter = parameterConverterFactory.getConverter(String.class, field.getType());
+        ParameterConverter converter = parameterConverterFactory.getConverter(field.getType());
         if (converter != null) {
             return converter.convert(parameterName, value, errors);
         }
@@ -111,8 +111,8 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
         if (collection != null) {
             return collection;
         }
-        if (Collection.class.isAssignableFrom(field.getType())) {
-            return (Collection) ReflectionUtils.newInstance(field.getType());
+        if ( field.isCollection() ) {
+            return (Collection) field.newInstance();
         }
         return null;
     }

@@ -1,14 +1,17 @@
 package com.github.restup.mapping.fields.composition;
 
-import com.github.restup.mapping.fields.ReadWriteField;
-import com.github.restup.util.Assert;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
 
+import com.github.restup.mapping.fields.ReadWriteField;
+import com.github.restup.util.Assert;
+
 public class MapField<VALUE> implements ReadWriteField<Map<String, Object>, VALUE> {
 
     private final String key;
+    
+    //TODO type... deserialization will serialize 1 to int when should be Long... this may cause problems
 
     MapField(String key) {
         Assert.notEmpty(key, "key is required");
@@ -19,7 +22,7 @@ public class MapField<VALUE> implements ReadWriteField<Map<String, Object>, VALU
         return new MapField<>(key);
     }
 
-    @SuppressWarnings("unchecked")
+    @SuppressWarnings({ "unchecked" })
 	public VALUE readValue(Object o) {
         Map<String, Object> map = asMap(o);
         return (VALUE) map.get(key);

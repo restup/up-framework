@@ -1,19 +1,47 @@
 package com.github.restup.controller;
 
-import com.github.restup.test.RestApiTest;
-import com.university.Course;
-import com.university.Student;
-import com.university.University;
-
 import org.junit.Before;
 import org.junit.Test;
 
-public class CourseServiceTest extends AbstractMockTest {
+import com.github.restup.mapping.MappedClass;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.test.RestApiTest;
 
-    public CourseServiceTest() {
-        super("/courses", Course.class
-                , Student.class
-                , University.class);
+public class CourseServiceWithoutModelTest extends AbstractMockTest {
+
+    public CourseServiceWithoutModelTest() {
+        super(courseRegistry(), "/courses", 1);
+    }
+    
+	static ResourceRegistry courseRegistry() {
+		ResourceRegistry registry = registry();
+		
+		registry.registerResource(Resource.builder()
+				.name("university")
+				.pluralName("universities")
+				.mapping(MappedClass.builder()
+						.id(Long.class)
+						.addCaseInsensitiveAttribute("name", "nameLowerCase"))
+				);
+
+		registry.registerResource(Resource.builder()
+				.name("course")
+				.mapping(MappedClass.builder()
+						.id(Long.class)
+						.addCaseInsensitiveAttribute("name", "nameLowerCase")
+						.addAttribute(MappedField.builder(Long.class)
+								.apiName("universityId")
+								.relationshipTo("university")
+								))
+				);
+		return registry;
+	}
+
+	@Override
+    protected Class<?> getRelativeToClass() {
+    		return CourseServiceTest.class;
     }
 
     @Before

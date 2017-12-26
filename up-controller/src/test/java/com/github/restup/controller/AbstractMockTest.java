@@ -12,9 +12,6 @@ import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.test.RestApiTest;
 import com.github.restup.test.repository.RepositoryUnit;
-import com.university.Course;
-import com.university.Student;
-import com.university.University;
 
 public abstract class AbstractMockTest {
 
@@ -27,6 +24,33 @@ public abstract class AbstractMockTest {
     protected AbstractMockTest(String path, Object... pathArgs) {
         this.path = path;
         this.pathArgs = pathArgs;
+    }
+
+    protected AbstractMockTest(ResourceRegistry registry, String path, Object... pathArgs) {
+    		this.registry = registry;
+        this.path = path;
+        this.pathArgs = pathArgs;
+    }
+
+    protected AbstractMockTest(Class<?>[] resourceClasses, String path, Object... pathArgs) {
+    		this.registry = registry(resourceClasses);
+        this.path = path;
+        this.pathArgs = pathArgs;
+    }
+
+    protected AbstractMockTest(String path, Class<?>... resourceClasses) {
+    		this(resourceClasses, path, 1);
+    }
+
+
+    public static ResourceRegistry registry(Class<?>... resourceClasses) {
+        // build registry setting, minimally passing in a repository factory
+        ResourceRegistry registry = new ResourceRegistry(RegistrySettings.builder()
+                .repositoryFactory(new MapBackedRepositoryFactory())
+        );
+
+        registry.registerResource(resourceClasses);
+        return registry;
     }
 
     @Before
@@ -42,24 +66,18 @@ public abstract class AbstractMockTest {
         ResourceController controller = resourceController(registry, mapper);
         MockContentNegotiation contentNegotiation = new MockJacksonContentNegotiation(mapper);
         MockApiExecutor executor = new MockApiExecutor(registry, controller, contentNegotiation);
-        RestApiTest.Builder b = new RestApiTest.Builder(executor, getClass(), path, pathArgs);
+        RestApiTest.Builder b = new RestApiTest.Builder(executor, getRelativeToClass(), path, pathArgs);
         if (jsonapi) {
             b.jsonapi();
         }
         return b;
     }
-
-    public ResourceRegistry registry() {
-        // build registry setting, minimally passing in a repository factory
-        ResourceRegistry registry = new ResourceRegistry(RegistrySettings.builder()
-                .repositoryFactory(new MapBackedRepositoryFactory())
-        );
-
-        registry.registerResource(Course.class
-                , Student.class
-                , University.class);
-        return registry;
+    
+    protected Class<?> getRelativeToClass() {
+    		return getClass();
     }
+    
+    
 
     public ResourceController resourceController(ResourceRegistry registry, ObjectMapper mapper) {
         // create new resource controller
@@ -79,7 +97,11 @@ public abstract class AbstractMockTest {
     }
 
     protected RepositoryUnit.Loader loader() {
-        return RepositoryUnit.loader().registry(registry);
+        return loader(getRelativeToClass());
+    }
+
+    protected RepositoryUnit.Loader loader(Class<?> relativeTo) {
+        return RepositoryUnit.loader().registry(registry).relativeTo(relativeTo);
     }
 
 }

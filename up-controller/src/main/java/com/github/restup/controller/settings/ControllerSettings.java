@@ -242,11 +242,11 @@ public class ControllerSettings {
                     Resource.builder(Resource.class)
                             .service(new DiscoveryService(linkBuilderFactory))
                             .excludeDefaultServiceFilters(true)
-                            .mappedClass(
+                            .mapping(
                                     MappedClass.builder(Resource.class)
                                             .name(UP_RESOURCE_DISCOVERY)
                                             .pluralName("resources")
-                                            .addIdAttribute(String.class, "name")
+                                            .id(String.class, "name")
                             )
             );
             return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler);

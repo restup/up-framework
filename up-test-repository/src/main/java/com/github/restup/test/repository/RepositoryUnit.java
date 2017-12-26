@@ -1,10 +1,16 @@
 package com.github.restup.test.repository;
 
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map.Entry;
+import java.util.function.Function;
+
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -13,11 +19,6 @@ import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.test.resource.RelativeTestResource;
 import com.github.restup.util.Assert;
-import com.github.restup.util.ReflectionUtils;
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map.Entry;
 
 public class RepositoryUnit {
 
@@ -136,33 +137,20 @@ public class RepositoryUnit {
         }
 
         private <T> void load(Resource<T, ?> resource, JsonNode node) {
-            T t = readValue(resource, node);
+            T t = null;
+            try {
+				t = mapper.treeToValue(node, resource.getClassType());
+			} catch (JsonProcessingException e) {
+				throw new RuntimeException("Unable to deserialize "+resource, e);
+			}
+            // we have to validate the object to handle Untyped Objects (deserialized to map & lose type details)
+            Resource.validate(resource, t);
+            
             ResourceRepositoryOperations repository = resource.getRepositoryOperations();
             RequestObjectFactory factory = resource.getRegistry().getSettings().getRequestObjectFactory();
             CreateRequest<T> request = factory.getCreateRequest(resource, t, Collections.emptyList(), Collections.emptyList(), null);
             repository.create(request);
         }
-
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-		private <T> T readValue(Resource<T, ?> resource, JsonNode node) {
-            T result = ReflectionUtils.newInstance(resource.getMapping().getType());
-            Iterator<Entry<String, JsonNode>> iterator = node.fields();
-            while (iterator.hasNext()) {
-                Entry<String, JsonNode> e = iterator.next();
-                String persistentName = e.getKey();
-                MappedField<Object> f = (MappedField) resource.findPersistedField(persistentName);
-                if (f != null) {
-                    Object value = null;
-                    if (e.getValue().isArray() || e.getValue().isObject()) {
-                        //TODO complex types
-                    } else {
-                        ParameterConverter<String,Object> converter = (ParameterConverter) registry.getSettings().getParameterConverterFactory().getConverter(String.class, f.getType());
-                        value = converter.convert(null, e.getValue().textValue(), null);
-                    }
-                    f.writeValue(result, value);
-                }
-            }
-            return result;
-        }
     }
+    
 }

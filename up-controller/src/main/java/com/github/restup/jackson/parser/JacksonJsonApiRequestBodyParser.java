@@ -80,7 +80,7 @@ public class JacksonJsonApiRequestBodyParser extends JacksonRequestBodyParser {
             if (resource.hasApiField(TYPE)) {
                 attributes.set(TYPE, node.get(TYPE));
             }
-            return mapper.treeToValue(attributes, resource.getType());
+            return mapper.treeToValue(attributes, resource.getClassType());
         } catch (JsonProcessingException e) {
             builder.addError(ErrorBuilder.ErrorCode.BODY_INVALID);
             return null;

@@ -110,7 +110,7 @@ public class OnUpdateFilterMethodCommand extends OnCreateFilterMethodCommand {
         UpdateRequest request = (UpdateRequest) ctx.getPersistenceRequest();
         Object data = getData(request);
         if (data != null) {
-            return ResourceQuery.find(registry, data.getClass(), request.getId());
+            return ResourceQuery.find(registry, request.getResource().getName(), request.getId());
         }
         return null;
     }

@@ -1,6 +1,7 @@
 package com.github.restup.registry;
 
 import java.io.Serializable;
+import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
@@ -22,7 +23,7 @@ import com.github.restup.util.Assert;
  */
 class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
 
-    private final Class<T> type;
+    private final Type type;
     private final String name;
     private final String pluralName;
     private final String basePath;
@@ -40,7 +41,7 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     private ResourceRepositoryOperations repositoryOperations;
     private ResourceService<T, ID> service;
 
-    BasicResource(Class<T> type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
+    BasicResource(Type type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
         Assert.notNull(type, "type is required");
         Assert.notNull(name, "name is required");
         Assert.notNull(pluralName, "pluralName is required");
@@ -103,7 +104,7 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         return result;
     }
 
-    public Class<T> getType() {
+    public Type getType() {
         return type;
     }
 
