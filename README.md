@@ -1,5 +1,7 @@
 # REST Up! Framework
 
+[![Build Status](https://travis-ci.org/restup/up-framework.svg?branch=master)](https://travis-ci.org/restup/up-framework)
+
 Up! Framework aims to simplify building and testing RESTful services.
 
 ###### Up! Framework:
