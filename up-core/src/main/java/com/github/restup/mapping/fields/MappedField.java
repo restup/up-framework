@@ -75,12 +75,10 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
     }
 
     static MappedField<?> getIdentityField(List<MappedField<?>> attributes) {
-        for (MappedField<?> field : attributes) {
-            if (field.isIdentifier()) {
-                return field;
-            }
-        }
-        return null;
+    		return attributes.stream()
+    			.filter(MappedField::isIdentifier)
+    			.findFirst()
+    			.get();
     }
 
     public static <T> BasicMappedField.Builder<T> builder(Class<T> type) {

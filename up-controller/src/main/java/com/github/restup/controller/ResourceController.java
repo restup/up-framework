@@ -1,5 +1,14 @@
 package com.github.restup.controller;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
@@ -32,13 +41,6 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Assert;
 import com.google.gson.Gson;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * <ol> <li>Create A document <p>
@@ -270,15 +272,13 @@ public class ResourceController {
 
     private static void addUpdateFields(ParsedResourceControllerRequest.Builder<?> builder, List<MappedField<?>> fields,
             Integer i) {
-        for (MappedField<?> f : fields) {
-            if (!f.isImmutable()) {
-                builder.addRequestedPath(i, f);
-            }
-        }
+    		fields.stream()
+    			.filter(f -> !f.isImmutable())
+    			.map(f -> builder.addRequestedPath(i, f));
     }
 
-    public Object handleException(ResourceControllerResponse response, Throwable e) {
-        return exceptionHandler.handleException(response, e);
+    public Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e) {
+        return exceptionHandler.handleException(request, response, e);
     }
 
     /**
@@ -289,18 +289,23 @@ public class ResourceController {
         ResourceControllerRequest request = null;
         try {
             request = builder.build();
-            return request(request, response);
+            return requestInternal(request, response);
         } catch (Throwable e) {
-            //XXX
-            response.setHeader("Content-Type", request != null
-                    ? request.getContentType()
-                    : MediaType.APPLICATION_JSON.getContentType());
-            return handleException(response, e);
+            return handleException(request, response, e);
+        }
+    }
+
+    public <T, ID extends Serializable> Object request(ResourceControllerRequest request,
+            ResourceControllerResponse response) {
+        try {
+            return requestInternal(request, response);
+        } catch (Throwable e) {
+            return handleException(request, response, e);
         }
     }
 
     @SuppressWarnings("unchecked")
-    public <T, ID extends Serializable> Object request(ResourceControllerRequest request,
+    <T, ID extends Serializable> Object requestInternal(ResourceControllerRequest request,
             ResourceControllerResponse response) {
         Assert.notNull(request, "request is required");
         Assert.notNull(response, "response is required");

@@ -7,7 +7,9 @@ import com.googlecode.gentyref.GenericTypeReflector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
+import java.lang.reflect.Constructor;
 import java.lang.reflect.Field;
+import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.lang.reflect.Modifier;
 import java.lang.reflect.Parameter;
@@ -57,16 +59,16 @@ public class ReflectionUtils {
      * Create a new instance, catching exceptions and rethrowing using {@link ErrorBuilder#throwError(Throwable)}
      *
      * @return a new instance of c
+     * @throws SecurityException 
+     * @throws NoSuchMethodException 
      */
     public final static <T> T newInstance(Class<T> c) {
         if (c != null) {
             try {
-                return c.newInstance();
-            } catch (InstantiationException e) {
-                if (!c.isInterface()) {
-                    ErrorBuilder.throwError(e);
-                }
-            } catch (IllegalAccessException e) {
+                Constructor<T> constructor = c.getDeclaredConstructor();
+                constructor.setAccessible(true);
+                return constructor.newInstance();
+            } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
                 if (!c.isInterface()) {
                     ErrorBuilder.throwError(e);
                 }

@@ -28,9 +28,7 @@ public class ResourceRelationshipTest {
     }
 
     private University u(long i) {
-        University u = new University();
-        u.setId(i);
-        return u;
+        return new University(i, null, null);
     }
 
     private Course c(long i) {

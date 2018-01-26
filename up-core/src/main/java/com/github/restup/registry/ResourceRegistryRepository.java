@@ -78,6 +78,10 @@ public interface ResourceRegistryRepository {
      */
     Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName);
 
+    /**
+     * 
+     * @return all registered resources
+     */
     Collection<Resource<?, ?>> getResources();
 
 }

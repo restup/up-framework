@@ -2,6 +2,9 @@ package com.github.restup.controller.mock;
 
 import static com.github.restup.controller.mock.MockResourceControllerRequest.getUrl;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import com.github.restup.controller.ResourceController;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
@@ -10,8 +13,6 @@ import com.github.restup.test.ApiRequest;
 import com.github.restup.test.ApiResponse;
 import com.github.restup.test.RpcApiTest;
 import com.github.restup.test.resource.Contents;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 /**
  * Mock {@link ApiExecutor} for testing {@link ResourceController} directly outside of a container or other framework support
@@ -32,21 +33,29 @@ public class MockApiExecutor implements ApiExecutor {
 
     public ApiResponse<String[]> execute(RpcApiTest settings) {
 
-        MockResourceControllerRequest.Builder mockRequest = MockResourceControllerRequest.builder();
         ApiRequest request = settings.getRequest();
 
-        mockRequest.method(request.getMethod().name());
-        mockRequest.url(request.getUrl());
-        mockRequest.headers(request.getHeaders());
-        mockRequest.setRegistry(registry);
+        MockResourceControllerRequest.Builder mockRequestBuilder 
+        		= MockResourceControllerRequest.builder()
+        			.method(request.getMethod().name())
+        			.url(request.getUrl())
+        			.headers(request.getHeaders())
+        			.setRegistry(registry);
 
         ResourceData<?> body = contentNegotiation.getBody(request.getBody());
-        mockRequest.setBody(body);
+        mockRequestBuilder.setBody(body);
 
         MockResourceControllerResponse mockResponse = new MockResourceControllerResponse();
-        Object result = controller.request(mockRequest, mockResponse);
+        MockResourceControllerRequest mockRequest = null;
+        Object result = null;
+        try {
+	        mockRequest = mockRequestBuilder.build();
+	        result = controller.request(mockRequest, mockResponse);
+        } catch ( Throwable t) {
+            result = controller.handleException(mockRequest, mockResponse, t);
+        }
 
-        Contents resultContents = serialize(mockResponse, result);
+        Contents resultContents = serialize(mockRequest, mockResponse, result);
 
         if (log.isDebugEnabled()) {
             log.debug("\n\nRequest:\n{} {}"
@@ -58,12 +67,12 @@ public class MockApiExecutor implements ApiExecutor {
         return new ApiResponse<String[]>(mockResponse.getStatus(), mockResponse.getHeaders(), resultContents);
     }
 
-    private Contents serialize(MockResourceControllerResponse mockResponse, Object result) {
+    private Contents serialize(MockResourceControllerRequest mockRequest, MockResourceControllerResponse mockResponse, Object result) {
         try {
             return contentNegotiation.serialize(result);
         } catch (Exception e) {
             try {
-                return contentNegotiation.serialize(controller.handleException(mockResponse, e));
+                return contentNegotiation.serialize(controller.handleException(mockRequest, mockResponse, e));
             } catch (Exception e1) {
                 throw new RuntimeException("Unable to serialize response", e1);
             }

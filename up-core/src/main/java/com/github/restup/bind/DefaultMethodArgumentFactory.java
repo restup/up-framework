@@ -39,7 +39,7 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
             if (mappedClass != null && mappedClass.getAttributes() != null) {
                 // check all mapped fields for (those annotated as allowing)
                 // parameterNames.
-                for (MappedField<?> field : mappedClass.getAttributes()) {
+            		mappedClass.getAttributes().forEach(field -> {
                     if (field.getParameterNames() != null) {
                         // collect the values for the parameter names
                         Object value = collectValues(field, parameterProvider, errors);
@@ -48,7 +48,7 @@ public class DefaultMethodArgumentFactory extends SimpleMethodArgumentFactory {
                             writeValue(field, instance, value);
                         }
                     }
-                }
+            		});
             }
         }
         return instance;

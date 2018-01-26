@@ -1,6 +1,7 @@
 package com.github.restup.mapping;
 
 import java.lang.reflect.Type;
+import java.util.HashMap;
 
 import com.github.restup.util.ReflectionUtils;
 
@@ -16,6 +17,11 @@ public class UntypedClass<T> implements Type {
 	
 	public UntypedClass(Class<T> container) {
 		this.container = container;
+	}
+	
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public UntypedClass() {
+		this((Class)HashMap.class);
 	}
 	
 	public T newInstance() {

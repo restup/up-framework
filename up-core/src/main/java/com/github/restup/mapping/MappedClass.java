@@ -25,7 +25,7 @@ public interface MappedClass<T> {
     }
 
     public static <T> Builder<T> builder(Class<T> type) {
-        return new Builder<T>().type(type);
+        return new Builder<T>(type);
     }
 
     /**
@@ -53,19 +53,21 @@ public interface MappedClass<T> {
      * then this should return true.
      * @return true if the model contains a {@link Map} with typed properties
      */
-	default boolean containsTypedMap() {
-		return false;
-	}
+	boolean containsTypedMap();
 
     /**
      * The attributes of the object
      */
     List<MappedField<?>> getAttributes();
 
+    /**
+     * @return a new instance of {@link #getType()}
+     */
 	T newInstance();
     
     static class AnonymousBuilder extends Builder<Object> {
-    		@Override
+
+			@Override
     		public Builder<Object> addAttribute(MappedField.Builder<?> builder) {
     			builder.anonymousMapping();
     			return super.addAttribute(builder);
@@ -76,13 +78,19 @@ public interface MappedClass<T> {
 
         private String name;
         private String pluralName;
-        private Class<T> type;
-        private Class<?> parentType;
+        private final Type type;
+        private Type parentType;
         private List<MappedField<?>> attributes;
         private Comparator<MappedField<?>> fieldComparator;
 
-        Builder() {
+        Builder(Type type) {
+        		Assert.notNull(type, "type is required");
+            this.type = type;
             attributes = new ArrayList<>();
+        }
+        
+        Builder() {
+        		this(new UntypedClass<>());
         }
 
         private Builder<T> me() {
@@ -159,22 +167,12 @@ public interface MappedClass<T> {
             return me();
         }
 
-        Builder<T> type(Class<T> type) {
-            this.type = type;
-            return me();
-        }
-
         public MappedClass<T> build() {
             Assert.notEmpty(name, "name is required");
             String pluralName = this.pluralName;
-            boolean containsTypedMap = false;
+            boolean containsTypedMap = type instanceof UntypedClass;
             if (StringUtils.isEmpty(pluralName)) {
                 pluralName = name + "s";
-            }
-            Type type = this.type;
-            if (type == null) {
-                type = new UntypedClass<>(HashMap.class);
-                containsTypedMap = true;
             }
             if (fieldComparator != null) {
                 Collections.sort(attributes, fieldComparator);

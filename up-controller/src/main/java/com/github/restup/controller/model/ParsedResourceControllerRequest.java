@@ -333,7 +333,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         
         public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
                 Collection<?> value) {
-        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, (Collection) value);
+        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, (Collection<?>) value);
         }
         
         public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
@@ -355,7 +355,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
         
         private Builder<T> addFilterInternal(String rawParameterName, Object rawParameterValue, String field, Operator operator,
-                Collection<Object> value) {
+                Collection<?> value) {
             Resource<?, ?> resource = getResource();
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
@@ -366,7 +366,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
             		.map( v -> convertValue(path, v, rawParameterName) )
             		.collect(Collectors.toList());
             
-            return addFilter(new ResourcePathFilter(path, operator, converted));
+            return addFilter(new ResourcePathFilter<>(path, operator, converted));
         }
 
         @SuppressWarnings({"rawtypes", "unchecked"})

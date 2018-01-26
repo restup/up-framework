@@ -1,5 +1,6 @@
 package com.github.restup.controller;
 
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.ArgumentMatchers.nullable;
@@ -7,6 +8,23 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
+
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.NoOpContentNegotiator;
@@ -18,7 +36,6 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.errors.ErrorObjectException;
-import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.TestRegistry;
@@ -31,19 +48,6 @@ import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 @RunWith(MockitoJUnitRunner.class)
@@ -69,8 +73,6 @@ public class ResourceControllerTest {
     private ContentNegotiator contentNegotiatorC;
     private ResourceController controller;
     private List<String> params;
-    private String expectedErrorCode;
-    private int expectedHttpStatus = 400;
 
     public static void assertInvocations(int i, Object toInspect) {
         assertEquals(1, CollectionUtils.size(Mockito.mockingDetails(toInspect).getInvocations()));
@@ -96,13 +98,18 @@ public class ResourceControllerTest {
         when(request.getResource()).thenReturn((Resource) registry.getResource(Company.class));
     }
 
-    private void error(String code) {
-        error(400, code);
+    private void error(String code, ThrowingCallable f) {
+        error(400, code, f);
     }
 
-    private void error(int status, String code) {
-        this.expectedErrorCode = code;
-        this.expectedHttpStatus = status;
+    private void error(int status, String code, ThrowingCallable f) {
+        Throwable thrownException = catchThrowable(f);
+        
+        Assertions.assertThat(thrownException)
+                .isInstanceOf(ErrorObjectException.class)
+                .hasFieldOrPropertyWithValue("code", code)
+                .hasFieldOrPropertyWithValue("httpStatus", status)
+                .hasNoCause();
     }
 
     private void relationship() {
@@ -186,6 +193,8 @@ public class ResourceControllerTest {
         params.add(name);
         when(request.getParameter(name)).thenReturn(values);
     }
+    
+    
 
     private void request(HttpMethod method, Integer... ids) {
         when(request.getMethod()).thenReturn(method);
@@ -194,14 +203,9 @@ public class ResourceControllerTest {
         }
         when(request.getParameterNames()).thenReturn(params);
         when(contentNegotiatorA.accept(any(ResourceControllerRequest.class))).thenReturn(true);
-        try {
-            controller.request(request, response);
-        } catch (ErrorObjectException e) {
-            RequestError error = e.getErrors().iterator().next();
-            assertEquals(expectedErrorCode, error.getCode());
-            assertEquals(expectedHttpStatus, error.getHttpStatus());
-            throw e;
-        }
+        
+        controller.requestInternal(request, response);
+        
         assertInvocations(1, service);
         verify(interceptorA, times(1)).before(any(ParsedResourceControllerRequest.class));
         verify(interceptorA, times(1)).before(any(ParsedResourceControllerRequest.class));
@@ -225,22 +229,19 @@ public class ResourceControllerTest {
         verify(service, times(1)).create(any(BulkRequest.class));
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test
     public void testPostItemResourceError() {
-        error(405, "METHOD_NOT_ALLOWED");
-        post(1);
+        error(405, "METHOD_NOT_ALLOWED", () -> post(1));
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test
     public void testPostErrorCollectionResourceError() {
-        error(405, "METHOD_NOT_ALLOWED");
-        post(1, 2, 3);
+        error(405, "METHOD_NOT_ALLOWED", () -> post(1, 2, 3));
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test
     public void testPostErrorDataRequired() {
-        error("DATA_REQUIRED");
-        post();
+        error("DATA_REQUIRED", () -> post());
     }
 
     @Test
@@ -282,11 +283,10 @@ public class ResourceControllerTest {
         verify(service, times(1)).list(any(ListRequest.class));
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test
     public void testGetByIdsRelationship() {
-        error("RELATIONSHIP_IDS_NOT_SUPPORTED");
         relationship();
-        get(1, 2, 3);
+        error("RELATIONSHIP_IDS_NOT_SUPPORTED", () -> get(1, 2, 3));
     }
 
     @Test

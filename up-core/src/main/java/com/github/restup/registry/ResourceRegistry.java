@@ -1,12 +1,14 @@
 package com.github.restup.registry;
 
 import java.lang.reflect.Type;
+import java.util.Arrays;
 import java.util.Collection;
 
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
+import com.github.restup.util.Streams;
 
 /**
  * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data, field mappings, repository, and service details for each registered each resource <p> A singleton instance exists for convenience, but it is possible to construct multiple {@link ResourceRegistry}s instances if needed.
@@ -55,10 +57,12 @@ public final class ResourceRegistry implements MappedClassRegistry {
         registerResource(b.registry(this).build());
     }
 
+    public void registerResource(Class<?> resourceClass) {
+        registerResource(Resource.builder(resourceClass));
+    }
+
     public void registerResource(Class<?>... resourceClasses) {
-        for (Class<?> resourceClass : resourceClasses) {
-            registerResource(Resource.builder(resourceClass));
-        }
+    		Streams.forEach(resourceClasses, this::registerResource);
     }
 
     public RegistrySettings getSettings() {

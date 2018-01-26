@@ -4,10 +4,8 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 
 import java.io.Serializable;
 import java.lang.reflect.Type;
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
@@ -94,16 +92,13 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
     Collection<ResourceRelationship<?,?,?,?>> getRelationships();
 
     default List<ResourceRelationship<?,?,?,?>> getRelationshipsTo() {
-        List<ResourceRelationship<?,?,?,?>> result = new ArrayList<>();
         Collection<ResourceRelationship<?,?,?,?>> relationships = getRelationships();
         if (relationships != null) {
-            for (ResourceRelationship<?,?,?,?> relationship : relationships) {
-                if (relationship.isTo(this)) {
-                    result.add(relationship);
-                }
-            }
+        		return relationships.stream()
+        			.filter(relationship -> relationship.isTo(this))
+        			.collect(Collectors.toList());
         }
-        return result;
+        return Collections.emptyList();
     }
 
     default MappedField<?> findApiField(String field) {
@@ -178,21 +173,12 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
 
     static List<ResourcePath> getPaths(Resource<?, ?> resource, boolean includeTransient, boolean apiFieldsOnly) {
         //TODO better to cache immutable paths?
-        List<ResourcePath> paths = new ArrayList<ResourcePath>();
-        for (MappedField<?> mf : resource.getMapping().getAttributes()) {
-            if (!includeTransient) {
-                if (mf.isTransientField()) {
-                    continue;
-                }
-            }
-            if (apiFieldsOnly) {
-                if (!mf.isApiProperty()) {
-                    continue;
-                }
-            }
-            paths.add(ResourcePath.path(resource, mf));
-        }
-        return paths;
+        return resource.getMapping().getAttributes()
+        		.stream()
+        		.filter(mf -> includeTransient || !mf.isTransientField() )
+        		.filter(mf -> !apiFieldsOnly || mf.isApiProperty() )
+        		.map(mf ->ResourcePath.path(resource, mf) )
+        		.collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
@@ -259,9 +245,8 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             this.type = resourceClass;
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
 		public Builder() {
-        		this(new UntypedClass<>(HashMap.class));
+        		this(new UntypedClass<>());
         }
 
         public Builder<T, ID> me() {

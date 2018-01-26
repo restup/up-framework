@@ -12,6 +12,8 @@ import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.registry.ResourceRelationship;
+import com.google.common.collect.HashBasedTable;
+import com.google.common.collect.Table;
 
 /**
  * A simple {@link ResourceRegistryRepository} using {@link IdentityHashMap}. This does not use thread safe collections. However, the expectation is that maps are initialized at startup and then are read only. Under these circumstances, this will be thread safe
@@ -23,34 +25,27 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
     private final Map<String, Resource<?, ?>> resources;
     private final Map<Type, MappedClass<?>> mappings;
     
-    //TODO Table
-    private final Map<String, Map<String, ResourceRelationship<?, ?, ?, ?>>> relationships;
+    private final Table<String, String, ResourceRelationship<?, ?, ?, ?>> relationships;
 
     DefaultResourceRegistryRepository() {
         resources = new HashMap<>();
         mappings = new IdentityHashMap<>();
-        relationships = new HashMap<>();
+        relationships = HashBasedTable.create();
     }
 
     public void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
             ResourceRelationship<?, ?, ?, ?> relationship) {
-        Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.get(from.getName());
-        if (map == null) {
-            map = new HashMap<String, ResourceRelationship<?, ?, ?, ?>>();
-            relationships.put(from.getName(), map);
-        }
-        map.put(to.getName(), relationship);
+        relationships.put(from.getName(), to.getName(), relationship);
     }
 
     @Override
     public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
-        Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.get(resourceName);
+        Map<String, ResourceRelationship<?, ?, ?, ?>> map = relationships.column(resourceName);
         return map == null ? Collections.emptySet() : map.values();
     }
 
     public ResourceRelationship<?, ?, ?, ?> getRelationship(String from, String to) {
-        Map<String, ResourceRelationship<?, ?, ?, ?>> relations = relationships.get(from);
-        return relations == null ? null : relations.get(to);
+        return relationships.get(from, to);
     }
 
     public MappedClass<?> getMappedClass(Type resourceClass) {

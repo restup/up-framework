@@ -1,16 +1,10 @@
 package com.github.restup.controller.request.parser;
 
-import java.util.Iterator;
-import java.util.Map;
-
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.errors.ErrorBuilder.ErrorCode;
-import com.github.restup.mapping.MappedClass;
-import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.ResourceData;
 

@@ -6,7 +6,17 @@ import com.github.restup.annotations.ApiName;
 @SuppressWarnings("unused")
 public class Animal {
 
-    private Long id;
-    private String name;
+    private final Long id;
+    private final String name;
+
+	public Animal(Long id, String name) {
+		super();
+		this.id = id;
+		this.name = name;
+	}
+
+	public Animal() {
+		this(null, null);
+	}
 
 }
