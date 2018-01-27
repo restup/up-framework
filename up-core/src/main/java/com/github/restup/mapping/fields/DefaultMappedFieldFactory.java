@@ -23,6 +23,7 @@ public class DefaultMappedFieldFactory implements MappedFieldFactory {
         this.visitors = visitors;
     }
 
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> MappedField<T> getMappedField(BeanInfo<T> bi, PropertyDescriptor pd) {
         Class<T> type = (Class) getReturnType(pd, bi.getType());

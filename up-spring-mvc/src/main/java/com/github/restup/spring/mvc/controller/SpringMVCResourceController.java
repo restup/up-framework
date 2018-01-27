@@ -26,7 +26,7 @@ public class SpringMVCResourceController {
     }
 
     @RequestMapping("/**")
-    public Object path(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) JacksonRequestBody body) {
+    public Object request(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) JacksonRequestBody body) {
         response.setStatus(200);
         return controller.request(HttpServletResourceControllerRequest.builder(request)
                         .setBody(body)

@@ -17,10 +17,12 @@ public class BasicLink implements Link {
         this(rel.getName(), href);
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getHref() {
         return href;
     }

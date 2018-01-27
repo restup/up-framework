@@ -1,12 +1,11 @@
 package com.github.restup.util;
 
-import com.github.restup.path.ResourcePath;
 import java.util.Collections;
-import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
-import java.util.Set;
 import org.apache.commons.lang3.ArrayUtils;
+import com.github.restup.path.ResourcePath;
+import com.google.common.collect.Iterables;
 
 public class UpUtils {
 
@@ -27,11 +26,6 @@ public class UpUtils {
         return map == null ? Collections.EMPTY_MAP : Collections.unmodifiableMap(map);
     }
 
-    @SuppressWarnings("unchecked")
-    public static <T> Set<T> unmodifiableSet(Set<T> map) {
-        return map == null ? Collections.EMPTY_SET : Collections.unmodifiableSet(map);
-    }
-
     public static <T> void removeAll(List<T> target, List<T> source) {
         if (source != null) {
             target.removeAll(source);
@@ -49,11 +43,7 @@ public class UpUtils {
     }
 
     public static <T> T getFirst(Iterable<T> it, T defaultValue) {
-        return it == null ? defaultValue : getFirst(it.iterator(), defaultValue);
-    }
-
-    public static <T> T getFirst(Iterator<T> it, T defaultValue) {
-        return it == null || !it.hasNext() ? defaultValue : it.next();
+        return it == null ? defaultValue : Iterables.getFirst(it, defaultValue);
     }
 
     public static void put(Map<String, String[]> map, String name, String value) {

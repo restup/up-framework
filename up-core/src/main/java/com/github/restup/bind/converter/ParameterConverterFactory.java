@@ -4,38 +4,18 @@ import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Function;
-
 import com.github.restup.errors.ErrorFactory;
-import com.google.common.collect.ImmutableMap;
 
-public class ParameterConverterFactory {
+public interface ParameterConverterFactory {
 	
-	private final Map<Type,ParameterConverter<String,?>> converters;
-	private final ParameterConverter<String,?> noOpConverter;
 
-	private ParameterConverterFactory(Map<Type,ParameterConverter<String,?>> converters
-			, ParameterConverter<String,?> noOpConverter) {
-		this.converters = ImmutableMap.copyOf(converters);
-		this.noOpConverter = noOpConverter;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <T> ParameterConverter<String,T> getConverter(Type to) {
-		ParameterConverter<String,?> converter = converters.get(to);
-		if ( converter == null ) {
-			if ( String.class == to ) {
-				return (ParameterConverter) noOpConverter;
-			}
-			throw new UnsupportedOperationException("Converter does not exist from String to "+to);
-		}
-		return (ParameterConverter) converter;
-	}
+	<T> ParameterConverter<String,T> getConverter(Type to);
 	
-	public static Builder builder(ErrorFactory errorFactory) {
+	static Builder builder(ErrorFactory errorFactory) {
 		return new Builder(errorFactory);
 	}
 
-	public final static class Builder {
+	final static class Builder {
 		private Map<Type,ParameterConverter<String,?>> converters = new HashMap<>();
 		private ErrorFactory errorFactory;
 		
@@ -70,7 +50,7 @@ public class ParameterConverterFactory {
 		
 		public ParameterConverterFactory build() {
 			ParameterConverter<String,?> noOpConverter = toConverter(a -> a);
-			return new ParameterConverterFactory(converters, noOpConverter);
+			return new DefaultParameterConverterFactory(converters, noOpConverter);
 		}
 	}
 	

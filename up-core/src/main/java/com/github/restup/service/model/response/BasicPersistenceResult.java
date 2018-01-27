@@ -1,14 +1,15 @@
 package com.github.restup.service.model.response;
 
-public class BasicPersistenceResult<T> implements PersistenceResult<T> {
+class BasicPersistenceResult<T> implements PersistenceResult<T> {
 
     private final T data;
 
-    public BasicPersistenceResult(T data) {
+    BasicPersistenceResult(T data) {
         super();
         this.data = data;
     }
 
+    @Override
     public T getData() {
         return data;
     }

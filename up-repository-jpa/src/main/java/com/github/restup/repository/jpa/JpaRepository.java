@@ -1,5 +1,10 @@
 package com.github.restup.repository.jpa;
 
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.DeleteResource;
 import com.github.restup.annotations.operations.UpdateResource;
@@ -9,13 +14,7 @@ import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.UpdateRequest;
-import com.github.restup.service.model.response.BasicPersistenceResult;
 import com.github.restup.service.model.response.PersistenceResult;
-import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 
 public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaRepository<T, ID> {
 
@@ -56,7 +55,7 @@ public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaReposi
             applyUpdate(t, update, defaults.getRequiredFields());
         }
         save(t);
-        return new BasicPersistenceResult<T>(t);
+        return PersistenceResult.of(t);
     }
 
     private void applyUpdate(T t, T update, List<ResourcePath> requestedPaths) {

@@ -1,30 +1,38 @@
 package com.github.restup.test.serializer;
 
 import com.google.gson.Gson;
+import com.google.gson.GsonBuilder;
 
-public class GsonSerializer implements SerializationProvider {
+public class GsonSerializer implements ResultSerializer {
 
-    private static Gson gson;
+    private static Gson instance;
+    private Gson gson;
+    
+    public GsonSerializer(Gson gson) {
+        this.gson = gson;
+    }
+    
+    public GsonSerializer() {
+        this(getGson());
+    }
+
+    public GsonSerializer(GsonBuilder gson) {
+        this(gson.create());
+    }
 
     private static Gson getGson() {
-        if (gson == null) {
-            gson = new Gson();
+        if (instance == null) {
+            instance = new Gson();
         }
-        return gson;
+        return instance;
     }
 
-    public static String convertToString(Object o) {
-        return convertToString(null, o);
-    }
-
-    public static String convertToString(Gson gson, Object o) {
+    @Override
+    public String convertToString(Object o) {
         try {
-            if (gson == null) {
-                gson = getGson();
-            }
             return gson.toJson(o);
         } catch (Throwable e) {
-            throw new RuntimeException("Unable to serialize value", e);
+            throw new AssertionError("Unable to serialize value", e);
         }
     }
 

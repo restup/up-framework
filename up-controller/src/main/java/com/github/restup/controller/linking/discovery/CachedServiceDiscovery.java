@@ -22,6 +22,7 @@ public class CachedServiceDiscovery implements ServiceDiscovery {
         this(delegate, new ConcurrentHashMap<>());
     }
 
+    @Override
     public String locateResourceUrl(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource) {
         String url = cache.get(resource);
         if (url == null) {

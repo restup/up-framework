@@ -7,4 +7,12 @@ public class Contractor extends Person {
     @Relationship(resource = Company.class)
     private Long companyId;
 
+    public Long getCompanyId() {
+        return companyId;
+    }
+
+    public void setCompanyId(Long companyId) {
+        this.companyId = companyId;
+    }
+
 }

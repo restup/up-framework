@@ -3,11 +3,6 @@ package com.university;
 import static com.university.University.PLURAL_NAME;
 import static com.university.University.RESOURCE_NAME;
 import static com.university.University.TABLE_NAME;
-
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.restup.annotations.ApiName;
-import com.github.restup.annotations.Plural;
-import com.github.restup.annotations.field.CaseInsensitive;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -16,6 +11,10 @@ import javax.persistence.Id;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.restup.annotations.ApiName;
+import com.github.restup.annotations.Plural;
+import com.github.restup.annotations.field.CaseInsensitive;
 
 @Entity(name = TABLE_NAME)
 @ApiName(value = RESOURCE_NAME)

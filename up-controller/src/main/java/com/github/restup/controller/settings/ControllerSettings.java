@@ -89,6 +89,10 @@ public class ControllerSettings {
         private LinkBuilderFactory linkBuilderFactory;
         private ServiceDiscovery serviceDiscovery;
         private String defaultMediaType;
+        
+        private Builder() {
+            super();
+        }
 
         private static RequestParser getRequestParser(RequestParser[] requestParsers, RequestParamParser[] requestParamParsers, RequestParser relationshipParser) {
             RequestParser[] arr = requestParsers;

@@ -1,17 +1,16 @@
 package com.github.restup.controller.mock;
 
 import static com.github.restup.controller.mock.MockResourceControllerRequest.getUrl;
-
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.github.restup.controller.ResourceController;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.test.ApiExecutor;
 import com.github.restup.test.ApiRequest;
 import com.github.restup.test.ApiResponse;
-import com.github.restup.test.RpcApiTest;
+import com.github.restup.test.BasicApiResponse;
+import com.github.restup.test.RpcApiAssertions;
 import com.github.restup.test.resource.Contents;
 
 /**
@@ -31,7 +30,8 @@ public class MockApiExecutor implements ApiExecutor {
         this.contentNegotiation = contentNegotiation;
     }
 
-    public ApiResponse<String[]> execute(RpcApiTest settings) {
+    @Override
+    public ApiResponse<String[]> execute(RpcApiAssertions settings) {
 
         ApiRequest request = settings.getRequest();
 
@@ -64,7 +64,7 @@ public class MockApiExecutor implements ApiExecutor {
                     resultContents.getContentAsString());
         }
 
-        return new ApiResponse<String[]>(mockResponse.getStatus(), mockResponse.getHeaders(), resultContents);
+        return new BasicApiResponse<String[]>(mockResponse.getStatus(), mockResponse.getHeaders(), resultContents);
     }
 
     private Contents serialize(MockResourceControllerRequest mockRequest, MockResourceControllerResponse mockResponse, Object result) {
@@ -74,7 +74,7 @@ public class MockApiExecutor implements ApiExecutor {
             try {
                 return contentNegotiation.serialize(controller.handleException(mockRequest, mockResponse, e));
             } catch (Exception e1) {
-                throw new RuntimeException("Unable to serialize response", e1);
+                throw new AssertionError("Unable to serialize response", e1);
             }
         }
     }

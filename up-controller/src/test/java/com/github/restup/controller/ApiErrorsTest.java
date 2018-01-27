@@ -1,6 +1,6 @@
 package com.github.restup.controller;
 
-import com.github.restup.test.RestApiTest;
+import com.github.restup.test.RestApiAssertions;
 import com.university.Course;
 import com.university.Student;
 import com.university.University;
@@ -22,13 +22,13 @@ public class ApiErrorsTest extends AbstractMockTest {
 
     @Test
     public void error400BodyRequired() {
-        api.add().error400();
+        api.add().body((String)null).error400();
         api.add("{}").error400();
     }
 
     @Test
     public void error400InvalidRelationship() {
-        RestApiTest.Builder api = builder("/courses/{courseId}/universities", 5);
+        RestApiAssertions.Builder api = builder("/courses/{courseId}/universities", 5);
         api.get().error400();
     }
 
@@ -44,7 +44,7 @@ public class ApiErrorsTest extends AbstractMockTest {
 
     @Test
     public void error404UnknownResource() {
-        RestApiTest.Builder api = builder("/foos", 5);
+        RestApiAssertions.Builder api = builder("/foos", 5);
         api.get().error404();
     }
 

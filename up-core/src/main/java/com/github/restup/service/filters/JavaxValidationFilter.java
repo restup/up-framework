@@ -1,9 +1,25 @@
 package com.github.restup.service.filters;
 
+import java.io.Serializable;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Set;
+import javax.validation.ConstraintViolation;
+import javax.validation.Validator;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.Size;
+import javax.validation.metadata.ConstraintDescriptor;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
-import com.github.restup.errors.ErrorBuilder;
 import com.github.restup.errors.Errors;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.mapping.fields.MappedField;
@@ -16,23 +32,6 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.ServiceFilter;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.UpdateRequest;
-import java.io.Serializable;
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import javax.validation.ConstraintViolation;
-import javax.validation.Validator;
-import javax.validation.constraints.Max;
-import javax.validation.constraints.Min;
-import javax.validation.constraints.Size;
-import javax.validation.metadata.ConstraintDescriptor;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public class JavaxValidationFilter implements ServiceFilter {
 
@@ -150,7 +149,7 @@ public class JavaxValidationFilter implements ServiceFilter {
             ResourcePath path, Object value) {
         if (violations != null) {
             for (ConstraintViolation<?> v : violations) {
-                ErrorBuilder err = ErrorBuilder.builder()
+                RequestError.Builder err = RequestError.builder()
                         .source(path)
                         .title("Invalid field value")
                         .detail("{0} {1}", path.getApiPath(), v.getMessage())
@@ -159,17 +158,7 @@ public class JavaxValidationFilter implements ServiceFilter {
                 if (constraint != null) {
                     Annotation ann = constraint.getAnnotation();
                     if (ann != null) {
-                        if (ann instanceof Max) {
-                            err.meta("actualLength", length(value));
-                            err.meta("max", constraint.getAttributes().get("value"));
-                        } else if (ann instanceof Min) {
-                            err.meta("actualLength", length(value));
-                            err.meta("min", value);
-                        } else if (ann instanceof Size) {
-                            err.meta("actualLength", length(value));
-                            err.meta("min", constraint.getAttributes().get("min"));
-                            err.meta("max", constraint.getAttributes().get("max"));
-                        }
+                        addMeta(err, ann, constraint, value);
                     }
                 }
 
@@ -178,7 +167,21 @@ public class JavaxValidationFilter implements ServiceFilter {
         }
     }
 
-	@Override
+    void addMeta(RequestError.Builder err, Annotation ann, ConstraintDescriptor<?> constraint, Object value) {
+        if (ann instanceof Max) {
+            err.meta("actualLength", length(value));
+            err.meta("max", constraint.getAttributes().get("value"));
+        } else if (ann instanceof Min) {
+            err.meta("actualLength", length(value));
+            err.meta("min", constraint.getAttributes().get("value"));
+        } else if (ann instanceof Size) {
+            err.meta("actualLength", length(value));
+            err.meta("min", constraint.getAttributes().get("min"));
+            err.meta("max", constraint.getAttributes().get("max"));
+        }
+    }
+
+    @Override
 	public <T, ID extends Serializable> boolean accepts(Resource<T, ID> resource) {
 		return resource.getType() instanceof Class;
 	}

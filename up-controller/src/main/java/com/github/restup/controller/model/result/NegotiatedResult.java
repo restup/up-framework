@@ -1,5 +1,9 @@
 package com.github.restup.controller.model.result;
 
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Map;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.path.PathValue;
 import com.github.restup.path.ResourcePath;
@@ -8,10 +12,6 @@ import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Map;
 
 public abstract class NegotiatedResult {
 
@@ -26,6 +26,9 @@ public abstract class NegotiatedResult {
         mappedPaths = map();
     }
 
+    /**
+     * @return true if the result includes a count only (no result or pagination), false otherwise
+     */
     public boolean isCount() {
         if (result instanceof PagedResult) {
             PagedResult<?> paged = (PagedResult<?>) result;
@@ -64,21 +67,23 @@ public abstract class NegotiatedResult {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     private void map(Map<PathValue, Map<PathValue, ?>> map, ResourcePath path) {
-        PathValue pv = path.value();
-        if (!pv.isReservedPath()) {
-            ResourcePath next = path.next();
-            if (next != null) {
-                // TODO consider Indexed paths?
-                // TODO if path is resource get its default paths
-                // TODO default fields for MappedClass
-                Map<PathValue, Map<PathValue, ?>> existing = (Map) map.get(pv);
-                if (existing == null) {
-                    existing = new HashMap<PathValue, Map<PathValue, ?>>();
-                    map.put(pv, existing);
+        if (path != null) {
+            PathValue pv = path.value();
+            if (!pv.isReservedPath()) {
+                ResourcePath next = path.next();
+                if (next != null) {
+                    // TODO consider Indexed paths?
+                    // TODO if path is resource get its default paths
+                    // TODO default fields for MappedClass
+                    Map<PathValue, Map<PathValue, ?>> existing = (Map) map.get(pv);
+                    if (existing == null) {
+                        existing = new LinkedHashMap<PathValue, Map<PathValue, ?>>();
+                        map.put(pv, existing);
+                    }
+                    map(existing, next);
+                } else {
+                    map.put(pv, null);
                 }
-                map(existing, next);
-            } else {
-                map.put(pv, null);
             }
         }
     }

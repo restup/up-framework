@@ -13,6 +13,7 @@ public class MockResourceControllerResponse implements ResourceControllerRespons
     private int status;
     private Map<String, String[]> headers = new HashMap<String, String[]>();
 
+    @Override
     public void setHeader(String name, String value) {
         UpUtils.put(headers, name, value);
     }
@@ -25,6 +26,7 @@ public class MockResourceControllerResponse implements ResourceControllerRespons
         return status;
     }
 
+    @Override
     public void setStatus(int status) {
         this.status = status;
     }

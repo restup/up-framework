@@ -7,6 +7,7 @@ import java.util.UUID;
  */
 public class StringIdentityStrategy implements IdentityStrategy<String> {
 
+    @Override
     public String getNextId() {
         return UUID.randomUUID().toString();
     }

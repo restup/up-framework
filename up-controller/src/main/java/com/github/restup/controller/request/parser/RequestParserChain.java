@@ -19,6 +19,7 @@ public class RequestParserChain implements RequestParser {
         this.parsers = parsers;
     }
 
+    @Override
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
         for (RequestParser parser : parsers) {
             parser.parse(request, builder);

@@ -1,17 +1,19 @@
 package com.github.restup.test.resource;
 
-public class StringContents implements Contents {
+class StringContents implements Contents {
 
     private final String value;
 
-    public StringContents(String value) {
+    StringContents(String value) {
         this.value = value;
     }
 
+    @Override
     public byte[] getContentAsByteArray() {
         return value.getBytes();
     }
 
+    @Override
     public String getContentAsString() {
         return value;
     }

@@ -4,14 +4,11 @@ import java.io.IOException;
 import java.util.Collections;
 import java.util.Iterator;
 import java.util.Map.Entry;
-import java.util.function.Function;
-
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
-import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.repository.ResourceRepositoryOperations;
@@ -82,14 +79,14 @@ public class RepositoryUnit {
         }
 
         public void load() {
+            if (registry == null) {
+                throw new IllegalStateException("registry is required");
+            }
             if (mapper == null) {
                 mapper = getMapper();
             }
             if (fileName == null) {
                 fileName = RelativeTestResource.getCallingStackElement().getMethodName();
-            }
-            if (registry == null) {
-                registry = ResourceRegistry.getInstance();
             }
             if (relativeTo == null) {
                 relativeTo = RelativeTestResource.getClassFromStack();
@@ -141,7 +138,7 @@ public class RepositoryUnit {
             try {
 				t = mapper.treeToValue(node, resource.getClassType());
 			} catch (JsonProcessingException e) {
-				throw new RuntimeException("Unable to deserialize "+resource, e);
+				throw new AssertionError("Unable to deserialize "+resource, e);
 			}
             // we have to validate the object to handle Untyped Objects (deserialized to map & lose type details)
             Resource.validate(resource, t);
@@ -151,6 +148,10 @@ public class RepositoryUnit {
             CreateRequest<T> request = factory.getCreateRequest(resource, t, Collections.emptyList(), Collections.emptyList(), null);
             repository.create(request);
         }
+    }
+    
+    private RepositoryUnit() {
+        super();
     }
     
 }

@@ -1,7 +1,5 @@
 package com.github.restup.controller.model;
 
-import static com.github.restup.util.UpUtils.unmodifiableList;
-
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -11,13 +9,10 @@ import java.util.List;
 import java.util.Map;
 import java.util.Objects;
 import java.util.stream.Collectors;
-
 import org.apache.commons.collections4.list.SetUniqueList;
-
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorBuilder.ErrorCode;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.errors.Errors;
 import com.github.restup.errors.RequestError;
@@ -36,73 +31,35 @@ import com.github.restup.service.model.ResourceData;
 /**
  * Contains result of parsing parameters
  */
-public class ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
+public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
 
-    private final T data;
-    private final List<ResourcePath> dataPaths;
-    private final List<ResourceQueryStatement> requestedQueries;
-    private final ResourceControllerRequest request;
-    private final List<String> acceptedParameterNames;
-    private final String pageLimitParameterName;
-    private final String pageOffsetParameterName;
-    private final boolean pageOffsetOneBased;
-
-    public ParsedResourceControllerRequest(T data, List<ResourcePath> requestedPaths,
-            List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request, ResourceData<?> body, List<String> acceptedParameterNames, String pageLimitParameterName, String pageOffsetParameterName, boolean pageOffsetOneBased) {
-        super(request.getMethod(), request.getResource(), request.getIds(), request.getRelationship(), request.getResourceRelationship(), body, request.getContentType(), request.getBaseRequestUrl(), request.getRequestUrl());
-        this.data = data;
-        this.dataPaths = unmodifiableList(requestedPaths);
-        this.requestedQueries = unmodifiableList(requestedQueries);
-        this.request = request;
-        this.acceptedParameterNames = acceptedParameterNames;
-        this.pageLimitParameterName = pageLimitParameterName;
-        this.pageOffsetParameterName = pageOffsetParameterName;
-        this.pageOffsetOneBased = pageOffsetOneBased;
-    }
 
     public static <T> Builder<T> builder(ResourceRegistry registry, ResourceControllerRequest request) {
         return new Builder<T>(registry, request);
     }
 
-    public T getData() {
-        return data;
-    }
+    public T getData();
 
-    public List<ResourcePath> getRequestedPaths() {
-        return dataPaths;
-    }
+    public List<ResourcePath> getRequestedPaths();
 
-    public List<ResourceQueryStatement> getRequestedQueries() {
-        return requestedQueries;
-    }
+    public List<ResourceQueryStatement> getRequestedQueries();
 
-    public List<String> getParameterNames() {
-        return request.getParameterNames();
-    }
+    @Override
+    public List<String> getParameterNames();
 
-    public String[] getParameter(String parameterName) {
-        return request.getParameter(parameterName);
-    }
+    @Override
+    public String[] getParameter(String parameterName);
 
-    public Enumeration<String> getHeaders(String name) {
-        return request == null ? null : request.getHeaders(name);
-    }
+    @Override
+    public Enumeration<String> getHeaders(String name);
 
-    public String getPageLimitParameterName() {
-        return pageLimitParameterName;
-    }
+    public String getPageLimitParameterName();
 
-    public String getPageOffsetParameterName() {
-        return pageOffsetParameterName;
-    }
+    public String getPageOffsetParameterName();
 
-    public List<String> getAcceptedParameterNames() {
-        return acceptedParameterNames;
-    }
+    public List<String> getAcceptedParameterNames();
 
-    public boolean isPageOffsetOneBased() {
-        return pageOffsetOneBased;
-    }
+    public boolean isPageOffsetOneBased();
 
     public static class Builder<T> implements Errors {
 
@@ -199,7 +156,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
             }
-            return addSort(new ResourceSort(path, asc));
+            return addSort(ResourceSort.of(path, asc));
         }
 
         public void addFilter(List<ResourcePath> paths, Collection<Object> joinIds) {
@@ -333,7 +290,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         
         public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
                 Collection<?> value) {
-        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, (Collection<?>) value);
+        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, value);
         }
         
         public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
@@ -476,8 +433,8 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
             addError(getParameterError(parameterName, value));
         }
 
-        private ErrorBuilder getParameterError(String parameterName, Object value) {
-            return ErrorBuilder.builder().code("INVALID_PARAMETER").title("Invalid parameter value")
+        private RequestError.Builder getParameterError(String parameterName, Object value) {
+            return RequestError.builder().code("INVALID_PARAMETER").title("Invalid parameter value")
                     .detail("'{0}' is not a valid value for {1}", value, parameterName)
                     .source(getErrorFactory().createParameterError(parameterName, value));
         }
@@ -490,7 +447,8 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
             return request.getResource();
         }
 
-        public void addError(ErrorBuilder b) {
+        @Override
+        public void addError(RequestError.Builder b) {
             if (b != null) {
                 if (errors == null) {
                     errors = getErrorFactory().createErrors();
@@ -500,17 +458,20 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
         }
 
         public void addError(ErrorCode code) {
-            addError(ErrorBuilder.builder().code(code).resource(getResource()));
+            addError(RequestError.builder().code(code).resource(getResource()));
         }
 
+        @Override
         public List<RequestError> getErrors() {
             return errors == null ? null : errors.getErrors();
         }
 
+        @Override
         public boolean hasErrors() {
             return errors == null ? false : errors.hasErrors();
         }
 
+        @Override
         public void assertErrors() {
             if (errors != null) {
                 errors.assertErrors();
@@ -537,7 +498,7 @@ public class ParsedResourceControllerRequest<T> extends ResourceControllerReques
                     }
                 }
             }
-            ParsedResourceControllerRequest<T> result = new ParsedResourceControllerRequest<T>(data, requestedPaths,
+            ParsedResourceControllerRequest<T> result = new BasicParsedResourceControllerRequest<T>(data, requestedPaths,
                     queries, request, body, acceptedParameterNames, pageLimitParameterName, pageOffsetParameterName, pageOffsetOneBased);
             return result;
         }

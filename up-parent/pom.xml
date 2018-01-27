@@ -1,136 +1,144 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xmlns="http://maven.apache.org/POM/4.0.0"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <groupId>com.github.restup</groupId>
-    <artifactId>up-parent</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
-    <packaging>pom</packaging>
-    <name>Up! :: parent</name>
-    <description>REST Up!</description>
-    <url>https://github.com/restup</url>
-
-
-    <licenses>
-        <license>
-            <name>MIT License</name>
-            <url>http://www.opensource.org/licenses/mit-license.php</url>
-        </license>
-    </licenses>
-
-    <developers>
-        <developer>
-            <name>Andy Buttaro</name>
-            <email>andrewbuttaro@yahoo.com</email>
-            <organization>REST Up!</organization>
-            <organizationUrl>https://github.com/restup</organizationUrl>
-        </developer>
-    </developers>
-
-    <scm>
-        <connection>scm:git:git://github.com/restup/up-framework.git</connection>
-        <developerConnection>scm:git:ssh://github.com:restup/up-framework.git</developerConnection>
-        <url>http://github.com/restup/up-framework/tree/master</url>
-    </scm>
-
-    <distributionManagement>
-        <snapshotRepository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/content/repositories/snapshots</url>
-        </snapshotRepository>
-        <repository>
-            <id>ossrh</id>
-            <url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
-        </repository>
-    </distributionManagement>
+	<groupId>com.github.restup</groupId>
+	<artifactId>up-parent</artifactId>
+	<version>0.0.1-SNAPSHOT</version>
+	<packaging>pom</packaging>
+	<name>Up! :: parent</name>
+	<description>REST Up!</description>
+	<url>https://github.com/restup</url>
 
 
-    <properties>
+	<licenses>
+		<license>
+			<name>MIT License</name>
+			<url>http://www.opensource.org/licenses/mit-license.php</url>
+		</license>
+	</licenses>
 
-        <!-- Dependency Versions -->
-        <maven-surefire-plugin-version>2.18.1</maven-surefire-plugin-version>
-        <slf4j.version>1.7.25</slf4j.version>
-        <gentyref.version>1.2.0</gentyref.version>
-        <commons.collections4.version>4.0</commons.collections4.version>
-        <commons.io.version>2.4</commons.io.version>
-        <commons.lang3.version>3.4</commons.lang3.version>
-        <javax.servlet.version>3.1.0</javax.servlet.version>
-        <javax.validation.version>2.0.0.Final</javax.validation.version>
+	<developers>
+		<developer>
+			<name>Andy Buttaro</name>
+			<email>andrewbuttaro@yahoo.com</email>
+			<organization>REST Up!</organization>
+			<organizationUrl>https://github.com/restup</organizationUrl>
+		</developer>
+	</developers>
 
-        <javax.persistence.api>2.2</javax.persistence.api>
-        <javax.transaction.api>1.2</javax.transaction.api>
-        <spring.version>4.3.7.RELEASE</spring.version>
+	<scm>
+		<connection>scm:git:git://github.com/restup/up-framework.git</connection>
+		<developerConnection>scm:git:ssh://github.com:restup/up-framework.git</developerConnection>
+		<url>http://github.com/restup/up-framework/tree/master</url>
+	</scm>
 
-        <junit.version>4.12</junit.version>
-        <json.unit.version>1.25.0</json.unit.version>
-        <mockito.version>2.8.47</mockito.version>
-        <hamcrest.version>2.0.0.0</hamcrest.version>
-        <assertj.version>3.9.0</assertj.version>
-        <hibernate.validator.version>4.2.0.Final</hibernate.validator.version>
-        <jackson.version>2.8.7</jackson.version>
-        <gson.version>2.3</gson.version>
-
-        <java.version>1.8</java.version>
-    </properties>
-
-    <dependencyManagement>
-        <dependencies>
-
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-api</artifactId>
-                <version>${slf4j.version}</version>
-            </dependency>
-
-            <!-- Testing -->
-            <dependency>
-                <groupId>org.slf4j</groupId>
-                <artifactId>slf4j-log4j12</artifactId>
-                <version>${slf4j.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>junit</groupId>
-                <artifactId>junit</artifactId>
-                <version>${junit.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-            <dependency>
-                <groupId>org.mockito</groupId>
-                <artifactId>mockito-core</artifactId>
-                <version>${mockito.version}</version>
-                <scope>test</scope>
-            </dependency>
-
-        </dependencies>
-
-    </dependencyManagement>
+	<distributionManagement>
+		<snapshotRepository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/content/repositories/snapshots</url>
+		</snapshotRepository>
+		<repository>
+			<id>ossrh</id>
+			<url>https://oss.sonatype.org/service/local/staging/deploy/maven2/</url>
+		</repository>
+	</distributionManagement>
 
 
-    <build>
-        <plugins>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-compiler-plugin</artifactId>
-                <configuration>
-                    <source>${java.version}</source>
-                    <target>${java.version}</target>
-                </configuration>
-            </plugin>
-            <plugin>
-                <groupId>org.apache.maven.plugins</groupId>
-                <artifactId>maven-release-plugin</artifactId>
-                <version>2.5.3</version>
-                <configuration>
-                    <autoVersionSubmodules>true</autoVersionSubmodules>
-                    <useReleaseProfile>false</useReleaseProfile>
-                    <releaseProfiles>release</releaseProfiles>
-                    <goals>deploy</goals>
-                </configuration>
-            </plugin>
-        </plugins>
-    </build>
+	<properties>
+
+		<!-- Dependency Versions -->
+		<maven-surefire-plugin-version>2.18.1</maven-surefire-plugin-version>
+		
+		<slf4j.version>1.7.25</slf4j.version>
+		<gentyref.version>1.2.0</gentyref.version>
+		<commons.collections4.version>4.0</commons.collections4.version>
+		<commons.io.version>2.4</commons.io.version>
+		<commons.lang3.version>3.7</commons.lang3.version>
+		<guava.version>23.6-jre</guava.version>
+		<javax.servlet.version>3.1.0</javax.servlet.version>
+		<javax.validation.version>2.0.0.Final</javax.validation.version>
+
+		<javax.persistence.api>2.2</javax.persistence.api>
+		<javax.transaction.api>1.2</javax.transaction.api>
+		<spring.version>4.3.7.RELEASE</spring.version>
+		<hibernate.validator.version>4.2.0.Final</hibernate.validator.version>
+		<jackson.version>2.8.7</jackson.version>
+		<gson.version>2.3</gson.version>
+
+		<java.version>1.8</java.version>
+
+		<!-- test dependencies -->
+		<junit.version>4.12</junit.version>
+		<json.unit.version>1.25.0</json.unit.version>
+		<mockito.version>2.8.47</mockito.version>
+		<hamcrest.version>2.0.0.0</hamcrest.version>
+		<assertj.version>3.9.0</assertj.version>
+		<jsoup.version>1.10.2</jsoup.version>
+		<asm.version>3.3.1</asm.version>
+		<openpojo.version>0.8.7</openpojo.version>
+		<equalsverifier.version>2.4.2</equalsverifier.version>
+	</properties>
+
+	<dependencyManagement>
+		<dependencies>
+
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-api</artifactId>
+				<version>${slf4j.version}</version>
+			</dependency>
+
+			<!-- Testing -->
+			<dependency>
+				<groupId>org.slf4j</groupId>
+				<artifactId>slf4j-log4j12</artifactId>
+				<version>${slf4j.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>junit</groupId>
+				<artifactId>junit</artifactId>
+				<version>${junit.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+			<dependency>
+				<groupId>org.mockito</groupId>
+				<artifactId>mockito-core</artifactId>
+				<version>${mockito.version}</version>
+				<scope>test</scope>
+			</dependency>
+
+		</dependencies>
+
+	</dependencyManagement>
+
+
+	<build>
+		<plugins>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-compiler-plugin</artifactId>
+				<configuration>
+					<source>${java.version}</source>
+					<target>${java.version}</target>
+				</configuration>
+			</plugin>
+			<plugin>
+				<groupId>org.apache.maven.plugins</groupId>
+				<artifactId>maven-release-plugin</artifactId>
+				<version>2.5.3</version>
+				<configuration>
+					<autoVersionSubmodules>true</autoVersionSubmodules>
+					<useReleaseProfile>false</useReleaseProfile>
+					<releaseProfiles>release</releaseProfiles>
+					<goals>deploy</goals>
+				</configuration>
+			</plugin>
+		</plugins>
+	</build>
 </project>

@@ -1,23 +1,21 @@
 package com.github.restup.controller;
 
 import org.junit.Before;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.mock.MockApiExecutor;
 import com.github.restup.controller.mock.MockContentNegotiation;
 import com.github.restup.controller.mock.MockJacksonContentNegotiation;
 import com.github.restup.controller.model.MediaType;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
-import com.github.restup.test.RestApiTest;
+import com.github.restup.test.RestApiAssertions;
 import com.github.restup.test.repository.RepositoryUnit;
 
 public abstract class AbstractMockTest {
 
     private final String path;
     private final Object[] pathArgs;
-    protected RestApiTest.Builder api;
+    protected RestApiAssertions.Builder api;
     protected ResourceRegistry registry;
     private boolean jsonapi;
 
@@ -45,9 +43,9 @@ public abstract class AbstractMockTest {
 
     public static ResourceRegistry registry(Class<?>... resourceClasses) {
         // build registry setting, minimally passing in a repository factory
-        ResourceRegistry registry = new ResourceRegistry(RegistrySettings.builder()
+        ResourceRegistry registry = ResourceRegistry.builder()
                 .repositoryFactory(new MapBackedRepositoryFactory())
-        );
+        .build();
 
         registry.registerResource(resourceClasses);
         return registry;
@@ -58,7 +56,7 @@ public abstract class AbstractMockTest {
         api = builder(path, pathArgs);
     }
 
-    protected RestApiTest.Builder builder(String path, Object... pathArgs) {
+    protected RestApiAssertions.Builder builder(String path, Object... pathArgs) {
         ObjectMapper mapper = new ObjectMapper();
         if (registry == null) {
             registry = registry();
@@ -66,7 +64,7 @@ public abstract class AbstractMockTest {
         ResourceController controller = resourceController(registry, mapper);
         MockContentNegotiation contentNegotiation = new MockJacksonContentNegotiation(mapper);
         MockApiExecutor executor = new MockApiExecutor(registry, controller, contentNegotiation);
-        RestApiTest.Builder b = new RestApiTest.Builder(executor, getRelativeToClass(), path, pathArgs);
+        RestApiAssertions.Builder b = new RestApiAssertions.Builder(executor, getRelativeToClass(), path, pathArgs);
         if (jsonapi) {
             b.jsonapi();
         }

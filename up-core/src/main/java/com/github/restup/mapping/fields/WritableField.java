@@ -18,6 +18,12 @@ public interface WritableField<TARGET, VALUE> {
      */
     TARGET createDeclaringInstance();
 
-    VALUE createInstance();
+    /**
+     * Create an instance of a container object of the field.
+     * @return
+     */
+    default VALUE createInstance() {
+        return null;
+    }
 
 }

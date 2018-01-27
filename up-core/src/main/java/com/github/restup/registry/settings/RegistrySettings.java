@@ -3,23 +3,18 @@ package com.github.restup.registry.settings;
 import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
-
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
-
 import org.apache.commons.lang3.ArrayUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import com.github.restup.bind.DefaultMethodArgumentFactory;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
-import com.github.restup.errors.DefaultErrorFactory;
 import com.github.restup.errors.ErrorFactory;
-import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
@@ -34,7 +29,6 @@ import com.github.restup.path.EmptyResourcePathsProvider;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.service.filters.BulkOperationByQueryFilter;
@@ -51,173 +45,59 @@ import com.github.restup.service.model.request.RequestObjectFactory;
 /**
  * Configures settings and implementations to be used by registry.
  */
-public class RegistrySettings {
+public interface RegistrySettings {
 
-	private final static Logger log = LoggerFactory.getLogger(RegistrySettings.class);
 
-	private final boolean primaryRegistry;
-	private final ResourceRegistryRepository resourceRegistryMap;
-	private final MappedClassFactory mappedClassFactory;
-	private final MappedClassRegistry mappedClassRegistry;
-	private final String[] packagesToScan;
-	private final MappedFieldFactory mappedFieldFactory;
-	private final MappedFieldBuilderVisitor[] mappedFieldVisitors;
-	private final Comparator<MappedField<?>> mappedFieldOrderComparator;
-
-	private final ControllerMethodAccess defaultControllerMethodAccess;
-	private final ServiceMethodAccess defaultServiceMethodAccess;
-	private final Pagination defaultPagination;
-	private final ResourcePathsProvider defaultSparseFieldsProvider;
-	private final ResourcePathsProvider defaultRestrictedFieldsProvider;
-
-	private final RepositoryFactory repositoryFactory;
-	private final ErrorFactory errorFactory;
-	private final RequestObjectFactory requestObjectFactory;
-	private final MethodArgumentFactory methodArgumentFactory;
-	private final ConverterFactory converterFactory;
-	private final ParameterConverterFactory parameterConverterFactory;
-	private final Object[] defaultServiceFilters;
-	private final String basePath;
-
-	private RegistrySettings(boolean primaryRegistry, ResourceRegistryRepository resourceRegistryMap,
-			MappedClassFactory mappedClassFactory, MappedClassRegistry mappedClassRegistry, String[] packagesToScan, MappedFieldFactory mappedFieldFactory,
-			MappedFieldBuilderVisitor[] mappedFieldVisitors, Comparator<MappedField<?>> mappedFieldOrderComparator,
-			ControllerMethodAccess defaultControllerMethodAccess, ServiceMethodAccess defaultServiceMethodAccess,
-			RepositoryFactory repositoryFactory, ErrorFactory errorFactory, RequestObjectFactory requestObjectFactory,
-			MethodArgumentFactory methodArgumentFactory, ConverterFactory converterFactory,
-			ParameterConverterFactory parameterConverterFactory, Object[] defaultServiceFilters,
-			Pagination defaultPagination, ResourcePathsProvider defaultSparseFieldsProvider,
-			ResourcePathsProvider defaultRestrictedFieldsProvider, String basePath) {
-		this.primaryRegistry = primaryRegistry;
-		this.packagesToScan = packagesToScan;
-		this.mappedFieldFactory = mappedFieldFactory;
-		this.mappedFieldVisitors = mappedFieldVisitors;
-		this.mappedFieldOrderComparator = mappedFieldOrderComparator;
-		this.defaultControllerMethodAccess = defaultControllerMethodAccess;
-		this.defaultServiceMethodAccess = defaultServiceMethodAccess;
-		this.repositoryFactory = repositoryFactory;
-		this.errorFactory = errorFactory;
-		this.requestObjectFactory = requestObjectFactory;
-		this.converterFactory = converterFactory;
-		this.parameterConverterFactory = parameterConverterFactory;
-		this.defaultServiceFilters = defaultServiceFilters;
-		this.defaultPagination = defaultPagination;
-		this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
-		this.defaultRestrictedFieldsProvider = defaultRestrictedFieldsProvider;
-		this.basePath = basePath;
-
-		MappedClassFactory factory = mappedClassFactory;
-		if (mappedClassFactory == null) {
-			factory = new DefaultMappedClassFactory(this);
-		}
-
-		// wrap with operations
-		RegistryOperations operations = new RegistryOperations(resourceRegistryMap, factory);
-		this.mappedClassFactory = mappedClassFactory;
-		this.mappedClassRegistry = operations;
-		this.resourceRegistryMap = operations;
-
-		if (methodArgumentFactory == null) {
-			this.methodArgumentFactory = new DefaultMethodArgumentFactory(this);
-		} else {
-			this.methodArgumentFactory = methodArgumentFactory;
-		}
-	}
-
-	public static Builder builder() {
+    static Builder builder() {
 		return new Builder();
 	}
 
-	public ResourceRegistryRepository getResourceRegistryMap() {
-		return resourceRegistryMap;
-	}
+    ResourceRegistryRepository getResourceRegistryRepository();
 
-	public MappedClassRegistry getMappedClassRegistry() {
-		return mappedClassRegistry;
-	}
+    MappedClassRegistry getMappedClassRegistry();
 
-	public MappedClassFactory getMappedClassFactory() {
-		return mappedClassFactory;
-	}
+    MappedClassFactory getMappedClassFactory();
 
-	public String[] getPackagesToScan() {
-		return packagesToScan;
-	}
+    List<String> getPackagesToScan();
 
-	public MappedFieldFactory getMappedFieldFactory() {
-		return mappedFieldFactory;
-	}
+    MappedFieldFactory getMappedFieldFactory();
 
-	public Comparator<MappedField<?>> getMappedFieldOrderComparator() {
-		return mappedFieldOrderComparator;
-	}
+    Comparator<MappedField<?>> getMappedFieldOrderComparator();
 
-	public RepositoryFactory getRepositoryFactory() {
-		return repositoryFactory;
-	}
+    RepositoryFactory getRepositoryFactory();
 
-	public MappedFieldBuilderVisitor[] getMappedFieldVisitors() {
-		return mappedFieldVisitors;
-	}
+    MappedFieldBuilderVisitor[] getMappedFieldVisitors();
 
-	public ErrorFactory getErrorFactory() {
-		return errorFactory;
-	}
+    ErrorFactory getErrorFactory();
 
-	public MethodArgumentFactory getMethodArgumentFactory() {
-		return methodArgumentFactory;
-	}
+    MethodArgumentFactory getMethodArgumentFactory();
 
-	public ConverterFactory getConverterFactory() {
-		return converterFactory;
-	}
+    ConverterFactory getConverterFactory();
 
-	public ParameterConverterFactory getParameterConverterFactory() {
-		return parameterConverterFactory;
-	}
+    ParameterConverterFactory getParameterConverterFactory();
 
-	public ControllerMethodAccess getDefaultControllerAccess() {
-		return defaultControllerMethodAccess;
-	}
+    ControllerMethodAccess getDefaultControllerAccess();
 
-	public ServiceMethodAccess getDefaultServiceAccess() {
-		return defaultServiceMethodAccess;
-	}
+    ServiceMethodAccess getDefaultServiceAccess();
 
-	public boolean isPrimaryRegistry() {
-		return primaryRegistry;
-	}
+    List<Object> getDefaultServiceFilters();
 
-	public Object[] getDefaultServiceFilters() {
-		return defaultServiceFilters;
-	}
+    RequestObjectFactory getRequestObjectFactory();
 
-	public RequestObjectFactory getRequestObjectFactory() {
-		return requestObjectFactory;
-	}
+    Pagination getDefaultPagination();
 
-	public Pagination getDefaultPagination() {
-		return defaultPagination;
-	}
+    ResourcePathsProvider getDefaultRestrictedFieldsProvider();
 
-	public ResourcePathsProvider getDefaultRestrictedFieldsProvider() {
-		return defaultRestrictedFieldsProvider;
-	}
+    ResourcePathsProvider getDefaultSparseFieldsProvider();
 
-	public ResourcePathsProvider getDefaultSparseFieldsProvider() {
-		return defaultSparseFieldsProvider;
-	}
+    String getBasePath();
 
-	public String getBasePath() {
-		return basePath;
-	}
-
-	public static class Builder {
+    static class Builder {
+        private final static Logger log = LoggerFactory.getLogger(RegistrySettings.class);
 
 		private boolean excludeFrameworkFilters;
 		private boolean excludeDefaultConverters;
 
-		private boolean primaryRegistry;
 		private ResourceRegistryRepository resourceRegistryMap;
 		private MappedClassFactory mappedClassFactory;
 		private MappedClassRegistry mappedClassRegistry;
@@ -245,18 +125,9 @@ public class RegistrySettings {
 		}
 
 		/**
-		 * If true, {@link ResourceRegistry} created using the resulting settings will
-		 * be made the singleton instance.
-		 */
-		public Builder primaryRegistry(boolean singleton) {
-			this.primaryRegistry = singleton;
-			return me();
-		}
-
-		/**
 		 * Provided alternate storage for registry meta data
 		 */
-		public Builder resourceRegistryMap(ResourceRegistryRepository resourceRegistryMap) {
+		public Builder resourceRegistryRepository(ResourceRegistryRepository resourceRegistryMap) {
 			this.resourceRegistryMap = resourceRegistryMap;
 			return me();
 		}
@@ -384,18 +255,21 @@ public class RegistrySettings {
 			return me();
 		}
 
-		public Builder defaultPagination(Pagination defaultPagination) {
-			this.defaultPagination = defaultPagination;
-			return me();
-		}
+        public Builder defaultPagination(Pagination defaultPagination) {
+            this.defaultPagination = defaultPagination;
+            return me();
+        }
 
-		public Builder defaultPagination(Integer pageLimit, Integer pageOffset, boolean pagingDisabled,
-				boolean withTotalsDisabled) {
-			return defaultPagination(new Pagination(pageLimit, pageOffset, pagingDisabled, withTotalsDisabled));
-		}
+        public Builder defaultPaginationDisabled() {
+            return defaultPagination(Pagination.disabled());
+        }
+
+        public Builder defaultPagination(Integer pageLimit, Integer pageOffset, boolean withTotalsDisabled) {
+            return defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
+        }
 
 		public Builder defaultPagination(Integer pageLimit) {
-			return defaultPagination(pageLimit, 0, false, false);
+			return defaultPagination(pageLimit, 0, false);
 		}
 
 		public Builder validator(Validator validator) {
@@ -454,7 +328,7 @@ public class RegistrySettings {
 
 			ErrorFactory errorFactory = this.errorFactory;
 			if (errorFactory == null) {
-				errorFactory = new DefaultErrorFactory();
+                errorFactory = ErrorFactory.getDefaultErrorFactory();
 			}
 			RequestObjectFactory requestObjectFactory = this.requestObjectFactory;
 			if (requestObjectFactory == null) {
@@ -509,12 +383,12 @@ public class RegistrySettings {
 
 			ServiceMethodAccess defaultServiceMethodAccess = this.defaultServiceMethodAccess;
 			if (defaultServiceMethodAccess == null) {
-				defaultServiceMethodAccess = new ServiceMethodAccess.Builder().setAllEnabled().build();
+				defaultServiceMethodAccess = ServiceMethodAccess.builder().setAllEnabled().build();
 			}
 
 			Pagination pagination = defaultPagination;
 			if (pagination == null) {
-				pagination = new Pagination(10, 0, false, false);
+				pagination = Pagination.of(10, 0);
 			}
 
 			ResourcePathsProvider defaultSparseFields = this.defaultSparseFieldsProvider;
@@ -532,7 +406,7 @@ public class RegistrySettings {
 				basePath = "/";
 			}
 
-			return new RegistrySettings(primaryRegistry, resourceRegistryMap, mappedClassFactory, mappedClassRegistry, packagesToScan,
+            return new BasicRegistrySettings(resourceRegistryMap, mappedClassFactory, mappedClassRegistry, packagesToScan,
 					mappedFieldFactory, mappedFieldVisitors, mappedFieldOrderComparator, defaultControllerMethodAccess,
 					defaultServiceMethodAccess, repositoryFactory, errorFactory, requestObjectFactory,
 					methodArgumentFactory, converterFactory, parameterConverterFactory, defaultServiceFilters,
@@ -540,34 +414,28 @@ public class RegistrySettings {
 		}
 	}
 
-	private static class MappedFieldComparator implements Comparator<MappedField<?>> {
+	static class MappedFieldComparator implements Comparator<MappedField<?>> {
 
-		public int compare(MappedField<?> a, MappedField<?> b) {
+		@Override
+        public int compare(MappedField<?> a, MappedField<?> b) {
 			if (a == null) {
-				return 1;
+                return b == null ? 0 : 1;
 			}
+            if (b == null) {
+                return -1;
+            }
 			if (a.isIdentifier()) {
-				return -10;
-			}
-			if (b == null) {
-				return -1;
-			}
-			if (b.isIdentifier()) {
+                if (!b.isIdentifier()) {
+                    return -1;
+                }
+            } else if (b.isIdentifier()) {
 				return 1;
 			}
-
-			if (a.getApiName() != null) {
-				if (b.getApiName() != null) {
-					return a.getApiName().compareTo(b.getApiName());
-				}
+            int result = StringUtils.compare(a.getApiName(), b.getApiName());
+            if (result == 0) {
+                result = StringUtils.compare(a.getBeanName(), b.getBeanName());
 			}
-			if (a.getBeanName() == null) {
-				return 1;
-			}
-			if (b.getBeanName() == null) {
-				return 1;
-			}
-			return a.getBeanName().compareTo(b.getBeanName());
+            return result;
 		}
 
 	}

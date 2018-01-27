@@ -8,6 +8,7 @@ import com.github.restup.registry.Resource;
  */
 public class DefaultServiceDiscovery implements ServiceDiscovery {
 
+    @Override
     public String locateResourceUrl(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource) {
         StringBuilder sb = new StringBuilder();
         String base = request.getBaseRequestUrl();

@@ -15,7 +15,7 @@ public interface Errors {
     /**
      * Add an error to the list of errors.
      */
-    void addError(ErrorBuilder error);
+    void addError(RequestError.Builder error);
 
     /**
      * @throws ErrorObjectException if 1 or more errors exist

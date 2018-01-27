@@ -1,5 +1,15 @@
 package com.github.restup.repository.collections;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.DeleteResource;
 import com.github.restup.annotations.operations.ListResource;
@@ -14,20 +24,9 @@ import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.DeleteRequest;
-import com.github.restup.service.model.request.ListRequest;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.UpdateRequest;
-import com.github.restup.service.model.response.BasicPagedResult;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import org.apache.commons.collections4.CollectionUtils;
+import com.github.restup.service.model.response.PagedResult;
 
 /**
  * A repository backed by a {@link Map}
@@ -51,7 +50,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
     public T create(Resource<?, ?> resource, CreateRequest<T> request) {
         T t = request.getData();
         MappedField<ID> idField = (MappedField) resource.getIdentityField();
-        ID id = (ID) idField.readValue(t);
+        ID id = idField.readValue(t);
         if (id == null) {
             id = identityStrategy.getNextId();
             idField.writeValue(t, id);
@@ -61,11 +60,11 @@ public class MapBackedRepository<T, ID extends Serializable> {
     }
 
     @ReadResource
-    public T find(Resource<?, ?> resource, ReadRequest<T, ID> request) {
-        return find(resource, request.getId());
+    public T find(ReadRequest<T, ID> request) {
+        return find(request.getId());
     }
 
-    public T find(Resource<?, ?> resource, ID id) {
+    public T find(ID id) {
         return map.get(id);
     }
 
@@ -77,7 +76,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
     @UpdateResource
     public T update(Resource<?, ?> resource, UpdateRequest<T, ID> request) {
         // PersistenceResult<T>
-        T existing = find(resource, request.getId());
+        T existing = find(request.getId());
         T update = request.getData();
         if (update != null && request.getRequestedPaths() != null) {
             for (ResourcePath path : request.getRequestedPaths()) {
@@ -90,7 +89,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
 
     @SuppressWarnings("unchecked")
 	@ListResource
-    public BasicPagedResult<T> list(ListRequest<T> request, PreparedResourceQueryStatement ps) {
+    public PagedResult<T> list(PreparedResourceQueryStatement ps) {
         List<T> result = new ArrayList<T>(map.values());
 
         Pagination paging = ps.getPagination();
@@ -124,7 +123,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
             }
         }
 
-        return new BasicPagedResult<T>(result, paging, totalCount);
+        return PagedResult.of(result, paging, totalCount);
     }
 
     private List<T> filter(PreparedResourceQueryStatement ps, List<T> result) {
@@ -148,7 +147,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
     private void sort(PreparedResourceQueryStatement ps, List<T> result) {
         List<ResourceSort> sortFields = ps.getRequestedSort();
         if (sortFields == null) {
-            sortFields = Arrays.asList(new ResourceSort(ResourcePath.idPath(ps.getResource())));
+            sortFields = Arrays.asList(ResourceSort.of(ResourcePath.idPath(ps.getResource())));
         }
         Collections.sort(result, new Sort<>(sortFields));
     }

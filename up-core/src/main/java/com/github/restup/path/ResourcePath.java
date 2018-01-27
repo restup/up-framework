@@ -1,8 +1,14 @@
 package com.github.restup.path;
 
-import com.github.restup.errors.ErrorBuilder;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 import com.github.restup.errors.ErrorSource;
 import com.github.restup.errors.Errors;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.mapping.fields.MappedField;
@@ -14,13 +20,6 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
-
 /**
  * Provides support for accessing and representing fields of an object or object
  * graph.
@@ -31,7 +30,6 @@ public class ResourcePath implements ErrorSource {
 
 	public final static PathValue ID = new ConstantPathValue("id");
 	public final static PathValue TYPE = new ConstantPathValue("type");
-	public final static PathValue DATA = new DataPathValue();
 	public final static PathValue ATTRIBUTES = new ConstantPathValue("attributes");
 	private final ResourcePath prior;
 	private final PathValue value;
@@ -449,7 +447,8 @@ public class ResourcePath implements ErrorSource {
 		return true;
 	}
 
-	public String getSource() {
+	@Override
+    public String getSource() {
 		return first().join(Mode.API, "/", true);
 	}
 
@@ -565,12 +564,14 @@ public class ResourcePath implements ErrorSource {
 	public final static class Builder {
 
 		private final static Function<PathValue, Boolean> NOT_NULL = new Function<PathValue, Boolean>() {
-			public Boolean apply(PathValue t) {
+			@Override
+            public Boolean apply(PathValue t) {
 				return t != null;
 			}
 		};
 		private final static Function<PathValue, Boolean> MAPPED = new Function<PathValue, Boolean>() {
-			public Boolean apply(PathValue t) {
+			@Override
+            public Boolean apply(PathValue t) {
 				return t instanceof MappedFieldPathValue;
 			}
 		};
@@ -587,10 +588,6 @@ public class ResourcePath implements ErrorSource {
 		private Errors errors;
 		private boolean quiet;
 		private Function<PathValue, Boolean> filter;
-
-		public Builder(MappedClass<?> mappedClass) {
-			this(ResourceRegistry.getInstance(), mappedClass);
-		}
 
 		public Builder(ResourceRegistry registry, MappedClass<?> mappedClass) {
 			this(registry);
@@ -638,11 +635,11 @@ public class ResourcePath implements ErrorSource {
 			if (root != null) {
 				throw new IllegalStateException("data not allowed here");
 			}
-			return append(DATA);
+            return append(PathValue.data());
 		}
 
 		public Builder data(int index) {
-			return append(DATA).index(index);
+            return append(PathValue.data()).index(index);
 		}
 
 		public Builder index(int index) {
@@ -658,7 +655,7 @@ public class ResourcePath implements ErrorSource {
 		@SuppressWarnings("rawtypes")
 		private boolean supportsIndex() {
 			if (current != null) {
-				if (currentCollection || current.value() == DATA) {
+                if (currentCollection || current.value() == PathValue.data()) {
 					return true;
 				}
 				if (current.value() instanceof MappedFieldPathValue) {
@@ -685,7 +682,7 @@ public class ResourcePath implements ErrorSource {
 
 		public Builder append(String field) {
 			if (invalid) {
-				return append(new InvalidPathValue(field));
+                return append(PathValue.invalid(field));
 			} else {
 				if (currentCollection) {
 					try {
@@ -700,7 +697,7 @@ public class ResourcePath implements ErrorSource {
 				}
 				MappedField<?> mappedField = findField(field);
 				if (mappedField == null) {
-					return append(new InvalidPathValue(field));
+                    return append(PathValue.invalid(field));
 				} else {
 					return append(mappedField);
 				}
@@ -803,7 +800,7 @@ public class ResourcePath implements ErrorSource {
 			result.setValid(!invalid);
 			result.setResource(resource);
 			if (invalid) {
-				ErrorBuilder error = ErrorBuilder.builder().code("INVALID_PATH").title("Invalid Path")
+                RequestError.Builder error = RequestError.builder().code("INVALID_PATH").title("Invalid Path")
 						.detail("The specified path is not valid.").path(result);
 				if (errors != null) {
 					errors.addError(error);

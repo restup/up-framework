@@ -26,10 +26,6 @@
 
         <dependency>
             <groupId>javax.persistence</groupId>
-            <!--
-            <artifactId>persistence-api</artifactId>
-            <version>1.0.2</version>
-            -->
             <artifactId>javax.persistence-api</artifactId>
             <version>${javax.persistence.api}</version>
         </dependency>
@@ -53,7 +49,19 @@
             <version>${hibernate.validator.version}</version>
             <optional>true</optional>
         </dependency>
+		
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
 
+        <dependency>
+            <groupId>com.github.restup.test</groupId>
+            <artifactId>up-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope>
+        </dependency>
 
     </dependencies>
 

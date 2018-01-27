@@ -25,6 +25,7 @@ public class AnnotatedService extends MethodCommandOperations implements Resourc
         /**
          * Determines whether the repoAnnotation exists on the operations. If it does, a {@link FilteredServiceMethodCommand} is returned If it does not, an {@link UnsupportedMethodCommand} is returned
          */
+        @Override
         @SuppressWarnings({"rawtypes"})
         protected MethodCommand<?> getMethod(Resource resource, String operation
                 , Class<? extends Annotation> repoAnnotation

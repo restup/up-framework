@@ -1,63 +1,38 @@
 package com.github.restup.test;
 
-import com.github.restup.test.resource.ByteArrayContents;
-import com.github.restup.test.resource.Contents;
-import com.github.restup.test.resource.RelativeTestResource;
 import java.util.Map;
 import org.hamcrest.Matcher;
+import com.github.restup.test.resource.Contents;
+import com.github.restup.test.resource.RelativeTestResource;
 
-public class ApiResponse<H> {
+public interface ApiResponse<H> {
 
-    private final int status;
-    private final Map<String, H> headers;
-    private final Contents body;
-
-    public ApiResponse(int status, Map<String, H> headers, Contents body) {
-        this.status = status;
-        this.headers = headers;
-        this.body = body;
-    }
-
-    public ApiResponse(int status, Map<String, H> headers, byte[] body) {
-        this(status, headers, new ByteArrayContents(body));
-    }
-
-    public static Builder builder() {
+    static Builder builder() {
         return new Builder();
     }
 
-    public H getHeader(String key) {
-        for (Map.Entry<String, H> e : headers.entrySet()) {
+
+    default H getHeader(String key) {
+        for (Map.Entry<String, H> e : getHeaders().entrySet()) {
             if (key.equalsIgnoreCase(e.getKey())) {
                 return e.getValue();
             }
         }
         return null;
     }
+    
+    int getStatus();
 
-    public int getStatus() {
-        return status;
-    }
+    Map<String, H> getHeaders();
 
-    public Map<String, H> getHeaders() {
-        return headers;
-    }
+    Contents getBody();
 
-    public Contents getBody() {
-        return body;
-    }
-
-    public static class Builder extends ApiRequest.AbstractBuilder<Builder, Matcher<String[]>> {
+    static class Builder extends AbstractApiRequestBuilder<Builder, Matcher<String[]>> {
 
         private int status;
 
         public Builder status(int status) {
             this.status = status;
-            return me();
-        }
-
-        public Builder header(String name, Matcher<String[]> value) {
-            headers.put(name, value);
             return me();
         }
 
@@ -67,7 +42,7 @@ public class ApiResponse<H> {
         }
 
         public ApiResponse<Matcher<String[]>> build() {
-            return new ApiResponse<>(status, getHeaders(), getBody());
+            return new BasicApiResponse<>(status, getHeaders(), getBody());
         }
     }
 }

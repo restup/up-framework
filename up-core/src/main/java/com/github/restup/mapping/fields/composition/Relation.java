@@ -44,6 +44,11 @@ public interface Relation {
         private boolean validateReferences;
         private String resourceName;
         private Class<?> resourceClass;
+        
+        private Builder() {
+            includable = true;
+            validateReferences = true;
+        }
 
         private Builder me() {
             return this;

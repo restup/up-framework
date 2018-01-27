@@ -20,6 +20,7 @@ public class BasicReadRequest<T, ID extends Serializable> extends AbstractReques
         this.id = id;
     }
 
+    @Override
     public ID getId() {
         return id;
     }

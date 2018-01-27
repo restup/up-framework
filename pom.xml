@@ -152,11 +152,11 @@
         <module>up-test</module>
         <module>up-test-spring</module>
         <module>up-core</module>
+        <module>up-test-repository</module>
         <module>up-controller</module>
         <module>up-repository-jpa</module>
         <module>up-http</module>
         <module>up-spring-mvc</module>
-        <module>up-test-repository</module>
     </modules>
 
 </project>

@@ -7,7 +7,7 @@ import org.apache.commons.lang3.StringUtils;
 
 public class StringToLocalDateTimeConverter implements Function<String,LocalDateTime> {
 
-    private static final String DEFAULT_TIME = "T00:00:00Z";
+    private static final String DEFAULT_TIME = "T00:00:00";
 
     private final boolean lenient;
 

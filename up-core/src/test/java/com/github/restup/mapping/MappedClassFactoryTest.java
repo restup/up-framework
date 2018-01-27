@@ -1,27 +1,25 @@
 package com.github.restup.mapping;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-
+import java.lang.reflect.Type;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Test;
 import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.registry.ResourceRegistryTest;
 import com.model.test.company.Address;
 import com.model.test.company.Company;
 import com.model.test.company.Contractor;
 import com.model.test.company.Employee;
 import com.model.test.company.Person;
 
-import java.lang.reflect.Type;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.Test;
-
 public class MappedClassFactoryTest {
 
-    MappedClassRegistry factory = ResourceRegistryTest.registry();
+    MappedClassRegistry factory = mapBackedRegistry();
 
     public static MappedField<?> assertField(MappedClass<?> mappedClass, int i, String name, Class<?> type) {
         return assertField(mappedClass, i, name, type, false, false, false, null);
@@ -113,6 +111,7 @@ public class MappedClassFactoryTest {
         assertEquals("name", name, mappedClass.getName());
         assertEquals("type", type, mappedClass.getType());
         assertEquals("parentType", parentType, mappedClass.getParentType());
+        assertEquals("toString", mappedClass.getName(), mappedClass.toString());
     }
 
     public static void assertCompany(MappedClass<Company> mappedClass) {

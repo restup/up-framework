@@ -160,7 +160,7 @@ public class ResourceQueryDefaults {
     public void setSort(String... beanPaths) {
         List<ResourceSort> sort = new ArrayList<ResourceSort>();
         for (String beanPath : beanPaths) {
-            sort.add(new ResourceSort(resource, beanPath));
+            sort.add(ResourceSort.of(resource, beanPath));
         }
         setSort(sort);
     }

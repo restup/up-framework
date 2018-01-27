@@ -7,7 +7,7 @@ import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.test.RestApiTest;
+import com.github.restup.test.RestApiAssertions;
 
 public class CourseServiceWithoutModelTest extends AbstractMockTest {
 
@@ -68,7 +68,7 @@ public class CourseServiceWithoutModelTest extends AbstractMockTest {
     @Test
     public void testRelationships() {
         // examples of fetching relationships between resources
-        RestApiTest.Builder api = builder("/courses/{courseId}/university", 5);
+        RestApiAssertions.Builder api = builder("/courses/{courseId}/university", 5);
         api.get().test("getCourseUniversity").ok();
 
         // and the reverse works as well

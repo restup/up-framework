@@ -1,7 +1,5 @@
 package com.github.restup.test.resource;
 
-import com.github.restup.test.ApiExecutor;
-import com.github.restup.test.utils.TestResourceUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -9,6 +7,8 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.restup.test.ApiExecutor;
+import com.github.restup.test.utils.TestResourceUtils;
 
 public class RelativeTestResource implements ResourceContents {
 
@@ -41,10 +41,6 @@ public class RelativeTestResource implements ResourceContents {
         this.path = sb.toString();
     }
 
-    public RelativeTestResource(Class<?> relativeTo, String fileName) {
-        this(relativeTo, null, fileName, null);
-    }
-
     /**
      * @return first non Up! test element from the stack
      */
@@ -63,7 +59,7 @@ public class RelativeTestResource implements ResourceContents {
         try {
             return Class.forName(getCallingStackElement().getClassName());
         } catch (ClassNotFoundException e) {
-            throw new RuntimeException("Class Not Found", e);
+            throw new AssertionError("Class Not Found", e);
         }
     }
 
@@ -96,34 +92,38 @@ public class RelativeTestResource implements ResourceContents {
         return resource(RESPONSES, fileName);
     }
 
+    @Override
     public String getContentAsString() {
         byte[] result = getContentAsByteArray();
         return result == null ? null : new String(result);
     }
 
+    @Override
     public byte[] getContentAsByteArray() {
-        if (!exists()) {
-            return null;
-        } else {
-            log.debug("Loading contents from {}", path);
-            try {
-                return IOUtils.toByteArray(new FileInputStream(getFile()));
-            } catch (IOException e) {
-                log.error("Unable to load contents from " + path, e);
-                throw new RuntimeException("Unable to read file", e);
+        log.debug("Loading contents from {}", path);
+        try {
+            return IOUtils.toByteArray(new FileInputStream(getFile()));
+        } catch (IOException e) {
+            log.error("Unable to load contents from " + path, e);
+            if (!exists()) {
+                throw new AssertionError(getPath() + " not found.");
+            } else {
+                throw new AssertionError("Unable to read file", e);
             }
         }
     }
 
+    @Override
     public void writeResult(byte[] body) {
         try {
             log.info("Writing results to {}", path);
             FileUtils.writeByteArrayToFile(getFile(), body);
         } catch (IOException e) {
-            throw new RuntimeException("Unable to write to " + path, e);
+            throw new AssertionError("Unable to write to " + path, e);
         }
     }
 
+    @Override
     public boolean exists() {
         return getFile().exists();
     }

@@ -1,18 +1,18 @@
 package com.github.restup.controller.model;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
+import java.util.Arrays;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.TestRegistry;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
-import java.util.Arrays;
-import java.util.Map;
-import org.junit.Test;
 
 @SuppressWarnings({"rawtypes"})
 public class ResourceControllerRequestTest {
@@ -65,8 +65,8 @@ public class ResourceControllerRequestTest {
         assertEquals(Arrays.asList(123l), b.ids);
     }
 
-    private Builder path(String path) {
-        ResourceRegistry registry = TestRegistry.registry();
+    private Builder path(String path)  {
+        ResourceRegistry registry = mapBackedRegistry();
         registry.registerResource(Resource.builder(Company.class)
                 .pluralName("companies"));
         registry.registerResource(Resource.builder(Person.class)
@@ -79,19 +79,25 @@ public class ResourceControllerRequestTest {
     }
 
     private void pathError(String code, String path, String resourceName) {
-        try {
-            path(path);
-            fail("Expected error");
-        } catch (ErrorObjectException e) {
-            RequestError err = e.getErrors().iterator().next();
-            assertEquals(code, err.getCode());
-            Map m = (Map) err.getMeta();
-            assertEquals(resourceName, m.get("resource"));
-        }
+        Throwable thrownException = catchThrowable( () -> path(path));
+        
+        Assertions.assertThat(thrownException)
+                .isInstanceOf(ErrorObjectException.class)
+                .hasFieldOrPropertyWithValue("code", code)
+                .hasFieldOrPropertyWithValue("httpStatus", 404)
+                .satisfies( e -> assertMeta(e, "resource", resourceName))
+                .hasNoCause();
+    }
+    
+    private void assertMeta(Throwable e, String key, String value) {
+        RequestError err = ((ErrorObjectException)e).getErrors().iterator().next();
+        Map m = (Map) err.getMeta();
+        assertEquals(value, m.get(key));
     }
 
     private final static class Builder extends ResourceControllerRequest.AbstractBuilder<Builder, ParsedResourceControllerRequest> {
 
+        @Override
         public ParsedResourceControllerRequest build() {
             return null;
         }

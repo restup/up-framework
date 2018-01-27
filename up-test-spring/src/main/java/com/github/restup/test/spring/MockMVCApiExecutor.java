@@ -2,12 +2,6 @@ package com.github.restup.test.spring;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
-
-import com.github.restup.test.ApiExecutor;
-import com.github.restup.test.ApiRequest;
-import com.github.restup.test.ApiResponse;
-import com.github.restup.test.RpcApiTest;
-import com.github.restup.test.resource.Contents;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -24,6 +18,12 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
+import com.github.restup.test.ApiExecutor;
+import com.github.restup.test.ApiRequest;
+import com.github.restup.test.ApiResponse;
+import com.github.restup.test.BasicApiResponse;
+import com.github.restup.test.RpcApiAssertions;
+import com.github.restup.test.resource.Contents;
 
 /**
  * mockMvc {@link ApiExecutor}
@@ -46,11 +46,7 @@ public class MockMVCApiExecutor implements ApiExecutor {
         // MockHttpServletResponse response = mvcResult.getResponse();
         if (log.isDebugEnabled()) {
             log.debug("Response from {}", request.getRequestURL());// , response(response)
-            try {
-                result.andDo(MockMvcResultHandlers.print());
-            } catch (NoSuchMethodError e) {
-                log.warn("", e);
-            }
+            result.andDo(MockMvcResultHandlers.print());
         }
         return result;
     }
@@ -58,7 +54,8 @@ public class MockMVCApiExecutor implements ApiExecutor {
     /**
      * @return a {@link ResultActionsApiResponse} with mockMvc results
      */
-    public ApiResponse<String[]> execute(RpcApiTest rpcApiTest) {
+    @Override
+    public ApiResponse<String[]> execute(RpcApiAssertions rpcApiTest) {
         ApiRequest test = rpcApiTest.getRequest();
         assertThat(test.getMethod(), notNullValue());
 
@@ -103,7 +100,7 @@ public class MockMVCApiExecutor implements ApiExecutor {
 
     }
 
-    public static class ResultActionsApiResponse extends ApiResponse<String[]> {
+    public static class ResultActionsApiResponse extends BasicApiResponse<String[]> {
 
         private final ResultActions resultActions;
 

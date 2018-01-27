@@ -4,12 +4,9 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
-import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.util.Assert;
 
@@ -53,7 +50,7 @@ public interface MappedClass<T> {
      * then this should return true.
      * @return true if the model contains a {@link Map} with typed properties
      */
-	boolean containsTypedMap();
+	boolean isTypedMapPresent();
 
     /**
      * The attributes of the object

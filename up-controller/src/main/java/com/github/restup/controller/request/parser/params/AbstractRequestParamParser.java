@@ -75,6 +75,7 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
      */
     abstract <T> void apply(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, P parsedParameterName, String value, String rawParamName, String rawValue);
 
+    @Override
     public <T> void parse(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, final String rawParamName, String[] parameterValues) {
         if (parameterValues == null || parameterValues.length < 1) {
             // apply with null to handle empty param error
@@ -105,6 +106,7 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
         }
     }
 
+    @Override
     public boolean accept(String paramName) {
         return Objects.equals(paramName, parameterName);
     }

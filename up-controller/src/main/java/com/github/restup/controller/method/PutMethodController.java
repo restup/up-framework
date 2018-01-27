@@ -17,6 +17,7 @@ public class PutMethodController<T, ID extends Serializable> extends BulkMethodC
         super(factory);
     }
 
+    @Override
     public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         if (isBulk(request)) {
             // update multiple documents

@@ -1,18 +1,34 @@
 package com.github.restup.bind.converter;
 
 import static com.github.restup.bind.converter.ConversionUtils.LONG_MAX;
+import static com.github.restup.test.assertions.Assertions.assertThrows;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.fail;
-
 import java.math.BigDecimal;
 import java.math.BigInteger;
 import java.time.LocalDate;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.function.Function;
 import org.junit.Test;
 
 public class ConverterFactoryTest {
 
 	private ConverterFactory factory = ConverterFactory.withDefaults().build();
+
+    
+    @Test
+    public void testNoOpConversion() {
+        Function<Object,Object> f = factory.getConverter(ArrayList.class, List.class);
+        assertEquals(Arrays.asList("a","b"), f.apply(Arrays.asList("a","b")));
+    }
+    
+    @Test
+    public void testUnsupportedConversion() {
+        assertThrows(()->factory.getConverter(ArrayList.class, Map.class), UnsupportedOperationException.class)
+        .hasNoCause();
+    }
 
 	@Test
 	public void testBasicStringConversion() {
@@ -60,11 +76,8 @@ public class ConverterFactoryTest {
 	}
 	
 	private <T> void overflow(Object from, Class<T> to, T expected) {
-		try {
-			test(from, to, expected);
-		} catch (IllegalArgumentException e) {
-			return;
-		}
-		fail("Overflow exception not thrown");
+		assertThrows(()->test(from, to, expected), IllegalArgumentException.class)
+        .hasNoCause();
 	}
+	
 }

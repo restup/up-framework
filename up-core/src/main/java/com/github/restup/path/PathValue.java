@@ -28,6 +28,16 @@ public interface PathValue {
     /**
      * @return true if the path represents a reserved path (type, id, data, included, linking, etc)
      */
-    boolean isReservedPath();
+    default boolean isReservedPath() {
+        return false;
+    }
+
+    static InvalidPathValue invalid(String field) {
+        return new InvalidPathValue(field);
+    }
+
+    static DataPathValue data() {
+        return DataPathValue.getInstance();
+    }
 
 }

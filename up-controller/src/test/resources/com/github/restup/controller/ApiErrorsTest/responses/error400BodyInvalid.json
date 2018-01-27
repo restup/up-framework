@@ -6,7 +6,7 @@
       "title": "Invalid Path",
       "detail": "The specified path is not valid.",
       "source": {
-        "pointer": "/data/foo"
+        "pointer": "/data/bar"
       },
       "meta": {
         "resource": "university"
@@ -19,7 +19,7 @@
       "title": "Invalid Path",
       "detail": "The specified path is not valid.",
       "source": {
-        "pointer": "/data/bar"
+        "pointer": "/data/foo"
       },
       "meta": {
         "resource": "university"

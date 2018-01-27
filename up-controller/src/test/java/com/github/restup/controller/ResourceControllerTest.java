@@ -1,5 +1,6 @@
 package com.github.restup.controller;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.ArgumentMatchers.any;
@@ -8,11 +9,9 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
 import org.assertj.core.api.Assertions;
@@ -25,7 +24,6 @@ import org.mockito.Mockito;
 import org.mockito.invocation.InvocationOnMock;
 import org.mockito.junit.MockitoJUnitRunner;
 import org.mockito.stubbing.Answer;
-
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.NoOpContentNegotiator;
 import com.github.restup.controller.interceptor.NoOpRequestInterceptor;
@@ -38,7 +36,6 @@ import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.TestRegistry;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.CreateRequest;
@@ -91,7 +88,7 @@ public class ResourceControllerTest {
 
     @Before
     public void setup() {
-        ResourceRegistry registry = TestRegistry.registry();
+        ResourceRegistry registry = mapBackedRegistry();
         registry.registerResource(Resource.builder(Company.class).service(service));
         registry.registerResource(Resource.builder(Person.class).name("person"));
         controller = controller(registry);
@@ -118,6 +115,7 @@ public class ResourceControllerTest {
 
     private void body(final Object data) {
         doAnswer(new Answer() {
+            @Override
             public Object answer(InvocationOnMock invocation) throws Throwable {
                 ParsedResourceControllerRequest.Builder b = (ParsedResourceControllerRequest.Builder) invocation.getArguments()[1];
                 if (data instanceof Object[]) {
@@ -157,7 +155,7 @@ public class ResourceControllerTest {
     }
 
     private void patch(Object... body) {
-        patchById((Object) body);
+        patchById(body);
     }
 
     private void patchById(Object body, Integer... ids) {

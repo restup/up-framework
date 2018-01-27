@@ -1,8 +1,9 @@
 package com.github.restup.service.filters;
 
 import com.github.restup.annotations.filter.PreCreateFilter;
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorBuilder.ErrorCode;
+import com.github.restup.errors.RequestError;
+import com.github.restup.errors.ErrorCode;
+import com.github.restup.errors.ErrorCodeStatus;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
@@ -26,11 +27,11 @@ public class SequencedIdValidationFilter implements ServiceFilter {
     @PreCreateFilter
     public <T, ID extends Serializable> void validateIdNotPresent(Errors errors, Resource<T, ID> resource, CreateRequest<T> request) {
         MappedField<ID> idField = resource.getIdentityField();
-        ID id = (ID) idField.readValue(request.getData());
+        ID id = idField.readValue(request.getData());
         if (id != null) {
-            errors.addError(ErrorBuilder.builder(resource)
+            errors.addError(RequestError.builder(resource)
                     .code(ErrorCode.ID_NOT_ALLOWED_ON_CREATE)
-                    .status(ErrorBuilder.ErrorCodeStatus.FORBIDDEN)
+                    .status(ErrorCodeStatus.FORBIDDEN)
                     .meta(idField.getApiName(), id));
         }
     }

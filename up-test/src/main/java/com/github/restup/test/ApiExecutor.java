@@ -2,6 +2,6 @@ package com.github.restup.test;
 
 public interface ApiExecutor {
 
-    ApiResponse<String[]> execute(RpcApiTest settings);
+    ApiResponse<String[]> execute(RpcApiAssertions settings);
 
 }

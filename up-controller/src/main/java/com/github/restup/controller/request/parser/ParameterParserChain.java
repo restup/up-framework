@@ -57,6 +57,7 @@ public class ParameterParserChain implements RequestParser {
     /**
      * Iterate over the {@link #parsers} and execute the first which accepts the parameter
      */
+    @Override
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
         List<String> params = request.getParameterNames();
         if (params != null) {

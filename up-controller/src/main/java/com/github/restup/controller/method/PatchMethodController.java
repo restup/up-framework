@@ -18,6 +18,7 @@ public class PatchMethodController<T, ID extends Serializable> extends BulkMetho
         super(factory);
     }
 
+    @Override
     public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         int ids = CollectionUtils.size(request.getIds());
         if (ids == 1) {

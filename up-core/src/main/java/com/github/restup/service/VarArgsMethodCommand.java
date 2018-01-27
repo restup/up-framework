@@ -1,16 +1,12 @@
 package com.github.restup.service;
 
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorObjectException;
-import com.github.restup.util.Assert;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
-
-import java.lang.annotation.Annotation;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-
-import static com.github.restup.util.ReflectionUtils.findAnnotatedMethod;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import com.github.restup.errors.RequestError;
+import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.util.Assert;
 
 /**
  * Simple Method Executor which uses reflection to invoke a {@link Method} from a variable list of arguments which are mapped to the {@link Method} arguments by type. <p> For example, given the class Foo <pre class="code"> public class Foo { public void bar(String message) { System.out.println(message); } } </pre> <p> The following will print "Hello World" <p> <pre class="code"> VarArgsMethodExecutor executor = new VarArgsMethodExecutor(new Foo(), Foo.class.getMethod("bar", String.class)); executor.execute(new Date(), 10, "Hello World"); </pre>
@@ -26,28 +22,15 @@ public class VarArgsMethodCommand implements MethodCommand<Object> {
 
     public VarArgsMethodCommand(Object objectInstance, Method method) {
         super();
-        Assert.notNull(objectInstance, "An object instance is required");
-        Assert.notNull(method, "An Method is required");
+        assertArguments(objectInstance, method);
         this.objectInstance = objectInstance;
-        method.setAccessible(true);
         this.method = method;
     }
-
-    public VarArgsMethodCommand(Class<? extends Annotation> methodAnnotation, Object... objects) {
-        Assert.notNull(methodAnnotation, "An annotation class is required");
-        Method method = null;
-        Object objectInstance = null;
-        for (Object o : objects) {
-            method = findAnnotatedMethod(o.getClass(), methodAnnotation);
-            if (method != null) {
-                objectInstance = o;
-                break;
-            }
-        }
+    
+    static void assertArguments(Object objectInstance, Method method) {
         Assert.notNull(objectInstance, "An object instance is required");
         Assert.notNull(method, "An Method instance is required");
-        this.objectInstance = objectInstance;
-        this.method = method;
+        method.setAccessible(true);
     }
 
     /**
@@ -78,6 +61,7 @@ public class VarArgsMethodCommand implements MethodCommand<Object> {
         log.debug("executing {}.{}(...)", objectInstance.getClass(), method.getName());
     }
 
+    @Override
     public Object execute(Object... args) {
         try {
             Object[] params = mapArgs(method, args);
@@ -85,9 +69,7 @@ public class VarArgsMethodCommand implements MethodCommand<Object> {
                 debug(params);
             }
             return method.invoke(objectInstance, params);
-        } catch (IllegalAccessException e) {
-            throw handle(e);
-        } catch (IllegalArgumentException e) {
+        } catch (IllegalAccessException | IllegalArgumentException e) {
             throw handle(e);
         } catch (InvocationTargetException e) {
             if (e.getTargetException() instanceof ErrorObjectException) {
@@ -101,7 +83,7 @@ public class VarArgsMethodCommand implements MethodCommand<Object> {
         if (t.getCause() instanceof ErrorObjectException) {
             return (ErrorObjectException) t.getCause();
         }
-        return ErrorBuilder.buildException(t);
+        return RequestError.buildException(t);
     }
 
     public Object getObjectInstance() {

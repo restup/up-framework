@@ -29,14 +29,13 @@ public class TestResourceUtils {
         }
         return sb.toString();
     }
-
-    public static URL getResource(Class<?> clazz, String fileName) {
-        String path = getRelativePath(clazz, false, null, fileName);
-        return getResource(path);
-    }
-
+    
     public static URL getResource(String path) {
         return ClassLoader.class.getResource(path);
+    }
+    
+    private TestResourceUtils() {
+        
     }
 
 }

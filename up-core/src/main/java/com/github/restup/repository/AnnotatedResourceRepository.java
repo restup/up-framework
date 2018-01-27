@@ -37,6 +37,7 @@ public class AnnotatedResourceRepository extends MethodCommandOperations impleme
             super(resource, repository);
         }
 
+        @Override
         @SuppressWarnings({"rawtypes"})
         protected MethodCommand<?> getMethod(Resource resource, String operation
                 , Class<? extends Annotation> repoAnnotation

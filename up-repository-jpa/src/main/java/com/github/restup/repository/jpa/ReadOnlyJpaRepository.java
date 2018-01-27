@@ -1,24 +1,5 @@
 package com.github.restup.repository.jpa;
 
-import com.github.restup.annotations.operations.ListResource;
-import com.github.restup.annotations.operations.ReadResource;
-import com.github.restup.bind.converter.StringToBooleanConverter;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.query.Pagination;
-import com.github.restup.query.PreparedResourceQueryStatement;
-import com.github.restup.query.ResourceSort;
-import com.github.restup.query.criteria.AndCriteria;
-import com.github.restup.query.criteria.OrCriteria;
-import com.github.restup.query.criteria.ResourcePathFilter;
-import com.github.restup.query.criteria.ResourcePathFilter.Operator;
-import com.github.restup.query.criteria.ResourceQueryCriteria;
-import com.github.restup.registry.Resource;
-import com.github.restup.service.model.request.ListRequest;
-import com.github.restup.service.model.request.ReadRequest;
-import com.github.restup.service.model.response.BasicPagedResult;
-import com.github.restup.service.model.response.BasicReadResult;
-import com.github.restup.service.model.response.ReadResult;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -36,6 +17,23 @@ import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.restup.annotations.operations.ListResource;
+import com.github.restup.annotations.operations.ReadResource;
+import com.github.restup.bind.converter.StringToBooleanConverter;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.query.Pagination;
+import com.github.restup.query.PreparedResourceQueryStatement;
+import com.github.restup.query.ResourceSort;
+import com.github.restup.query.criteria.AndCriteria;
+import com.github.restup.query.criteria.OrCriteria;
+import com.github.restup.query.criteria.ResourcePathFilter;
+import com.github.restup.query.criteria.ResourcePathFilter.Operator;
+import com.github.restup.query.criteria.ResourceQueryCriteria;
+import com.github.restup.registry.Resource;
+import com.github.restup.service.model.request.ReadRequest;
+import com.github.restup.service.model.response.PagedResult;
+import com.github.restup.service.model.response.ReadResult;
 
 public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
@@ -96,9 +94,9 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
     @SuppressWarnings("unchecked")
     @ReadResource
-    public BasicReadResult<T> find(ReadRequest<T, ID> request) {
+    public ReadResult<T> find(ReadRequest<T, ID> request) {
         T t = findOne((Resource<T, ID>) request.getResource(), request.getId());
-        return new BasicReadResult<T>(t);
+        return ReadResult.of(t);
     }
 
     protected T findOne(Resource<T, ID> resource, ID id) {
@@ -112,10 +110,11 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @ListResource
-    public ReadResult<List<T>> list(ListRequest<T> request, PreparedResourceQueryStatement ps) {
+    public PagedResult<T> list(PreparedResourceQueryStatement ps) {
         EntityManager em = getEntityManager();
         CriteriaBuilder cb = em.getCriteriaBuilder();
-        Class<T> resourceClass = (Class) request.getResource().getClassType();
+        Resource resource = ps.getResource();
+        Class<T> resourceClass = resource.getClassType();
         CriteriaQuery<T> q = cb.createQuery(resourceClass);
 
         Root<T> root = q.from(resourceClass);
@@ -141,7 +140,7 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
         } else {
             if (pagination.isWithTotalsEnabled()) {
                 totalCount = count(resourceClass, predicates);
-                log.debug("{} count({}); {}", request.getResource(), query, totalCount);
+                log.debug("{} count({}); {}", resource, query, totalCount);
             }
 
             Integer limit = pagination.getLimit();
@@ -158,7 +157,7 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
                 pagination = null;
             }
         }
-        return new BasicPagedResult<T>(list, pagination, totalCount);
+        return PagedResult.of(list, pagination, totalCount);
     }
 
     private Long count(Class<T> resourceClass, List<Predicate> predicates) {
@@ -295,7 +294,7 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
                     return cb.isNull(keyPath);
                 }
             case regex:
-                // ErrorBuilder.builder()
+                // RequestError.builder()
                 // .setCode()
                 // ErrorObject.notSupported("regex is not a supported filter
                 // function").param(f.getRawParam())

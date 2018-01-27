@@ -3,7 +3,7 @@ package com.github.restup.mapping.fields.composition;
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.registry.ResourceRegistry;
 
-public class BasicNamedRelation extends BasicRelation {
+class BasicNamedRelation extends AbstractBasicRelation {
 
 	private final String resourceName;
 	
@@ -17,5 +17,9 @@ public class BasicNamedRelation extends BasicRelation {
 	public String getResource(ResourceRegistry registry) {
 		return resourceName;
 	}
+	
+	public String getResourceName() {
+        return resourceName;
+    }
 
 }

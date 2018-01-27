@@ -1,6 +1,6 @@
 package com.github.restup.service;
 
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.registry.Resource;
 import com.github.restup.util.Assert;
@@ -26,9 +26,10 @@ public class UnsupportedMethodCommand implements MethodCommand<Object> {
         this.resource = resource;
     }
 
+    @Override
     public Object execute(Object... args) {
         log.warn("{} {} not supported", operation, resource);
-        throw ErrorBuilder.builder()
+        throw RequestError.builder()
                 .codePrefix(operation)
                 .codeSuffix("NOT_SUPPORTED")
                 .resource(resource)

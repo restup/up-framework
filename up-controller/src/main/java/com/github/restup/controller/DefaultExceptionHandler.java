@@ -20,7 +20,8 @@ public class DefaultExceptionHandler implements ExceptionHandler {
 
 	private final static Logger log = LoggerFactory.getLogger(DefaultExceptionHandler.class);
 
-	public Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e) {
+	@Override
+    public Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e) {
 		ErrorObjectException result;
 		if (e instanceof ErrorObjectException) {
 			result = (ErrorObjectException) e;

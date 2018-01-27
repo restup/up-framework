@@ -1,6 +1,6 @@
 package com.github.restup.test.spring;
 
-import com.github.restup.test.RestApiTest.Builder;
+import com.github.restup.test.RestApiAssertions.Builder;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -17,7 +17,7 @@ public abstract class AbstractMockMVCTest {
     private final Object[] pathArgs;
     protected Builder api;
     @Autowired
-    private MockMvc mockMvc;
+    MockMvc mockMvc;
     private boolean jsonapi;
 
     protected AbstractMockMVCTest(String path, Object... pathArgs) {

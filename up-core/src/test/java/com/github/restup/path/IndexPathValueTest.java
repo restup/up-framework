@@ -1,10 +1,14 @@
 package com.github.restup.path;
 
+import static org.hamcrest.MatcherAssert.assertThat;
+import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-
+import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.HashSet;
 import java.util.List;
 import org.junit.Test;
+import com.github.restup.test.assertions.Assertions;
 
 public class IndexPathValueTest {
 
@@ -50,6 +54,24 @@ public class IndexPathValueTest {
         assertEquals(null, write(null, 1, "x"));
     }
 
+    @Test
+    public void testIndexPathValue() {
+        assertThat(new IndexPathValue(1).createDeclaringInstance(), instanceOf(ArrayList.class));
+        assertThat(new IndexPathValue(HashSet.class, 1).createDeclaringInstance(), instanceOf(HashSet.class));
+    }
+
+    @Test
+    public void testReadValue() {
+        Assertions.assertThrows(() -> new IndexPathValue(0).readValue(""),
+                IllegalArgumentException.class);
+    }
+
+    @Test
+    public void testWriteValue() {
+        Assertions.assertThrows(() -> new IndexPathValue(0).writeValue("", ""),
+                IllegalArgumentException.class);
+    }
+
     private Object index(Object o, int i) {
         IndexPathValue pv = new IndexPathValue(i);
         return pv.readValue(o);
@@ -59,6 +81,11 @@ public class IndexPathValueTest {
         IndexPathValue pv = new IndexPathValue(i);
         pv.writeValue(o, value);
         return pv.readValue(o);
+    }
+    
+    @Test
+    public void testHashCodeEquals() {
+        Assertions.assertHashCodeEquals(IndexPathValue.class);
     }
 
 }

@@ -79,6 +79,7 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
                 ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
     }
 
+    @Override
     public final Object execute(Object... state) {
         // build up a context for method execution
         FilterChainContext ctx = context(state);
@@ -120,6 +121,7 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
 
     public final static class FilterOrderComparator implements Comparator<AnnotatedFilterMethodCommand> {
 
+        @Override
         public int compare(AnnotatedFilterMethodCommand a, AnnotatedFilterMethodCommand b) {
             if (b == null) {
                 return -1;

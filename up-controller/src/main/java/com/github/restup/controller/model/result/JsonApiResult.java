@@ -18,7 +18,7 @@ public class JsonApiResult extends NegotiatedResult {
     public final static String RELATIONSHIPS = "relationships";
     public final static String LINKS = "links";
 
-    private LinkBuilder linkBuilder;
+    private final LinkBuilder linkBuilder;
 
     public JsonApiResult(LinkBuilder linkBuilder, ParsedResourceControllerRequest<?> request, Object result) {
         super(request, result);
@@ -39,6 +39,10 @@ public class JsonApiResult extends NegotiatedResult {
 
     public List<Link> getRelationshipLinks(Resource<?, ?> relationship, Object id, RelationshipType type) {
         return linkBuilder.getRelationshipLinks(getRequest(), getResult(), relationship, id, type);
+    }
+    
+    public LinkBuilder getLinkBuilder() {
+        return linkBuilder;
     }
 
 }

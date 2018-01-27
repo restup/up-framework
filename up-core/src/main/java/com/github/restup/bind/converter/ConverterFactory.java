@@ -11,55 +11,25 @@ import java.util.Date;
 import java.util.Map;
 import java.util.Set;
 import java.util.function.Function;
-
 import com.google.common.collect.ImmutableTable;
 
-public class ConverterFactory {
+public interface ConverterFactory {
 
-	private final ImmutableTable<Type,Type,Function<?,?>> converters;
-	private final Function<?,?> noOpConverter;
-
-	public ConverterFactory(ImmutableTable.Builder<Type,Type,Function<?,?>> table) {
-		this(table.build());
-	}
-
-	public ConverterFactory(ImmutableTable<Type,Type,Function<?,?>> table) {
-		this.converters = table;
-		this.noOpConverter = a -> a;
-	}
-
-	@SuppressWarnings({ "unchecked", "rawtypes" })
-	public <F, T> Function<F, T> getConverter(Type from, Type to) {
-		Function<?,?> converter = converters.get(from, to);
-		if ( converter == null ) {
-			if ( to instanceof Class && from instanceof Class 
-					&& ((Class)to).isAssignableFrom((Class) from) ) {
-				return (Function) noOpConverter;
-			}
-			throw new UnsupportedOperationException("Converter does not exist from "+from+" to "+to);
-		}
-		return (Function) converter;
-	}
+    <F, T> Function<F, T> getConverter(Type from, Type to);
 	
-	@SuppressWarnings({ "rawtypes", "unchecked" })
-	public <T> Map<Type, Function<T,?>> getConverters(Class<T> from) {
-		return (Map) converters.row(from);
-	}
+    <T> Map<Type, Function<T, ?>> getConverters(Class<T> from);
 
-	@SuppressWarnings("unchecked")
-	public <F, T> T convert(F from, Type to) {
-		return (T) getConverter((Class<F>) from.getClass(), to).apply(from);
-	}
+    <F, T> T convert(F from, Type to);
 
-	public static final Builder builder() {
+    static Builder builder() {
 		return new Builder();
 	}
 
-	public static final Builder withDefaults() {
+    static Builder withDefaults() {
 		return builder().addDefaults();
 	}
 
-	public final static class Builder {
+    static class Builder {
 		private ImmutableTable.Builder<Type,Type,Function<?,?>> table = ImmutableTable.builder();
 
 		private Builder() {
@@ -123,7 +93,7 @@ public class ConverterFactory {
 		}
 		
 		public ConverterFactory build() {
-			return new ConverterFactory(table);
+            return new DefaultConverterFactory(table);
 		}
 	}
 }

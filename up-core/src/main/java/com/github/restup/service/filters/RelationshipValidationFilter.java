@@ -15,7 +15,7 @@ import org.apache.commons.lang3.StringUtils;
 
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.fields.IterableField;
 import com.github.restup.path.ResourcePath;
@@ -56,7 +56,7 @@ public class RelationshipValidationFilter {
                             String apiPath = path.getApiPath();
                             String resourceName = path.getResource().getName();
                             Object idMeta = singularOrPluralAppropriate(path, invalidIdsAtPath);
-                            errors.addError(ErrorBuilder.builder(path)
+                            errors.addError(RequestError.builder(path)
                                     .codeSuffix("NOT_FOUND")
                                     .title("Reference not found")
                                     .detail("{0} {1} not found", StringUtils.capitalize(resourceName), apiPath)

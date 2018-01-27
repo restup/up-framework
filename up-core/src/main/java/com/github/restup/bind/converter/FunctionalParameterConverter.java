@@ -5,7 +5,7 @@ import java.util.function.Function;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.errors.Errors;
 
@@ -31,13 +31,14 @@ public class FunctionalParameterConverter<T> implements ParameterConverter<Strin
         return apply(from);
     }
 
+    @Override
     public final T convert(String parameterName, String from, Errors errors) {
         try {
             return convertValue(parameterName, from, errors);
         } catch (Exception e) {
             log.debug("Unable to convert parameter " + parameterName + "=" + from, e);
             errors.addError(
-                    ErrorBuilder.builder()
+                    RequestError.builder()
                             .code("PARAMETER_CONVERSION")
                             .title("Conversion Error")
                             .detail("Unable to convert value to correct type")

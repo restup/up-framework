@@ -7,10 +7,12 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
  */
 public class NoOpRequestInterceptor implements RequestInterceptor {
 
+    @Override
     public <T> void before(ParsedResourceControllerRequest<T> request) {
         // NOOP
     }
 
+    @Override
     public <T> void after(ParsedResourceControllerRequest<T> request) {
         // NOOP
     }

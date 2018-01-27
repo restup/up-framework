@@ -33,13 +33,12 @@ public class EmbeddedResourcePathValue implements PathValue {
         return instance == resource.getType();
     }
 
-    @Override
-    public boolean isReservedPath() {
-        return false;
-    }
-
     public Resource<?, ?> getResource() {
         return resource;
+    }
+
+    public String getPath() {
+        return path;
     }
 
 }

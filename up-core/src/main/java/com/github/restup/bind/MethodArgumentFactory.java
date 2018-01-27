@@ -1,12 +1,19 @@
 package com.github.restup.bind;
 
+import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.Errors;
+import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.service.FilterChainContext;
 
 /**
  * Factory used to provide pojo instances of filter method arguments
  */
 public interface MethodArgumentFactory {
+
+
+    static MethodArgumentFactory getDefaultInstance(MappedClassRegistry mappedClassRegistry, ParameterConverterFactory parameterConverterFactory) {
+        return new DefaultMethodArgumentFactory(mappedClassRegistry, parameterConverterFactory);
+    }
 
     /**
      * Create a new instance of clazz

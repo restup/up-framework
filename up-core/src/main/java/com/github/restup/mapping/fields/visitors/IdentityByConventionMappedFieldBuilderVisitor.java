@@ -22,6 +22,7 @@ public class IdentityByConventionMappedFieldBuilderVisitor implements MappedFiel
         this("id");
     }
 
+    @Override
     public <T> void visit(Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
         if (Objects.equals(name, b.getBeanName())) {
             b.idField(true);

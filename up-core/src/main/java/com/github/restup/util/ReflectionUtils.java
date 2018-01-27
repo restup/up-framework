@@ -1,7 +1,7 @@
 package com.github.restup.util;
 
 import com.github.restup.annotations.operations.AutoWrapDisabled;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.UntypedClass;
 import com.googlecode.gentyref.GenericTypeReflector;
 import java.lang.annotation.Annotation;
@@ -56,7 +56,7 @@ public class ReflectionUtils {
     }
 
     /**
-     * Create a new instance, catching exceptions and rethrowing using {@link ErrorBuilder#throwError(Throwable)}
+     * Create a new instance, catching exceptions and rethrowing using {@link RequestError#throwError(Throwable)}
      *
      * @return a new instance of c
      * @throws SecurityException 
@@ -70,7 +70,7 @@ public class ReflectionUtils {
                 return constructor.newInstance();
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
                 if (!c.isInterface()) {
-                    ErrorBuilder.throwError(e);
+                    RequestError.throwError(e);
                 }
             }
         }
@@ -260,6 +260,7 @@ public class ReflectionUtils {
             if (arr != null) {
                 List<Method> methods = Arrays.asList(arr);
                 Collections.sort(methods, new Comparator<Method>() {
+                    @Override
                     public int compare(Method a, Method b) {
                         int result = a.getName().compareTo(b.getName());
                         if (result == 0) {
@@ -338,7 +339,7 @@ public class ReflectionUtils {
             if (p == null) {
                 p = map.get("_" + fieldName);
                 if (p != null) {
-                    p.name = fieldName;
+                    p.setName(fieldName);
                 }
             }
             return p;
@@ -402,8 +403,8 @@ public class ReflectionUtils {
 
         public PropertyDescriptor getPropertyDescriptor(String name) {
 
-            for (PropertyDescriptor pd : (Collection<PropertyDescriptor>) getPropertyDescriptors()) {
-                if (pd.getName().equals("name")) {
+            for (PropertyDescriptor pd : getPropertyDescriptors()) {
+                if (pd.getName().equals(name)) {
                     return pd;
                 }
             }
@@ -414,7 +415,7 @@ public class ReflectionUtils {
     public final static class PropertyDescriptor {
 
         private String name;
-        private Field field;
+        private final Field field;
         private Method getter;
         private Method setter;
         private List<Method> getterOverrides;
@@ -426,8 +427,9 @@ public class ReflectionUtils {
             field = f;
         }
 
-        public PropertyDescriptor(String fieldName) {
+        private PropertyDescriptor(String fieldName) {
             this.name = fieldName;
+            this.field = null;
         }
 
         public void addGetterOverrides(Method m) {
@@ -474,6 +476,10 @@ public class ReflectionUtils {
 
         private void setSetter(Method setter) {
             this.setter = setter;
+        }
+        
+        private void setName(String name) {
+            this.name = name;
         }
 
         @Override

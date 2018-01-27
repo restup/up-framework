@@ -37,6 +37,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return new BasicLink(resource.getPluralName(), baseUrl);
     }
 
+    @Override
     public List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> resource, Object id) {
         if (HttpMethod.DELETE == request.getMethod()) {
             return Collections.emptyList();
@@ -49,6 +50,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return Arrays.asList(link(request, LinkRelations.self, resource, id));
     }
 
+    @Override
     public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object Result, Resource<?, ?> relationship, Object id) {
         List<Link> links = new ArrayList<Link>();
 
@@ -58,6 +60,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return links;
     }
 
+    @Override
     public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> relationship, Object id, RelationshipType type) {
         List<Link> links = new ArrayList<Link>();
 
@@ -68,6 +71,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return links;
     }
 
+    @Override
     public List<Link> getTopLevelLinks(ParsedResourceControllerRequest<?> request, Object result) {
         List<Link> links = new ArrayList<Link>();
         String baseUrl = buildResourceRequestBaseUrl(request);

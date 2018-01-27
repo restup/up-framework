@@ -1,7 +1,9 @@
 package com.github.restup.controller.method;
 
 import static com.github.restup.util.UpUtils.getFirst;
-
+import java.io.Serializable;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
@@ -9,11 +11,7 @@ import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.ListRequest;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
-import com.github.restup.service.model.response.BasicReadResult;
 import com.github.restup.service.model.response.ReadResult;
-import java.io.Serializable;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Handle GET operations <ul> <li>List documents (matching optional query criteria)</li> <li>A single document</li> </ul>
@@ -24,6 +22,7 @@ public class GetMethodController<T, ID extends Serializable> extends MethodContr
         super(factory);
     }
 
+    @Override
     public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         if (request.getResourceRelationship() != null) {
             return findRelationship(request, resource);
@@ -52,7 +51,7 @@ public class GetMethodController<T, ID extends Serializable> extends MethodContr
         ReadResult<List<T>> result = resource.getService().list(readRequest);
         // if relationship is to one resource, then return an item, not collection
         if (relationship.isToOneRelationship(request.getRelationship())) {
-            return new BasicReadResult(getFirst(result.getData()));
+            return ReadResult.of(getFirst(result.getData()));
         }
         return result;
     }

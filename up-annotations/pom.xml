@@ -1,20 +1,28 @@
 <?xml version="1.0"?>
-<project
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns="http://maven.apache.org/POM/4.0.0"
-    xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
-    <modelVersion>4.0.0</modelVersion>
+<project xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xmlns="http://maven.apache.org/POM/4.0.0"
+	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+	<modelVersion>4.0.0</modelVersion>
 
-    <parent>
-        <groupId>com.github.restup</groupId>
-        <artifactId>up-parent</artifactId>
-        <version>0.0.1-SNAPSHOT</version>
-        <relativePath>../up-parent</relativePath>
-    </parent>
+	<parent>
+		<groupId>com.github.restup</groupId>
+		<artifactId>up-parent</artifactId>
+		<version>0.0.1-SNAPSHOT</version>
+		<relativePath>../up-parent</relativePath>
+	</parent>
 
-    <artifactId>up-annotations</artifactId>
-    <packaging>jar</packaging>
-    <name>Up! :: annotations</name>
+	<artifactId>up-annotations</artifactId>
+	<packaging>jar</packaging>
+	<name>Up! :: annotations</name>
 
+	<dependencies>
+
+		<dependency>
+			<groupId>junit</groupId>
+			<artifactId>junit</artifactId>
+			<scope>test</scope>
+		</dependency>
+
+	</dependencies>
 
 </project>

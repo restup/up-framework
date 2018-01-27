@@ -9,10 +9,12 @@ import com.github.restup.controller.model.ResourceControllerResponse;
  */
 public class NoOpContentNegotiator implements ContentNegotiator {
 
+    @Override
     public <T> boolean accept(ResourceControllerRequest request) {
         return request != null;
     }
 
+    @Override
     public <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response, Object result) {
         return result;
     }

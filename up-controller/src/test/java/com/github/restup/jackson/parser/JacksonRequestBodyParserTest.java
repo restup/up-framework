@@ -1,8 +1,11 @@
 package com.github.restup.jackson.parser;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-
+import java.io.IOException;
+import java.net.URL;
+import org.junit.Test;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
@@ -10,15 +13,10 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.jackson.service.model.JacksonRequestBody;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.RegistrySettings;
-import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.test.utils.TestResourceUtils;
 import com.model.test.company.Person;
 import com.music.Label;
-import java.io.IOException;
-import java.net.URL;
-import org.junit.Test;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class JacksonRequestBodyParserTest {
@@ -63,8 +61,7 @@ public class JacksonRequestBodyParserTest {
 
     public ParsedResourceControllerRequest test(Class<?> resourceClass, String path) throws IOException {
         ObjectMapper mapper = new ObjectMapper();
-        ResourceRegistry registry = new ResourceRegistry(RegistrySettings.builder()
-                .repositoryFactory(new MapBackedRepositoryFactory()));
+        ResourceRegistry registry = mapBackedRegistry();
 
         registry.registerResource(resourceClass);
 

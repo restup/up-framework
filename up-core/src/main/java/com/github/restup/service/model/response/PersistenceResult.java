@@ -5,4 +5,8 @@ package com.github.restup.service.model.response;
  */
 public interface PersistenceResult<T> extends ResourceResult<T> {
 
+    static <T> PersistenceResult<T> of(T data) {
+        return new BasicPersistenceResult<>(data);
+    }
+
 }

@@ -4,7 +4,7 @@ import com.github.restup.annotations.filter.PostCreateFilter;
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.annotations.filter.Rank;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.util.Assert;
 import java.lang.annotation.Annotation;
@@ -43,7 +43,7 @@ public class AnnotatedFilterMethodCommand extends FilterChainContextMethodComman
 
     @Override
     protected RuntimeException handle(Throwable t) {
-        return ErrorBuilder.buildException(resource, t);
+        return RequestError.buildException(resource, t);
     }
 
     public int getRank() {

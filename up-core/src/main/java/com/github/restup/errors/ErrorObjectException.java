@@ -1,13 +1,13 @@
 package com.github.restup.errors;
 
+import static com.github.restup.util.UpUtils.unmodifiableList;
+import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
-
-import static com.github.restup.util.UpUtils.unmodifiableList;
-import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * An exception containing {@link RequestError}s
@@ -39,7 +39,7 @@ public class ErrorObjectException extends RuntimeException {
 	 * {@link #ErrorObjectException(RequestError...)}
 	 */
 	public ErrorObjectException(Throwable t) {
-		this(ErrorBuilder.error(null, t).build());
+		this(RequestError.error(null, t).build());
 	}
 
 	/**
@@ -48,8 +48,8 @@ public class ErrorObjectException extends RuntimeException {
 	private static Throwable cause(List<RequestError> errors) {
 		if (errors != null) {
 			for (RequestError error : errors) {
-				if (error instanceof DefaultRequestError) {
-					DefaultRequestError e = (DefaultRequestError) error;
+				if (error instanceof BasicRequestError) {
+					BasicRequestError e = (BasicRequestError) error;
 					if (e.getCause() != null) {
 						return e.getCause();
 					}
@@ -69,15 +69,15 @@ public class ErrorObjectException extends RuntimeException {
 	 */
 	public int getHttpStatus() {
 		RequestError error = getPrimaryError();
-		return error != null ? error.getHttpStatus() : ErrorBuilder.ErrorCodeStatus.INTERNAL_SERVER_ERROR.getHttpStatus();
+		return error != null ? error.getHttpStatus() : ErrorCodeStatus.INTERNAL_SERVER_ERROR.getHttpStatus();
 	}
 
 	public String getCode() {
 		RequestError error = getPrimaryError();
-		return error != null ? error.getCode() : ErrorBuilder.ErrorCodeStatus.INTERNAL_SERVER_ERROR.name();
+		return error != null ? error.getCode() : ErrorCodeStatus.INTERNAL_SERVER_ERROR.name();
 	}
 
-	private RequestError getPrimaryError() {
+	public RequestError getPrimaryError() {
 		Optional<RequestError> error = errors.stream().findFirst();
 		return error.isPresent() ? error.get() : null;
 	}
@@ -87,18 +87,18 @@ public class ErrorObjectException extends RuntimeException {
 	 */
 	private final class RequestErrorComparator implements Comparator<RequestError> {
 
-		public int compare(RequestError a, RequestError b) {
-			if (a.getStatus() != b.getStatus()) {
-				return a.getHttpStatus() > b.getHttpStatus() ? -1 : 1;
+		@Override
+        public int compare(RequestError a, RequestError b) {
+		    int result = StringUtils.compare(a.getStatus(), b.getStatus());
+			if ( result == 0) {
+	            String sourceA = getSource(a.getSource());
+	            String sourceB = getSource(b.getSource());
+	            result = StringUtils.compare(sourceA, sourceB);
+			} else {
+			    // want descending status
+			    result *= -1;
 			}
-			String sourceA = getSource(a.getSource());
-			String sourceB = getSource(b.getSource());
-			if (sourceA == null) {
-				return sourceB == null ? 0 : 1;
-			} else if (sourceB == null) {
-				return -1;
-			}
-			return sourceA.compareTo(sourceB);
+			return result;
 		}
 
 		private String getSource(ErrorSource err) {

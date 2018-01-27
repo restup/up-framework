@@ -17,6 +17,7 @@ public class JpaRepositoryFactory implements RepositoryFactory {
         this.repository = repository;
     }
 
+    @Override
     public Object getRepository(Resource<?, ?> resource) {
         return repository;
     }

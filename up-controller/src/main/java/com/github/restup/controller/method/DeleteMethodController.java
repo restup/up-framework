@@ -20,6 +20,7 @@ public class DeleteMethodController<T, ID extends Serializable> extends BulkMeth
         super(factory);
     }
 
+    @Override
     public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         int ids = CollectionUtils.size(request.getIds());
         if (ids == 1) {

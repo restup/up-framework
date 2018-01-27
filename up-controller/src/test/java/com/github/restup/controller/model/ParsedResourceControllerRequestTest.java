@@ -1,28 +1,27 @@
 package com.github.restup.controller.model;
 
 import static com.github.restup.controller.model.ParsedResourceControllerRequest.builder;
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
+import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.junit.Assert.fail;
 import static org.mockito.Mockito.when;
-
-import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
-import com.github.restup.errors.ErrorObjectException;
-import com.github.restup.errors.RequestError;
-import com.github.restup.query.ResourceQueryStatement;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.TestRegistry;
-import com.model.test.company.Company;
-import com.model.test.company.Person;
 import java.util.Collection;
 import org.apache.commons.collections4.CollectionUtils;
+import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
+import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.query.ResourceQueryStatement;
+import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRegistry;
+import com.model.test.company.Company;
+import com.model.test.company.Person;
 
 @RunWith(MockitoJUnitRunner.class)
 @SuppressWarnings({"rawtypes", "unchecked"})
@@ -38,7 +37,7 @@ public class ParsedResourceControllerRequestTest {
 
     @Before
     public void setup() {
-        registry = TestRegistry.registry();
+        registry = mapBackedRegistry();
         registry.registerResource(Company.class);
         registry.registerResource(Resource.builder(Person.class).name("person"));
         when(details.getResource()).thenReturn((Resource) registry.getResource(Company.class));
@@ -56,16 +55,17 @@ public class ParsedResourceControllerRequestTest {
     }
 
     private void assertError(String code, Builder b) {
-        try {
-            assertSize(1, b.getErrors());
-            assertTrue(b.hasErrors());
-            rql(b);
-            fail("Exception Expected");
-        } catch (ErrorObjectException ex) {
-            assertEquals(1, ex.getErrors().size());
-            RequestError e = ex.getErrors().iterator().next();
-            assertEquals(code, e.getCode());
-        }
+
+        assertSize(1, b.getErrors());
+        assertTrue(b.hasErrors());
+        
+        Throwable thrownException = catchThrowable( () -> rql(b));
+        
+        Assertions.assertThat(thrownException)
+                .isInstanceOf(ErrorObjectException.class)
+                .hasFieldOrPropertyWithValue("code", code)
+                .hasFieldOrPropertyWithValue("httpStatus", 400)
+                .hasNoCause();
     }
 
     @Test

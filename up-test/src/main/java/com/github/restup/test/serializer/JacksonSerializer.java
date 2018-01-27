@@ -3,29 +3,32 @@ package com.github.restup.test.serializer;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
-public class JacksonSerializer implements SerializationProvider {
+public class JacksonSerializer implements ResultSerializer {
 
-    private static ObjectMapper mapper;
+    private static ObjectMapper instance;
+    private ObjectMapper mapper;
 
     private static ObjectMapper getMapper() {
-        if (mapper == null) {
-            mapper = new ObjectMapper();
+        if (instance == null) {
+            instance = new ObjectMapper();
         }
-        return mapper;
+        return instance;
     }
-
-    public static String convertToString(Object o) {
-        return convertToString(null, o);
+    
+    public JacksonSerializer(ObjectMapper mapper) {
+        this.mapper = mapper;
     }
-
-    public static String convertToString(ObjectMapper mapper, Object o) {
+    
+    public JacksonSerializer() {
+        this(getMapper());
+    }
+    
+    @Override
+    public String convertToString(Object o) {
         try {
-            if (mapper == null) {
-                mapper = getMapper();
-            }
             return mapper.writeValueAsString(o);
         } catch (JsonProcessingException e) {
-            throw new RuntimeException("Unable to serialize value", e);
+            throw new AssertionError("Unable to serialize value", e);
         }
     }
 

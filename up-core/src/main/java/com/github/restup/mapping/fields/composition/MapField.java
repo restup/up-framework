@@ -3,7 +3,6 @@ package com.github.restup.mapping.fields.composition;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
-
 import com.github.restup.mapping.fields.ReadWriteField;
 import com.github.restup.util.Assert;
 
@@ -22,12 +21,14 @@ public class MapField<VALUE> implements ReadWriteField<Map<String, Object>, VALU
         return new MapField<>(key);
     }
 
+    @Override
     @SuppressWarnings({ "unchecked" })
 	public VALUE readValue(Object o) {
         Map<String, Object> map = asMap(o);
         return (VALUE) map.get(key);
     }
 
+    @Override
     public void writeValue(Map<String, Object> obj, VALUE value) {
         Map<String, Object> map = asMap(obj);
         map.put(key, value);
@@ -58,16 +59,16 @@ public class MapField<VALUE> implements ReadWriteField<Map<String, Object>, VALU
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(key);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (! ( o instanceof MapField )) {
             return false;
         }
         MapField<?> that = (MapField<?>) o;

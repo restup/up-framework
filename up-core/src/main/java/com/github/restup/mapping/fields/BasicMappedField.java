@@ -2,7 +2,6 @@ package com.github.restup.mapping.fields;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
-
 import com.github.restup.annotations.field.Param;
 import com.github.restup.mapping.fields.composition.CaseSensitivity;
 import com.github.restup.mapping.fields.composition.Identifier;
@@ -129,10 +128,12 @@ class BasicMappedField<T> implements MappedField<T> {
         return beanName;
     }
 
+    @Override
     public void writeValue(Object instance, T value) {
         writer.writeValue(instance, value);
     }
 
+    @Override
     public T readValue(Object instance) {
         return reader.readValue(instance);
     }
@@ -140,6 +141,7 @@ class BasicMappedField<T> implements MappedField<T> {
     /**
      * @return true if this field is a member of clazz
      */
+    @Override
     public boolean isDeclaredBy(Class<?> clazz) {
         if (reader instanceof DeclaredBy) {
             return ((DeclaredBy) reader).isDeclaredBy(clazz);
@@ -161,11 +163,11 @@ class BasicMappedField<T> implements MappedField<T> {
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (! ( o instanceof BasicMappedField )) {
             return false;
         }
         BasicMappedField<?> that = (BasicMappedField<?>) o;
@@ -174,7 +176,7 @@ class BasicMappedField<T> implements MappedField<T> {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(beanName, reader, writer);
     }
 }

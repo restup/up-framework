@@ -23,6 +23,7 @@ public class ContentNegotiatedRequestParser implements RequestParser {
         return new Builder();
     }
 
+    @Override
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
         RequestParser parser = parsers.get(request.getContentType());
         if (parser == null) {

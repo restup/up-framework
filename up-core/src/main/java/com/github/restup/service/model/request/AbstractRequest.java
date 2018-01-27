@@ -1,12 +1,11 @@
 package com.github.restup.service.model.request;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-
+import java.util.ArrayList;
+import java.util.List;
 import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
-import java.util.ArrayList;
-import java.util.List;
 
 public abstract class AbstractRequest implements QueryRequest, ParameterProvider {
 
@@ -30,18 +29,22 @@ public abstract class AbstractRequest implements QueryRequest, ParameterProvider
         this.delegate = parameterProvider;
     }
 
+    @Override
     public List<ResourceQueryStatement> getSecondaryQueries() {
         return requestedQueries;
     }
 
+    @Override
     public ResourceQueryStatement getQuery() {
         return query;
     }
 
+    @Override
     public List<String> getParameterNames() {
         return delegate.getParameterNames();
     }
 
+    @Override
     public String[] getParameter(String parameterName) {
         return delegate.getParameter(parameterName);
     }

@@ -2,8 +2,7 @@ package com.github.restup.bind.converter;
 
 import java.util.HashSet;
 import java.util.Set;
-
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.*;
 
 public class StringToBooleanConverter {
 
@@ -40,16 +39,21 @@ public class StringToBooleanConverter {
     }
 
     public static Boolean toBoolean(String from) {
-        String value = from.trim();
-        if (!StringUtils.isEmpty(from)) {
-            value = value.toLowerCase();
-            if (trueValues.contains(value)) {
-                return Boolean.TRUE;
-            } else if (falseValues.contains(value)) {
-                return Boolean.FALSE;
+        if (from != null) {
+            String value = from.trim();
+            if (isNotEmpty(from)) {
+                value = value.toLowerCase();
+                if (trueValues.contains(value)) {
+                    return Boolean.TRUE;
+                } else if (falseValues.contains(value)) {
+                    return Boolean.FALSE;
+                }
             }
         }
-        throw new IllegalArgumentException(from+" is not a valid boolean value");
+        throw new IllegalArgumentException(from + " is not a valid boolean value");
     }
 
+    private StringToBooleanConverter() {
+        super();        
+    }
 }

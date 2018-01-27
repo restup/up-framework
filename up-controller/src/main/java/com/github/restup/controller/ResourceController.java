@@ -4,11 +4,9 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
@@ -30,9 +28,9 @@ import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.settings.ControllerSettings;
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorBuilder.ErrorCodeStatus;
+import com.github.restup.errors.ErrorCodeStatus;
 import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.registry.Resource;
@@ -214,8 +212,8 @@ public class ResourceController {
         return error(request).code(code).title("Not supported").detail(detail).buildException();
     }
 
-    private static ErrorBuilder error(ResourceControllerRequest request) {
-        return ErrorBuilder.builder().resource(request.getResource());
+    private static RequestError.Builder error(ResourceControllerRequest request) {
+        return RequestError.builder().resource(request.getResource());
     }
 
     private static ErrorObjectException itemResourceNotAllowed(ResourceControllerRequest request,
@@ -347,7 +345,7 @@ public class ResourceController {
                 return contentNegotiator;
             }
         }
-        throw ErrorBuilder.builder(request.getResource())
+        throw RequestError.builder(request.getResource())
                 .status(ErrorCodeStatus.UNSUPPORTED_MEDIA_TYPE)
                 .meta(ContentTypeNegotiation.CONTENT_TYPE, request.getContentType())
                 .buildException();
@@ -358,15 +356,15 @@ public class ResourceController {
             boolean itemOperation) {
         switch (request.getMethod()) {
             case GET:
-                return (MethodController) getController;
+                return getController;
             case PATCH:
-                return (MethodController) patchController;
+                return patchController;
             case POST:
-                return (MethodController) postController;
+                return postController;
             case PUT:
-                return (MethodController) putController;
+                return putController;
             case DELETE:
-                return (MethodController) deleteController;
+                return deleteController;
         }
         if (itemOperation) {
             throw itemResourceNotAllowed(request, access);
@@ -401,7 +399,7 @@ public class ResourceController {
         ControllerSettings.Builder settings;
 
         public Builder() {
-            settings = new ControllerSettings.Builder();
+            settings = ControllerSettings.builder();
         }
 
         private Builder me() {

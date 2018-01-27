@@ -1,18 +1,17 @@
 package com.github.restup.controller.request.parser.params;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import org.junit.Test;
+import org.mockito.Mockito;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.query.ResourceQueryStatement.Type;
 import com.github.restup.registry.Resource;
-import com.github.restup.registry.TestRegistry;
 import com.model.test.company.Company;
-import org.junit.Test;
-import org.mockito.Mockito;
 
 public class FieldsParserTest {
 
@@ -49,7 +48,7 @@ public class FieldsParserTest {
     public void testParseEvery() {
         String param = "fields";
         ResourceControllerRequest details = Mockito.mock(ResourceControllerRequest.class);
-        when(details.getResource()).thenReturn((Resource) Resource.builder(Company.class).registry(TestRegistry.registry()).build());
+        when(details.getResource()).thenReturn((Resource) Resource.builder(Company.class).registry(mapBackedRegistry()).build());
         ParsedResourceControllerRequest.Builder b = Mockito.mock(ParsedResourceControllerRequest.Builder.class);
         FieldsParser parser = new FieldsParser();
         parser.parse(details, b, param, new String[]{"**"});

@@ -40,10 +40,12 @@ public class DefaultContentNegotiator implements ContentNegotiator {
      *
      * @return true always
      */
+    @Override
     public <T> boolean accept(ResourceControllerRequest request) {
         return true;
     }
 
+    @Override
     public <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response, Object result) {
         return contentNegotiator.formatResponse(request, response, result);
     }

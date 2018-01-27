@@ -15,6 +15,18 @@
     </appender>
 
 
+    <logger name="com.github.restup.errors.BasicRequestError">
+        <level value="debug"/>
+    </logger>
+
+    <logger name="com.github.restup.service.filters.JavaxValidationFilter">
+        <level value="debug"/>
+    </logger>
+
+    <logger name="com.github.restup.service.VarArgsMethodCommand">
+        <level value="debug"/>
+    </logger>
+    
     <logger name="com.github.restup.mapping.DefaultMappedClassFactory">
         <level value="warn"/>
     </logger>

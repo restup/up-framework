@@ -1,10 +1,9 @@
 package com.github.restup.query;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-
+import java.util.List;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
-import java.util.List;
 
 abstract class AbstractResourceQueryStatement {
 

@@ -9,6 +9,7 @@ public class LongIdentityStrategy implements IdentityStrategy<Long> {
 
     private volatile AtomicLong id = new AtomicLong();
 
+    @Override
     public Long getNextId() {
         return id.incrementAndGet();
     }

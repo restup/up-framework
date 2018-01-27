@@ -13,6 +13,7 @@ public class JacksonRequestBody implements ResourceData<JsonNode> {
     @JsonProperty(DataPathValue.DATA)
     private JsonNode data;
 
+    @Override
     public JsonNode getData() {
         return data;
     }

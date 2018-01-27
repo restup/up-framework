@@ -1,10 +1,10 @@
 package com.github.restup.mapping.fields.composition;
 
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.mapping.fields.ReadWriteField;
-import com.github.restup.util.ReflectionUtils;
 import java.lang.reflect.Field;
 import java.util.Objects;
+import com.github.restup.errors.RequestError;
+import com.github.restup.mapping.fields.ReadWriteField;
+import com.github.restup.util.ReflectionUtils;
 
 public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET, VALUE> {
 
@@ -24,10 +24,8 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
     public VALUE readValue(Object o) {
         try {
             return o == null ? null : (VALUE) field.get(o);
-        } catch (IllegalAccessException e) {
-            throw ErrorBuilder.buildException(e);
-        } catch (IllegalArgumentException e) {
-            throw ErrorBuilder.buildException(e);
+        } catch (IllegalAccessException | IllegalArgumentException e) {
+            throw RequestError.buildException(e);
         }
     }
 
@@ -36,10 +34,8 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
         if (obj != null) {
             try {
                 field.set(obj, value);
-            } catch (IllegalAccessException e) {
-                ErrorBuilder.throwError(e);
-            } catch (IllegalArgumentException e) {
-                ErrorBuilder.throwError(e);
+            } catch (IllegalAccessException | IllegalArgumentException e) {
+                RequestError.throwError(e);
             }
         }
     }
@@ -66,16 +62,16 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(field);
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (!(o instanceof ReflectMappedField)) {
             return false;
         }
         ReflectMappedField<?, ?> that = (ReflectMappedField<?, ?>) o;

@@ -5,7 +5,7 @@ package com.github.restup.path;
  */
 public class InvalidPathValue extends ConstantPathValue {
 
-    public InvalidPathValue(String field) {
+    InvalidPathValue(String field) {
         super(field, false);
     }
 

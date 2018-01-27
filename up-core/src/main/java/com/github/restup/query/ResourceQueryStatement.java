@@ -1,19 +1,17 @@
 package com.github.restup.query;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-
-import com.github.restup.errors.Errors;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.path.ResourcePath.Builder.Mode;
-import com.github.restup.query.criteria.OrCriteria;
-import com.github.restup.query.criteria.ResourcePathFilter;
-import com.github.restup.query.criteria.ResourcePathFilter.Operator;
-import com.github.restup.query.criteria.ResourceQueryCriteria;
-import com.github.restup.registry.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
 import java.util.Objects;
+import com.github.restup.errors.Errors;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.path.ResourcePath.Builder.Mode;
+import com.github.restup.query.criteria.ResourcePathFilter;
+import com.github.restup.query.criteria.ResourcePathFilter.Operator;
+import com.github.restup.query.criteria.ResourceQueryCriteria;
+import com.github.restup.registry.Resource;
 
 /**
  * Represents a resource query including all fields, criteria, paging behavior and sort criteria.
@@ -110,6 +108,7 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
         return type;
     }
 
+    @Override
     public Resource<?, ?> getResource() {
         return resource;
     }
@@ -354,7 +353,7 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
                 for (ResourcePath path : paths) {
                     criteria.add(new ResourcePathFilter<Object>(path, operator, value));
                 }
-                return addCriteria(new OrCriteria(criteria));
+                return addCriteria(ResourceQueryCriteria.or(criteria));
             }
             return me();
         }
@@ -392,10 +391,10 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
             if (pageLimit != null || pageOffset != null || withTotalsDisabled != null || pagingDisabled != null) {
                 Integer limit = pageLimit != null ? pageLimit : pagination.getLimit();
                 Integer offset = pageOffset != null ? pageOffset : pagination.getOffset();
-                Boolean disablePaging = pagingDisabled != null ? pagingDisabled : pagination.isPagingDisabled();
-                Boolean disableTotals = withTotalsDisabled != null ? withTotalsDisabled : pagination.isWithTotalsDisabled();
+                boolean disablePaging = pagingDisabled != null ? pagingDisabled : pagination.isPagingDisabled();
+                boolean disableTotals = withTotalsDisabled != null ? withTotalsDisabled : pagination.isWithTotalsDisabled();
 
-                pagination = new Pagination(limit, offset, disablePaging, disableTotals);
+                pagination = disablePaging ? Pagination.disabled() : Pagination.of(limit, offset, disableTotals);
             }
             Type t = type;
             if (t == null) {

@@ -2,7 +2,7 @@ package com.github.restup.controller.request.parser;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
-import com.github.restup.errors.ErrorBuilder.ErrorCode;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.settings.ControllerMethodAccess;
@@ -13,6 +13,7 @@ import com.github.restup.service.model.ResourceData;
  */
 public abstract class AbstractRequestBodyParser<T> implements RequestParser {
 
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder builder) {
         Resource resource = request.getResource();

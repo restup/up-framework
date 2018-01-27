@@ -1,11 +1,11 @@
 package com.github.restup.mapping.fields.composition;
 
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.mapping.fields.ReadWriteField;
-import com.github.restup.util.Assert;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import com.github.restup.errors.RequestError;
+import com.github.restup.mapping.fields.ReadWriteField;
+import com.github.restup.util.Assert;
 
 public class ReflectMappedMethod<TARGET, VALUE> extends ReflectWritableMappedMethod<TARGET, VALUE> implements ReadWriteField<TARGET, VALUE> {
 
@@ -25,26 +25,31 @@ public class ReflectMappedMethod<TARGET, VALUE> extends ReflectWritableMappedMet
         return new ReflectMappedMethod<>(getter, setter);
     }
 
+    @Override
     @SuppressWarnings("unchecked")
 	public VALUE readValue(Object o) {
         try {
             return (VALUE) getter.invoke(o);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw ErrorBuilder.buildException(e);
+            throw RequestError.buildException(e);
         }
+    }
+    
+    public Method getGetter() {
+        return getter;
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(getter, getSetter());
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (! ( o instanceof ReflectMappedMethod )) {
             return false;
         }
         ReflectMappedMethod<?, ?> that = (ReflectMappedMethod<?, ?>) o;

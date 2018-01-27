@@ -6,7 +6,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.AbstractRequestBodyParser;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import java.util.ArrayList;
@@ -63,7 +63,7 @@ public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode
         try {
             return mapper.treeToValue(node, details.getResource().getClassType());
         } catch (JsonProcessingException e) {
-            builder.addError(ErrorBuilder.ErrorCode.BODY_INVALID);
+            builder.addError(ErrorCode.BODY_INVALID);
             return null;
         }
     }

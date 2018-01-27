@@ -5,7 +5,6 @@ import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
-
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
@@ -35,8 +34,8 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     private final ControllerMethodAccess controllerAccess;
     private final ServiceMethodAccess serviceAccess;
     private final Pagination defaultPagination;
-    private final ResourcePathsProvider defaultSparseFields;
-    private final ResourcePathsProvider restrictedFields;
+    private final ResourcePathsProvider defaultSparseFieldsProvider;
+    private final ResourcePathsProvider restrictedFieldsProvider;
     private ResourceServiceOperations serviceOperations;
     private ResourceRepositoryOperations repositoryOperations;
     private ResourceService<T, ID> service;
@@ -63,11 +62,12 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.controllerAccess = controllerAccess;
         this.serviceAccess = serviceAccess;
         this.defaultPagination = pagination;
-        this.defaultSparseFields = defaultSparseFields;
-        this.restrictedFields = restrictedFields;
+        this.defaultSparseFieldsProvider = defaultSparseFields;
+        this.restrictedFieldsProvider = restrictedFields;
     }
 
 
+    @Override
     public List<ResourcePath> getAllPaths() {
         //TODO better to cache immutable paths?
         List<ResourcePath> paths = new ArrayList<ResourcePath>();
@@ -87,11 +87,13 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         }
     }
 
+    @Override
     public Collection<ResourceRelationship<?,?,?,?>> getRelationships() {
         return registry.getRelationships(name);
     }
 
-	public List<ResourceRelationship<?,?,?,?>> getRelationshipsTo() {
+	@Override
+    public List<ResourceRelationship<?,?,?,?>> getRelationshipsTo() {
         List<ResourceRelationship<?,?,?,?>> result = new ArrayList<>();
         Collection<ResourceRelationship<?,?,?,?>> relationships = getRelationships();
         if (relationships != null) {
@@ -104,26 +106,32 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         return result;
     }
 
+    @Override
     public Type getType() {
         return type;
     }
 
+    @Override
     public String getName() {
         return name;
     }
 
+    @Override
     public String getPluralName() {
         return pluralName;
     }
 
+    @Override
     public MappedClass<T> getMapping() {
         return mapping;
     }
 
+    @Override
     public MappedField<ID> getIdentityField() {
         return identityField;
     }
 
+    @Override
     public ResourceService<T, ID> getService() {
         return service;
     }
@@ -133,6 +141,7 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.service = service;
     }
 
+    @Override
     public ResourceServiceOperations getServiceOperations() {
         return serviceOperations;
     }
@@ -142,6 +151,7 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.serviceOperations = serviceOperations;
     }
 
+    @Override
     public ResourceRepositoryOperations getRepositoryOperations() {
         return repositoryOperations;
     }
@@ -151,18 +161,22 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.repositoryOperations = repositoryOperations;
     }
 
+    @Override
     public ControllerMethodAccess getControllerAccess() {
         return controllerAccess;
     }
 
+    @Override
     public ServiceMethodAccess getServiceAccess() {
         return serviceAccess;
     }
 
+    @Override
     public ResourceRegistry getRegistry() {
         return registry;
     }
 
+    @Override
     public Pagination getDefaultPagination() {
         return defaultPagination;
     }
@@ -170,17 +184,28 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     /**
      * @return the fields returned by default for sparse fields requests.
      */
+    @Override
     public List<ResourcePath> getDefaultSparseFields() {
-        return defaultSparseFields.getPaths(this);
+        return defaultSparseFieldsProvider.getPaths(this);
+    }
+
+    public ResourcePathsProvider getDefaultSparseFieldsProvider() {
+        return defaultSparseFieldsProvider;
     }
 
     /**
      * Returns any fields to which the requestor is not permitted to read
      */
+    @Override
     public List<ResourcePath> getRestrictedFields() {
-        return restrictedFields.getPaths(this);
+        return restrictedFieldsProvider.getPaths(this);
     }
 
+    public ResourcePathsProvider getRestrictedFieldsProvider() {
+        return restrictedFieldsProvider;
+    }
+
+    @Override
     public String getBasePath() {
         return basePath;
     }

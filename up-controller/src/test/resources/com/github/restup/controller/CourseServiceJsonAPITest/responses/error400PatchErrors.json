@@ -1,19 +1,5 @@
 {
-  "errors": [
-    {
-      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
-      "code": "WRAP_FIELDS_WITH_ATTRIBUTES",
-      "title": "field must be wrapped",
-      "detail": "The field is valid, but it must be wrapped in attributes",
-      "source": {
-        "pointer": "/data/name"
-      },
-      "meta": {
-        "resource": "course"
-      },
-      "status": "400"
-    },
-    {
+  "errors": [{
       "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
       "code": "ID_REQUIRED",
       "title": "id is required",
@@ -33,6 +19,19 @@
       "detail": "Missing type at specified path",
       "source": {
         "pointer": "/data"
+      },
+      "meta": {
+        "resource": "course"
+      },
+      "status": "400"
+    },
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "WRAP_FIELDS_WITH_ATTRIBUTES",
+      "title": "field must be wrapped",
+      "detail": "The field is valid, but it must be wrapped in attributes",
+      "source": {
+        "pointer": "/data/name"
       },
       "meta": {
         "resource": "course"

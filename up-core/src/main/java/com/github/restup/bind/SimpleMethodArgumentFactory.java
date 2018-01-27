@@ -9,10 +9,12 @@ import com.github.restup.util.ReflectionUtils;
  */
 public class SimpleMethodArgumentFactory implements MethodArgumentFactory {
 
+    @Override
     public <T> T newInstance(Class<T> clazz) {
         return ReflectionUtils.newInstance(clazz);
     }
 
+    @Override
     public <T> T newInstance(Class<T> clazz, FilterChainContext ctx, Errors errors) {
         return newInstance(clazz);
     }

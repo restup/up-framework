@@ -11,10 +11,12 @@ public class HttpServletResourceControllerResponse implements ResourceController
         this.response = response;
     }
 
+    @Override
     public void setStatus(int status) {
         response.setStatus(status);
     }
 
+    @Override
     public void setHeader(String name, String value) {
         response.setHeader(name, value);
     }

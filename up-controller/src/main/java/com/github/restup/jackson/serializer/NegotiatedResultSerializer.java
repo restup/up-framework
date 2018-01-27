@@ -6,7 +6,8 @@ import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.github.restup.controller.model.result.NegotiatedResult;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.ReadableField;
 import com.github.restup.path.DataPathValue;
@@ -39,8 +40,8 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
                 jgen.writeEndObject();
             } catch (Exception e) {
                 log.error("Resource Object Serialization error", e);
-                ErrorBuilder.error(result.getRequest().getResource(), e)
-                        .code(ErrorBuilder.ErrorCode.SERIALIZATION_ERROR)
+                RequestError.error(result.getRequest().getResource(), e)
+                        .code(ErrorCode.SERIALIZATION_ERROR)
                         .throwError();
             }
         } else {

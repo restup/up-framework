@@ -18,12 +18,14 @@ public class RequestInterceptorChain implements RequestInterceptor {
         this.interceptors = interceptors;
     }
 
+    @Override
     public <T> void before(ParsedResourceControllerRequest<T> request) {
         for (RequestInterceptor interceptor : interceptors) {
             interceptor.before(request);
         }
     }
 
+    @Override
     public <T> void after(ParsedResourceControllerRequest<T> request) {
         for (RequestInterceptor interceptor : interceptors) {
             interceptor.after(request);

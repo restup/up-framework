@@ -1,49 +1,60 @@
 package com.deep;
 
-import java.util.Arrays;
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Random;
+import java.util.concurrent.atomic.AtomicInteger;
 import java.util.concurrent.atomic.AtomicLong;
 import javax.validation.constraints.NotNull;
 
 public class Shallow extends BaseObject {
 
-    private static final AtomicLong id = new AtomicLong(new Random().nextInt(10000));
+    private static final AtomicLong sequence = new AtomicLong(new Random().nextInt(1000));
     @NotNull
     private Deep deep;
     private List<Deep> deeps;
 
     public static Shallow graph() {
-        int i = 0;
-        Shallow shallow = init(i++, new Shallow());
-        shallow.setDeep(deep(i++));
-        shallow.setDeeps(Arrays.asList(deep(i++), deep(i++)));
+        AtomicInteger i = new AtomicInteger(0);
+        Shallow shallow = init(i, new Shallow());
+        shallow.setDeep(deep(i));
+        shallow.setDeeps(asList(deep(i), deep(i)));
         return shallow;
     }
 
-    public static Deep deep(int i) {
-        Deep d = new Deep();
-        d.setDeeper(deeper(i++));
-        d.setDeepers(Arrays.asList(deeper(i++), deeper(i++)));
-        return init(i++, d);
+    @SuppressWarnings("unchecked")
+    static <T> List<T> asList(T... items) {
+        List<T> list = new ArrayList<>();
+        for ( T t : items ) {
+            list.add(t);
+        }
+        return list;
     }
 
-    public static Deeper deeper(int i) {
-        Deeper d = new Deeper();
-        d.setDeepest(deepest(i++));
-        d.setDeepests(Arrays.asList(deepest(i++), deepest(i++)));
+    public static Deep deep(AtomicInteger i) {
+        Deep d = new Deep();
+        d.setDeeper(deeper(i));
+        d.setDeepers(asList(deeper(i), deeper(i)));
         return init(i, d);
     }
 
-    public static Deepest deepest(int i) {
+    public static Deeper deeper(AtomicInteger i) {
+        Deeper d = new Deeper();
+        d.setDeepest(deepest(i));
+        d.setDeepests(asList(deepest(i), deepest(i)));
+        return init(i, d);
+    }
+
+    public static Deepest deepest(AtomicInteger i) {
         Deepest d = new Deepest();
         return init(i, d);
     }
 
-    private static <T extends BaseObject> T init(int i, T base) {
-        base.setId(id.incrementAndGet());
+    private static <T extends BaseObject> T init(AtomicInteger id, T base) {
+        base.setId(sequence.incrementAndGet());
         base.setDepth(10);
-        base.setName(String.valueOf((char) (i % 26 + 'A')));
+        base.setName(String.valueOf((char) (id.get() % 26 + 'A')));
+        id.incrementAndGet();
         return base;
     }
 

@@ -11,6 +11,7 @@ public final class ContentTypeMatcher extends BaseMatcher<String[]> {
         this.contentType = contentType;
     }
 
+    @Override
     public boolean matches(Object item) {
         if (item instanceof String[]) {
             String[] arr = (String[]) item;
@@ -20,6 +21,7 @@ public final class ContentTypeMatcher extends BaseMatcher<String[]> {
         return false;
     }
 
+    @Override
     public void describeTo(Description description) {
         description.appendText("Content-Type=").appendValue(contentType);
     }

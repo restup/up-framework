@@ -1,9 +1,12 @@
 package com.github.restup.query;
 
+import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 import com.github.restup.bind.param.NoOpParameterProvider;
-import com.github.restup.errors.ErrorBuilder;
-import com.github.restup.errors.ErrorBuilder.ErrorCode;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.errors.Errors;
+import com.github.restup.errors.RequestError;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
@@ -15,9 +18,6 @@ import com.github.restup.service.model.request.ListRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.response.ReadResult;
 import com.github.restup.util.Assert;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Provides a ResourceQuery Builder for building and executing resource queries programmatically.
@@ -142,9 +142,8 @@ public class ResourceQuery {
             return ResourcePath.idPath(resource);
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         private ResourceService<T, ?> getService() {
-            return (ResourceService) resource.getService();
+            return resource.getService();
         }
 
         public List<T> list() {
@@ -165,7 +164,7 @@ public class ResourceQuery {
             if (n < 1) {
                 return null;
             } else if (n > 1) {
-                ErrorBuilder.builder()
+                RequestError.builder()
                         .code(ErrorCode.UNEXPECTED_FIND_RESULTS)
                         .meta("size", n)
                         .throwError();

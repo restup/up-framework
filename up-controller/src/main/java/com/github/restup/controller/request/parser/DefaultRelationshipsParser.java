@@ -13,6 +13,7 @@ import java.util.Collection;
  */
 public class DefaultRelationshipsParser implements RequestParser {
 
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
         if (!builder.hasErrors()) {

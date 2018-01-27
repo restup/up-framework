@@ -33,6 +33,7 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
         relationships = HashBasedTable.create();
     }
 
+    @Override
     public void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
             ResourceRelationship<?, ?, ?, ?> relationship) {
         relationships.put(from.getName(), to.getName(), relationship);
@@ -44,35 +45,43 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
         return map == null ? Collections.emptySet() : map.values();
     }
 
+    @Override
     public ResourceRelationship<?, ?, ?, ?> getRelationship(String from, String to) {
         return relationships.get(from, to);
     }
 
+    @Override
     public MappedClass<?> getMappedClass(Type resourceClass) {
         return mappings.get(resourceClass);
     }
 
+    @Override
     public Collection<Resource<?, ?>> getResources() {
         return resources.values();
     }
 
+    @Override
     public boolean hasResource(String resourceName) {
         return null != getResource(resourceName);
     }
 
+    @Override
     public boolean hasResource(Class<?> resourceClass) {
         return null != getResource(resourceClass);
     }
 
+    @Override
     @SuppressWarnings({"unchecked", "rawtypes"})
     public <T> Resource<T, ?> getResource(Class<T> resourceClass) {
 		return (Resource) getResource(resourceClass, r->resourceClass == r.getType() );
     }
 
+    @Override
     public Resource<?, ?> getResource(String resourceName) {
 		return resources.get(resourceName);
     }
 
+    @Override
     public Resource<?, ?> getResourceByPluralName(String pluralName) {
 		return getResource(pluralName, r->pluralName.equals(r.getPluralName()));
     }
@@ -85,14 +94,17 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
     				.orElse(null);
     }
 
+    @Override
     public void registerResource(Resource<?, ?> resource) {
         resources.put(resource.getName(), resource);
     }
 
+    @Override
     public boolean hasMapping(Type mappedClass) {
         return mappings.containsKey(mappedClass);
     }
 
+    @Override
     public void registerMappedClass(MappedClass<?> mappedClass) {
         mappings.put(mappedClass.getType(), mappedClass);
     }

@@ -1,7 +1,6 @@
 package com.github.restup.registry;
 
 import static org.apache.commons.lang3.StringUtils.isEmpty;
-
 import java.io.Serializable;
 import java.lang.reflect.Type;
 import java.util.Collection;
@@ -11,10 +10,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Set;
 import java.util.stream.Collectors;
-
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.ArrayUtils;
-
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.UntypedClass;
@@ -185,7 +182,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
 	static <T> T  validate(Resource<T, ?> resource, T o) {
     	 	MappedClass<T> mapping = resource.getMapping();
     		// if an object is 
-		if ( mapping.containsTypedMap() ) {
+		if ( mapping.isTypedMapPresent() ) {
 			if (o instanceof Iterable ) {
 				Iterator<T> it = ((Iterable<T>) o).iterator();
 				while ( it.hasNext() ) {
@@ -194,7 +191,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
 			} else {
 				mapping.getAttributes()
 					.forEach(mappedField -> {
-						MappedField<Object> mf = (MappedField) mappedField;
+						MappedField<Object> mf = (MappedField<Object>) mappedField;
 						if ( o instanceof Map ) {
 							Object value = mappedField.readValue(o);
 							if ( value != null ) {
@@ -308,11 +305,6 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             return me();
         }
 
-        public Builder<T, ID> defaultPagination(Pagination defaultPagination) {
-            this.defaultPagination = defaultPagination;
-            return me();
-        }
-
         public Builder<T, ID> restrictedFieldsProvider(ResourcePathsProvider restrictedFieldsProvider) {
             this.restrictedFieldsProvider = restrictedFieldsProvider;
             return me();
@@ -323,12 +315,24 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             return me();
         }
 
+        public Builder<T, ID> defaultPagination(Pagination defaultPagination) {
+            this.defaultPagination = defaultPagination;
+            return me();
+        }
+
         /**
-         * @param pagingDisabled so that no paging information is returned and full result set is returned.
-         * @param withTotalsDisabled so that last page cannot be determined
+         * {@link #defaultPagination(Integer, Integer, boolean, boolean)} with offset of 0, paging and totals enabled.
          */
-        public Builder<T, ID> defaultPagination(Integer pageLimit, Integer pageOffset, boolean pagingDisabled, boolean withTotalsDisabled) {
-            return defaultPagination(new Pagination(pageLimit, pageOffset, pagingDisabled, withTotalsDisabled));
+        public Builder<T, ID> defaultPagination(Integer pageLimit) {
+            return defaultPagination(pageLimit, 0, false);
+        }
+
+        /**
+         * @param withTotalsDisabled so that last page cannot be determined
+         * @param pagingDisabled so that no paging information is returned and full result set is returned.
+         */
+        public Builder<T, ID> defaultPagination(Integer pageLimit, Integer pageOffset, boolean withTotalsDisabled) {
+            return defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
         }
 
         public Builder<T, ID> mappedClassFactory(MappedClassRegistry mappedClassRegsitry) {
@@ -344,13 +348,6 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         public Builder<T, ID> mapping(MappedClass.Builder<T> builder) {
         		builder.defaultName(name);
             return mapping(builder.build());
-        }
-
-        /**
-         * {@link #defaultPagination(Integer, Integer, boolean, boolean)} with offset of 0, paging and totals enabled.
-         */
-        public Builder<T, ID> defaultPagination(Integer pageLimit) {
-            return defaultPagination(pageLimit, 0, false, false);
         }
 
         @SuppressWarnings({"unchecked", "rawtypes"})

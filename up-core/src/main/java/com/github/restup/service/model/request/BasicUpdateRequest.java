@@ -16,6 +16,7 @@ public class BasicUpdateRequest<T, ID extends Serializable> extends AbstractPers
         this.id = id;
     }
 
+    @Override
     public ID getId() {
         return id;
     }

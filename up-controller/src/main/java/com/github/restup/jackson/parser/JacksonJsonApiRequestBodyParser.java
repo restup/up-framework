@@ -11,7 +11,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.RequestError;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import java.util.Iterator;
@@ -49,22 +50,22 @@ public class JacksonJsonApiRequestBodyParser extends JacksonRequestBodyParser {
                     // invalid and not an expected field (id, type, attributes), indicate to push field
                     // into attributes.
 
-                    builder.addError(ErrorBuilder.builder(path.build())
-                            .code(ErrorBuilder.ErrorCode.WRAP_FIELDS_WITH_ATTRIBUTES));
+                    builder.addError(RequestError.builder(path.build())
+                            .code(ErrorCode.WRAP_FIELDS_WITH_ATTRIBUTES));
                 }
             }
         }
 
         if (id == null) {
             if (!HttpMethod.POST.equals(request.getMethod())) {
-                builder.addError(ErrorBuilder.builder(parent)
-                        .code(ErrorBuilder.ErrorCode.ID_REQUIRED));
+                builder.addError(RequestError.builder(parent)
+                        .code(ErrorCode.ID_REQUIRED));
             }
             // TODO else required client generated ids?
         }
         if (type == null) {
-            builder.addError(ErrorBuilder.builder(parent)
-                    .code(ErrorBuilder.ErrorCode.TYPE_REQUIRED));
+            builder.addError(RequestError.builder(parent)
+                    .code(ErrorCode.TYPE_REQUIRED));
         }
 
         super.graphObject(request, builder, resource, parent, attributes);
@@ -82,7 +83,7 @@ public class JacksonJsonApiRequestBodyParser extends JacksonRequestBodyParser {
             }
             return mapper.treeToValue(attributes, resource.getClassType());
         } catch (JsonProcessingException e) {
-            builder.addError(ErrorBuilder.ErrorCode.BODY_INVALID);
+            builder.addError(ErrorCode.BODY_INVALID);
             return null;
         }
     }

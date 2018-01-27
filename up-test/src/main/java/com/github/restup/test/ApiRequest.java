@@ -1,137 +1,28 @@
 package com.github.restup.test;
 
-import static com.github.restup.test.RpcApiTest.HttpMethod;
-
-import com.github.restup.test.resource.ByteArrayContents;
-import com.github.restup.test.resource.Contents;
-import com.github.restup.test.resource.RelativeTestResource;
-import com.github.restup.test.resource.StringContents;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
+import com.github.restup.test.resource.Contents;
+import com.github.restup.test.resource.RelativeTestResource;
 
-public class ApiRequest {
+public interface ApiRequest {
 
-    private final HttpMethod method;
-    private final Map<String, String[]> headers;
-    private final String url;
-    private final Contents body;
-    private final boolean https;
+    HttpMethod getMethod();
 
-    private ApiRequest(HttpMethod method, Map<String, String[]> headers, String url, Contents body, boolean https) {
-        this.method = method;
-        this.headers = headers;
-        this.url = url;
-        this.body = body;
-        this.https = https;
+    Contents getBody();
+
+    Map<String, String[]> getHeaders();
+
+    boolean isHttps();
+
+    String getUrl();
+    
+    static Builder builder(String path, Object... args) {
+        return new Builder(path, args);
     }
 
-    private ApiRequest(HttpMethod method, Map<String, String[]> headers, String url, byte[] body, boolean https) {
-        this(method, headers, url, new ByteArrayContents(body), https);
-    }
-
-    public HttpMethod getMethod() {
-        return method;
-    }
-
-    public Contents getBody() {
-        return body;
-    }
-
-    public Map<String, String[]> getHeaders() {
-        return headers;
-    }
-
-    public boolean isHttps() {
-        return https;
-    }
-
-    public String getUrl() {
-        return url;
-    }
-
-    abstract static class AbstractBuilder<B extends AbstractBuilder<B, H>, H> {
-
-        protected Map<String, H> headers = new HashMap<String, H>();
-        private Class<?> testClass;
-        private String testName;
-        private String testFileExtension;
-        private Contents bodyResource;
-
-        @SuppressWarnings({"unchecked"})
-        protected B me() {
-            return (B) this;
-        }
-
-        public B body(byte[] body) {
-            return body(new ByteArrayContents(body));
-        }
-
-        public B body(String body) {
-            return body(new StringContents(body));
-        }
-
-        public B body(Contents bodyResource) {
-            this.bodyResource = bodyResource;
-            return me();
-        }
-
-        public B testClass(Class<?> testClass) {
-            this.testClass = testClass;
-            return me();
-        }
-
-        public B testName(String testName) {
-            this.testName = testName;
-            return me();
-        }
-
-        public B testFileExtension(String testFileExtension) {
-            this.testFileExtension = testFileExtension;
-            return me();
-        }
-
-        protected void add(Map<String, String[]> map, String key, String... values) {
-            if (StringUtils.isNotEmpty(key)) {
-                String[] existing = map.get(key);
-                if (existing == null) {
-                    map.put(key, values);
-                } else {
-                    map.put(key, ArrayUtils.addAll(existing, values));
-                }
-            }
-        }
-
-        protected Map<String, H> getHeaders() {
-            return headers;
-        }
-
-        protected abstract String getTestDir();
-
-        protected boolean isDefaultTestResourceAllowed() {
-            return StringUtils.isNotBlank(testName);
-        }
-
-        protected boolean hasConfiguredBody() {
-            return bodyResource != null || isDefaultTestResourceAllowed();
-        }
-
-        public Contents getBody() {
-            if (bodyResource != null) {
-                return bodyResource;
-            }
-            if (isDefaultTestResourceAllowed()) {
-                RelativeTestResource resource = new RelativeTestResource(testClass, getTestDir(), testName, testFileExtension);
-                return resource;
-            }
-            return null;
-        }
-
-    }
-
-    public static class Builder extends AbstractBuilder<Builder, String[]> {
+    static class Builder extends AbstractApiRequestBuilder<Builder, String[]> {
 
         private final String path;
         private final Object[] defaultPathArgs;
@@ -140,7 +31,7 @@ public class ApiRequest {
         private Object[] pathArgs;
         private Map<String, String[]> params = new LinkedHashMap<String, String[]>();
 
-        public Builder(String path, Object... args) {
+        private Builder(String path, Object... args) {
             this.path = path;
             this.defaultPathArgs = args;
         }
@@ -173,6 +64,7 @@ public class ApiRequest {
             return me();
         }
 
+        @Override
         public Builder header(String name, String... value) {
             add(headers, name, value);
             return me();
@@ -258,7 +150,7 @@ public class ApiRequest {
                 }
             }
 
-            return new ApiRequest(method, getHeaders(), url.toString(), getBody(), https);
+            return new BasicApiRequest(method, getHeaders(), url.toString(), getBody(), https);
         }
     }
 }

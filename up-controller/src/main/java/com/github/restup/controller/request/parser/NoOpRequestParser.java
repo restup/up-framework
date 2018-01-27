@@ -5,6 +5,7 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 
 public class NoOpRequestParser implements RequestParser {
 
+    @Override
     public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
 
     }

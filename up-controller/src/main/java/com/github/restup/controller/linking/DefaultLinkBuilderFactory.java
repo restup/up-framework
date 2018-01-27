@@ -14,6 +14,7 @@ public class DefaultLinkBuilderFactory implements LinkBuilderFactory {
         this.linkBuilder = new DefaultLinkBuilder(serviceDiscovery);
     }
 
+    @Override
     public LinkBuilder getLinkBuilder(ParsedResourceControllerRequest<?> request, Object result) {
         return linkBuilder;
     }

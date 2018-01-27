@@ -4,7 +4,7 @@ import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 
-public class BasicTypedRelation extends BasicRelation {
+class BasicTypedRelation extends AbstractBasicRelation {
 
 	private final Class<?> resourceClass;
 	private String resourceName;
@@ -30,5 +30,17 @@ public class BasicTypedRelation extends BasicRelation {
 		}
 		return resourceName;
 	}
+	
+	public Class<?> getResourceClass() {
+        return resourceClass;
+    }
+	
+	public String getResourceName() {
+        return resourceName;
+    }
+	
+	void setResourceName(String resourceName) {
+        this.resourceName = resourceName;
+    }
 
 }

@@ -24,4 +24,8 @@ public interface RequestObjectFactory {
 
     <T, ID extends Serializable> DeleteRequest<T, ID> getDeleteRequest(Resource<T, ID> requestedResource, ID id, List<ResourceQueryStatement> requestedQueries, ParameterProvider parameterProvider);
 
+    static RequestObjectFactory getDefaultRequestObjectFactory() {
+        return new DefaultRequestObjectFactory();
+    }
+    
 }

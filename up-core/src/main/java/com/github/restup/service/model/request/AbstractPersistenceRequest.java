@@ -1,12 +1,11 @@
 package com.github.restup.service.model.request;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-
+import java.util.List;
 import com.github.restup.bind.param.ParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
-import java.util.List;
 
 public class AbstractPersistenceRequest<T> extends AbstractRequest implements PersistenceRequest<T> {
 
@@ -19,6 +18,7 @@ public class AbstractPersistenceRequest<T> extends AbstractRequest implements Pe
         this.requestedPaths = unmodifiableList(requestedPaths);
     }
 
+    @Override
     public T getData() {
         return data;
     }
@@ -26,10 +26,12 @@ public class AbstractPersistenceRequest<T> extends AbstractRequest implements Pe
     /**
      * The requested paths. Never null and immutable
      */
+    @Override
     public List<ResourcePath> getRequestedPaths() {
         return requestedPaths;
     }
 
+    @Override
     public boolean hasPath(ResourcePath other) {
         return ResourcePath.hasPath(requestedPaths, other);
     }

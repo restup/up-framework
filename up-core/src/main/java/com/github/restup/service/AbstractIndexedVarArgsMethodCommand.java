@@ -1,6 +1,5 @@
 package com.github.restup.service;
 
-import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 
 /**
@@ -12,10 +11,6 @@ public abstract class AbstractIndexedVarArgsMethodCommand extends VarArgsMethodC
 
     protected AbstractIndexedVarArgsMethodCommand(Object objectInstance, Method method) {
         super(objectInstance, method);
-    }
-
-    protected AbstractIndexedVarArgsMethodCommand(Class<? extends Annotation> methodAnnotation, Object... objects) {
-        super(methodAnnotation, objects);
     }
 
     /**

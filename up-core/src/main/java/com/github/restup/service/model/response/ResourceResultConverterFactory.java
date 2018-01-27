@@ -77,6 +77,7 @@ public class ResourceResultConverterFactory {
 
     public final static class NoOpResourceResultConverter implements ResourceResultConverter {
 
+        @Override
         public Object convert(Object o) {
             return o;
         }
@@ -84,9 +85,10 @@ public class ResourceResultConverterFactory {
 
     private final static class PersistenceResultConverter implements ResourceResultConverter {
 
+        @Override
         public Object convert(Object result) {
             if (result instanceof PersistenceResult) {
-                return (PersistenceResult<?>) result;
+                return result;
             } else {
                 return new BasicPersistenceResult<>(result);
             }
@@ -95,9 +97,10 @@ public class ResourceResultConverterFactory {
 
     private final static class PersistenceListResultConverter implements ResourceResultConverter {
 
+        @Override
         public Object convert(Object result) {
             if (result instanceof PersistenceResult) {
-                return (PersistenceResult<?>) result;
+                return result;
             } else {
                 List<?> list = asList(result);
                 return new BasicPersistenceResult<>(list);
@@ -107,9 +110,10 @@ public class ResourceResultConverterFactory {
 
     private final static class ListResourceResultConverter implements ResourceResultConverter {
 
+        @Override
         public Object convert(Object result) {
             if (result instanceof ReadResult) {
-                return (ReadResult<?>) result;
+                return result;
             } else {
                 List<?> list = asList(result);
                 return new BasicListResult<>(list);
@@ -119,9 +123,10 @@ public class ResourceResultConverterFactory {
 
     private final static class ReadResourceResultConverter implements ResourceResultConverter {
 
+        @Override
         public Object convert(Object result) {
             if (result instanceof ReadResult) {
-                return (ReadResult<?>) result;
+                return result;
             } else {
                 return new BasicReadResult<>(result);
             }

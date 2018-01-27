@@ -1,50 +1,38 @@
 package com.github.restup.registry.settings;
 
 /**
- * Configures Contoller method access.  Disabling methods will ensure methods are not exposed over http, however they still may be available internally depending up on {@link ServiceMethodAccess} settings. Similarly, enabled methods may still be disabled if the service method setting is disabled. By default, all are enabled.
+ * Configures Contoller method access. Disabling methods will ensure methods are not exposed over
+ * http, however they still may be available internally depending up on {@link ServiceMethodAccess}
+ * settings. Similarly, enabled methods may still be disabled if the service method setting is
+ * disabled. By default, all are enabled.
  */
-public final class ControllerMethodAccess extends ServiceMethodAccess {
+public interface ControllerMethodAccess extends ServiceMethodAccess {
 
-    private final boolean getByIdsDisabled;
-    private final boolean patchByIdsDisabled;
-    private final boolean updateByIdDisabled;
-    private final boolean updateMultipleDisabled;
 
-    public ControllerMethodAccess(boolean createDisabled, boolean createMultipleDisabled, boolean getByIdDisabled, boolean listDisabled, boolean deleteByIdDisabled, boolean deleteByIdsDisabled, boolean patchByIdDisabled, boolean patchMultipleDisabled, boolean deleteByQueryDisabled, boolean patchByQueryDisabled, boolean getByIdsDisabled, boolean patchByIdsDisabled, boolean updateByIdDisabled, boolean updateMultipleDisabled) {
-        super(createDisabled, createMultipleDisabled, getByIdDisabled, listDisabled, deleteByIdDisabled, deleteByIdsDisabled, patchByIdDisabled, patchMultipleDisabled, deleteByQueryDisabled, patchByQueryDisabled);
-        this.getByIdsDisabled = getByIdsDisabled;
-        this.patchByIdsDisabled = patchByIdsDisabled;
-        this.updateByIdDisabled = updateByIdDisabled;
-        this.updateMultipleDisabled = updateMultipleDisabled;
-    }
-
-    public static Builder builder() {
+    static Builder builder() {
         return new Builder();
     }
 
-    public boolean isGetByIdsDisabled() {
-        return getByIdsDisabled;
-    }
+    boolean isGetByIdsDisabled();
 
-    public boolean isPatchByIdsDisabled() {
-        return patchByIdsDisabled;
-    }
+    boolean isPatchByIdsDisabled();
 
-    public boolean isUpdateByIdDisabled() {
-        return updateByIdDisabled;
-    }
+    boolean isUpdateByIdDisabled();
 
-    public boolean isUpdateMultipleDisabled() {
-        return updateMultipleDisabled;
-    }
+    boolean isUpdateMultipleDisabled();
 
-    public static class Builder extends ServiceMethodAccess.AbstractBuilder<Builder, ControllerMethodAccess> {
+    static class Builder extends AbstractMethodAccessBuilder<Builder, ControllerMethodAccess> {
 
         private boolean getByIdsDisabled;
         private boolean patchByIdsDisabled;
         private boolean updateByIdDisabled;
         private boolean updateMultipleDisabled;
+        
+        private Builder() {
+            
+        }
 
+        @Override
         public Builder setAllDisabled(boolean b) {
             return super.setAllDisabled(b)
                     .setGetByIdsDisabled(b)
@@ -73,8 +61,10 @@ public final class ControllerMethodAccess extends ServiceMethodAccess {
             return me();
         }
 
+        @Override
         public ControllerMethodAccess build() {
-            return new ControllerMethodAccess(createDisabled, createMultipleDisabled, getByIdDisabled, listDisabled, deleteByIdDisabled, deleteByIdsDisabled, patchByIdDisabled, patchMultipleDisabled, deleteByQueryDisabled, patchByQueryDisabled, getByIdsDisabled, patchByIdsDisabled, updateByIdDisabled, updateMultipleDisabled);
+            return new BasicControllerMethodAccess(createDisabled, createMultipleDisabled, getByIdDisabled, listDisabled, deleteByIdDisabled, deleteByIdsDisabled, patchByIdDisabled,
+                    patchMultipleDisabled, deleteByQueryDisabled, patchByQueryDisabled, getByIdsDisabled, patchByIdsDisabled, updateByIdDisabled, updateMultipleDisabled);
         }
     }
 

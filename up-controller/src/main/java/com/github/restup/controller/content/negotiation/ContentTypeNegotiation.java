@@ -22,10 +22,12 @@ public abstract class ContentTypeNegotiation implements ContentNegotiator {
         this.headerValue = this.contentType;
     }
 
+    @Override
     public <T> boolean accept(ResourceControllerRequest request) {
         return Objects.equals(request.getContentType(), contentType);
     }
 
+    @Override
     public final <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response,
             Object result) {
         response.setHeader(CONTENT_TYPE, headerValue);

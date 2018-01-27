@@ -1,11 +1,9 @@
 package com.github.restup.mapping;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
-
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.util.ReflectionUtils;
 
@@ -21,15 +19,15 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     private final Type type;
     private final Type parentType;
     private final List<MappedField<?>> attributes;
-    private final boolean containsTypedMap;
+    private final boolean typedMapPresent;
 
-    protected BasicMappedClass(String name, String pluralName, Type type, Type parentType, List<MappedField<?>> attributes, boolean containsTypedMap) {
+    protected BasicMappedClass(String name, String pluralName, Type type, Type parentType, List<MappedField<?>> attributes, boolean typedMapPresent) {
         this.name = name;
         this.pluralName = pluralName;
         this.type = type;
         this.parentType = parentType;
         this.attributes = unmodifiableList(attributes);
-        this.containsTypedMap = containsTypedMap;
+        this.typedMapPresent = typedMapPresent;
     }
     
     @Override
@@ -40,6 +38,7 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     /**
      * The name of the object
      */
+    @Override
     public String getName() {
         return name;
     }
@@ -47,6 +46,7 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     /**
      * The pluralized name of the object
      */
+    @Override
     public String getPluralName() {
         return pluralName;
     }
@@ -54,6 +54,7 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     /**
      * The type of the object
      */
+    @Override
     public Type getType() {
         return type;
     }
@@ -61,6 +62,7 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     /**
      * The type of the object's parent
      */
+    @Override
     public Type getParentType() {
         return parentType;
     }
@@ -69,6 +71,7 @@ public class BasicMappedClass<T> implements MappedClass<T> {
      * The attributes of the object
      */
 
+    @Override
     public List<MappedField<?>> getAttributes() {
         return attributes;
     }
@@ -79,21 +82,21 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     }
 
     @Override
-    public int hashCode() {
-        return Objects.hash(name);
+    public final int hashCode() {
+        return Objects.hash(name, type);
     }
     
     @Override
-    public boolean containsTypedMap() {
-    		return containsTypedMap;
+    public boolean isTypedMapPresent() {
+    		return typedMapPresent;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if ( ! (o instanceof BasicMappedClass) ) {
             return false;
         }
         BasicMappedClass<?> that = (BasicMappedClass<?>) o;

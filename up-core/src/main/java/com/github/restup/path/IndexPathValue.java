@@ -1,12 +1,13 @@
 package com.github.restup.path;
 
-import com.github.restup.mapping.fields.ReadableField;
-import com.github.restup.mapping.fields.WritableField;
-import com.github.restup.util.ReflectionUtils;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.Objects;
 import org.apache.commons.collections4.CollectionUtils;
+import com.github.restup.mapping.fields.ReadableField;
+import com.github.restup.mapping.fields.WritableField;
+import com.github.restup.util.ReflectionUtils;
 
 /**
  * {@link PathValue} indicating the index of a Collection or Array.
@@ -31,26 +32,18 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
         this(ArrayList.class, index);
     }
 
-    @Override
-    public boolean isReservedPath() {
-        return false;
-    }
-
     /**
      * @return a new instance of {@link #type}
      */
+    @Override
     public Object createDeclaringInstance() {
         return ReflectionUtils.newInstance(type);
-    }
-
-    @Override
-    public Object createInstance() {
-        return null;
     }
 
     /**
      * @return {@link #toString()}
      */
+    @Override
     public String getApiPath() {
         return toString();
     }
@@ -58,6 +51,7 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
     /**
      * @return {@link #toString()}
      */
+    @Override
     public String getBeanPath() {
         return toString();
     }
@@ -65,6 +59,7 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
     /**
      * @return {@link #toString()}
      */
+    @Override
     public String getPersistedPath() {
         return toString();
     }
@@ -80,11 +75,13 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
     /**
      * @return true for Collection implementations or Object[], false otherwise
      */
+    @Override
     public boolean supportsType(Class<?> clazz) {
         return Collection.class.isAssignableFrom(clazz)
                 || Object[].class == clazz;
     }
 
+    @Override
     public Object readValue(Object instance) {
         if (instance instanceof Collection) {
             return CollectionUtils.get(instance, index);
@@ -97,6 +94,7 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
         return null;
     }
 
+    @Override
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void writeValue(Object instance, Object value) {
         if (instance instanceof List) {
@@ -109,27 +107,30 @@ public class IndexPathValue implements PathValue, ReadableField<Object>, Writabl
         }
     }
 
-    @Override
-    public int hashCode() {
+    public int getIndex() {
         return index;
     }
 
+    public Class<?> getType() {
+        return type;
+    }
+
     @Override
-    public boolean equals(Object obj) {
-        if (this == obj) {
+    public final int hashCode() {
+        return Objects.hash(index, type);
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (this == o) {
             return true;
         }
-        if (obj == null) {
+        if (! ( o instanceof IndexPathValue )) {
             return false;
         }
-        if (getClass() != obj.getClass()) {
-            return false;
-        }
-        IndexPathValue other = (IndexPathValue) obj;
-        if (index != other.index) {
-            return false;
-        }
-        return true;
+        IndexPathValue that = (IndexPathValue) o;
+        return Objects.equals(index, that.index)
+                && Objects.equals(type, that.type);
     }
 
 }

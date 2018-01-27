@@ -6,8 +6,14 @@ import static com.github.restup.query.PreparedResourceQueryStatement.queryFields
 import static com.github.restup.query.PreparedResourceQueryStatement.sparseFields;
 import static com.github.restup.util.ReflectionUtils.getAnnotation;
 import static com.github.restup.util.ResourceAssert.assertBeanPaths;
+import static com.github.restup.util.TestRegistries.mapBackedRegistryBuilder;
 import static org.junit.Assert.assertEquals;
-
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.Transient;
+import org.junit.Before;
+import org.junit.Test;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
@@ -21,16 +27,8 @@ import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.RegistrySettings;
-import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.util.ReflectionUtils;
 import com.many.fields.A2J;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.Transient;
-import org.junit.Before;
-import org.junit.Test;
 
 public class PreparedResourceQueryStatementTest {
 
@@ -45,15 +43,15 @@ public class PreparedResourceQueryStatementTest {
         sparseFieldsDefaultsProvider = new TestResourcePathsProvider();
         sparseFieldsDefaultsProvider.delegate = AllResourcePathsProvider.getDefaultSparseFieldsProvider();
         restrictedFieldsProvider = new TestResourcePathsProvider();
-        ResourceRegistry registry = new ResourceRegistry(RegistrySettings.builder()
+        ResourceRegistry registry = mapBackedRegistryBuilder()
                 .mappedFieldBuilderVisitors(
                         new IdentityByConventionMappedFieldBuilderVisitor()
                         , new MappedFieldBuilderVisitor() {
+                            @Override
                             public <T> void visit(MappedField.Builder<T> b, ReflectionUtils.BeanInfo<T> bi, ReflectionUtils.PropertyDescriptor pd) {
                                 b.transientField(null != getAnnotation(Transient.class, pd));
                             }
-                        })
-                .repositoryFactory(new MapBackedRepositoryFactory()));
+                        }).build();
         registry
                 .registerResource(Resource.builder(A2J.class)
                         .sparseFieldsDefaultsProvider(sparseFieldsDefaultsProvider)

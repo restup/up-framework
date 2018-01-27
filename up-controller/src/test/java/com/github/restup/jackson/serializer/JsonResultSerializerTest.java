@@ -1,19 +1,16 @@
 package com.github.restup.jackson.serializer;
 
-import static com.github.restup.test.ContentsTest.json;
+import static com.github.restup.test.ContentsAssertions.json;
 import static com.github.restup.util.ReflectionUtils.getAnnotation;
+import static com.github.restup.util.TestRegistries.mapBackedRegistryBuilder;
 import static org.mockito.Mockito.when;
-
 import java.util.Arrays;
-
 import javax.persistence.Transient;
-
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-
 import com.deep.Shallow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -26,10 +23,8 @@ import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedField
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.RegistrySettings;
-import com.github.restup.repository.collections.MapBackedRepositoryFactory;
-import com.github.restup.service.model.response.BasicReadResult;
-import com.github.restup.test.ContentsTest.Builder;
+import com.github.restup.service.model.response.ReadResult;
+import com.github.restup.test.ContentsAssertions.Builder;
 import com.github.restup.util.ReflectionUtils;
 import com.many.fields.A2J;
 
@@ -44,15 +39,15 @@ public class JsonResultSerializerTest {
 
     @Before
     public void setup() {
-        ResourceRegistry registry = new ResourceRegistry(RegistrySettings.builder()
+        ResourceRegistry registry = mapBackedRegistryBuilder()
                 .mappedFieldBuilderVisitors(
                         new IdentityByConventionMappedFieldBuilderVisitor()
                         , new MappedFieldBuilderVisitor() {
+                            @Override
                             public <T> void visit(MappedField.Builder<T> b, ReflectionUtils.BeanInfo<T> bi, ReflectionUtils.PropertyDescriptor pd) {
                                 b.transientField(null != getAnnotation(Transient.class, pd));
                             }
-                        })
-                .repositoryFactory(new MapBackedRepositoryFactory()));
+                        }).build();
 
         registry.registerResource(A2J.class, Shallow.class);
 
@@ -61,7 +56,7 @@ public class JsonResultSerializerTest {
     }
 
     private JsonResult result(Object object) {
-        return new JsonResult(request, new BasicReadResult<>(object));
+        return new JsonResult(request, ReadResult.of(object));
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

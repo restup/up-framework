@@ -1,7 +1,7 @@
 package com.github.restup.controller.model;
 
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertTrue;
+import static org.junit.Assert.*;
 
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import java.util.Arrays;
@@ -62,6 +62,15 @@ public class HttpMethodTest {
             } else {
                 assertFalse(m.supportsMultiple(enabled));
             }
+        }
+    }
+    
+    @Test
+    public void testOf() {
+        assertNull(HttpMethod.of("foo"));
+        for (HttpMethod m : HttpMethod.values()) {
+            assertEquals(m, HttpMethod.of(m.name().toLowerCase()));
+            assertEquals(m, HttpMethod.of(m.name().toUpperCase()));
         }
     }
 }

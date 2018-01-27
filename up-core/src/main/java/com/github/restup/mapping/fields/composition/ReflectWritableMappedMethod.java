@@ -1,13 +1,13 @@
 package com.github.restup.mapping.fields.composition;
 
-import com.github.restup.errors.ErrorBuilder;
+import java.lang.reflect.InvocationTargetException;
+import java.lang.reflect.Method;
+import java.util.Objects;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.fields.DeclaredBy;
 import com.github.restup.mapping.fields.WritableField;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
-import java.lang.reflect.InvocationTargetException;
-import java.lang.reflect.Method;
-import java.util.Objects;
 
 /**
  * For write only property mapped by Method
@@ -27,12 +27,13 @@ public class ReflectWritableMappedMethod<TARGET, VALUE> implements WritableField
         return new ReflectWritableMappedMethod<>(setter);
     }
 
+    @Override
     public void writeValue(TARGET obj, VALUE value) {
         if (obj != null) {
             try {
                 setter.invoke(obj, value);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                ErrorBuilder.throwError(e);
+                RequestError.throwError(e);
             }
         }
     }
@@ -45,11 +46,6 @@ public class ReflectWritableMappedMethod<TARGET, VALUE> implements WritableField
     @Override
     public TARGET createDeclaringInstance() {
         return createDeclaringInstance(setter);
-    }
-
-    @Override
-    public VALUE createInstance() {
-        return null;
     }
 
     @SuppressWarnings("unchecked")

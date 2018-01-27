@@ -97,7 +97,7 @@ public class ResourcePathFilter<T> implements ResourceQueryCriteria {
                 }
                 b = result;
             } else {
-                b = (Comparable<?>) MappedField.toCaseInsensitive(mf.getCaseSensitivity(), b);
+                b = MappedField.toCaseInsensitive(mf.getCaseSensitivity(), b);
             }
         }
 

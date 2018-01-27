@@ -1,23 +1,23 @@
 package com.github.restup.registry;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
+import static com.github.restup.util.TestRegistries.universityRegistry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
-
+import java.util.Arrays;
+import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.path.ResourcePath;
 import com.university.Course;
 import com.university.University;
-import java.util.Arrays;
-import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
 
 public class ResourceRelationshipTest {
 
     @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void testGetIds() {
-        ResourceRegistry registry = ResourceRegistryTest.registry();
-        registry.registerResource(University.class, Course.class);
+        ResourceRegistry registry = universityRegistry();
         ResourceRelationship<Course, Long, University, Long> relationship = (ResourceRelationship) registry.getRelationship("university", "course");
 
         assertEquals(Sets.newSet(1l), relationship.getIdsTo(u(1)));
@@ -40,12 +40,12 @@ public class ResourceRelationshipTest {
     @Test
     public void testManyToOne() {
         // confirm order resources registered doesn't matter
-        ResourceRegistry b = ResourceRegistryTest.registry();
+        ResourceRegistry b = mapBackedRegistry();
         b.registerResource(Course.class);
         b.registerResource(University.class);
         assertCourseToUniversity(b);
 
-        ResourceRegistry a = ResourceRegistryTest.registry();
+        ResourceRegistry a = mapBackedRegistry();
         a.registerResource(University.class);
         a.registerResource(Course.class);
         assertCourseToUniversity(a);

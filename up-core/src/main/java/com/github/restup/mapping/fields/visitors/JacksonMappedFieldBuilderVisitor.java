@@ -17,6 +17,7 @@ public class JacksonMappedFieldBuilderVisitor implements MappedFieldBuilderVisit
     /**
      * Checks for {@link JsonProperty} and applies the api property name to builder if the annotation exists
      */
+    @Override
     public <T> void visit(Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
         JsonIgnore ignore = getAnnotation(JsonIgnore.class, pd);
         if (ignore != null) {

@@ -2,13 +2,12 @@ package com.github.restup.test;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-
 import org.junit.Test;
 
 public class ApiRequestTest {
 
     private ApiRequest test(String path, Object... args) {
-        ApiRequest.Builder b = new ApiRequest.Builder(path, args);
+        ApiRequest.Builder b = ApiRequest.builder(path, args);
         return b.build();
     }
 
@@ -25,7 +24,7 @@ public class ApiRequestTest {
     }
 
     private ApiRequest override(Object... args) {
-        ApiRequest.Builder b = new ApiRequest.Builder("/{accountId}/{organizationId}/foo/{bar}", 1, 2, 3);
+        ApiRequest.Builder b = ApiRequest.builder("/{accountId}/{organizationId}/foo/{bar}", 1, 2, 3);
         b.pathArgs(args);
         return b.build();
     }
@@ -40,7 +39,7 @@ public class ApiRequestTest {
 
     @Test
     public void testQueryString() {
-        ApiRequest.Builder b = new ApiRequest.Builder("/{accountId}/{organizationId}/foo/{bar}?v=1", 1, 2, 3);
+        ApiRequest.Builder b = ApiRequest.builder("/{accountId}/{organizationId}/foo/{bar}?v=1", 1, 2, 3);
         b.pathArgs("a");
         b.query("?foo=x&bar=y&baz=z&foo=x2");
         assertThat(b.build().getUrl(), is("/1/2/foo/a?foo=x&foo=x2&bar=y&baz=z&v=1"));

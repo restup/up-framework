@@ -17,6 +17,7 @@ public class PostMethodController<T, ID extends Serializable> extends BulkMethod
         super(factory);
     }
 
+    @Override
     public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
         if (isBulk(request)) {
             // create multiple documents
@@ -34,6 +35,7 @@ public class PostMethodController<T, ID extends Serializable> extends BulkMethod
         return factory.getCreateRequest(resource, request.getData(), request.getRequestedPaths(), request.getRequestedQueries(), request);
     }
 
+    @Override
     public int getSuccessStatus() {
         return 201;
     }

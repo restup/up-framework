@@ -103,42 +103,52 @@ public class FilteredService extends MethodCommandOperations implements Resource
             return null;
         }
 
+        @Override
         public MethodCommand<?> getCreateOperation() {
             return getMethod(resource, "CREATE", CreateResource.class, PreCreateFilter.class, PostCreateFilter.class, access.isCreateDisabled(), repository);
         }
 
+        @Override
         public MethodCommand<?> getUpdateOperation() {
             return getMethod(resource, "UPDATE", UpdateResource.class, PreUpdateFilter.class, PostUpdateFilter.class, access.isPatchByIdDisabled(), repository);
         }
 
+        @Override
         public MethodCommand<?> getDeleteOperation() {
             return getMethod(resource, "DELETE", DeleteResource.class, PreDeleteFilter.class, PostDeleteFilter.class, access.isDeleteByIdDisabled(), repository);
         }
 
+        @Override
         public MethodCommand<?> getBulkUpdateOperation() {
             return getMethod(resource, "BULK_UPDATE", BulkUpdateResource.class, PreBulkUpdateFilter.class, PostBulkUpdateFilter.class, access.isPatchMultipleDisabled(), repository, defaultBulkRepo);
         }
 
+        @Override
         public MethodCommand<?> getBulkCreateOperation() {
             return getMethod(resource, "BULK_CREATE", BulkCreateResource.class, PreBulkCreateFilter.class, PostBulkCreateFilter.class, access.isCreateMultipleDisabled(), repository, defaultBulkRepo);
         }
 
+        @Override
         public MethodCommand<?> getBulkDeleteOperation() {
             return getMethod(resource, "BULK_DELETE", BulkDeleteResource.class, PreBulkDeleteFilter.class, PostBulkDeleteFilter.class, access.isDeleteByIdsDisabled(), repository, defaultBulkRepo);
         }
 
+        @Override
         public MethodCommand<?> getDeleteByQueryOperation() {
             return getMethod(resource, "FILTERED_DELETE", DeleteResourceByQuery.class, PreDeleteByQueryFilter.class, PostDeleteByQueryFilter.class, access.isDeleteByQueryDisabled(), repository, defaultBulkRepo);
         }
 
+        @Override
         public MethodCommand<?> getUpdateByQueryOperation() {
             return getMethod(resource, "FILTERED_UPDATE", UpdateResourceByQuery.class, PreUpdateByQueryFilter.class, PostUpdateByQueryFilter.class, access.isPatchByQueryDisabled(), repository, defaultBulkRepo);
         }
 
+        @Override
         public MethodCommand<?> getListOperation() {
             return getMethod(resource, "LIST", ListResource.class, PreListFilter.class, PostListFilter.class, access.isListDisabled(), repository);
         }
 
+        @Override
         public MethodCommand<?> getFindOperation() {
             return getMethod(resource, "FIND", ReadResource.class, PreReadFilter.class, PostReadFilter.class, access.isGetByIdDisabled(), repository);
         }

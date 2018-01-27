@@ -20,6 +20,7 @@ public class BasicDeleteRequest<T, ID extends Serializable> extends AbstractRequ
         this.id = id;
     }
 
+    @Override
     public ID getId() {
         return id;
     }

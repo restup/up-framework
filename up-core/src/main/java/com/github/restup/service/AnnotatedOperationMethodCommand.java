@@ -52,6 +52,7 @@ public class AnnotatedOperationMethodCommand implements MethodCommand<Object> {
                 ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
     }
 
+    @Override
     public final Object execute(Object... state) {
         // build up a context for method execution
         FilterChainContext ctx = context(state);

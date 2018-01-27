@@ -169,6 +169,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
 
     boolean isRelationship();
 
+    @Override
     boolean isDeclaredBy(Class<?> clazz);
 
     default String getRelationshipName() {
@@ -344,7 +345,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
                     readable = ReflectMappedMethod.of(getter, setter);
                 } else if (getter != null) {
                     readable = ReflectReadableMappedMethod.of(getter);
-                } else if (writable == null) {
+                } else {
                     // if writable is explicitly configured (not null) then
                     // we will use setter or used default MapField readable
                     if (setter != null) {

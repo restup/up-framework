@@ -14,24 +14,27 @@ class BasicCaseSensitivity implements CaseSensitivity {
         this.lowerCased = lowerCased;
     }
 
+    @Override
     public boolean isCaseInsensitive() {
         return caseInsensitive;
     }
 
+    @Override
     public String getSearchField() {
         return searchField;
     }
 
+    @Override
     public boolean isLowerCased() {
         return lowerCased;
     }
 
     @Override
-    public boolean equals(Object o) {
+    public final boolean equals(Object o) {
         if (this == o) {
             return true;
         }
-        if (o == null || getClass() != o.getClass()) {
+        if (! ( o instanceof BasicCaseSensitivity )) {
             return false;
         }
         BasicCaseSensitivity that = (BasicCaseSensitivity) o;
@@ -41,7 +44,7 @@ class BasicCaseSensitivity implements CaseSensitivity {
     }
 
     @Override
-    public int hashCode() {
+    public final int hashCode() {
         return Objects.hash(caseInsensitive, searchField, lowerCased);
     }
 

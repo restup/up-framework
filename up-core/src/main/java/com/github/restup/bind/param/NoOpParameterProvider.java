@@ -28,6 +28,7 @@ public class NoOpParameterProvider implements ParameterProvider {
     /**
      * @return empty, immutable list always, never null
      */
+    @Override
     public List<String> getParameterNames() {
         return Collections.emptyList();
     }
@@ -35,6 +36,7 @@ public class NoOpParameterProvider implements ParameterProvider {
     /**
      * @return null always
      */
+    @Override
     public String[] getParameter(String parameterName) {
         return null;
     }

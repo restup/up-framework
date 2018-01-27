@@ -131,6 +131,7 @@ public class FilterChainContext implements MethodArgumentFactory {
         return parameterProvider;
     }
 
+    @Override
     @SuppressWarnings("unchecked")
     public <T> T newInstance(Class<T> clazz) {
         if (Errors.class.isAssignableFrom(clazz)) {
@@ -151,6 +152,7 @@ public class FilterChainContext implements MethodArgumentFactory {
         }
     }
 
+    @Override
     public <T> T newInstance(Class<T> clazz, FilterChainContext ctx, Errors errors) {
         return argumentFactory.newInstance(clazz, ctx, errors);
     }

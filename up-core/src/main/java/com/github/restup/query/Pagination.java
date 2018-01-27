@@ -5,23 +5,43 @@ package com.github.restup.query;
  *
  * @author abuttaro
  */
-public class Pagination {
+public interface Pagination {
 
-    // pagination
-    private final Integer limit;
-    private final Integer offset;
-    private final boolean pagingDisabled;
-    private final boolean withTotalsDisabled;
+    Integer getLimit();
 
-    public Pagination(Integer limit, Integer offset, boolean pagingDisabled, boolean withTotalsDisabled) {
-        super();
-        this.limit = limit;
-        this.offset = offset;
-        this.pagingDisabled = pagingDisabled;
-        this.withTotalsDisabled = withTotalsDisabled;
+    Integer getOffset();
+
+    boolean isPagingDisabled();
+
+    default boolean isPagingEnabled() {
+        return !isPagingDisabled();
     }
 
-    public static int getStart(Pagination pagination) {
+    default boolean isWithTotalsEnabled() {
+        return !isWithTotalsDisabled();
+    }
+
+    boolean isWithTotalsDisabled();
+
+    /**
+     * Pagination with specified limit and offset and paging and totals enabled
+     * @param limit
+     * @param offset
+     * @return
+     */
+    static Pagination of(Integer limit, Integer offset) {
+        return of(limit, offset, false);
+    }
+    
+    static Pagination of(Integer limit, Integer offset, boolean withTotalsDisabled) {
+        return new BasicPagination(limit, offset, withTotalsDisabled);
+    }
+
+    static Pagination disabled() {
+        return new BasicPagination();
+    }
+
+    static int getStart(Pagination pagination) {
         Integer offset = pagination.getOffset();
         if (offset == null) {
             offset = 0;
@@ -35,34 +55,10 @@ public class Pagination {
         return offset * pageSize;
     }
 
-    public static boolean isPagedListRequired(Pagination pagination, Long totalCount) {
+    static boolean isPagedListRequired(Pagination pagination, Long totalCount) {
         return (pagination.isWithTotalsDisabled() || totalCount > 0)
                 && pagination.getLimit() != null
                 && pagination.getLimit() > 0;
-    }
-
-    public Integer getLimit() {
-        return limit;
-    }
-
-    public Integer getOffset() {
-        return offset;
-    }
-
-    public boolean isPagingDisabled() {
-        return pagingDisabled;
-    }
-
-    public boolean isPagingEnabled() {
-        return !isPagingDisabled();
-    }
-
-    public boolean isWithTotalsEnabled() {
-        return !isWithTotalsDisabled();
-    }
-
-    public boolean isWithTotalsDisabled() {
-        return withTotalsDisabled;
     }
 
 }

@@ -1,23 +1,21 @@
 package com.github.restup.controller.model;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
-
 import java.lang.reflect.Type;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.List;
 import java.util.Objects;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.bind.param.ParameterProvider;
-import com.github.restup.errors.ErrorBuilder;
+import com.github.restup.errors.ErrorCodeStatus;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.Errors;
+import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRelationship;
@@ -27,70 +25,27 @@ import com.github.restup.util.Assert;
 /**
  * In an http request, this is a partially parsed details from the request, having parsed the request path to obtain resource info and ids.
  */
-public abstract class ResourceControllerRequest implements ParameterProvider {
+public interface ResourceControllerRequest extends ParameterProvider {
 
-    private final HttpMethod method;
-    private final Resource<?, ?> resource;
-    private final Resource<?, ?> relationship;
-    private final ResourceRelationship<?, ?, ?, ?> resourceRelationship;
-    private final ResourceData<?> body;
-    private final List<?> ids;
-    private final String contentType;
-    private final String baseRequestUrl;
-    private final String requestUrl;
+    Enumeration<String> getHeaders(String name);
 
-    protected ResourceControllerRequest(HttpMethod method, Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship, ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body
-            , String contentType, String baseRequestUrl, String requestUrl) {
-        this.resource = resource;
-        this.ids = ids;
-        this.relationship = relationship;
-        this.resourceRelationship = resourceRelationship;
-        this.method = method;
-        this.body = body;
-        this.contentType = contentType;
-        this.baseRequestUrl = baseRequestUrl;
-        this.requestUrl = requestUrl;
-    }
+    public String getContentType();
 
-    public Enumeration<String> getHeaders(String name) {
-        return null;
-    }
+    public HttpMethod getMethod();
 
-    public String getContentType() {
-        return contentType;
-    }
+    public Resource<?, ?> getResource();
 
-    public HttpMethod getMethod() {
-        return method;
-    }
+    public Resource<?, ?> getRelationship();
 
-    public Resource<?, ?> getResource() {
-        return resource;
-    }
+    public ResourceRelationship<?, ?, ?, ?> getResourceRelationship();
 
-    public Resource<?, ?> getRelationship() {
-        return relationship;
-    }
+    public List<?> getIds();
 
-    public ResourceRelationship<?, ?, ?, ?> getResourceRelationship() {
-        return resourceRelationship;
-    }
+    public ResourceData<?> getBody();
 
-    public List<?> getIds() {
-        return ids;
-    }
+    public String getBaseRequestUrl();
 
-    public ResourceData<?> getBody() {
-        return body;
-    }
-
-    public String getBaseRequestUrl() {
-        return baseRequestUrl;
-    }
-
-    public String getRequestUrl() {
-        return requestUrl;
-    }
+    public String getRequestUrl();
 
     public abstract static class AbstractBuilder<T extends AbstractBuilder<T, R>, R extends ResourceControllerRequest> {
 
@@ -109,7 +64,7 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
         }
 
         private static ErrorObjectException invalidPath(String requestPath) {
-            return ErrorBuilder.builder()
+            return RequestError.builder()
                     .code("INVALID_PATH")
                     .detail("{0} is not a valid path", requestPath)
                     .buildException();
@@ -128,16 +83,16 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
         }
 
         private static ErrorObjectException invalidPath(String requestPath, String resourceName) {
-            return ErrorBuilder.builder()
+            return RequestError.builder()
                     .code("INVALID_RESOURCE_PATH")
                     .detail("{0} is not a valid resource", resourceName)
                     .meta("resource", resourceName)
-                    .status(ErrorBuilder.ErrorCodeStatus.NOT_FOUND)
+                    .status(ErrorCodeStatus.NOT_FOUND)
                     .buildException();
         }
 
         private static ErrorObjectException invalidRelationship(Resource<?, ?> a, Resource<?, ?> b) {
-            return ErrorBuilder.builder()
+            return RequestError.builder()
                     .code("INVALID_RELATIONSHIP")
                     .title("Unknown relationship")
                     .detail("Unknown relationship between {0} and {1}", a.getName(), b.getName())
@@ -147,7 +102,7 @@ public abstract class ResourceControllerRequest implements ParameterProvider {
         }
 
         private static ErrorObjectException invalidRelationship(Resource<?, ?> a, Resource<?, ?> b, boolean toMany) {
-            return ErrorBuilder.builder()
+            return RequestError.builder()
                     .code("INVALID_RELATIONSHIP_TYPE")
                     .title("Invalid relationship")
                     .detail("Relationship between {0} and {1} exists, but not of requested type. Did you mean to request /{2}", a.getName(), b.getName(), toMany ? b.getName() : b.getPluralName())

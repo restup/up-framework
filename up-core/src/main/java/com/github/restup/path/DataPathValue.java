@@ -10,7 +10,13 @@ public class DataPathValue extends ConstantPathValue implements ReadableField<Ob
 
     public static final String DATA = "data";
 
-    public DataPathValue() {
+    private final static DataPathValue instance = new DataPathValue();
+
+    static DataPathValue getInstance() {
+        return instance;
+    }
+
+    private DataPathValue() {
         super(DATA);
     }
 
@@ -19,6 +25,7 @@ public class DataPathValue extends ConstantPathValue implements ReadableField<Ob
         return clazz != null && ResourceData.class.isAssignableFrom(clazz);
     }
 
+    @Override
     @SuppressWarnings("rawtypes")
     public Object readValue(Object instance) {
         if (instance instanceof ResourceData) {

@@ -9,6 +9,7 @@ public class IntegerIdentityStrategy implements IdentityStrategy<Integer> {
 
     private volatile AtomicInteger id = new AtomicInteger();
 
+    @Override
     public Integer getNextId() {
         return id.incrementAndGet();
     }

@@ -1,13 +1,11 @@
 package com.github.restup.controller.interceptor;
 
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RequestInterceptorChainTest {
@@ -25,13 +23,13 @@ public class RequestInterceptorChainTest {
     @Test
     public void testBefore() {
         new RequestInterceptorChain(interceptor).before(request);
-        verify(interceptor, times(1)).before(request);
+        verify(interceptor).before(request);
     }
 
     @Test
     public void testAfter() {
         new RequestInterceptorChain(interceptor).after(request);
-        verify(interceptor, times(1)).after(request);
+        verify(interceptor).after(request);
     }
 
 }

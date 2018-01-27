@@ -13,24 +13,31 @@ import com.github.restup.errors.RequestError;
         setterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
 public interface RequestErrorMixin extends RequestError {
 
+    @Override
     @JsonProperty("id")
     String getId();
 
+    @Override
     @JsonProperty("code")
     String getCode();
 
+    @Override
     @JsonProperty("title")
     String getTitle();
 
+    @Override
     @JsonProperty("detail")
     String getDetail();
 
+    @Override
     @JsonProperty("source")
     ErrorSource getSource();
 
+    @Override
     @JsonProperty("meta")
     Object getMeta();
 
+    @Override
     @JsonProperty("status")
     String getStatus();
 

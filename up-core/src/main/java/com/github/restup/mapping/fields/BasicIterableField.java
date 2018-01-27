@@ -22,7 +22,8 @@ class BasicIterableField<T> extends BasicMappedField<T> implements IterableField
 		this.genericType = genericType;
 	}
 
-	public Class<?> getGenericType() {
+	@Override
+    public Class<?> getGenericType() {
 		return genericType;
 	}
 

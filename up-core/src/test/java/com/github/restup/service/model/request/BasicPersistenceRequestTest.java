@@ -1,25 +1,27 @@
 package com.github.restup.service.model.request;
 
+import static com.github.restup.util.TestRegistries.defaultRegistry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-
+import java.util.Arrays;
+import org.junit.Test;
 import com.github.restup.bind.param.NoOpParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.ResourceRegistry;
 import com.model.test.company.Person;
-import java.util.Arrays;
-import org.junit.Test;
 
 public class BasicPersistenceRequestTest {
 
     @Test
     public void testHasPath() {
+        
+        ResourceRegistry registry = defaultRegistry();
 
-        ResourcePath address = ResourcePath.path(ResourceRegistry.getInstance(), Person.class, "address");
-        ResourcePath lastName = ResourcePath.path(ResourceRegistry.getInstance(), Person.class, "lastName");
-        ResourcePath street = ResourcePath.path(ResourceRegistry.getInstance(), Person.class, "address.street");
-        ResourcePath dStreet = ResourcePath.builder(ResourceRegistry.getInstance(), Person.class).data().path("address.street").build();
-        ResourcePath iStreet = ResourcePath.builder(ResourceRegistry.getInstance(), Person.class).data(1).path("address.street").build();
+        ResourcePath address = ResourcePath.path(registry, Person.class, "address");
+        ResourcePath lastName = ResourcePath.path(registry, Person.class, "lastName");
+        ResourcePath street = ResourcePath.path(registry, Person.class, "address.street");
+        ResourcePath dStreet = ResourcePath.builder(registry, Person.class).data().path("address.street").build();
+        ResourcePath iStreet = ResourcePath.builder(registry, Person.class).data(1).path("address.street").build();
 
         // test exact path
         assertTrue(request(street).hasPath(street));

@@ -1,5 +1,6 @@
 package com.github.restup.service;
 
+import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
@@ -9,7 +10,9 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-
+import java.io.Serializable;
+import java.util.Arrays;
+import org.junit.Test;
 import com.github.restup.annotations.field.Param;
 import com.github.restup.annotations.filter.PostCreateFilter;
 import com.github.restup.annotations.filter.PostDeleteFilter;
@@ -34,7 +37,6 @@ import com.github.restup.errors.Errors;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.ResourceRegistryTest;
 import com.github.restup.repository.Repository;
 import com.github.restup.resource.operations.CreatableResource;
 import com.github.restup.resource.operations.DeletableResource;
@@ -55,10 +57,6 @@ import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PersistenceResult;
 import com.github.restup.service.model.response.ReadResult;
 import com.model.test.company.Company;
-import java.io.Serializable;
-import java.util.Arrays;
-import org.junit.Test;
-
 public class FilteredServiceTest {
 
     @Test
@@ -72,6 +70,7 @@ public class FilteredServiceTest {
     @SuppressWarnings({"rawtypes"})
     public void testCreateSupported() {
         test(new CreatableResource() {
+            @Override
             public PersistenceResult create(CreateRequest request) {
                 return null;
             }
@@ -82,6 +81,7 @@ public class FilteredServiceTest {
     @SuppressWarnings({"rawtypes"})
     public void testFindSupported() {
         test(new ReadableResource() {
+            @Override
             public ReadResult find(ReadRequest request) {
                 return null;
             }
@@ -92,6 +92,7 @@ public class FilteredServiceTest {
     @SuppressWarnings({"rawtypes"})
     public void testUpdateSupported() {
         test(new UpdatableResource() {
+            @Override
             public PersistenceResult update(UpdateRequest request) {
                 return null;
             }
@@ -102,6 +103,7 @@ public class FilteredServiceTest {
     @SuppressWarnings({"rawtypes"})
     public void testDeleteSupported() {
         test(new DeletableResource() {
+            @Override
             public PersistenceResult delete(DeleteRequest request) {
                 return null;
             }
@@ -112,6 +114,7 @@ public class FilteredServiceTest {
     @SuppressWarnings({"rawtypes"})
     public void testListSupported() {
         test(new ListableResource() {
+            @Override
             public ReadResult list(ListRequest request) {
                 return null;
             }
@@ -177,7 +180,7 @@ public class FilteredServiceTest {
     @SuppressWarnings({"rawtypes"})
     private ResourceServiceOperations getService(Object repo, Object... filters) {
         Resource<?, ?> resource = Resource.builder(Company.class)
-                .registry(ResourceRegistryTest.registry()).repository(repo)
+                .registry(mapBackedRegistry()).repository(repo)
                 .excludeDefaultServiceFilters(true)
                 .serviceFilters(new ServiceFilter() {
                     @Override

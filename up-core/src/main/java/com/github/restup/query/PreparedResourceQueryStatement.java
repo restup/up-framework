@@ -43,7 +43,7 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
         if (ResourceQueryDefaults.hasCriteria(defaults)) {
             result.addAll(defaults.getCriteria());
         }
-        if (ResourceQueryStatement.hasCriteria(query)) {
+        if (AbstractResourceQueryStatement.hasCriteria(query)) {
             if (groupEq) {
                 result.addAll(groupEq(query.getRequestedCriteria()));
             } else {

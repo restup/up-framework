@@ -7,7 +7,7 @@ import com.github.restup.controller.model.result.JsonApiResult;
 import com.github.restup.controller.model.result.JsonResult;
 import com.github.restup.controller.request.parser.ContentNegotiatedRequestParser;
 import com.github.restup.controller.request.parser.RequestParser;
-import com.github.restup.controller.request.parser.UnsupportedMediaTypeBodeRequestParser;
+import com.github.restup.controller.request.parser.UnsupportedMediaTypeBodyRequestParser;
 import com.github.restup.errors.ErrorObjectException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.jackson.mixins.BasicPagedResultMixin;
@@ -22,7 +22,7 @@ import com.github.restup.jackson.parser.JacksonJsonApiRequestBodyParser;
 import com.github.restup.jackson.parser.JacksonRequestBodyParser;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.service.model.ResourceData;
-import com.github.restup.service.model.response.BasicPagedResult;
+import com.github.restup.service.model.response.PagedResult;
 
 public class JacksonConfiguration {
 
@@ -41,7 +41,7 @@ public class JacksonConfiguration {
         mapper.addMixIn(ResourcePath.class, ResourcePathMixin.class);
         mapper.addMixIn(LinksResult.class, LinksResultMixin.class);
 
-        mapper.addMixIn(BasicPagedResult.class, BasicPagedResultMixin.class);
+        mapper.addMixIn(PagedResult.class, BasicPagedResultMixin.class);
         mapper.addMixIn(ResourceData.class, ResourceDataMixin.class);
 
         // XXX feature module may be "better"?
@@ -54,7 +54,7 @@ public class JacksonConfiguration {
         return ContentNegotiatedRequestParser.builder()
                 .addParser(MediaType.APPLICATION_JSON, new JacksonRequestBodyParser(configure(mapper)))
                 .addParser(MediaType.APPLICATION_JSON_API, new JacksonJsonApiRequestBodyParser(configure(mapper)))
-                .defaultParser(new UnsupportedMediaTypeBodeRequestParser())
+                .defaultParser(new UnsupportedMediaTypeBodyRequestParser())
                 .build();
     }
 
