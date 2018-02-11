@@ -50,11 +50,12 @@ public class JacksonConfiguration {
         return mapper;
     }
 
-    public static RequestParser parser(ObjectMapper mapper) {
+    public static RequestParser parser(ObjectMapper mapper, String defaultMediaType) {
         return ContentNegotiatedRequestParser.builder()
                 .addParser(MediaType.APPLICATION_JSON, new JacksonRequestBodyParser(configure(mapper)))
                 .addParser(MediaType.APPLICATION_JSON_API, new JacksonJsonApiRequestBodyParser(configure(mapper)))
                 .defaultParser(new UnsupportedMediaTypeBodyRequestParser())
+                .defaultMediaType(defaultMediaType)
                 .build();
     }
 

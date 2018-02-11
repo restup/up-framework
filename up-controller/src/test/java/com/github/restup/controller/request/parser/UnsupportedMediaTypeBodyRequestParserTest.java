@@ -1,6 +1,7 @@
 package com.github.restup.controller.request.parser;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
@@ -22,7 +23,7 @@ public class UnsupportedMediaTypeBodyRequestParserTest {
         UnsupportedMediaTypeBodyRequestParser parser = new UnsupportedMediaTypeBodyRequestParser();
 
         Assertions.assertThrows(() -> parser.parse(request, null))
-        // .code("UNSUPPORTED_MEDIA_TYPE")
+                .code("UNSUPPORTED_MEDIA_TYPE")
         ;
         verify(request).getResource();
         verify(request).getContentType();

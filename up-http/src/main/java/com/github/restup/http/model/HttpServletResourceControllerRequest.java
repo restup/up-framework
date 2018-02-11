@@ -20,9 +20,9 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
 
     private final HttpServletRequest request;
 
-    protected HttpServletResourceControllerRequest(HttpServletRequest request, HttpMethod method, Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship, ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body, String baseRequestUrl, String requestUrl) {
+    protected HttpServletResourceControllerRequest(HttpServletRequest request, HttpMethod method, Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship, ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body, String baseRequestUrl, String requestUrl, String contentType) {
         super(method, resource, ids, relationship, resourceRelationship, body,
-                getContentType(request), baseRequestUrl, requestUrl);
+                contentType, baseRequestUrl, requestUrl);
         this.request = request;
     }
 
@@ -82,7 +82,8 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
             setRequestPath(path);
             setMethod(HttpMethod.of(httpRequest.getMethod()));
             parsePath();
-            return new HttpServletResourceControllerRequest(httpRequest, method, resource, ids, relationship, resourceRelationship, body, baseRequestUrl, url);
+            String contentType = getContentType(httpRequest);
+            return new HttpServletResourceControllerRequest(httpRequest, method, resource, ids, relationship, resourceRelationship, body, baseRequestUrl, url, contentType);
         }
     }
 }

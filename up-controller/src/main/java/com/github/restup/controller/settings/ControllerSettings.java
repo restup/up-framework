@@ -1,7 +1,7 @@
 package com.github.restup.controller.settings;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
-
+import org.apache.commons.lang3.ArrayUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.DefaultExceptionHandler;
 import com.github.restup.controller.ExceptionHandler;
@@ -29,7 +29,6 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.AutoDetectConstants;
 import com.github.restup.service.registry.DiscoveryService;
 import com.google.gson.Gson;
-import org.apache.commons.lang3.ArrayUtils;
 
 public class ControllerSettings {
 
@@ -38,20 +37,26 @@ public class ControllerSettings {
     private final RequestInterceptor requestInterceptor;
     private final RequestParser requestParser;
     private final ExceptionHandler exceptionHandler;
+    private final String defaultMediaType;
 
     protected ControllerSettings(ResourceRegistry registry, ContentNegotiator[] contentNegotiators,
             RequestInterceptor requestInterceptor, RequestParser requestParsers,
-            ExceptionHandler exceptionHandler) {
+            ExceptionHandler exceptionHandler, String defaultMediaType) {
         super();
         this.registry = registry;
         this.contentNegotiators = contentNegotiators;
         this.requestInterceptor = requestInterceptor;
         this.requestParser = requestParsers;
         this.exceptionHandler = exceptionHandler;
+        this.defaultMediaType = defaultMediaType;
     }
 
     public static Builder builder() {
         return new Builder();
+    }
+
+    public String getDefaultMediaType() {
+        return defaultMediaType;
     }
 
     public ResourceRegistry getRegistry() {
@@ -226,7 +231,7 @@ public class ControllerSettings {
 
             if (!autoDetectDisabled) {
                 if (AutoDetectConstants.JACKSON2_EXISTS) {
-                    requestParsers(JacksonConfiguration.parser(mapper));
+                    requestParsers(JacksonConfiguration.parser(mapper, defaultMediaType));
                 }
             }
             RequestParser relationshipsParser = this.relationshipParser;
@@ -253,7 +258,7 @@ public class ControllerSettings {
                                             .id(String.class, "name")
                             )
             );
-            return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler);
+            return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler, defaultMediaType);
         }
     }
 
