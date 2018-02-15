@@ -23,6 +23,7 @@ import com.github.restup.query.Pagination;
 import com.github.restup.query.PreparedResourceQueryStatement;
 import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.query.ResourceSort;
+import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.request.CreateRequest;
@@ -159,6 +160,14 @@ public class JpaRepositoryTest {
         PagedResult<Course> result = courseRepo.list(ps);
         assertList(result, "Alpha","Bravo","Charlie","Delta","Echo","Fox Trot","Golf","Hotel","India");
         verifyList(ps);
+    }
+
+    @Test
+    public void testSupportsCollection() {
+        List<Operator> collections = Arrays.asList(Operator.in, Operator.nin);
+        for (Operator operator : Operator.values()) {
+            assertEquals(operator.name(), collections.contains(operator), courseRepo.supportsCollection(operator));
+        }
     }
 
     private Course update(Course course, String field) {

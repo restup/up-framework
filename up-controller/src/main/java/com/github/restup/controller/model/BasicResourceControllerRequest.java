@@ -21,7 +21,8 @@ public abstract class BasicResourceControllerRequest implements ResourceControll
     private final String baseRequestUrl;
     private final String requestUrl;
 
-    protected BasicResourceControllerRequest(HttpMethod method, Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship, ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body
+    protected BasicResourceControllerRequest(HttpMethod method, Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship,
+            ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body
             , String contentType, String baseRequestUrl, String requestUrl) {
         this.resource = resource;
         this.ids = ids;

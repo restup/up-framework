@@ -1,12 +1,12 @@
 package com.github.restup.service;
 
-import static org.junit.Assert.*;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertSame;
 import java.lang.reflect.InvocationTargetException;
 import java.util.Date;
 import org.junit.Test;
 import com.github.restup.assertions.Assertions;
-import com.github.restup.errors.RequestError;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 
 public class VarArgsMethodCommandTest {
 
@@ -18,16 +18,16 @@ public class VarArgsMethodCommandTest {
     }
 
     @Test
-    public void testErrorObjectException() throws NoSuchMethodException, SecurityException {
+    public void testRequestErrorException() throws NoSuchMethodException, SecurityException {
         VarArgsMethodCommand executor = new VarArgsMethodCommand(new Foo(), Foo.class.getMethod("errorObject"));
         Assertions.assertThrows(() -> executor.execute());
     }
 
     @Test
     public void testHandle() throws NoSuchMethodException, SecurityException {
-        ErrorObjectException errorObjectException = new ErrorObjectException(new IllegalArgumentException());
+        RequestErrorException requestErrorException = new RequestErrorException(new IllegalArgumentException());
         VarArgsMethodCommand executor = new VarArgsMethodCommand(new Foo(), Foo.class.getMethod("errorObject"));
-        assertSame(errorObjectException, executor.handle(new RuntimeException(errorObjectException)));
+        assertSame(requestErrorException, executor.handle(new RuntimeException(requestErrorException)));
     }
 
     /**
@@ -52,7 +52,7 @@ public class VarArgsMethodCommandTest {
         }
 
         public void errorObject() throws InvocationTargetException {
-            throw RequestError.buildException(new IllegalArgumentException());
+            throw RequestErrorException.of(new IllegalArgumentException());
         }
     }
 

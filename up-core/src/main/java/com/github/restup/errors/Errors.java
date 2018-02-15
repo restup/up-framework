@@ -18,9 +18,9 @@ public interface Errors {
     void addError(RequestError.Builder error);
 
     /**
-     * @throws ErrorObjectException if 1 or more errors exist
+     * @throws RequestErrorException if 1 or more errors exist
      */
-    void assertErrors() throws ErrorObjectException;
+    void assertErrors() throws RequestErrorException;
 
     /**
      * @return true if 1 or more errors exist, false otherwise

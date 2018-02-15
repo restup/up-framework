@@ -7,7 +7,7 @@ import java.util.Arrays;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -82,7 +82,7 @@ public class ResourceControllerRequestTest {
         Throwable thrownException = catchThrowable( () -> path(path));
         
         Assertions.assertThat(thrownException)
-                .isInstanceOf(ErrorObjectException.class)
+                .isInstanceOf(RequestErrorException.class)
                 .hasFieldOrPropertyWithValue("code", code)
                 .hasFieldOrPropertyWithValue("httpStatus", 404)
                 .satisfies( e -> assertMeta(e, "resource", resourceName))
@@ -90,7 +90,7 @@ public class ResourceControllerRequestTest {
     }
     
     private void assertMeta(Throwable e, String key, String value) {
-        RequestError err = ((ErrorObjectException)e).getErrors().iterator().next();
+        RequestError err = ((RequestErrorException)e).getErrors().iterator().next();
         Map m = (Map) err.getMeta();
         assertEquals(value, m.get(key));
     }

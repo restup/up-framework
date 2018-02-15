@@ -2,7 +2,7 @@ package com.github.restup.mapping.fields.composition;
 
 import java.lang.reflect.Field;
 import java.util.Objects;
-import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.mapping.fields.ReadWriteField;
 import com.github.restup.util.ReflectionUtils;
 
@@ -25,7 +25,7 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
         try {
             return o == null ? null : (VALUE) field.get(o);
         } catch (IllegalAccessException | IllegalArgumentException e) {
-            throw RequestError.buildException(e);
+            throw RequestErrorException.of(e);
         }
     }
 
@@ -35,7 +35,7 @@ public class ReflectMappedField<TARGET, VALUE> implements ReadWriteField<TARGET,
             try {
                 field.set(obj, value);
             } catch (IllegalAccessException | IllegalArgumentException e) {
-                RequestError.throwError(e);
+                RequestErrorException.rethrow(e);
             }
         }
     }

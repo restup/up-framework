@@ -8,10 +8,10 @@ import com.github.restup.controller.model.result.JsonResult;
 import com.github.restup.controller.request.parser.ContentNegotiatedRequestParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.request.parser.UnsupportedMediaTypeBodyRequestParser;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.jackson.mixins.BasicPagedResultMixin;
-import com.github.restup.jackson.mixins.ErrorObjectExceptionMixin;
+import com.github.restup.jackson.mixins.RequestErrorExceptionMixin;
 import com.github.restup.jackson.mixins.JsonApiResultMixin;
 import com.github.restup.jackson.mixins.JsonResultMixin;
 import com.github.restup.jackson.mixins.LinksResultMixin;
@@ -37,7 +37,7 @@ public class JacksonConfiguration {
         }
         // errors
         mapper.addMixIn(RequestError.class, RequestErrorMixin.class);
-        mapper.addMixIn(ErrorObjectException.class, ErrorObjectExceptionMixin.class);
+        mapper.addMixIn(RequestErrorException.class, RequestErrorExceptionMixin.class);
         mapper.addMixIn(ResourcePath.class, ResourcePathMixin.class);
         mapper.addMixIn(LinksResult.class, LinksResultMixin.class);
 
@@ -57,6 +57,10 @@ public class JacksonConfiguration {
                 .defaultParser(new UnsupportedMediaTypeBodyRequestParser())
                 .defaultMediaType(defaultMediaType)
                 .build();
+    }
+
+    private JacksonConfiguration() {
+
     }
 
 }

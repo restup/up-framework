@@ -53,20 +53,16 @@ public interface RequestError {
 
     public static Builder error(Resource<?, ?> resource, Throwable t) {
         return new Builder(t)
-                .status(ErrorCodeStatus.INTERNAL_SERVER_ERROR)
+                .status(StatusCode.INTERNAL_SERVER_ERROR)
                 .resource(resource);
     }
 
-    public static ErrorObjectException buildException(Resource<?, ?> resource, Throwable t) {
-        return error(resource, t).buildException();
+    public static RequestError of(Throwable t) {
+        return error(null, t).build();
     }
 
-    public static ErrorObjectException buildException(Throwable t) {
-        return error(null, t).buildException();
-    }
-
-    public static void throwError(Throwable t) {
-        error(null, t).throwError();
+    public static RequestError of(Resource<?, ?> resource, Throwable t) {
+        return error(resource, t).build();
     }
 
     public class Builder {
@@ -77,7 +73,7 @@ public interface RequestError {
         private String[] codeSuffix;
         private ResourcePath path;
         private Resource<?, ?> resource;
-        private ErrorCodeStatus status;
+        private StatusCode status;
         private String id;
         private ErrorCode errorCode;
         private String code;
@@ -130,7 +126,7 @@ public interface RequestError {
             return me();
         }
 
-        public Builder status(ErrorCodeStatus status) {
+        public Builder status(StatusCode status) {
             this.status = status;
             return me();
         }
@@ -195,8 +191,8 @@ public interface RequestError {
 
         @SuppressWarnings("rawtypes")
         private String getDefaultCode() {
-            if (status == ErrorCodeStatus.INTERNAL_SERVER_ERROR) {
-                return ErrorCodeStatus.INTERNAL_SERVER_ERROR.name();
+            if (status == StatusCode.INTERNAL_SERVER_ERROR) {
+                return StatusCode.INTERNAL_SERVER_ERROR.name();
             }
 
             if (errorCode != null) {
@@ -242,12 +238,12 @@ public interface RequestError {
             return join(parts, "_").toUpperCase();
         }
 
-        public ErrorObjectException buildException() {
+        public RequestErrorException buildException() {
             RequestError err = build();
-            return new ErrorObjectException(err);
+            return new RequestErrorException(err);
         }
 
-        public void throwError() throws ErrorObjectException {
+        public void throwError() throws RequestErrorException {
             throw buildException();
         }
 
@@ -268,9 +264,9 @@ public interface RequestError {
                 id = UUID.randomUUID().toString();
             }
             // default status to 400
-            ErrorCodeStatus status = this.status;
+            StatusCode status = this.status;
             if (status == null) {
-                status = ErrorCodeStatus.BAD_REQUEST;
+                status = StatusCode.BAD_REQUEST;
             }
             int httpStatus = this.httpStatus;
             if (httpStatus == 0) {

@@ -3,43 +3,43 @@ package com.github.restup.assertions;
 import java.util.Map;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.Assertions;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
 
-public class ErrorObjectExceptionAssertions<ASSERT extends AbstractThrowableAssert<ASSERT, ErrorObjectException>> extends DelegatingAbstractThrowableAssertions<ErrorObjectExceptionAssertions<ASSERT>,ASSERT,ErrorObjectException> {
+public class RequestErrorExceptionAssertions<ASSERT extends AbstractThrowableAssert<ASSERT, RequestErrorException>> extends DelegatingAbstractThrowableAssertions<RequestErrorExceptionAssertions<ASSERT>,ASSERT,RequestErrorException> {
 
-    private final ErrorObjectException exception;
+    private final RequestErrorException exception;
     
     @SuppressWarnings({"unchecked", "rawtypes"})
-    ErrorObjectExceptionAssertions(Throwable thrownException) {
-        super((AbstractThrowableAssert)Assertions.assertThat(thrownException).isInstanceOf(ErrorObjectException.class));
-        exception = (ErrorObjectException) thrownException;
+    RequestErrorExceptionAssertions(Throwable thrownException) {
+        super((AbstractThrowableAssert)Assertions.assertThat(thrownException).isInstanceOf(RequestErrorException.class));
+        exception = (RequestErrorException) thrownException;
     }
 
-    public ErrorObjectExceptionAssertions<ASSERT> httpStatus(int httpStatus) {
+    public RequestErrorExceptionAssertions<ASSERT> httpStatus(int httpStatus) {
         assertThat(exception.getHttpStatus()).isEqualTo(httpStatus);
         return me();
     }
 
-    public ErrorObjectExceptionAssertions<ASSERT> code(String code) {
+    public RequestErrorExceptionAssertions<ASSERT> code(String code) {
         assertThat(exception.getCode()).isEqualTo(code);
         return me();
     }
 
-    public ErrorObjectExceptionAssertions<ASSERT> detail(String detail) {
+    public RequestErrorExceptionAssertions<ASSERT> detail(String detail) {
         return detail(0, detail);
     }
 
-    public ErrorObjectExceptionAssertions<ASSERT> detail(int i, String detail) {
+    public RequestErrorExceptionAssertions<ASSERT> detail(int i, String detail) {
         assertThat(getError(i).getDetail()).isEqualTo(detail);
         return me();
     }
 
-    public ErrorObjectExceptionAssertions<ASSERT> meta(String key, Object value) {
+    public RequestErrorExceptionAssertions<ASSERT> meta(String key, Object value) {
         return meta(0, key, value);
     }
 
-    public ErrorObjectExceptionAssertions<ASSERT> meta(int i, String key, Object value) {
+    public RequestErrorExceptionAssertions<ASSERT> meta(int i, String key, Object value) {
         assertThat(getMeta(i).get(key)).isEqualTo(value);
         return me();
     }

@@ -22,7 +22,6 @@ import com.github.restup.test.ApiExecutor;
 import com.github.restup.test.ApiRequest;
 import com.github.restup.test.ApiResponse;
 import com.github.restup.test.BasicApiResponse;
-import com.github.restup.test.RpcApiAssertions;
 import com.github.restup.test.resource.Contents;
 
 /**
@@ -55,8 +54,7 @@ public class MockMVCApiExecutor implements ApiExecutor {
      * @return a {@link ResultActionsApiResponse} with mockMvc results
      */
     @Override
-    public ApiResponse<String[]> execute(RpcApiAssertions rpcApiTest) {
-        ApiRequest test = rpcApiTest.getRequest();
+    public ApiResponse<String[]> execute(ApiRequest test) {
         assertThat(test.getMethod(), notNullValue());
 
         String requestUrl = test.getUrl();

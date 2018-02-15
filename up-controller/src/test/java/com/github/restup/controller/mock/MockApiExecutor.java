@@ -10,7 +10,6 @@ import com.github.restup.test.ApiExecutor;
 import com.github.restup.test.ApiRequest;
 import com.github.restup.test.ApiResponse;
 import com.github.restup.test.BasicApiResponse;
-import com.github.restup.test.RpcApiAssertions;
 import com.github.restup.test.resource.Contents;
 
 /**
@@ -31,9 +30,7 @@ public class MockApiExecutor implements ApiExecutor {
     }
 
     @Override
-    public ApiResponse<String[]> execute(RpcApiAssertions settings) {
-
-        ApiRequest request = settings.getRequest();
+    public ApiResponse<String[]> execute(ApiRequest request) {
 
         MockResourceControllerRequest.Builder mockRequestBuilder 
         		= MockResourceControllerRequest.builder()

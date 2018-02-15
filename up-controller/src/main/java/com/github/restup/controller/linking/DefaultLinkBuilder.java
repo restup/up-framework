@@ -1,14 +1,5 @@
 package com.github.restup.controller.linking;
 
-import com.github.restup.annotations.field.RelationshipType;
-import com.github.restup.controller.linking.discovery.ServiceDiscovery;
-import com.github.restup.controller.model.HttpMethod;
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.controller.request.parser.params.PageLimitParser;
-import com.github.restup.controller.request.parser.params.PageOffsetParser;
-import com.github.restup.registry.Resource;
-import com.github.restup.service.model.ResourceData;
-import com.github.restup.service.model.response.PagedResult;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -18,6 +9,15 @@ import java.util.List;
 import java.util.Objects;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.restup.annotations.field.RelationshipType;
+import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.controller.model.HttpMethod;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.controller.request.parser.params.PageLimitParser;
+import com.github.restup.controller.request.parser.params.PageOffsetParser;
+import com.github.restup.registry.Resource;
+import com.github.restup.service.model.ResourceData;
+import com.github.restup.service.model.response.PagedResult;
 
 /**
  * Default implementation of {@link LinkBuilder}
@@ -42,7 +42,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         if (HttpMethod.DELETE == request.getMethod()) {
             return Collections.emptyList();
         }
-        if (request.getRelationship() != null && !isList(result)) {
+        if (request.getRelationship() != null && !isIterable(result)) {
             Object rel = getId(request);
             return Arrays.asList(link(request, LinkRelations.self, request.getRelationship(), rel, resource),
                     link(request, LinkRelations.related, request.getRelationship(), rel));
@@ -79,7 +79,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
             PagedResult<?> paged = (PagedResult<?>) result;
             Integer offset = paged.getOffset();
             Integer limit = paged.getLimit();
-            if (offset != null && limit != null) {
+            if (offset != null && limit != null && limit > 0) {
                 if (offset > 0) {
                     paging(baseUrl, request, links, LinkRelations.first, 0, limit);
                     paging(baseUrl, request, links, LinkRelations.prev, offset - 1, limit);
@@ -97,7 +97,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
             } else {
                 links.add(new BasicLink(LinkRelations.self, baseUrl));
             }
-        } else if (isList(result)) {
+        } else if (isIterable(result)) {
             links.add(new BasicLink(LinkRelations.self, baseUrl));
         } else {
             return links;
@@ -108,11 +108,13 @@ public class DefaultLinkBuilder implements LinkBuilder {
         return links;
     }
 
-    private boolean isList(Object result) {
+    private boolean isIterable(Object result) {
         if (result instanceof ResourceData) {
             if (((ResourceData<?>) result).getData() instanceof Iterable) {
                 return true;
             }
+        } else if (result instanceof Iterable) {
+            return true;
         }
         return false;
     }

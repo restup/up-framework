@@ -8,11 +8,12 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
+import com.github.restup.registry.Resource;
 
 /**
  * An exception containing {@link RequestError}s
  */
-public class ErrorObjectException extends RuntimeException {
+public class RequestErrorException extends RuntimeException {
 
 	private static final long serialVersionUID = 1L;
 
@@ -21,26 +22,38 @@ public class ErrorObjectException extends RuntimeException {
 	/**
 	 * Sorts errors by httpStatus, cause
 	 */
-	public ErrorObjectException(List<RequestError> errors) {
+	public RequestErrorException(List<RequestError> errors) {
 		super(isEmpty(errors) ? null : errors.iterator().next().getDetail(), cause(errors));
 		Collections.sort(errors, new RequestErrorComparator());
 		this.errors = unmodifiableList(errors);
 	}
 
 	/**
-	 * Converts array to {@link List}, calls {@link #ErrorObjectException(List)}
+	 * Converts array to {@link List}, calls {@link #RequestErrorException(List)}
 	 */
-	public ErrorObjectException(RequestError... errors) {
+	public RequestErrorException(RequestError... errors) {
 		this(Arrays.asList(errors));
 	}
 
 	/**
 	 * builds a new {@link RequestError}, calls
-	 * {@link #ErrorObjectException(RequestError...)}
+	 * {@link #RequestErrorException(RequestError...)}
 	 */
-	public ErrorObjectException(Throwable t) {
+	public RequestErrorException(Throwable t) {
 		this(RequestError.error(null, t).build());
 	}
+
+    public static RequestErrorException of(Throwable t) {
+        return new RequestErrorException(RequestError.of(t));
+    }
+
+    public static RequestErrorException of(Resource<?, ?> resource, Throwable t) {
+        return new RequestErrorException(RequestError.of(resource, t));
+    }
+
+    public static void rethrow(Throwable t) {
+        throw of(t);
+    }
 
 	/**
 	 * @return the first non null cause from the list of errors, null if none
@@ -69,12 +82,12 @@ public class ErrorObjectException extends RuntimeException {
 	 */
 	public int getHttpStatus() {
 		RequestError error = getPrimaryError();
-		return error != null ? error.getHttpStatus() : ErrorCodeStatus.INTERNAL_SERVER_ERROR.getHttpStatus();
+		return error != null ? error.getHttpStatus() : StatusCode.INTERNAL_SERVER_ERROR.getHttpStatus();
 	}
 
 	public String getCode() {
 		RequestError error = getPrimaryError();
-		return error != null ? error.getCode() : ErrorCodeStatus.INTERNAL_SERVER_ERROR.name();
+		return error != null ? error.getCode() : StatusCode.INTERNAL_SERVER_ERROR.name();
 	}
 
 	public RequestError getPrimaryError() {
@@ -105,4 +118,5 @@ public class ErrorObjectException extends RuntimeException {
 			return err == null ? null : err.getSource();
 		}
 	}
+
 }

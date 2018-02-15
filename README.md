@@ -12,7 +12,7 @@ Up! Framework aims to simplify building and testing RESTful services.
 * Uses consistent conventions for API parameters to support sparse fields requests, sorting, pagination, and filtering of resources
 * Is not coupled to other persistence, serialization, or web application frameworks, making your APIs completely portable. 
 * Is designed to support PATCH operations correctly and easily
-* Provides flexible, filter based services promoting composition and reuse.
+* Supports flexible, filter based services promoting composition and reuse.
 * Provides content negotiation to support multiple json response formats (json, json api, or hal)
 * Supports [JSR 303 Bean Validation](http://beanvalidation.org/1.0/spec/)
 * Supports automatic validation of resource relationships (unless configured otherwise)

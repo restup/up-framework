@@ -3,33 +3,19 @@ package com.github.restup.test;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-
+import java.util.Map;
+import org.hamcrest.Matcher;
 import com.github.restup.test.matchers.ContentTypeMatcher;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
-import java.util.Map;
-import org.hamcrest.Matcher;
 
 /**
  * Provides a {@link Builder} with some defaults and support for easy file comparisons
  */
 public class RpcApiAssertions {
 
-    // request attributes
-    private final ApiRequest request;
-    private final ApiResponse<Matcher<String[]>> expected;
-
-    private RpcApiAssertions(ApiRequest request, ApiResponse<Matcher<String[]>> expected) {
-        this.request = request;
-        this.expected = expected;
-    }
-
-    public ApiRequest getRequest() {
-        return request;
-    }
-
-    public ApiResponse<?> getExpected() {
-        return expected;
+    private RpcApiAssertions() {
+        super();
     }
     
     public static Builder builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
@@ -89,6 +75,15 @@ public class RpcApiAssertions {
 
         public Builder requestHeader(String name, String... values) {
             request.header(name, values);
+            return me();
+        }
+
+        public Builder https() {
+            return https(true);
+        }
+
+        public Builder https(boolean https) {
+            request.https(https);
             return me();
         }
 
@@ -209,8 +204,7 @@ public class RpcApiAssertions {
             }
             ApiRequest request = this.request.build();
             ApiResponse<Matcher<String[]>> expected = this.expected.build();
-            RpcApiAssertions test = new RpcApiAssertions(request, expected);
-            ApiResponse<String[]> response = executor.execute(test);
+            ApiResponse<String[]> response = executor.execute(request);
 
             // assert status
             assertThat("Status ", response.getStatus(), is(expected.getStatus()));

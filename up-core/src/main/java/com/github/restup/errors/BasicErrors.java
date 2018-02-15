@@ -45,7 +45,7 @@ class BasicErrors implements Errors {
     @Override
     public void assertErrors() {
         if (hasErrors()) {
-            throw new ErrorObjectException(getErrors());
+            throw new RequestErrorException(getErrors());
         }
     }
 

@@ -9,7 +9,19 @@ import com.github.restup.test.resource.RelativeTestResource;
 public class RestApiAssertions {
 
     private RestApiAssertions() {
+        super();
+    }
 
+    public static Builder builder(ApiExecutor executor, Class<?> unitTest, String path, Object... args) {
+        return new Builder(executor, unitTest, path, args);
+    }
+
+    public static Builder builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
+        return new Builder(executor, unitTest, path, args);
+    }
+
+    public static Builder builder(ApiExecutor executor, String path, Object... args) {
+        return new Builder(executor, path, args);
     }
 
     public static class Builder {
@@ -22,23 +34,23 @@ public class RestApiAssertions {
         private HttpMethod method;
         private Object[] args;
         private int okStatus = 200;
-        private boolean testNameAsMethodName;
+        private String testName;
         private MediaType mediaType;
+        private boolean https;
 
-        public Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... args) {
+        Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... args) {
             this.executor = executor;
             this.unitTest = unitTest;
             this.path = path;
             this.defaultArgs = args;
-            this.testNameAsMethodName = true;
             mediaType = MediaType.APPLICATION_JSON;
         }
 
-        public Builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
+        Builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
             this(executor, unitTest.getClass(), path, args);
         }
 
-        public Builder(ApiExecutor executor, String path, Object... args) {
+        Builder(ApiExecutor executor, String path, Object... args) {
             this(executor, RelativeTestResource.getClassFromStack(), path, args);
         }
 
@@ -85,8 +97,8 @@ public class RestApiAssertions {
         /**
          * If true, the test name will be detected and applied automatically based upon the calling method's name
          */
-        public Builder testNameAsMethodName(boolean testNameAsMethodName) {
-            this.testNameAsMethodName = testNameAsMethodName;
+        public Builder test(String testName) {
+            this.testName = testName;
             return me();
         }
 
@@ -169,6 +181,15 @@ public class RestApiAssertions {
                     .build();
         }
 
+        public Builder https() {
+            return https(true);
+        }
+
+        public Builder https(boolean https) {
+            this.https = https;
+            return me();
+        }
+
         private RpcApiAssertions.Builder build() {
 
             String testPath = path;
@@ -185,9 +206,11 @@ public class RestApiAssertions {
             return new RpcApiAssertions.Builder(executor, unitTest, testPath, defaultArgs)
                     .pathArgs(args)
                     .method(method)
-                    .testNameAsMethodName(testNameAsMethodName)
+                    .test(testName)
                     .mediaType(mediaType)
+                    .https(https)
                     .okStatus(okStatus);
         }
+
     }
 }

@@ -1,12 +1,12 @@
 package com.github.restup.service;
 
-import com.github.restup.errors.RequestError;
-import com.github.restup.registry.Resource;
-import com.github.restup.util.Assert;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.restup.errors.RequestErrorException;
+import com.github.restup.registry.Resource;
+import com.github.restup.util.Assert;
 
 public class AnnotatedRepositoryMethodCommand extends FilterChainContextMethodCommand {
 
@@ -22,7 +22,7 @@ public class AnnotatedRepositoryMethodCommand extends FilterChainContextMethodCo
 
     @Override
     protected RuntimeException handle(Throwable t) {
-        return RequestError.buildException(resource, t);
+        return RequestErrorException.of(resource, t);
     }
 
     @Override

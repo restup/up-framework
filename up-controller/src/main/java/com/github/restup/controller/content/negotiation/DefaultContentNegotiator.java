@@ -24,7 +24,7 @@ public class DefaultContentNegotiator implements ContentNegotiator {
         this(getContentNegotiator(mediaType, negotiators));
     }
 
-    private static ContentNegotiator getContentNegotiator(String mediaType, ContentNegotiator[] negotiators) {
+    static ContentNegotiator getContentNegotiator(String mediaType, ContentNegotiator... negotiators) {
         for (ContentNegotiator negotiator : negotiators) {
             if (negotiator instanceof ContentTypeNegotiation) {
                 if (((ContentTypeNegotiation) negotiator).getContentType().equals(mediaType)) {

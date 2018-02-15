@@ -3,7 +3,7 @@ package com.github.restup.mapping.fields.composition;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.mapping.fields.ReadWriteField;
 import com.github.restup.util.Assert;
 
@@ -31,7 +31,7 @@ public class ReflectMappedMethod<TARGET, VALUE> extends ReflectWritableMappedMet
         try {
             return (VALUE) getter.invoke(o);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw RequestError.buildException(e);
+            throw RequestErrorException.of(e);
         }
     }
     

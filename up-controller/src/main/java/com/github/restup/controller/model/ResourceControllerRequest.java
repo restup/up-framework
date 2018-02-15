@@ -12,8 +12,8 @@ import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.bind.param.ParameterProvider;
-import com.github.restup.errors.ErrorCodeStatus;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.StatusCode;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.Errors;
 import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
@@ -63,14 +63,14 @@ public interface ResourceControllerRequest extends ParameterProvider {
             return current >= 0 && current < path.length ? path[current] : null;
         }
 
-        private static ErrorObjectException invalidPath(String requestPath) {
+        private static RequestErrorException invalidPath(String requestPath) {
             return RequestError.builder()
                     .code("INVALID_PATH")
                     .detail("{0} is not a valid path", requestPath)
                     .buildException();
         }
 
-        private static ErrorObjectException invalidPath(String requestPath, String[] parts) {
+        private static RequestErrorException invalidPath(String requestPath, String[] parts) {
             int n = 0;
             if (parts.length > 3) {
                 n = parts.length - 3;
@@ -82,16 +82,16 @@ public interface ResourceControllerRequest extends ParameterProvider {
             return invalidPath(requestPath, resourceName);
         }
 
-        private static ErrorObjectException invalidPath(String requestPath, String resourceName) {
+        private static RequestErrorException invalidPath(String requestPath, String resourceName) {
             return RequestError.builder()
                     .code("INVALID_RESOURCE_PATH")
                     .detail("{0} is not a valid resource", resourceName)
                     .meta("resource", resourceName)
-                    .status(ErrorCodeStatus.NOT_FOUND)
+                    .status(StatusCode.NOT_FOUND)
                     .buildException();
         }
 
-        private static ErrorObjectException invalidRelationship(Resource<?, ?> a, Resource<?, ?> b) {
+        private static RequestErrorException invalidRelationship(Resource<?, ?> a, Resource<?, ?> b) {
             return RequestError.builder()
                     .code("INVALID_RELATIONSHIP")
                     .title("Unknown relationship")
@@ -101,7 +101,7 @@ public interface ResourceControllerRequest extends ParameterProvider {
                     .buildException();
         }
 
-        private static ErrorObjectException invalidRelationship(Resource<?, ?> a, Resource<?, ?> b, boolean toMany) {
+        private static RequestErrorException invalidRelationship(Resource<?, ?> a, Resource<?, ?> b, boolean toMany) {
             return RequestError.builder()
                     .code("INVALID_RELATIONSHIP_TYPE")
                     .title("Invalid relationship")

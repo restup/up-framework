@@ -2,14 +2,20 @@ package com.github.restup.jackson.parser;
 
 import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 import java.io.IOException;
 import java.net.URL;
 import org.junit.Test;
+import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.node.TextNode;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.errors.ErrorCode;
 import com.github.restup.jackson.service.model.JacksonRequestBody;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -20,6 +26,24 @@ import com.music.Label;
 
 @SuppressWarnings({"rawtypes", "unchecked"})
 public class JacksonRequestBodyParserTest {
+
+    @Test
+    public void testParseException() {
+
+        JacksonRequestBodyParser parser = new JacksonRequestBodyParser();
+        JsonNode node = mock(JsonNode.class);
+        ResourceControllerRequest details = mock(ResourceControllerRequest.class);
+        Builder<?> builder = mock(Builder.class);
+        Resource resource = mock(Resource.class);
+        when(resource.getClassType()).thenReturn(Person.class);
+        when(details.getResource()).thenReturn(resource);
+
+        parser.deserializeObject(details, builder, new TextNode("foo"));
+
+        verify(details).getResource();
+        verify(builder).addError(ErrorCode.BODY_INVALID);
+        verifyNoMoreInteractions(details, builder);
+    }
 
     @Test
     public void testPerson() throws IOException {

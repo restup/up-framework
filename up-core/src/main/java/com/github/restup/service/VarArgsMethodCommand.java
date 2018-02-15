@@ -4,8 +4,7 @@ import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.restup.errors.RequestError;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.util.Assert;
 
 /**
@@ -72,18 +71,18 @@ public class VarArgsMethodCommand implements MethodCommand<Object> {
         } catch (IllegalAccessException | IllegalArgumentException e) {
             throw handle(e);
         } catch (InvocationTargetException e) {
-            if (e.getTargetException() instanceof ErrorObjectException) {
-                throw (ErrorObjectException) e.getTargetException();
+            if (e.getTargetException() instanceof RequestErrorException) {
+                throw (RequestErrorException) e.getTargetException();
             }
             throw handle(e);
         }
     }
 
     protected RuntimeException handle(Throwable t) {
-        if (t.getCause() instanceof ErrorObjectException) {
-            return (ErrorObjectException) t.getCause();
+        if (t.getCause() instanceof RequestErrorException) {
+            return (RequestErrorException) t.getCause();
         }
-        return RequestError.buildException(t);
+        return RequestErrorException.of(t);
     }
 
     public Object getObjectInstance() {

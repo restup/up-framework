@@ -1,6 +1,6 @@
 package com.github.restup.errors;
 
-public enum ErrorCodeStatus {
+public enum StatusCode {
     INTERNAL_SERVER_ERROR(500, "Unexpected Error", "The server encountered an unexpected condition which prevented it from fulfilling the request."),
     BAD_REQUEST(400, "Bad Request", "The request could not be understood by the server due to malformed syntax"),
     FORBIDDEN(403, "Forbidden", "The request is forbidden˙"),
@@ -12,7 +12,7 @@ public enum ErrorCodeStatus {
     final private String defaultTitle;
     final private String defaultDetail;
 
-    private ErrorCodeStatus(int httpStatus, String defaultTitle, String defaultDetail) {
+    private StatusCode(int httpStatus, String defaultTitle, String defaultDetail) {
         this.httpStatus = httpStatus;
         this.defaultTitle = defaultTitle;
         this.defaultDetail = defaultDetail;

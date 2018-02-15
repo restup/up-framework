@@ -64,7 +64,7 @@ public abstract class AbstractMockTest {
         ResourceController controller = resourceController(registry, mapper);
         MockContentNegotiation contentNegotiation = new MockJacksonContentNegotiation(mapper);
         MockApiExecutor executor = new MockApiExecutor(registry, controller, contentNegotiation);
-        RestApiAssertions.Builder b = new RestApiAssertions.Builder(executor, getRelativeToClass(), path, pathArgs);
+        RestApiAssertions.Builder b = RestApiAssertions.builder(executor, getRelativeToClass(), path, pathArgs);
         if (jsonapi) {
             b.jsonapi();
         }

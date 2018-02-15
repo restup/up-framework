@@ -12,4 +12,9 @@ public interface ExceptionHandler {
 
     Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e);
 
+
+    static ExceptionHandler getDefaultInstance() {
+        return DefaultExceptionHandler.getInstance();
+    }
+
 }

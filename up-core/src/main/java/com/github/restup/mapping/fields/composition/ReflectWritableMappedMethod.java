@@ -3,7 +3,7 @@ package com.github.restup.mapping.fields.composition;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
-import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.mapping.fields.DeclaredBy;
 import com.github.restup.mapping.fields.WritableField;
 import com.github.restup.util.Assert;
@@ -33,7 +33,7 @@ public class ReflectWritableMappedMethod<TARGET, VALUE> implements WritableField
             try {
                 setter.invoke(obj, value);
             } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-                RequestError.throwError(e);
+                RequestErrorException.rethrow(e);
             }
         }
     }

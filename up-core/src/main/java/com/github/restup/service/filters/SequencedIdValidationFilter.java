@@ -3,7 +3,7 @@ package com.github.restup.service.filters;
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.ErrorCode;
-import com.github.restup.errors.ErrorCodeStatus;
+import com.github.restup.errors.StatusCode;
 import com.github.restup.errors.Errors;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
@@ -31,7 +31,7 @@ public class SequencedIdValidationFilter implements ServiceFilter {
         if (id != null) {
             errors.addError(RequestError.builder(resource)
                     .code(ErrorCode.ID_NOT_ALLOWED_ON_CREATE)
-                    .status(ErrorCodeStatus.FORBIDDEN)
+                    .status(StatusCode.FORBIDDEN)
                     .meta(idField.getApiName(), id));
         }
     }

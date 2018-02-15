@@ -11,7 +11,7 @@ import java.util.List;
 @JsonInclude(Include.NON_EMPTY)
 @JsonAutoDetect(fieldVisibility = Visibility.NONE, getterVisibility = Visibility.NONE,
         setterVisibility = Visibility.NONE, isGetterVisibility = Visibility.NONE)
-public interface ErrorObjectExceptionMixin extends RequestError {
+public interface RequestErrorExceptionMixin extends RequestError {
 
     @JsonProperty("errors")
     List<RequestError> getErrors();

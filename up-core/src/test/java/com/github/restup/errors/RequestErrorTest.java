@@ -1,16 +1,15 @@
 package com.github.restup.errors;
 
+import static com.github.restup.assertions.Assertions.assertThat;
+import static com.github.restup.assertions.Assertions.assertThrows;
+import static com.github.restup.errors.RequestError.builder;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
-import static com.github.restup.assertions.Assertions.assertThat;
-import static com.github.restup.errors.RequestError.buildException;
-import static com.github.restup.errors.RequestError.builder;
-import static com.github.restup.errors.RequestError.throwError;
+import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertNotNull;
+import static org.mockito.Mockito.when;
 import org.junit.Test;
-import static org.junit.Assert.*;
 import org.mockito.Mockito;
-import static org.mockito.Mockito.*;
-import static com.github.restup.assertions.Assertions.*;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -68,12 +67,6 @@ public class RequestErrorTest {
     }
 
     @Test
-    public void testThrowError() {
-        assertThrows(()->throwError(new IllegalArgumentException()))
-        .hasCauseExactlyInstanceOf(IllegalArgumentException.class);
-    }
-
-    @Test
     public void testBuilderThrowError() {
         assertThrows(()->builder().throwError())
             .hasNoCause();
@@ -93,7 +86,7 @@ public class RequestErrorTest {
 
     @Test
     public void testLogException() {
-        ErrorObjectException ex = buildException(new IllegalArgumentException());
+        RequestErrorException ex = RequestErrorException.of(new IllegalArgumentException());
         BasicRequestError err = (BasicRequestError) ex.getPrimaryError();
         assertEquals(err.getCause(), err.logStackTrace());
     }

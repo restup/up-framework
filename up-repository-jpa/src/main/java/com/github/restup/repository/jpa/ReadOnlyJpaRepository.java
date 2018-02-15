@@ -5,6 +5,7 @@ import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Collections;
 import java.util.List;
+import java.util.Set;
 import javax.persistence.EntityManager;
 import javax.persistence.TypedQuery;
 import javax.persistence.criteria.CriteriaBuilder;
@@ -34,14 +35,17 @@ import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.response.PagedResult;
 import com.github.restup.service.model.response.ReadResult;
+import com.google.common.collect.ImmutableSet;
 
 public class ReadOnlyJpaRepository<T, ID extends Serializable> {
 
     private final static Logger log = LoggerFactory.getLogger(ReadOnlyJpaRepository.class);
     private final EntityManager entityManager;
+    private final Set<Operator> collectionValues;
 
     public ReadOnlyJpaRepository(EntityManager entityManager) {
         this.entityManager = entityManager;
+        this.collectionValues = ImmutableSet.of(Operator.in, Operator.nin);
     }
 
     private static void filter(CriteriaQuery<?> q, CriteriaBuilder cb, List<Predicate> predicates) {
@@ -244,13 +248,8 @@ public class ReadOnlyJpaRepository<T, ID extends Serializable> {
         }
     }
 
-    @SuppressWarnings("incomplete-switch")
-    private boolean supportsCollection(Operator operator) {
-        switch (operator) {
-            case in:
-                return true;
-        }
-        return false;
+    boolean supportsCollection(Operator operator) {
+        return collectionValues.contains(operator);
     }
 
     @SuppressWarnings({"rawtypes", "unchecked"})

@@ -28,8 +28,8 @@ import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.settings.ControllerSettings;
-import com.github.restup.errors.ErrorCodeStatus;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.StatusCode;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
@@ -208,7 +208,7 @@ public class ResourceController {
         }
     }
 
-    private static ErrorObjectException error(ResourceControllerRequest request, String code, String detail) {
+    private static RequestErrorException error(ResourceControllerRequest request, String code, String detail) {
         return error(request).code(code).title("Not supported").detail(detail).buildException();
     }
 
@@ -216,7 +216,7 @@ public class ResourceController {
         return RequestError.builder().resource(request.getResource());
     }
 
-    private static ErrorObjectException itemResourceNotAllowed(ResourceControllerRequest request,
+    private static RequestErrorException itemResourceNotAllowed(ResourceControllerRequest request,
             ControllerMethodAccess access) {
         List<HttpMethod> supported = new ArrayList<HttpMethod>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
@@ -227,7 +227,7 @@ public class ResourceController {
         return methodNotAllowed(request, access, supported);
     }
 
-    private static ErrorObjectException collectionResourceNotAllowed(ResourceControllerRequest request,
+    private static RequestErrorException collectionResourceNotAllowed(ResourceControllerRequest request,
             ControllerMethodAccess access) {
         List<HttpMethod> supported = new ArrayList<HttpMethod>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
@@ -238,10 +238,10 @@ public class ResourceController {
         return methodNotAllowed(request, access, supported);
     }
 
-    private static ErrorObjectException methodNotAllowed(ResourceControllerRequest request,
+    private static RequestErrorException methodNotAllowed(ResourceControllerRequest request,
             ControllerMethodAccess access, List<HttpMethod> supported) {
-        return error(request).status(ErrorCodeStatus.METHOD_NOT_ALLOWED)
-                .code(ErrorCodeStatus.METHOD_NOT_ALLOWED.name()).meta(HttpHeader.Allow.name(), supported)
+        return error(request).status(StatusCode.METHOD_NOT_ALLOWED)
+                .code(StatusCode.METHOD_NOT_ALLOWED.name()).meta(HttpHeader.Allow.name(), supported)
                 // TODO The response MUST query an Allow header containing a list of valid
                 // methods for the requested resource.
                 .buildException();
@@ -337,7 +337,7 @@ public class ResourceController {
 
     /**
      * @return ContentNegotiator for content type passed
-     * @throws ErrorObjectException if content type is not supported
+     * @throws RequestErrorException if content type is not supported
      */
     private ContentNegotiator getContentNegotiator(ResourceControllerRequest request) {
         for (ContentNegotiator contentNegotiator : contentNegotiators) {
@@ -346,7 +346,7 @@ public class ResourceController {
             }
         }
         throw RequestError.builder(request.getResource())
-                .status(ErrorCodeStatus.UNSUPPORTED_MEDIA_TYPE)
+                .status(StatusCode.UNSUPPORTED_MEDIA_TYPE)
                 .meta(ContentTypeNegotiation.CONTENT_TYPE, request.getContentType())
                 .buildException();
     }
@@ -388,10 +388,6 @@ public class ResourceController {
             addUpdateFields(builder, fields);
         }
         return builder.build();
-    }
-
-    public enum Feature {
-        DISCOVERY_ENDPOINT
     }
 
     public static class Builder {

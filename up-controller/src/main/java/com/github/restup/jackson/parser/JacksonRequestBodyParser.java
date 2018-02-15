@@ -1,5 +1,8 @@
 package com.github.restup.jackson.parser;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -9,9 +12,6 @@ import com.github.restup.controller.request.parser.AbstractRequestBodyParser;
 import com.github.restup.errors.ErrorCode;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 
 public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode> {
 
@@ -19,6 +19,10 @@ public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode
 
     public JacksonRequestBodyParser(ObjectMapper mapper) {
         this.mapper = mapper;
+    }
+
+    public JacksonRequestBodyParser() {
+        this(new ObjectMapper());
     }
 
     @Override

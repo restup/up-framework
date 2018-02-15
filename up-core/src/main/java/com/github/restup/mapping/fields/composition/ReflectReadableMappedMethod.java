@@ -1,12 +1,12 @@
 package com.github.restup.mapping.fields.composition;
 
-import com.github.restup.errors.RequestError;
-import com.github.restup.mapping.fields.DeclaredBy;
-import com.github.restup.mapping.fields.ReadableField;
-import com.github.restup.util.Assert;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import java.util.Objects;
+import com.github.restup.errors.RequestErrorException;
+import com.github.restup.mapping.fields.DeclaredBy;
+import com.github.restup.mapping.fields.ReadableField;
+import com.github.restup.util.Assert;
 
 /**
  * For read only property mapped by Method
@@ -32,7 +32,7 @@ public class ReflectReadableMappedMethod<T> implements ReadableField<T>, Declare
         try {
             return (T) getter.invoke(o);
         } catch (IllegalAccessException | IllegalArgumentException | InvocationTargetException e) {
-            throw RequestError.buildException(e);
+            throw RequestErrorException.of(e);
         }
     }
 

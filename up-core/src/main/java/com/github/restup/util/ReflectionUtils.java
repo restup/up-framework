@@ -1,9 +1,5 @@
 package com.github.restup.util;
 
-import com.github.restup.annotations.operations.AutoWrapDisabled;
-import com.github.restup.errors.RequestError;
-import com.github.restup.mapping.UntypedClass;
-import com.googlecode.gentyref.GenericTypeReflector;
 import java.lang.annotation.Annotation;
 import java.lang.reflect.AccessibleObject;
 import java.lang.reflect.AnnotatedElement;
@@ -28,6 +24,11 @@ import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.reflect.FieldUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import com.github.restup.annotations.operations.AutoWrapDisabled;
+import com.github.restup.errors.RequestErrorException;
+import com.github.restup.errors.RequestError;
+import com.github.restup.mapping.UntypedClass;
+import com.googlecode.gentyref.GenericTypeReflector;
 
 public class ReflectionUtils {
 
@@ -70,7 +71,7 @@ public class ReflectionUtils {
                 return constructor.newInstance();
             } catch (InstantiationException | IllegalAccessException | IllegalArgumentException | InvocationTargetException | NoSuchMethodException e) {
                 if (!c.isInterface()) {
-                    RequestError.throwError(e);
+                    RequestErrorException.rethrow(e);
                 }
             }
         }

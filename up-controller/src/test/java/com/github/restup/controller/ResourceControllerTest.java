@@ -33,7 +33,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParser;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.ResourceServiceOperations;
@@ -103,7 +103,7 @@ public class ResourceControllerTest {
         Throwable thrownException = catchThrowable(f);
         
         Assertions.assertThat(thrownException)
-                .isInstanceOf(ErrorObjectException.class)
+                .isInstanceOf(RequestErrorException.class)
                 .hasFieldOrPropertyWithValue("code", code)
                 .hasFieldOrPropertyWithValue("httpStatus", status)
                 .hasNoCause();

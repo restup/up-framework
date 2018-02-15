@@ -1,7 +1,7 @@
 package com.github.restup.service;
 
-import static com.github.restup.errors.ErrorCodeStatus.BAD_REQUEST;
-import static com.github.restup.errors.ErrorCodeStatus.INTERNAL_SERVER_ERROR;
+import static com.github.restup.errors.StatusCode.BAD_REQUEST;
+import static com.github.restup.errors.StatusCode.INTERNAL_SERVER_ERROR;
 import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -19,7 +19,7 @@ import com.github.restup.annotations.filter.Validation;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.UpdateResource;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.Errors;
 import com.github.restup.errors.RequestError;
 import com.github.restup.path.ResourcePath;
@@ -40,7 +40,7 @@ public class FilteredServiceMethodCommandTest {
         return new DefaultRequestObjectFactory();
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test(expected = RequestErrorException.class)
     @SuppressWarnings({"rawtypes", "unchecked"})
     public void testRuntimeException() {
         final String s = null;
@@ -72,9 +72,9 @@ public class FilteredServiceMethodCommandTest {
         });
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test(expected = RequestErrorException.class)
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public void testErrorObjectException() {
+    public void testRequestErrorException() {
         create(new Repository() {
             @Validation(path = "name", required = false)
             public void e(Errors errors, ResourcePath path) {
@@ -113,9 +113,9 @@ public class FilteredServiceMethodCommandTest {
         });
     }
 
-    @Test(expected = ErrorObjectException.class)
+    @Test(expected = RequestErrorException.class)
     @SuppressWarnings({"rawtypes", "unchecked"})
-    public void testErrorObjectExceptionOnUpdate() {
+    public void testRequestErrorExceptionOnUpdate() {
         update(new Repository() {
             @Validation(path = {"name", "workers"})
             public void f(Errors errors, ResourcePath path, Company c) {
@@ -161,7 +161,7 @@ public class FilteredServiceMethodCommandTest {
     private void create(Repository repository, Function<RequestError, Boolean> function) {
         try {
             getService(repository).create((CreateRequest) getInstance().getCreateRequest(null, null, null, null, null));
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             assertEquals(1, e.getErrors().size());
             function.apply(e.getErrors().iterator().next());
             throw e;
@@ -176,7 +176,7 @@ public class FilteredServiceMethodCommandTest {
             ResourceServiceOperations service = getService(repository);
             List<ResourcePath> paths = Arrays.asList(ResourcePath.path(registry, Company.class, "name"));
             service.update(getInstance().getUpdateRequest((Resource)registry.getResource(c.getClass()), 1l, c, paths, null, null));
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             log.debug("Error", e.getCause());
             assertEquals(1, e.getErrors().size());
             function.apply(e.getErrors().iterator().next());

@@ -3,7 +3,6 @@ package com.github.restup.controller.settings;
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
 import org.apache.commons.lang3.ArrayUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.restup.controller.DefaultExceptionHandler;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.DefaultContentNegotiator;
@@ -30,56 +29,26 @@ import com.github.restup.registry.settings.AutoDetectConstants;
 import com.github.restup.service.registry.DiscoveryService;
 import com.google.gson.Gson;
 
-public class ControllerSettings {
+public interface ControllerSettings {
 
-    private final ResourceRegistry registry;
-    private final ContentNegotiator[] contentNegotiators;
-    private final RequestInterceptor requestInterceptor;
-    private final RequestParser requestParser;
-    private final ExceptionHandler exceptionHandler;
-    private final String defaultMediaType;
 
-    protected ControllerSettings(ResourceRegistry registry, ContentNegotiator[] contentNegotiators,
-            RequestInterceptor requestInterceptor, RequestParser requestParsers,
-            ExceptionHandler exceptionHandler, String defaultMediaType) {
-        super();
-        this.registry = registry;
-        this.contentNegotiators = contentNegotiators;
-        this.requestInterceptor = requestInterceptor;
-        this.requestParser = requestParsers;
-        this.exceptionHandler = exceptionHandler;
-        this.defaultMediaType = defaultMediaType;
-    }
-
-    public static Builder builder() {
+    static Builder builder() {
         return new Builder();
     }
 
-    public String getDefaultMediaType() {
-        return defaultMediaType;
-    }
+    String getDefaultMediaType();
 
-    public ResourceRegistry getRegistry() {
-        return registry;
-    }
+    ResourceRegistry getRegistry();
 
-    public ContentNegotiator[] getContentNegotiators() {
-        return contentNegotiators;
-    }
+    ContentNegotiator[] getContentNegotiators();
 
-    public RequestInterceptor getRequestInterceptor() {
-        return requestInterceptor;
-    }
+    RequestInterceptor getRequestInterceptor();
 
-    public RequestParser getRequestParser() {
-        return requestParser;
-    }
+    RequestParser getRequestParser();
 
-    public ExceptionHandler getExceptionHandler() {
-        return exceptionHandler;
-    }
+    ExceptionHandler getExceptionHandler();
 
-    public static class Builder {
+    static class Builder {
 
         private ResourceRegistry registry;
         private ContentNegotiator[] contentNegotiator;
@@ -243,7 +212,7 @@ public class ControllerSettings {
             ContentNegotiator[] contentNegotiators = getContentNegotiator(this.contentNegotiator);
             ExceptionHandler exceptionHandler = this.exceptionHandler;
             if (exceptionHandler == null) {
-                exceptionHandler = new DefaultExceptionHandler();
+                exceptionHandler = ExceptionHandler.getDefaultInstance();
             }
 
             //TODO
@@ -258,7 +227,7 @@ public class ControllerSettings {
                                             .id(String.class, "name")
                             )
             );
-            return new ControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler, defaultMediaType);
+            return new BasicControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler, defaultMediaType);
         }
     }
 

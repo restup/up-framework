@@ -32,7 +32,7 @@ import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
 import com.github.restup.annotations.operations.UpdateResource;
 import com.github.restup.bind.param.ParameterProvider;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.Errors;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
@@ -319,31 +319,31 @@ public class FilteredServiceTest {
         try {
             service.create(new BasicCreateRequest(null, null, null, null, parameterProvider));
             assertTrue(create);
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             assertFalse(create);
         }
         try {
             service.find(new BasicReadRequest(null, null, null, parameterProvider));
             assertTrue(find);
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             assertFalse(find);
         }
         try {
             service.update(new BasicUpdateRequest(null, null, null, null, null, parameterProvider));
             assertTrue(update);
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             assertFalse(update);
         }
         try {
             service.delete(new BasicDeleteRequest(null, null, null, parameterProvider));
             assertTrue(delete);
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             assertFalse(delete);
         }
         try {
             service.list(new BasicListRequest(null, null, parameterProvider));
             assertTrue(list);
-        } catch (ErrorObjectException e) {
+        } catch (RequestErrorException e) {
             assertFalse(e.getMessage(), list);
         }
 

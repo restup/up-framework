@@ -5,18 +5,24 @@ import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
+import java.util.Arrays;
 import java.util.Collection;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.assertj.core.api.Assertions;
 import org.junit.Before;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
+import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
 import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
-import com.github.restup.errors.ErrorObjectException;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -62,10 +68,32 @@ public class ParsedResourceControllerRequestTest {
         Throwable thrownException = catchThrowable( () -> rql(b));
         
         Assertions.assertThat(thrownException)
-                .isInstanceOf(ErrorObjectException.class)
+                .isInstanceOf(RequestErrorException.class)
                 .hasFieldOrPropertyWithValue("code", code)
                 .hasFieldOrPropertyWithValue("httpStatus", 400)
                 .hasNoCause();
+    }
+
+    @Test
+    public void testGetHeaders() {
+        ParsedResourceControllerRequest<?> request = mock().build();
+        assertNull(request.getHeaders("foo"));
+
+        Enumeration e = Mockito.mock(Enumeration.class);
+        when(details.getHeaders("foo")).thenReturn(e);
+        request = mock().build();
+        assertEquals(e, request.getHeaders("foo"));
+    }
+
+    @Test
+    public void testGetParameterNames() {
+        ParsedResourceControllerRequest<?> request = mock().build();
+        assertEquals(Collections.emptyList(), request.getParameterNames());
+
+        List<String> params = Arrays.asList("foo", "bar");
+        when(details.getParameterNames()).thenReturn(params);
+        request = mock().build();
+        assertEquals(params, request.getParameterNames());
     }
 
     @Test

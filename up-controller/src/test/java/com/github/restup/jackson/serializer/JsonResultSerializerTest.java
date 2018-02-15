@@ -80,43 +80,39 @@ public class JsonResultSerializerTest {
 
     @Test
     public void testNull() throws JsonProcessingException {
-        a2j().result(result(null))
+        a2j().expect(result(null))
                 .matches("{\"data\":null}");
     }
 
     @Test
     public void testA2J() throws JsonProcessingException {
-        a2j().result(result(new A2J(1l, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J")))
-                .test("a2j.json");
+        a2j().test("a2j.json")
+                .matches(result(new A2J(1l, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J")));;
     }
 
     @Test
     public void testGraph() throws JsonProcessingException {
-        shallow().result(result(Shallow.graph()))
-                .test("graph.json");
+        shallow().test("graph.json").matches(result(Shallow.graph()));
     }
 
     @Test
     public void testPath() throws JsonProcessingException {
         query(shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name");
-        shallow().result(result(Shallow.graph()))
-                .test("path.json");
+        shallow().test("path.json").matches(result(Shallow.graph()));
     }
 
     @Test
     public void testPathArraysIndexed() throws JsonProcessingException {
         query(shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name"
                 , "deeps.1.name", "deeps.0.deepers.1.name", "deeps.1.deepers.0.deepests.0.name");
-        shallow().result(result(Shallow.graph()))
-                .test("pathArraysIndexed.json");
+        shallow().test("pathArraysIndexed.json").matches(result(Shallow.graph()));
     }
 
     @Test
     public void testPathArrays() throws JsonProcessingException {
         query(shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name"
                 , "deeps.name", "deeps.deepers.name", "deeps.deepers.deepests.name");
-        shallow().result(result(Shallow.graph()))
-                .test("pathArrays.json");
+        shallow().test("pathArrays.json").matches(result(Shallow.graph()));
     }
 
 }

@@ -16,9 +16,19 @@ import com.github.restup.test.serializer.JacksonSerializer;
 import com.github.restup.test.serializer.ResultSerializer;
 import com.google.gson.Gson;
 
+/**
+ * Provides a {@link Builder} to build and compare expected and actual result {@link Contents}
+ * 
+ * @author abuttaro
+ *
+ */
 public class ContentsAssertions {
 
     private final static Logger log = LoggerFactory.getLogger(ContentsAssertions.class);
+
+    private ContentsAssertions() {
+        super();
+    }
 
     public final static boolean tddCheat(Contents expected, Contents actual) {
         if (expected instanceof ResourceContents) {
@@ -70,19 +80,24 @@ public class ContentsAssertions {
             this.expected.testClass(unitTest);
         }
 
-        public Builder result(byte[] body) {
+        Builder result(byte[] body) {
             actual.contents(body);
             return me();
         }
 
-        public Builder result(String body) {
+        Builder result(String body) {
             actual.contents(body);
             return me();
         }
 
-        public Builder result(Contents body) {
+        Builder result(Contents body) {
             actual.contents(body);
             return me();
+        }
+
+        Builder result(Object value) {
+            String body = serialize(value);
+            return result(body);
         }
 
         public Builder gson(Gson gson) {
@@ -98,8 +113,8 @@ public class ContentsAssertions {
             return me();
         }
 
-        public Builder result(Object value) {
-            if ( serializer == null ) {
+        public String serialize(Object value) {
+            if (serializer == null) {
                 if (AutoDetectConstants.JACKSON2_EXISTS) {
                     serializer = new JacksonSerializer();
                 } else if (AutoDetectConstants.GSON_EXISTS) {
@@ -108,25 +123,26 @@ public class ContentsAssertions {
                     throw new IllegalStateException("Unable to serialize value. Please add a supported serializer to classpath (Jackson, Gson))");
                 }
             }
-            String body = serializer.convertToString(value);
-
-            actual.contents(body);
-            return me();
+            return serializer.convertToString(value);
         }
 
-        Builder expect(byte[] body) {
+        public Builder expect(byte[] body) {
             expected.contents(body);
             return me();
         }
 
-        Builder expect(String body) {
+        public Builder expect(String body) {
             expected.contents(body);
             return me();
         }
 
-        Builder expect(Contents body) {
+        public Builder expect(Contents body) {
             expected.contents(body);
             return me();
+        }
+
+        public Builder expect(Object body) {
+            return expect(serialize(body));
         }
 
         public Builder matcher(Matcher<String> matcher) {
@@ -147,22 +163,51 @@ public class ContentsAssertions {
             return this;
         }
 
+        /**
+         * assert expected matches the provided contents
+         * 
+         * @param contents
+         */
         public void matches(byte[] contents) {
-            expect(contents).build();
+            result(contents).build();
         }
 
+        /**
+         * assert expected matches the provided contents
+         * 
+         * @param contents
+         */
         public void matches(String contents) {
-            expect(contents).build();
+            result(contents).build();
         }
 
+        /**
+         * assert expected matches the provided contents
+         * 
+         * @param contents
+         */
         public void matches(Contents contents) {
-            expect(contents).build();
+            result(contents).build();
         }
 
-        public void test(String testName) {
+        /**
+         * assert expected matches the provided contents
+         * 
+         * @param contents
+         */
+        public void matches(Object contents) {
+            result(contents).build();
+        }
+
+        /**
+         * Set
+         * 
+         * @param testName
+         */
+        public Builder test(String testName) {
             actual.testName(testName);
             expected.testName(testName);
-            build();
+            return me();
         }
 
         void build() {
