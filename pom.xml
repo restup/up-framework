@@ -28,8 +28,8 @@
     </developers>
 
     <scm>
-        <connection>scm:git:git://github.com/restup/up-framework.git</connection>
-        <developerConnection>scm:git:ssh://github.com:restup/up-framework.git</developerConnection>
+        <connection>scm:git:git@github.com/restup/up-framework.git</connection>
+        <developerConnection>scm:git:git@github.com:restup/up-framework.git</developerConnection>
         <url>http://github.com/restup/up-framework/tree/master</url>
     </scm>
 
