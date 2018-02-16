@@ -1,7 +1,12 @@
 package com.github.restup.jackson.serializer;
 
 import static com.github.restup.jackson.serializer.LinksSerializer.writeLinksObject;
-
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.restup.controller.linking.Link;
@@ -12,12 +17,6 @@ import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Custom serialization for JSON API content.
@@ -61,7 +60,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         super.writeAttributes(resource, paths, data, result, jgen, provider, false);
         jgen.writeEndObject();
 
-        writeRelationships(resource, paths, data, result, jgen, provider);
+        writeResourceRelationships(resource, paths, data, result, jgen, provider);
 
         writeLinks(jgen, result.getLinks(resource, id));
 
@@ -70,10 +69,8 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         jgen.writeEndObject();
     }
 
-    /**
-     * Writes relationships for resource objects
-     */
-    protected void writeRelationships(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, JsonApiResult result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
+    protected void writeResourceRelationships(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, JsonApiResult result, JsonGenerator jgen,
+            SerializerProvider provider) throws Exception {
         //TODO toMany relationshps
         Collection<ResourceRelationship<?,?,?,?>> relationships = resource.getRelationshipsTo();
         if (hasRelationships(paths) || CollectionUtils.isNotEmpty(relationships)) {

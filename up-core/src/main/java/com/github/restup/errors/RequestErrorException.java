@@ -20,8 +20,10 @@ public class RequestErrorException extends RuntimeException {
 	private final List<RequestError> errors;
 
 	/**
-	 * Sorts errors by httpStatus, cause
-	 */
+     * Sorts errors by httpStatus, cause
+     * 
+     * @param errors causing execption
+     */
 	public RequestErrorException(List<RequestError> errors) {
 		super(isEmpty(errors) ? null : errors.iterator().next().getDetail(), cause(errors));
 		Collections.sort(errors, new RequestErrorComparator());
@@ -29,16 +31,19 @@ public class RequestErrorException extends RuntimeException {
 	}
 
 	/**
-	 * Converts array to {@link List}, calls {@link #RequestErrorException(List)}
-	 */
+     * Converts array to {@link List}, calls {@link #RequestErrorException(List)}
+     * 
+     * @param errors causing exception
+     */
 	public RequestErrorException(RequestError... errors) {
 		this(Arrays.asList(errors));
 	}
 
 	/**
-	 * builds a new {@link RequestError}, calls
-	 * {@link #RequestErrorException(RequestError...)}
-	 */
+     * builds a new {@link RequestError}, calls {@link #RequestErrorException(RequestError...)}
+     * 
+     * @param t cause of {@link RequestError}
+     */
 	public RequestErrorException(Throwable t) {
 		this(RequestError.error(null, t).build());
 	}

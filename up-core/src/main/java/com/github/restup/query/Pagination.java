@@ -25,9 +25,10 @@ public interface Pagination {
 
     /**
      * Pagination with specified limit and offset and paging and totals enabled
-     * @param limit
-     * @param offset
-     * @return
+     * 
+     * @param limit value for pagination
+     * @param offset value for pagination
+     * @return pagination instance
      */
     static Pagination of(Integer limit, Integer offset) {
         return of(limit, offset, false);

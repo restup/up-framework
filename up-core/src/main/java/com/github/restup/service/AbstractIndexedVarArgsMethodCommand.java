@@ -14,6 +14,7 @@ public abstract class AbstractIndexedVarArgsMethodCommand extends VarArgsMethodC
     }
 
     /**
+     * @param method to map args to
      * @param varArgs passed as arguments to {@link #execute(Object...)}
      * @return the mapped indexes of passed args to executed args
      */

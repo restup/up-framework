@@ -43,7 +43,7 @@ public interface ResourceSort {
     }
 
     /**
-     * true if ascending, false if descending, null if unspecified
+     * @return true if ascending, false if descending, null if unspecified
      */
     Boolean getAscending();
 

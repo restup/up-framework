@@ -2,19 +2,18 @@ package com.github.restup.query;
 
 import static com.github.restup.util.UpUtils.removeAll;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
-
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.query.criteria.ResourcePathFilter;
-import com.github.restup.query.criteria.ResourcePathFilter.Operator;
-import com.github.restup.query.criteria.ResourceQueryCriteria;
-import com.github.restup.registry.Resource;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.collections4.list.SetUniqueList;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.query.criteria.ResourcePathFilter;
+import com.github.restup.query.criteria.ResourcePathFilter.Operator;
+import com.github.restup.query.criteria.ResourceQueryCriteria;
+import com.github.restup.registry.Resource;
 
 public class PreparedResourceQueryStatement extends AbstractResourceQueryStatement {
 
@@ -114,9 +113,6 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
         }
     }
 
-    /**
-     * @return All of the fields required for
-     */
     public static List<ResourcePath> queryFields(Resource<?, ?> resource, ResourceQueryStatement query,
             ResourceQueryDefaults defaults) {
         List<ResourcePath> result = SetUniqueList.setUniqueList(new ArrayList<ResourcePath>());
@@ -141,6 +137,9 @@ public class PreparedResourceQueryStatement extends AbstractResourceQueryStateme
     }
 
     /**
+     * 
+     * @param resource queried
+     * @param query fields
      * @return All of the fields required for rendering sparse fields
      */
     public static List<ResourcePath> sparseFields(Resource<?, ?> resource, ResourceQueryStatement query) {

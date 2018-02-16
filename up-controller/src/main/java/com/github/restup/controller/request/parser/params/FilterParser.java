@@ -4,12 +4,20 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 
 /**
- * Parses filter parameters. <p> Ex: For a resource with fields named foo & bar
+ * <p>
+ * Parses filter parameters.
+ * </p>
+ * 
+ * <p>
+ * Ex: For a resource with fields named foo &amp; bar
+ * </p>
+ * 
  * <pre>
  * ?filter[foo]=foo
  * ?filter[bar][gt]=1
  * </pre>
- *
+ * 
+ * 
  * @author abuttaro
  */
 public class FilterParser extends AbstractRequestParamParser<String[]> {

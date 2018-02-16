@@ -9,7 +9,11 @@ import com.github.restup.controller.settings.ControllerSettings;
 public interface LinkBuilderFactory {
 
     /**
-     * The resulting {@link LinkBuilder} could be implemented as singleton, thread safe or accept the arguments for specific requests.
+     * The resulting {@link LinkBuilder} could be implemented as singleton, thread safe or accept the
+     * arguments for specific requests.
+     * 
+     * @param request
+     * @param result
      *
      * @return a link builder for the request.
      */

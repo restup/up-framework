@@ -26,22 +26,22 @@ public interface MappedClass<T> {
     }
 
     /**
-     * The name of the object
+     * @return The name of the object
      */
     String getName();
 
     /**
-     * The pluralized name of the object
+     * @return The pluralized name of the object
      */
     String getPluralName();
 
     /**
-     * The type of the object
+     * @return The type of the object
      */
     Type getType();
 
     /**
-     * The type of the object's parent
+     * @return The type of the object's parent
      */
     Type getParentType();
 
@@ -53,7 +53,7 @@ public interface MappedClass<T> {
 	boolean isTypedMapPresent();
 
     /**
-     * The attributes of the object
+     * @return The attributes of the object
      */
     List<MappedField<?>> getAttributes();
 

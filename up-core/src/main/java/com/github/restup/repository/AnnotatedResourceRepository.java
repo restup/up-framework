@@ -2,9 +2,7 @@ package com.github.restup.repository;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-
 import org.apache.commons.lang3.tuple.Pair;
-
 import com.github.restup.registry.Resource;
 import com.github.restup.service.AnnotatedOperationMethodCommand;
 import com.github.restup.service.FilteredService;
@@ -26,6 +24,8 @@ public class AnnotatedResourceRepository extends MethodCommandOperations impleme
 
     /**
      * The original, wrapped repository instance
+     * 
+     * @return the repository instance
      */
     public Object getRepository() {
         return repository;

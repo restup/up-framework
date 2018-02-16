@@ -17,6 +17,9 @@ public class DefaultContentNegotiator implements ContentNegotiator {
 
     /**
      * Delegates to the {@link ContentTypeNegotiation} found for the specified media type
+     * 
+     * @param mediaType type of media to
+     * @param negotiators available content negotiators
      *
      * @throws IllegalArgumentException if mediaType is not found in the provided negotiators
      */

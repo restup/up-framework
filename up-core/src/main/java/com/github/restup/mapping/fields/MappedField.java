@@ -1,16 +1,13 @@
 package com.github.restup.mapping.fields;
 
 import static com.github.restup.util.ReflectionUtils.makeAccessible;
-
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.List;
 import java.util.function.Function;
-
 import org.apache.commons.lang3.StringUtils;
-
 import com.github.restup.annotations.field.CaseInsensitive;
 import com.github.restup.annotations.field.Immutable;
 import com.github.restup.annotations.field.Param;
@@ -41,6 +38,9 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
     //TODO doc
 
     /**
+     * 
+     * @param mappedField providing relationship name
+     * @param resource providing default name
      * @return The relationship name from the mappedField or the resource name by default
      */
     static String getRelationshipName(MappedField<?> mappedField, Resource<?, ?> resource) {
@@ -117,6 +117,10 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
 
     /**
      * null safe. apply f to {@link #getIdentifier()}
+     * 
+     * @param <R> result of function
+     * @param f function to apply
+     * @return result of function
      */
     default <R> R applyToIdentifier(Function<Identifier, R> f) {
         Identifier identifier = getIdentifier();
@@ -135,6 +139,10 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
 
     /**
      * null safe. apply f to {@link #getCaseSensitivity()}
+     * 
+     * @param <R> result of function
+     * @param f function to apply
+     * @return result of function
      */
     default <R> R applyToCaseSensitivity(Function<CaseSensitivity, R> f) {
         CaseSensitivity caseSensitivity = getCaseSensitivity();
@@ -157,6 +165,10 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
 
     /**
      * null safe. apply f to {@link #getImmutability()}
+     * 
+     * @param <R> result of function
+     * @param f function to apply
+     * @return result of function
      */
     default <R> R applyToImmutability(Function<Immutability, R> f) {
         Immutability immutability = getImmutability();
@@ -190,6 +202,10 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
 
     /**
      * null safe. apply f to {@link #getRelationship()}
+     * 
+     * @param <R> result of function
+     * @param f function to apply to the relationship
+     * @return result of f
      */
     default <R> R applyToRelationship(Function<Relation, R> f) {
         Relation relation = getRelationship();

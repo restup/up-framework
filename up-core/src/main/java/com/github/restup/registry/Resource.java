@@ -35,21 +35,21 @@ import com.github.restup.util.Assert;
 /**
  * Resource meta data, defining resource name, type, service implementation, etc.
  */
-public interface Resource<T, ID extends Serializable> extends Comparable<Resource<T,ID>> {
+public interface Resource<T, ID extends Serializable> extends Comparable<Resource<T, ID>> {
 
     List<ResourcePath> getAllPaths();
 
     Type getType();
 
     @SuppressWarnings("unchecked")
-	default Class<T> getClassType() {
-    		Type type = getType();
-    		if ( type instanceof Class) {
-    			return (Class<T>) type;
-    		} else if ( type instanceof UntypedClass) {
-    			return ((UntypedClass<T>) type).getContainer();
-    		}
-    		throw new IllegalStateException("type must be Class or UntypedClass");
+    default Class<T> getClassType() {
+        Type type = getType();
+        if (type instanceof Class) {
+            return (Class<T>) type;
+        } else if (type instanceof UntypedClass) {
+            return ((UntypedClass<T>) type).getContainer();
+        }
+        throw new IllegalStateException("type must be Class or UntypedClass");
     }
 
     String getName();
@@ -80,20 +80,20 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
     List<ResourcePath> getDefaultSparseFields();
 
     /**
-     * Returns any fields to which the requestor is not permitted to read
+     * @return any fields to which the requestor is not permitted to read
      */
     List<ResourcePath> getRestrictedFields();
 
     String getBasePath();
 
-    Collection<ResourceRelationship<?,?,?,?>> getRelationships();
+    Collection<ResourceRelationship<?, ?, ?, ?>> getRelationships();
 
-    default List<ResourceRelationship<?,?,?,?>> getRelationshipsTo() {
-        Collection<ResourceRelationship<?,?,?,?>> relationships = getRelationships();
+    default List<ResourceRelationship<?, ?, ?, ?>> getRelationshipsTo() {
+        Collection<ResourceRelationship<?, ?, ?, ?>> relationships = getRelationships();
         if (relationships != null) {
-        		return relationships.stream()
-        			.filter(relationship -> relationship.isTo(this))
-        			.collect(Collectors.toList());
+            return relationships.stream()
+                    .filter(relationship -> relationship.isTo(this))
+                    .collect(Collectors.toList());
         }
         return Collections.emptyList();
     }
@@ -121,21 +121,24 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
     default boolean hasBeanField(String field) {
         return findBeanField(field) != null;
     }
-    
+
     default List<ResourcePath> getPaths(boolean includeTransient) {
         return getPaths(this, includeTransient, false);
     }
 
     @Override
-    default int compareTo(Resource<T,ID> o) {
+    default int compareTo(Resource<T, ID> o) {
         if (o == null) {
             return -1;
         }
         return getName().compareTo(o.getName());
     }
-    
+
     /**
      * Ensures basepath always has leading and trailing / so it is prepared for url concatenation
+     * 
+     * @param basePath to clean
+     * @return clean base path
      */
     static String cleanBasePath(String basePath) {
         String result = basePath;
@@ -150,9 +153,8 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         return result;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     static List<ResourcePath> getAllPaths(Resource<?, ?> resource) {
-        return resource == null ? (List) Collections.emptyList() : resource.getAllPaths();
+        return resource == null ? Collections.emptyList() : resource.getAllPaths();
     }
 
     static <T, ID extends Serializable> Set<ID> getIds(Resource<T, ID> resource, List<T> list) {
@@ -162,48 +164,48 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             result = Collections.emptySet();
         } else {
             result = list.stream()
-            			.map(t -> resource.getIdentityField().readValue(t))
+                    .map(t -> resource.getIdentityField().readValue(t))
                     .collect(Collectors.toSet());
         }
         return result;
     }
 
     static List<ResourcePath> getPaths(Resource<?, ?> resource, boolean includeTransient, boolean apiFieldsOnly) {
-        //TODO better to cache immutable paths?
+        // TODO better to cache immutable paths?
         return resource.getMapping().getAttributes()
-        		.stream()
-        		.filter(mf -> includeTransient || !mf.isTransientField() )
-        		.filter(mf -> !apiFieldsOnly || mf.isApiProperty() )
-        		.map(mf ->ResourcePath.path(resource, mf) )
-        		.collect(Collectors.toList());
+                .stream()
+                .filter(mf -> includeTransient || !mf.isTransientField())
+                .filter(mf -> !apiFieldsOnly || mf.isApiProperty())
+                .map(mf -> ResourcePath.path(resource, mf))
+                .collect(Collectors.toList());
     }
 
     @SuppressWarnings("unchecked")
-	static <T> T  validate(Resource<T, ?> resource, T o) {
-    	 	MappedClass<T> mapping = resource.getMapping();
-    		// if an object is 
-		if ( mapping.isTypedMapPresent() ) {
-			if (o instanceof Iterable ) {
-				Iterator<T> it = ((Iterable<T>) o).iterator();
-				while ( it.hasNext() ) {
-					validate(resource, it.next());
-				}
-			} else {
-				mapping.getAttributes()
-					.forEach(mappedField -> {
-						MappedField<Object> mf = (MappedField<Object>) mappedField;
-						if ( o instanceof Map ) {
-							Object value = mappedField.readValue(o);
-							if ( value != null ) {
-								Object converted = resource.getRegistry().getSettings().getConverterFactory().convert(value, mf.getType());
-								mf.writeValue(o, converted);
-							}
-						}
-					});
-			}
-		} 
-		return o;
-	}
+    static <T> T validate(Resource<T, ?> resource, T o) {
+        MappedClass<T> mapping = resource.getMapping();
+        // if an object is
+        if (mapping.isTypedMapPresent()) {
+            if (o instanceof Iterable) {
+                Iterator<T> it = ((Iterable<T>) o).iterator();
+                while (it.hasNext()) {
+                    validate(resource, it.next());
+                }
+            } else {
+                mapping.getAttributes()
+                        .forEach(mappedField -> {
+                            MappedField<Object> mf = (MappedField<Object>) mappedField;
+                            if (o instanceof Map) {
+                                Object value = mappedField.readValue(o);
+                                if (value != null) {
+                                    Object converted = resource.getRegistry().getSettings().getConverterFactory().convert(value, mf.getType());
+                                    mf.writeValue(o, converted);
+                                }
+                            }
+                        });
+            }
+        }
+        return o;
+    }
 
     public static <T, ID extends Serializable> Builder<T, ID> builder(Class<T> resourceClass) {
         return new Builder<T, ID>(resourceClass);
@@ -242,8 +244,8 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             this.type = resourceClass;
         }
 
-		public Builder() {
-        		this(new UntypedClass<>());
+        public Builder() {
+            this(new UntypedClass<>());
         }
 
         public Builder<T, ID> me() {
@@ -321,15 +323,20 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         }
 
         /**
-         * {@link #defaultPagination(Integer, Integer, boolean, boolean)} with offset of 0, paging and totals enabled.
+         * {@link #defaultPagination(Integer, Integer, boolean)} with offset of 0, and totals enabled.
+         * 
+         * @param pageLimit value for pagination
+         * @return this builder
          */
         public Builder<T, ID> defaultPagination(Integer pageLimit) {
             return defaultPagination(pageLimit, 0, false);
         }
 
         /**
-         * @param withTotalsDisabled so that last page cannot be determined
-         * @param pagingDisabled so that no paging information is returned and full result set is returned.
+         * @param pageLimit value for pagination
+         * @param pageOffset value for pagination
+         * @param withTotalsDisabled to enable/disable totals included in result
+         * @return this builder
          */
         public Builder<T, ID> defaultPagination(Integer pageLimit, Integer pageOffset, boolean withTotalsDisabled) {
             return defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
@@ -346,7 +353,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         }
 
         public Builder<T, ID> mapping(MappedClass.Builder<T> builder) {
-        		builder.defaultName(name);
+            builder.defaultName(name);
             return mapping(builder.build());
         }
 
@@ -400,8 +407,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
                 basePath = registrySettings.getBasePath();
             }
 
-            Object[] filters = excludeDefaultServiceFilters ? serviceFilters :
-                    ArrayUtils.addAll(serviceFilters, registrySettings.getDefaultServiceFilters());
+            Object[] filters = excludeDefaultServiceFilters ? serviceFilters : ArrayUtils.addAll(serviceFilters, registrySettings.getDefaultServiceFilters());
 
             Pagination pagination = defaultPagination;
             if (pagination == null) {
@@ -418,7 +424,8 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
                 restrictedFields = registrySettings.getDefaultRestrictedFieldsProvider();
             }
 
-            BasicResource<T, ID> resource = new BasicResource(type, name, pluralName, basePath, registry, mapping, identityField, controllerMethodAccess, serviceMethodAccess, pagination, defaultSparseFields, restrictedFields);
+            BasicResource<T, ID> resource = new BasicResource(type, name, pluralName, basePath, registry, mapping, identityField, controllerMethodAccess, serviceMethodAccess,
+                    pagination, defaultSparseFields, restrictedFields);
             Object service = this.service;
             Object repository = this.repository;
             if (service == null) {
@@ -453,7 +460,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             return resource;
         }
 
-        private ResourceRepositoryOperations toResourceRepository(Resource<?,?> resource, Object repository) {
+        private ResourceRepositoryOperations toResourceRepository(Resource<?, ?> resource, Object repository) {
             if (repository == null) {
                 return null;
             } else if (repository instanceof ResourceRepositoryOperations) {

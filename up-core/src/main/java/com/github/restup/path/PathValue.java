@@ -21,6 +21,7 @@ public interface PathValue {
     String getPersistedPath();
 
     /**
+     * @param instance type to confirm is supported by the {@link PathValue}
      * @return true if the {@link PathValue} supports the type specified, false otherwise
      */
     boolean supportsType(Class<?> instance);

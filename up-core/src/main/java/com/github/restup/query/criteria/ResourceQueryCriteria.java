@@ -9,9 +9,10 @@ import com.google.common.collect.ImmutableList;
 public interface ResourceQueryCriteria {
 
     /**
+     * @param target object to filter
      * @return true if the criteria is met, false otherwise
      */
-    boolean filter(Object t);
+    boolean filter(Object target);
 
     static ResourceQueryCriteria and(ResourceQueryCriteria... criteria) {
         return and(ImmutableList.copyOf(criteria));

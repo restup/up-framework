@@ -1,9 +1,8 @@
 package com.github.restup.registry;
 
-import com.github.restup.mapping.MappedClass;
-
 import java.lang.reflect.Type;
 import java.util.Collection;
+import com.github.restup.mapping.MappedClass;
 
 /**
  * Interface for all registry storage operations, allowing for the {@link ResourceRegistry} to store Resource meta data alternatively if needed
@@ -25,6 +24,7 @@ public interface ResourceRegistryRepository {
     Resource<?, ?> getResourceByPluralName(String pluralName);
 
     /**
+     * @param <T> type of resource
      * @param resourceClass the class of the resource to find
      * @return the resource with type equal to the passed resourceClass, null otherwise
      */
@@ -32,30 +32,39 @@ public interface ResourceRegistryRepository {
 
     /**
      * Add the resource to the {@link ResourceRegistryRepository}
+     * 
+     * @param resource to register
      */
     void registerResource(Resource<?, ?> resource);
 
     /**
      * Add the MappedClass to the {@link ResourceRegistryRepository}
+     * 
+     * @param mappedClass to register
      */
     void registerMappedClass(MappedClass<?> mappedClass);
 
     /**
+     * 
+     * @param resourceName to find
      * @return true if a resource with a name matching resourceName exists, false otherwise
      */
     boolean hasResource(String resourceName);
 
     /**
+     * @param resourceClass to find
      * @return true if a resource with a class matching resourceClass exists, false otherwise
      */
     boolean hasResource(Class<?> resourceClass);
 
     /**
-     * @return a mappedClass, never null
+     * @param mappedClass to retrieve
+     * @return a mappedClass
      */
     MappedClass<?> getMappedClass(Type mappedClass);
 
     /**
+     * @param mapping to find
      * @return true if a mappedClass with a class matching mappedClass exists, false otherwise
      */
     boolean hasMapping(Type mapping);
@@ -63,18 +72,22 @@ public interface ResourceRegistryRepository {
     /**
      * add a relationship between two objects
      *
-     * @param relationship between from an to
+     * @param from resource
+     * @param to resource
+     * @param relationship between from and to
      */
     void addRelationship(Resource<?, ?> from, Resource<?, ?> to, ResourceRelationship<?, ?, ?, ?> relationship);
 
     /**
      * @return relationship between 2 resources or null if none
+     * @param from resource
+     * @param to resource
      */
     ResourceRelationship<?, ?, ?, ?> getRelationship(String from, String to);
 
     /**
-     * @param resourceName
-     * @return
+     * @param resourceName of resource
+     * @return relationships for resource
      */
     Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName);
 

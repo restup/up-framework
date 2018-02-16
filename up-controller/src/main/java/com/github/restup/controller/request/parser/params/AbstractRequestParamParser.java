@@ -1,14 +1,16 @@
 package com.github.restup.controller.request.parser.params;
 
+import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.util.Assert;
-import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * provides base implementation and support for parameter parsing
+ * 
+ * @param <P> parameter type
  */
 public abstract class AbstractRequestParamParser<P> implements RequestParamParser {
 
@@ -29,9 +31,15 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
     }
 
     /**
-     * parses a parameter with brackets to a String array, validating the number of resulting parts. <p> ex filter[foo][gt] -> ['filter', 'foo', 'gt' ]
-     *
+     * parses a parameter with brackets to a String array, validating the number of resulting parts.
+     * <p>
+     * ex filter[foo][gt] -&gt; ['filter', 'foo', 'gt' ]
+     * 
+     * @param <T> resource type
+     * @param builder request builder
      * @param rawParameterName to be parsed
+     * @param rawValue raw parameter value
+     * @param targetString parameter to parse
      * @param minPartSize minimum allowed paths
      * @param maxPartSize maximum allowed paths
      * @return null if any errors occur and are added to builder, path parts otherwise

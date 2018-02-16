@@ -16,7 +16,8 @@ public class BasicMappedFieldTest {
     
     /**
      * Builds a Person foo field of a Map
-     * @return
+     * 
+     * @return builder
      */
     private MappedField.Builder<Person> person() {
         return builder(Person.class)

@@ -14,7 +14,14 @@ import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.response.ReadResult;
 
 /**
- * Handle GET operations <ul> <li>List documents (matching optional query criteria)</li> <li>A single document</li> </ul>
+ * Handle GET operations
+ * <ul>
+ * <li>List documents (matching optional query criteria)</li>
+ * <li>A single document</li>
+ * </ul>
+ * 
+ * @param <T> resource type
+ * @param <ID> resource id type
  */
 public class GetMethodController<T, ID extends Serializable> extends MethodController<T, ID> {
 

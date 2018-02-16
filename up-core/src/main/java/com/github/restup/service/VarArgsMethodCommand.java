@@ -8,7 +8,27 @@ import com.github.restup.errors.RequestErrorException;
 import com.github.restup.util.Assert;
 
 /**
- * Simple Method Executor which uses reflection to invoke a {@link Method} from a variable list of arguments which are mapped to the {@link Method} arguments by type. <p> For example, given the class Foo <pre class="code"> public class Foo { public void bar(String message) { System.out.println(message); } } </pre> <p> The following will print "Hello World" <p> <pre class="code"> VarArgsMethodExecutor executor = new VarArgsMethodExecutor(new Foo(), Foo.class.getMethod("bar", String.class)); executor.execute(new Date(), 10, "Hello World"); </pre>
+ * Simple Method Executor which uses reflection to invoke a {@link Method} from a variable list of
+ * arguments which are mapped to the {@link Method} arguments by type.
+ * <p>
+ * For example, given the class Foo
+ * </p>
+ * 
+ * <pre class="code">
+ * public class Foo {
+ *     public void bar(String message) {
+ *         System.out.println(message);
+ *     }
+ * }
+ * </pre>
+ * <p>
+ * The following will print "Hello World"
+ * </p>
+ * 
+ * <pre class="code">
+ * VarArgsMethodExecutor executor = new VarArgsMethodExecutor(new Foo(), Foo.class.getMethod("bar", String.class));
+ * executor.execute(new Date(), 10, "Hello World");
+ * </pre>
  *
  * @author andy.buttaro
  */

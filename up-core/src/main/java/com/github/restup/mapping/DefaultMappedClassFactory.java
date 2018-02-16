@@ -15,7 +15,17 @@ import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.google.common.collect.ImmutableList;
 
 /**
- * Default {@link MappedClassFactory} which will accept and build a {@link MappedClass} for any type contained within packages defined by {@link RegistrySettings#packagesToScan}. <p> Fields will be mapped using {@link RegistrySettings#mappedFieldFactory} and sorted using {@link RegistrySettings#mappedFieldOrderComparator}. <p> {@link MappedClass} names will be {@link Class#getName()} by default or {@link ApiName#value()} if present. Plural {@link MappedClass} name will be {@link Plural#value()} if present or use default pluralization, appending 's' to {@link MappedClass#getName()}
+ * Default {@link MappedClassFactory} which will accept and build a {@link MappedClass} for any type
+ * contained within packages defined by {@link RegistrySettings#getPackagesToScan()}.
+ * <p>
+ * Fields will be mapped using {@link RegistrySettings#getMappedFieldFactory()} and sorted using
+ * {@link RegistrySettings#getMappedFieldOrderComparator()}.
+ * </p>
+ * <p>
+ * {@link MappedClass} names will be {@link Class#getName()} by default or {@link ApiName#value()}
+ * if present. Plural {@link MappedClass} name will be {@link Plural#value()} if present or use
+ * default pluralization, appending 's' to {@link MappedClass#getName()}
+ * </p>
  */
 public class DefaultMappedClassFactory implements MappedClassFactory {
 
@@ -27,7 +37,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     private final MappedFieldFactory mappedFieldFactory;
 
     /**
-     * Requires settings to define packagesToScan, fieldComparator, and mappedFieldFactory.
+     * @param settings define packagesToScan, fieldComparator, and mappedFieldFactory.
      */
     public DefaultMappedClassFactory(RegistrySettings settings) {
         Assert.notNull(settings.getMappedFieldFactory(), "mappedFieldFactory is required");
@@ -40,7 +50,8 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     }
 
     /**
-     * @return true if type is in one of the packages defined by {@link #packagesToScan}, false otherwise
+     * @return true if type is in one of the packages defined by {@link #packagesToScan}, false
+     *         otherwise
      */
     @Override
     public boolean isMappable(Class<?> type) {
@@ -52,9 +63,9 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
 
     private boolean contains(List<String> packages, Class<?> type) {
         return packages.stream()
-    			.filter(pkg -> type.getName().startsWith(pkg))
-    			.findFirst()
-    			.isPresent();
+                .filter(pkg -> type.getName().startsWith(pkg))
+                .findFirst()
+                .isPresent();
     }
 
     @Override

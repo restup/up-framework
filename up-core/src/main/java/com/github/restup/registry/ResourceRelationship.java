@@ -58,6 +58,7 @@ public interface ResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO
     }
 
     /**
+     * @param resource to get paths from
      * @return A list of *all* relationships defined from this resource, including nested objects
      */
     static List<ResourcePath> getAllRelationshipPaths(Resource<?, ?> resource) {

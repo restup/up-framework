@@ -6,11 +6,22 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.query.ResourceQueryStatement.Type;
 
 /**
- * Parses query parameters <p> <p> Ex: For a resource with relationships to resources named foo & bar <p>
+ * <p>
+ * Parses query parameters
+ * <p>
+ * <p>
+ * Ex: For a resource with relationships to resources named foo &amp; bar
+ * </p>
+ * 
  * <pre>
  * ?query=foo,bar
  * </pre>
- * <p> Since a resource may have multiple relationships to a resource, the path may be targeted as well.  For example, given a resource Foo with goodBarId and badBarId fields both with a {@link Relationship} to Bar, the field(s) to join on may be specified in [] <p>
+ * <p>
+ * Since a resource may have multiple relationships to a resource, the path may be targeted as well.
+ * For example, given a resource Foo with goodBarId and badBarId fields both with a
+ * {@link Relationship} to Bar, the field(s) to join on may be specified in []
+ * </p>
+ * 
  * <pre>
  * /foo?query=bar[goodBarId]
  * /bar?query=foo[goodBarId]

@@ -14,16 +14,18 @@ public class UpUtils {
     }
 
     /**
+     * Null safe unmodifiable list returning empty list for null.
+     * 
+     * @param <T> type of elements in the list
+     * @param list to make unmodifiable
      * @return unmodifiable list, never null
      */
-    @SuppressWarnings("unchecked")
     public static <T> List<T> unmodifiableList(List<T> list) {
-        return list == null ? Collections.EMPTY_LIST : Collections.unmodifiableList(list);
+        return list == null ? Collections.emptyList() : Collections.unmodifiableList(list);
     }
 
-    @SuppressWarnings("unchecked")
     public static <K, V> Map<K, V> unmodifiableMap(Map<K, V> map) {
-        return map == null ? Collections.EMPTY_MAP : Collections.unmodifiableMap(map);
+        return map == null ? Collections.emptyMap() : Collections.unmodifiableMap(map);
     }
 
     public static <T> void removeAll(List<T> target, List<T> source) {

@@ -4,7 +4,13 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 
 /**
- * Similar to offset, but pageNumber is 1 based, so the value has to be adjusted <p> <p> Ex: <p>
+ * <p>
+ * Similar to offset, but pageNumber is 1 based, so the value has to be adjusted
+ * </p>
+ * <p>
+ * Ex:
+ * </p>
+ * 
  * <pre>
  * ?pageNumber=1
  * </pre>

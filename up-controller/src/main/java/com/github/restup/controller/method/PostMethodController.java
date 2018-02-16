@@ -1,15 +1,22 @@
 package com.github.restup.controller.method;
 
+import java.io.Serializable;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
-import java.io.Serializable;
 
 /**
- * Handle POST operations <ul> <li>Multiple documents</li> <li>A single document</li> </ul>
+ * Handle POST operations
+ * <ul>
+ * <li>Multiple documents</li>
+ * <li>A single document</li>
+ * </ul>
+ * 
+ * @param <T> resource type
+ * @param <ID> resource id type
  */
 public class PostMethodController<T, ID extends Serializable> extends BulkMethodController<T, ID, CreateRequest<T>> {
 

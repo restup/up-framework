@@ -2,10 +2,8 @@ package com.github.restup.service;
 
 import java.lang.annotation.Annotation;
 import java.lang.reflect.Method;
-
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
-
 import com.github.restup.annotations.filter.PostBulkCreateFilter;
 import com.github.restup.annotations.filter.PostBulkDeleteFilter;
 import com.github.restup.annotations.filter.PostBulkUpdateFilter;
@@ -74,7 +72,18 @@ public class FilteredService extends MethodCommandOperations implements Resource
         }
 
         /**
-         * Determines whether the repoAnnotation exists on the operations. If it does, a {@link FilteredServiceMethodCommand} is returned If it does not, an {@link UnsupportedMethodCommand} is returned
+         * Determines whether the repoAnnotation exists on the operations. If it does, a
+         * {@link FilteredServiceMethodCommand} is returned If it does not, an
+         * {@link UnsupportedMethodCommand} is returned
+         * 
+         * @param resource filter is applied to
+         * @param operation name
+         * @param repoAnnotation operation annotation
+         * @param preAnnotation pre operation annotation
+         * @param postAnnotation post operation annotation
+         * @param disabledViaAccessSettings true if disabled
+         * @param repositories available repositories for operation
+         * @return methodCommand
          */
         @SuppressWarnings({"rawtypes"})
         protected MethodCommand<?> getMethod(Resource resource, String operation

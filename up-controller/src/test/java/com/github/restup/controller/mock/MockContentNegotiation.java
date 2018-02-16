@@ -10,11 +10,18 @@ public interface MockContentNegotiation {
 
     /**
      * Parse the Contents to ResourceData.
+     * 
+     * @param contents
+     * @return {@link ResourceData}
      */
     ResourceData<?> getBody(Contents contents);
 
     /**
      * serialize the result
+     * 
+     * @param result
+     * @return {@link Contents} representing serialized result
+     * @throws Exception
      */
     Contents serialize(Object result) throws Exception;
 }
