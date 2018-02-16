@@ -29,6 +29,7 @@ import com.github.restup.path.EmptyResourcePathsProvider;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.service.filters.BulkOperationByQueryFilter;
@@ -125,131 +126,169 @@ public interface RegistrySettings {
 		}
 
 		/**
-		 * Provided alternate storage for registry meta data
-		 */
+         * Provided alternate storage for registry meta data
+         * 
+         * @param resourceRegistryMap implementation
+         * @return this builder
+         */
 		public Builder resourceRegistryRepository(ResourceRegistryRepository resourceRegistryMap) {
 			this.resourceRegistryMap = resourceRegistryMap;
 			return me();
 		}
 
 		/**
-		 * This will behave as a default but will not override settings explicitly
-		 * passed elsewhere
-		 */
+         * @param packagesToScan used by {@link ResourceRegistry} to filter acceptable {@link Resource}s
+         * @return this builder
+         */
 		public Builder packagesToScan(String... packagesToScan) {
 			this.packagesToScan = packagesToScan;
 			return me();
 		}
 
 		/**
-		 * Comparator for defining sort order of {@link MappedClass#getAttributes()}
-		 */
+         * Comparator for defining sort order of {@link MappedClass#getAttributes()}
+         * 
+         * @param mappedFieldOrderComparator implementation
+         * @return this builder
+         */
 		public Builder mappedFieldOrderComparator(Comparator<MappedField<?>> mappedFieldOrderComparator) {
 			this.mappedFieldOrderComparator = mappedFieldOrderComparator;
 			return me();
 		}
 
 		/**
-		 * Provide an alternate implementation for creating {@link MappedField}
-		 */
+         * Provide an alternate implementation for creating {@link MappedField}
+         * 
+         * @param mappedFieldFactory implementation
+         * @return this builder
+         */
 		public Builder mappedFieldFactory(MappedFieldFactory mappedFieldFactory) {
 			this.mappedFieldFactory = mappedFieldFactory;
 			return me();
 		}
 
 		/**
-		 * If {@link #mappedFieldFactory(MappedFieldFactory)} is not overridden,
-		 * {@link MappedFieldBuilderVisitor} implementations may be specified to
-		 * customize behavior of {@link DefaultMappedFieldFactory}
-		 */
+         * If {@link #mappedFieldFactory(MappedFieldFactory)} is not overridden,
+         * {@link MappedFieldBuilderVisitor} implementations may be specified to customize behavior of
+         * {@link DefaultMappedFieldFactory}
+         * 
+         * @param visitors implementations
+         * @return this builder
+         */
 		public Builder mappedFieldBuilderVisitors(MappedFieldBuilderVisitor... visitors) {
 			this.mappedFieldVisitors = visitors;
 			return me();
 		}
 
 		/**
-		 * Overrides factory for providing default
-		 * {@link com.github.restup.repository.Repository} implementations.
-		 */
+         * Overrides factory for providing default {@link com.github.restup.repository.Repository}
+         * implementations.
+         * 
+         * @param repositoryFactory implementation
+         * @return this builder
+         */
 		public Builder repositoryFactory(RepositoryFactory repositoryFactory) {
 			this.repositoryFactory = repositoryFactory;
 			return me();
 		}
 
 		/**
-		 * Overrides factory for providing error objects
-		 */
+         * Overrides factory for providing error objects
+         * 
+         * @param errorFactory implementation
+         * @return this builder
+         */
 		public Builder errorFactory(ErrorFactory errorFactory) {
 			this.errorFactory = errorFactory;
 			return me();
 		}
 
 		/**
-		 * @param methodArgumentFactory
-		 * @return
-		 */
+         * Provides argument instances for services filters
+         * 
+         * @param methodArgumentFactory implementation
+         * @return this builder
+         */
 		public Builder methodArgumentFactory(MethodArgumentFactory methodArgumentFactory) {
 			this.methodArgumentFactory = methodArgumentFactory;
 			return me();
 		}
 
 		/**
-		 * Defines default service method access for resources. Resources may define
-		 * their own.
-		 */
+         * Defines default service method access for resources. Resources may define their own.
+         * 
+         * @param defaultServiceMethodAccess implementation
+         * @return this builder
+         */
 		public Builder serviceMethodAccess(ServiceMethodAccess defaultServiceMethodAccess) {
 			this.defaultServiceMethodAccess = defaultServiceMethodAccess;
 			return me();
 		}
 
 		/**
-		 * Defines default service controller access for resources. Resources may define
-		 * their own.
-		 */
+         * Defines default service controller access for resources. Resources may define their own.
+         * 
+         * @param defaultControllerMethodAccess implementation
+         * @return this builder
+         */
 		public Builder controllerMethodAccess(ControllerMethodAccess defaultControllerMethodAccess) {
 			this.defaultControllerMethodAccess = defaultControllerMethodAccess;
 			return me();
 		}
 
 		/**
-		 * If set to true default Up! {@link ParameterConverter} implementations will
-		 * not be used
-		 */
+         * If set to true default Up! {@link ParameterConverter} implementations will not be used
+         * 
+         * @param excludeDefaultConverters if false default converter functions are registered with
+         *        {@link ConverterFactory}, if true the default converters are excluded
+         * @return this builder
+         */
 		public Builder excludeDefaultConverters(boolean excludeDefaultConverters) {
 			this.excludeDefaultConverters = excludeDefaultConverters;
 			return me();
 		}
 
 		/**
-		 * Overrides default {@link RequestObjectFactory}
-		 */
+         * Overrides default {@link RequestObjectFactory}
+         * 
+         * @param requestObjectFactory implementation
+         * @return this builder
+         */
 		public Builder requestObjectFactory(RequestObjectFactory requestObjectFactory) {
 			this.requestObjectFactory = requestObjectFactory;
 			return me();
 		}
 
 		/**
-		 * Overrides default {@link MappedClassFactory}
-		 */
+         * Overrides default {@link MappedClassFactory}
+         * 
+         * @param mappedClassFactory implementation
+         * @return this builder
+         */
 		public Builder mappedClassFactory(MappedClassFactory mappedClassFactory) {
 			this.mappedClassFactory = mappedClassFactory;
 			return me();
 		}
 
 		/**
-		 * If true, default filters ({@link NotFoundFilter}, etc) will be excluded from
-		 * default filters
-		 */
+         * If true, default filters ({@link NotFoundFilter}, etc) will be excluded from default filters
+         * 
+         * @param excludeFrameworkFilters if true service filters are excluded. if false, Up! filters are
+         *        added.
+         * @return this builder
+         */
 		public Builder excludeFrameworkFilters(boolean excludeFrameworkFilters) {
 			this.excludeFrameworkFilters = excludeFrameworkFilters;
 			return me();
 		}
 
 		/**
-		 * Define default service filters to be used for resources relying on filter
-		 * based services. This will add to default Up! filters unless,
-		 * {@link #excludeFrameworkFilters(boolean)} is set to true
-		 */
+         * Define default service filters to be used for resources relying on filter based services. This
+         * will add to default Up! filters unless, {@link #excludeFrameworkFilters(boolean)} is set to true
+         * 
+         * @param filters to add as default service filters.
+         * @return this builder
+         */
 		public Builder defaultServiceFilters(Object... filters) {
 			this.defaultServiceFilters = filters;
 			return me();
@@ -278,26 +317,33 @@ public interface RegistrySettings {
 		}
 
 		/**
-		 * Default implementation to be used when resource does not specify it's own
-		 * implementation
-		 */
+         * Default implementation to be used when resource does not specify it's own implementation
+         * 
+         * @param restrictedFieldsProvider implementation
+         * @return this builder
+         */
 		public Builder defaultRestrictedFieldsProvider(ResourcePathsProvider restrictedFieldsProvider) {
 			this.defaultRestrictedFieldsProvider = restrictedFieldsProvider;
 			return me();
 		}
 
 		/**
-		 * Default implementation to be used when resource does not specify it's own
-		 * implementation
-		 */
+         * Default implementation to be used when resource does not specify it's own implementation
+         * 
+         * @param defaultSparseFieldsProvider implementation
+         * @return this builder
+         */
 		public Builder defaultSparseFieldsProvider(ResourcePathsProvider defaultSparseFieldsProvider) {
 			this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
 			return me();
 		}
 
 		/**
-		 * The default base path for all resources
-		 */
+         * The default base path for all resources
+         * 
+         * @param basePath used for exposed endpoints
+         * @return this builder
+         */
 		public Builder basePath(String basePath) {
 			this.basePath = basePath;
 			return me();

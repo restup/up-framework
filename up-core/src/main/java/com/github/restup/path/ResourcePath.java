@@ -85,11 +85,6 @@ public class ResourcePath implements ErrorSource {
 		return false;
 	}
 
-	/**
-	 * @param paths
-	 * @param other
-	 * @return
-	 */
 	public static boolean hasPath(List<ResourcePath> paths, ResourcePath other) {
 		if (paths == null || other == null) {
 			return false;
@@ -428,9 +423,10 @@ public class ResourcePath implements ErrorSource {
 	}
 
 	/**
-	 * @return true if this path subsequent paths is the same as other path and
-	 *         subsequent values. Does not consider prior.
-	 */
+     * @param other path
+     * @return true if this path subsequent paths is the same as other path and subsequent values. Does
+     *         not consider prior.
+     */
 	public boolean equalsPath(ResourcePath other) {
 		if (other == null) {
 			return false;
@@ -514,26 +510,10 @@ public class ResourcePath implements ErrorSource {
 		return firstMappedFieldPath().isSubPathOf(other.firstMappedFieldPath());
 	}
 
-	//
-	// public ResourcePath copy() {
-	// ResourcePath copy = null;
-	// Builder b = builder();
-	// ResourcePath path = first();
-	// while ( path != null ) {
-	// b.append(path.value());
-	// if ( path.value == this.value) {
-	// copy = b.current;
-	// }
-	// path = path.next;
-	// }
-	// b.build();
-	// return copy;
-	// }
-
 	/**
-	 * @return true if this path matches or is a sub path of other. ex "foo.bar" is
-	 *         a sub path of "foo"
-	 */
+     * @param other path
+     * @return true if this path matches or is a sub path of other. ex "foo.bar" is a sub path of "foo"
+     */
 	public boolean isSubPathOf(ResourcePath other) {
 		if (other == null) {
 			return false;
@@ -770,8 +750,9 @@ public class ResourcePath implements ErrorSource {
 		}
 
 		/**
-		 * If true errors will be ignored
-		 */
+         * @param quiet If true errors will be ignored
+         * @return this builder
+         */
 		public Builder setQuiet(boolean quiet) {
 			this.quiet = quiet;
 			return me();

@@ -10,6 +10,9 @@ public interface RequestParser {
 
     /**
      * parse request appending results to builder
+     * 
+     * @param request
+     * @param builder
      */
     void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder);
 

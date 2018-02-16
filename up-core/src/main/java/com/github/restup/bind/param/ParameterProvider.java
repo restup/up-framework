@@ -13,6 +13,7 @@ public interface ParameterProvider {
     List<String> getParameterNames();
 
     /**
+     * @param parameterName name of parameter
      * @return all values for the specified parameterName
      */
     String[] getParameter(String parameterName);

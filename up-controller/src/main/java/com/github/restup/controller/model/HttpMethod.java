@@ -17,6 +17,7 @@ public enum HttpMethod {
     }
 
     /**
+     * @param access settings
      * @return true if method is supported for multiple ids
      */
     public boolean supportsAccessByIds(ControllerMethodAccess access) {
@@ -33,6 +34,7 @@ public enum HttpMethod {
     }
 
     /**
+     * @param access settings
      * @return true if method is supported for single ids
      */
     public boolean supportsItemOperation(ControllerMethodAccess access) {

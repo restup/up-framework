@@ -6,7 +6,11 @@ import com.github.restup.query.ResourceQueryStatement.Type;
 import com.github.restup.registry.Resource;
 
 /**
- * Parses fields parameters. <p> Ex: For a resource foo with fields named a, b, & c
+ * Parses fields parameters.
+ * <p>
+ * Ex: For a resource foo with fields named a, b, &amp; c
+ * </p>
+ * 
  * <pre>
  * ?fields=a,b
  * ?filter[foo]=a,b

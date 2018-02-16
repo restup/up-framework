@@ -1,16 +1,24 @@
 package com.github.restup.controller.method;
 
+import java.io.Serializable;
+import org.apache.commons.collections4.CollectionUtils;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.request.UpdateRequest;
-import java.io.Serializable;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
- * Handle PUT operations <ul> <li>Multiple documents</li> <li>A single document</li> <li>Multiple document matching query criteria</li> </ul>
+ * Handle PUT operations
+ * <ul>
+ * <li>Multiple documents</li>
+ * <li>A single document</li>
+ * <li>Multiple document matching query criteria</li>
+ * </ul>
+ * 
+ * @param <T> resource type
+ * @param <ID> resource id type
  */
 public class PatchMethodController<T, ID extends Serializable> extends BulkMethodController<T, ID, UpdateRequest<T, ID>> {
 

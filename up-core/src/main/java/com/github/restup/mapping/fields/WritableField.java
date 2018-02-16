@@ -14,13 +14,13 @@ public interface WritableField<TARGET, VALUE> {
     void writeValue(TARGET instance, VALUE value);
 
     /**
-     * Returns a new instance of the object containing the field so that it may be populated using {@link #writeValue(Object, Object)} if needed
+     * @return a new instance of the object containing the field so that it may be populated using
+     *         {@link #writeValue(Object, Object)} if needed
      */
     TARGET createDeclaringInstance();
 
     /**
-     * Create an instance of a container object of the field.
-     * @return
+     * @return an instance of a container object of the field.
      */
     default VALUE createInstance() {
         return null;

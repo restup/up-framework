@@ -3,7 +3,6 @@ package com.github.restup.mapping.fields;
 import static com.github.restup.util.ReflectionUtils.getAnnotation;
 import static com.github.restup.util.ReflectionUtils.getGenericReturnType;
 import static com.github.restup.util.ReflectionUtils.getReturnType;
-
 import com.github.restup.annotations.field.CaseInsensitive;
 import com.github.restup.annotations.field.Immutable;
 import com.github.restup.annotations.field.Param;
@@ -13,7 +12,11 @@ import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 
 /**
- * Default {@link MappedFieldFactory} implementation. <p> Provides default mapping and accepts {@link MappedFieldBuilderVisitor}s which will be applied to the {@link MappedField.Builder} allowing for overriding default mapping details. (For example, api, persistent names obtained from implementation specific annotations).
+ * Default {@link MappedFieldFactory} implementation.
+ * <p>
+ * Provides default mapping and accepts {@link MappedFieldBuilderVisitor}s which will be applied to
+ * the {@link MappedField.Builder} allowing for overriding default mapping details. (For example,
+ * api, persistent names obtained from implementation specific annotations).
  */
 public class DefaultMappedFieldFactory implements MappedFieldFactory {
 

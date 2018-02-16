@@ -17,6 +17,8 @@ public interface ErrorFactory {
     Errors createErrors();
 
     /**
+     * @param parameterName name of parameter
+     * @param parameterValue value of parameter
      * @return A new {@link ParameterError} instance
      */
     ParameterError createParameterError(String parameterName, Object parameterValue);

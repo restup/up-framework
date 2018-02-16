@@ -1,12 +1,14 @@
 package com.github.restup.controller.request.parser.params;
 
+import org.apache.commons.lang3.StringUtils;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.util.Assert;
-import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provides support for parameters that may contain a delimited list
+ * 
+ * @param <P> parameter type
  */
 public abstract class AbstractDelimitedParamParser<P> extends AbstractRequestParamParser<P> {
 

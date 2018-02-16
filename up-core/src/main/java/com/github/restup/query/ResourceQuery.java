@@ -34,11 +34,12 @@ public class ResourceQuery {
      * Convenience method for finding a resource by id
      *
      * @param registry containing meta data about the resource
-     * @param resourceClass resource to find
+     * @param resourceName resource to find
      * @param id the id of the resource to find
      * @param <T> type of class to be found
      * @return resource found
      */
+    @SuppressWarnings("unchecked")
     public static <T> T find(ResourceRegistry registry, String resourceName, Object id) {
         return (T) query(registry, resourceName).filterById(id).get();
     }
@@ -51,8 +52,9 @@ public class ResourceQuery {
      * Create a new query builder
      *
      * @param registry containing meta data about the resource
-     * @param resourceClass resource to find
+     * @param resourceName resource to find
      * @param <T> type of class to be found
+     * @return this builder
      */
     public static <T> Builder<T> query(ResourceRegistry registry, String resourceName) {
         return new Builder<T>(registry, resourceName);
@@ -76,11 +78,12 @@ public class ResourceQuery {
         private final RequestObjectFactory factory;
         private ResourceQueryStatement.Builder query;
 
+        @SuppressWarnings("unchecked")
         Builder(ResourceRegistry registry, String resourceName) {
             super();
             Assert.notNull(registry, "registry is required");
             Assert.notNull(resourceName, "resourceName is required");
-            this.resource = (Resource) registry.getResource(resourceName);
+            this.resource = (Resource<T, ?>) registry.getResource(resourceName);
             this.factory = registry.getSettings().getRequestObjectFactory();
             Assert.notNull(resource, "resource is required");
             query = ResourceQueryStatement.builder(resource);

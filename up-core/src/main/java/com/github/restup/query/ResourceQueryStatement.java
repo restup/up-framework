@@ -77,28 +77,28 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
     }
 
     /**
-     * Basic requested paths... foo, bar
+     * @return Basic requested paths... foo, bar
      */
     public List<ResourcePath> getRequestedPaths() {
         return requestedPaths;
     }
 
     /**
-     * Paths required based upon a requested relationship
+     * @return Paths required based upon a requested relationship
      */
     public List<ResourcePath> getRequiredRelationshipPaths() {
         return requiredRelationshipPaths;
     }
 
     /**
-     * Paths requested to be excluded from response... fields=-bar
+     * @return Paths requested to be excluded from response... fields=-bar
      */
     public List<ResourcePath> getRequestedPathsExcluded() {
         return requestedPathsExcluded;
     }
 
     /**
-     * Paths requested to be included in response... fields=+foo
+     * @return Paths requested to be included in response... fields=+foo
      */
     public List<ResourcePath> getRequestedPathsAdded() {
         return requestedPathsAdded;

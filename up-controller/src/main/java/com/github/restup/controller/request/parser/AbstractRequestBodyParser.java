@@ -9,7 +9,10 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.ResourceData;
 
 /**
- * Abstract implementation for handling request body, providing commons support for detecting error conditions.
+ * Abstract implementation for handling request body, providing commons support for detecting error
+ * conditions.
+ * 
+ * @param <T> type of resource
  */
 public abstract class AbstractRequestBodyParser<T> implements RequestParser {
 

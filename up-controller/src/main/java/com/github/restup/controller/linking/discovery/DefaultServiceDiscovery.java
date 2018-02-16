@@ -4,7 +4,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 
 /**
- * Default implementation builds urls based upon request & registry details
+ * Default implementation builds urls based upon request &amp; registry details
  */
 public class DefaultServiceDiscovery implements ServiceDiscovery {
 

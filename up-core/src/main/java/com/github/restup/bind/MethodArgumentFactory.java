@@ -25,10 +25,13 @@ public interface MethodArgumentFactory {
     <T> T newInstance(Class<T> clazz);
 
     /**
-     * Create a new instance of clazz, appending any errors to the
+     * Create a new instance of clazz, appending any errors to {@link Errors}
      *
+     * @param clazz to instantiate
      * @param ctx the context of the filter execution requiring the argument
      * @param errors to append any errors to
+     * @param <T> the type of the class
+     * @return a new object instance
      */
     <T> T newInstance(Class<T> clazz, FilterChainContext ctx, Errors errors);
 

@@ -1,17 +1,28 @@
 package com.github.restup.query;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.criteria.ListCriteria;
 import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 
 /**
- * Provides defaults for queries.  For example, may define <p> <li>Fields required for some internal logic, but not requested in sparse field request <li>Filters applied by default for some access control or hiding inactive data by default <li>Default sort criteria. <p> This is a mutable object, which may be the argument of multiple filter methods setting values as needed.
+ * <p>
+ * Provides defaults for queries. For example, may define
+ * </p>
+ * <ul>
+ * <li>Fields required for some internal logic, but not requested in sparse field request</li>
+ * <li>Filters applied by default for some access control or hiding inactive data by default</li>
+ * <li>Default sort criteria.</li>
+ * </ul>
+ * <p>
+ * This is a mutable object, which may be the argument of multiple filter methods setting values as
+ * needed.
+ * </p>
  *
  * @author abuttaro
  */
@@ -34,6 +45,7 @@ public class ResourceQueryDefaults {
     /**
      * null safe convenience method
      *
+     * @param defaults source of criteria
      * @return true if default criteria is not null, false otherwise
      */
     public static boolean hasCriteria(ResourceQueryDefaults defaults) {
@@ -68,7 +80,11 @@ public class ResourceQueryDefaults {
     }
 
     /**
-     * Add a field that is required for handling the request.  A Repository may implement query projection, retrieving only requested fields.  If a field not requested is required for handling the request, it must also be added to the query for projection.
+     * Add a field that is required for handling the request. A Repository may implement query
+     * projection, retrieving only requested fields. If a field not requested is required for handling
+     * the request, it must also be added to the query for projection.
+     * 
+     * @param beanPaths required
      */
     public void addRequiredFields(String... beanPaths) {
         this.requiredFields = addPaths(requiredFields, beanPaths);
@@ -99,7 +115,9 @@ public class ResourceQueryDefaults {
     }
 
     /**
-     * Add a filter that must always be applied.  For example, a filter that restricts data available to the requestor that may not be passed in the request, but defaulted from an authenticated context.
+     * Add a filter that must always be applied. For example, a filter that restricts data available to
+     * the requestor that may not be passed in the request, but defaulted from an authenticated context.
+     * @param queryCriteria to add
      */
     public void addCriteria(ResourceQueryCriteria queryCriteria) {
         if (queryCriteria != null) {
@@ -119,7 +137,12 @@ public class ResourceQueryDefaults {
     }
 
     /**
-     * Add a default that should be applied only if not present in the request. For example, if a resource has a delete state, by default it may be desired that only active documents are queried.  However, it might be desirable to also permit access to query deleted documents.
+     * Add a default that should be applied only if not present in the request. For example, if a
+     * resource has a delete state, by default it may be desired that only active documents are queried.
+     * However, it might be desirable to also permit access to query deleted documents.
+     * 
+     * @param criteria to add
+     * 
      */
     public void addDefaultCriteria(ResourcePathFilter<?> criteria) {
         if (!isPresentInRequest(criteria)) {
@@ -137,6 +160,8 @@ public class ResourceQueryDefaults {
 
     /**
      * Set default sort. Ignored if sort is specified by request
+     * 
+     * @param sort criteria
      */
     public void setSort(List<ResourceSort> sort) {
         this.sort = sort;
@@ -156,6 +181,8 @@ public class ResourceQueryDefaults {
 
     /**
      * Add default sort by each specified path, with default order (ascending)
+     * 
+     * @param beanPaths to sort
      */
     public void setSort(String... beanPaths) {
         List<ResourceSort> sort = new ArrayList<ResourceSort>();

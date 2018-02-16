@@ -12,12 +12,17 @@ import com.github.restup.controller.model.ResourceControllerResponse;
 public interface ContentNegotiator {
 
     /**
+     * @param request
+     * @param <T>
      * @return true if the controller will accept the request, false otherwise
      */
     <T> boolean accept(ResourceControllerRequest request);
 
     /**
-     * Reformats an object for response.  This may be required to alter the response for a different presentation (json, json api, hal, etc)
+     * Reformats an object for response. This may be required to alter the response for a different
+     * presentation (json, json api, hal, etc)
+     * 
+     * @param <T>
      *
      * @param request producing the response
      * @param response for the request

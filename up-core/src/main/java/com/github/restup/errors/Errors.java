@@ -14,6 +14,8 @@ public interface Errors {
 
     /**
      * Add an error to the list of errors.
+     * 
+     * @param error to add
      */
     void addError(RequestError.Builder error);
 

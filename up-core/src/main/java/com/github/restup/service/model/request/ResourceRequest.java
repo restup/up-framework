@@ -9,6 +9,8 @@ public interface ResourceRequest<T> {
 
     /**
      * The requested resource
+     * 
+     * @return resource requested
      */
     Resource<?, ?> getResource();
 }

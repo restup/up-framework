@@ -1,18 +1,26 @@
 package com.github.restup.controller.method;
 
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.service.model.request.BulkRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
 
 /**
- * Handle DELETE operations <ul> <li>Multiple documents</li> <li>A single document</li> <li>Multiple document matching query criteria</li> </ul>
+ * Handle DELETE operations
+ * <ul>
+ * <li>Multiple documents</li>
+ * <li>A single document</li>
+ * <li>Multiple document matching query criteria</li>
+ * </ul>
+ * 
+ * @param <T> resource type
+ * @param <ID> resource id type
  */
 public class DeleteMethodController<T, ID extends Serializable> extends BulkMethodController<T, ID, DeleteRequest<T, ID>> {
 

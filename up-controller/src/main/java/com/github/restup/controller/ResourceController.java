@@ -28,9 +28,9 @@ import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.settings.ControllerSettings;
-import com.github.restup.errors.StatusCode;
-import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
+import com.github.restup.errors.StatusCode;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.registry.Resource;
@@ -41,67 +41,111 @@ import com.github.restup.util.Assert;
 import com.google.gson.Gson;
 
 /**
- * <ol> <li>Create A document <p>
+ * <ol>
+ * <li>Create A document
+ * 
  * <pre>
  * POST /foo
  * { data : {} }
  * </pre>
- * <p> <li>Create Multiple documents by passing an array. <p>
+ * 
+ * </li>
+ * <li>Create Multiple documents by passing an array.
+ * 
  * <pre>
  * POST /foo
  * { data : [{}] }
  * </pre>
- * <p> <li>Update a document by id <p>
+ * 
+ * </li>
+ * <li>Update a document by id
+ * 
  * <pre>
  * PUT /foo/1 { data : {} }
  * </pre>
- * <p> <li>Update multiple documents passing an array <p>
+ * 
+ * <li>Update multiple documents passing an array
+ * 
  * <pre>
  * PUT /foo { data : [{}] }
  * </pre>
- * <p> <li>Get a single document by id <p>
+ * 
+ * </li>
+ * <li>Get a single document by id
+ * 
  * <pre>
  * GET / foo / 1
  * </pre>
- * <p> <li>List documents <p>
+ * 
+ * </li>
+ * <li>List documents
+ * 
  * <pre>
  * GET / foo
  * </pre>
- * <p> <li>Get multiple documents by id <p>
+ * 
+ * </li>
+ * <li>Get multiple documents by id
+ * 
  * <pre>
  * GET /foo/1,2,3
  * </pre>
- * <p> <li>Delete a document by id <p>
+ * 
+ * </li>
+ * <li>Delete a document by id
+ * 
  * <pre>
  * DELETE / foo / 1
  * </pre>
- * <p> <li>Delete multiple documents by id <p>
+ * 
+ * </li>
+ * <li>Delete multiple documents by id
+ * 
  * <pre>
  * DELETE /foo/1,2,3
  * </pre>
- * <p> <li>Delete multiple documents matching filter criteria <p>
+ * 
+ * </li>
+ * <li>Delete multiple documents matching filter criteria
+ * 
  * <pre>
  * DELETE /foo?filter[x]=y
  * </pre>
- * <p> <li>Patch a document by id <p>
+ * 
+ * </li>
+ * <li>Patch a document by id
+ * 
  * <pre>
  * PATCH /foo/1 { data : {} }
  * </pre>
- * <p> <li>Patch multiple documents by id <p>
+ * 
+ * </li>
+ * <li>Patch multiple documents by id
+ * 
  * <pre>
  * PATCH /foo/1,2,3
  * { data : {} }
  * </pre>
- * <p> <li>Patch multiple documents matching filter criteria <p>
+ * 
+ * </li>
+ * <li>Patch multiple documents matching filter criteria
+ * 
+ * 
  * <pre>
  * PATCH /foo?filter[x]=y
  * { data : {} }
  * </pre>
- * <p> <li>Patch multiple documents passing an array <p>
+ * 
+ * </li>
+ * <li>Patch multiple documents passing an array
+ * 
+ * 
  * <pre>
  * PATCH /foo { data : [{}] }
  * </pre>
- * <p> </ol>
+ * 
+ * </li>
+ * </ol>
  *
  * @author abuttaro
  */
@@ -118,6 +162,7 @@ public class ResourceController {
     private final PatchMethodController<?, ?> patchController;
     private final PostMethodController<?, ?> postController;
     private final PutMethodController<?, ?> putController;
+
     public ResourceController(ControllerSettings.Builder settings) {
         this(settings.build());
     }
@@ -167,7 +212,7 @@ public class ResourceController {
                     }
                 } else if (items > 1) {
                     if (itemOperation || !method.supportsMultiple(access)
-                            // array not supported in combination with multiple ids
+                    // array not supported in combination with multiple ids
                             || ids > 1) {
                         throw error(request, "DOCUMENT_ARRAY_NOT_SUPPORTED", "Array of documents not supported");
                     }
@@ -270,9 +315,9 @@ public class ResourceController {
 
     private static void addUpdateFields(ParsedResourceControllerRequest.Builder<?> builder, List<MappedField<?>> fields,
             Integer i) {
-    		fields.stream()
-    			.filter(f -> !f.isImmutable())
-    			.map(f -> builder.addRequestedPath(i, f));
+        fields.stream()
+                .filter(f -> !f.isImmutable())
+                .map(f -> builder.addRequestedPath(i, f));
     }
 
     public Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e) {
@@ -281,6 +326,12 @@ public class ResourceController {
 
     /**
      * Handles exceptions when building {@link ResourceControllerRequest} and handling request
+     * 
+     * @param <T> resource type
+     * @param <ID> resource id type
+     * @param builder request builder
+     * @param response response object
+     * @return response
      */
     public <T, ID extends Serializable> Object request(ResourceControllerRequest.AbstractBuilder<?, ?> builder,
             ResourceControllerResponse response) {
@@ -463,9 +514,12 @@ public class ResourceController {
         }
 
         /**
-         * Use the content negotiator for the specified mediaType as the default content negotiator. This will allow the mediaType to be rendered in a browser by default if desired.
+         * 
+         * Use the content negotiator for the specified mediaType as the default content negotiator. This
+         * will allow the mediaType to be rendered in a browser by default if desired.
          *
-         * @throws IllegalArgumentException if the specified mediaType is not supported
+         * @param mediaType default media type
+         * @return this builder
          */
         public Builder defaultMediaType(String mediaType) {
             settings.defaultMediaType(mediaType);
@@ -474,6 +528,8 @@ public class ResourceController {
 
         /**
          * @see #defaultMediaType(String)
+         * @param mediaType type of media
+         * @return this builder
          */
         public Builder defaultMediaType(MediaType mediaType) {
             return defaultMediaType(mediaType.getContentType());

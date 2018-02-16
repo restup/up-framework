@@ -30,6 +30,8 @@ import com.github.restup.service.model.ResourceData;
 
 /**
  * Contains result of parsing parameters
+ * 
+ * @param <T> type of resource requested
  */
 public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
 

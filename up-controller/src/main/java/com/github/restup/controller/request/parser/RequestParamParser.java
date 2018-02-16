@@ -17,9 +17,15 @@ public interface RequestParamParser {
     boolean accept(String parameterName);
 
     /**
-     * Parses the parameter as needed and appends appropriate details to the {@link ParsedResourceControllerRequest.Builder}
+     * Parses the parameter as needed and appends appropriate details to the
+     * {@link ParsedResourceControllerRequest.Builder}
+     * 
+     * @param request
+     * @param builder
+     * @param <T>
      *
      * @param parameterName name of the parameter, never null
+     * @param parameterValue
      */
     <T> void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<T> builder, String parameterName, String[] parameterValue);
 

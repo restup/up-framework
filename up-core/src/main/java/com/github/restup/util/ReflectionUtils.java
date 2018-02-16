@@ -26,7 +26,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.github.restup.annotations.operations.AutoWrapDisabled;
 import com.github.restup.errors.RequestErrorException;
-import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.UntypedClass;
 import com.googlecode.gentyref.GenericTypeReflector;
 
@@ -57,11 +56,12 @@ public class ReflectionUtils {
     }
 
     /**
-     * Create a new instance, catching exceptions and rethrowing using {@link RequestError#throwError(Throwable)}
-     *
+     * Create a new instance, catching exceptions and rethrowing using
+     * {@link RequestErrorException#rethrow(Throwable)}
+     * 
+     * @param c class to create
+     * @param <T> type of object to create
      * @return a new instance of c
-     * @throws SecurityException 
-     * @throws NoSuchMethodException 
      */
     public final static <T> T newInstance(Class<T> c) {
         if (c != null) {
@@ -148,6 +148,9 @@ public class ReflectionUtils {
     }
 
     /**
+     * @param annClass annotation class
+     * @param p property descriptor
+     * @param <T> type of annotation passed
      * @return true if the annotation exists on any of the {@link AnnotatedElement}s
      */
     public static <T extends Annotation> boolean hasAnnotation(Class<T> annClass, PropertyDescriptor p) {
@@ -187,7 +190,12 @@ public class ReflectionUtils {
     }
 
     /**
-     * get an {@link Annotation} from the {@link AnnotatedElement}
+     * Nullsafe {@link AnnotatedElement#getAnnotation(Class)}
+     * 
+     * @param <T> type of annotation passed get an {@link Annotation} from the {@link AnnotatedElement}
+     * @param f annotated element
+     * @param annotationClass annotation to get
+     * @return annotation if present, null otherwise
      */
     public static <T extends Annotation> T getAnnotation(AnnotatedElement f, Class<T> annotationClass) {
         if (f != null) {

@@ -1,13 +1,18 @@
 package com.github.restup.jackson.serializer;
 
+import java.io.IOException;
+import java.util.Iterator;
+import java.util.Map;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.fasterxml.jackson.databind.ser.BeanPropertyWriter;
 import com.github.restup.controller.model.result.NegotiatedResult;
-import com.github.restup.errors.RequestError;
 import com.github.restup.errors.ErrorCode;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.ReadableField;
 import com.github.restup.path.DataPathValue;
@@ -18,11 +23,6 @@ import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.response.PagedResult;
 import com.github.restup.service.model.response.ResourceResult;
-import java.io.IOException;
-import java.util.Iterator;
-import java.util.Map;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> extends JsonSerializer<T> {
 
@@ -80,7 +80,8 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     }
 
     /**
-     * writes fieldName, then calls {@link #writeObject(Resource, Map, Object, T, JsonGenerator, SerializerProvider)}
+     * writes fieldName, then calls
+     * {@link #writeObject(Resource, Map, Object, NegotiatedResult, JsonGenerator, SerializerProvider)}
      */
     protected void writeObjectField(String fieldName, Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, T result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeFieldName(fieldName);

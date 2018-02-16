@@ -129,6 +129,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
     }
 
     /**
+     * @param request parsed request
      * @return A url representing the request including all accepted parameters, less paging params
      */
     public String buildResourceRequestBaseUrl(ParsedResourceControllerRequest<?> request) {
