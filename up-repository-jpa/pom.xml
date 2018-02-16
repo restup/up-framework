@@ -4,7 +4,7 @@
     <parent>
         <artifactId>up-parent</artifactId>
         <groupId>com.github.restup</groupId>
-        <version>0.0.1</version>
+        <version>0.0.2-SNAPSHOT</version>
         <relativePath>../up-parent</relativePath>
     </parent>
     <modelVersion>4.0.0</modelVersion>
