@@ -4,6 +4,7 @@ import java.util.Collection;
 import java.util.Comparator;
 import javax.validation.Validator;
 import com.github.restup.bind.MethodArgumentFactory;
+import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
@@ -93,6 +94,11 @@ public interface ResourceRegistry extends MappedClassRegistry {
             return me();
         }
 
+        public Builder converterFactory(ConverterFactory converterFactory) {
+            settings.converterFactory(converterFactory);
+            return me();
+        }
+
         public Builder mappedFieldFactory(MappedFieldFactory mappedFieldFactory) {
             settings.mappedFieldFactory(mappedFieldFactory);
             return me();
@@ -125,11 +131,6 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
         public Builder controllerMethodAccess(ControllerMethodAccess defaultControllerMethodAccess) {
             settings.controllerMethodAccess(defaultControllerMethodAccess);
-            return me();
-        }
-
-        public Builder excludeDefaultConverters(boolean excludeDefaultConverters) {
-            settings.excludeDefaultConverters(excludeDefaultConverters);
             return me();
         }
 

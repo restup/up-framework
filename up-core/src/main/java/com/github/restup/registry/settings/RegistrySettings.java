@@ -12,10 +12,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
-import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorFactory;
-import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.DefaultMappedFieldFactory;
@@ -24,12 +22,9 @@ import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.visitors.JacksonMappedFieldBuilderVisitor;
-import com.github.restup.path.AllResourcePathsProvider;
-import com.github.restup.path.EmptyResourcePathsProvider;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.service.filters.BulkOperationByQueryFilter;
@@ -97,7 +92,6 @@ public interface RegistrySettings {
         private final static Logger log = LoggerFactory.getLogger(RegistrySettings.class);
 
 		private boolean excludeFrameworkFilters;
-		private boolean excludeDefaultConverters;
 
 		private ResourceRegistryRepository resourceRegistryMap;
 		private MappedClassFactory mappedClassFactory;
@@ -120,6 +114,7 @@ public interface RegistrySettings {
 		private ResourcePathsProvider defaultSparseFieldsProvider;
 		private ResourcePathsProvider defaultRestrictedFieldsProvider;
 		private String basePath;
+        private ConverterFactory converterFactory;
 
 		private Builder me() {
 			return this;
@@ -237,18 +232,6 @@ public interface RegistrySettings {
 		}
 
 		/**
-         * If set to true default Up! {@link ParameterConverter} implementations will not be used
-         * 
-         * @param excludeDefaultConverters if false default converter functions are registered with
-         *        {@link ConverterFactory}, if true the default converters are excluded
-         * @return this builder
-         */
-		public Builder excludeDefaultConverters(boolean excludeDefaultConverters) {
-			this.excludeDefaultConverters = excludeDefaultConverters;
-			return me();
-		}
-
-		/**
          * Overrides default {@link RequestObjectFactory}
          * 
          * @param requestObjectFactory implementation
@@ -344,10 +327,19 @@ public interface RegistrySettings {
          * @param basePath used for exposed endpoints
          * @return this builder
          */
-		public Builder basePath(String basePath) {
-			this.basePath = basePath;
-			return me();
-		}
+        public Builder basePath(String basePath) {
+            this.basePath = basePath;
+            return me();
+        }
+
+        /**
+         * @param converterFactory used for parameter conversion
+         * @return this builder
+         */
+        public Builder converterFactory(ConverterFactory converterFactory) {
+            this.converterFactory = converterFactory;
+            return me();
+        }
 
 		public RegistrySettings build() {
 			String[] packagesToScan = this.packagesToScan;
@@ -410,12 +402,12 @@ public interface RegistrySettings {
 				resourceRegistryMap = new DefaultResourceRegistryRepository();
 			}
 
-			ConverterFactory.Builder builder = ConverterFactory.builder();
-			if (!excludeDefaultConverters) {
-				builder.addDefaults();
+            // builder.add(parameterConverters);
+            ConverterFactory converterFactory = this.converterFactory;
+
+            if (converterFactory == null) {
+                converterFactory = ConverterFactory.builder().addDefaults().build();
 			}
-			// builder.add(parameterConverters);
-			ConverterFactory converterFactory = builder.build();
 
 			ParameterConverterFactory parameterConverterFactory = ParameterConverterFactory
 					.builder(errorFactory)
@@ -424,12 +416,12 @@ public interface RegistrySettings {
 
 			ControllerMethodAccess defaultControllerMethodAccess = this.defaultControllerMethodAccess;
 			if (defaultControllerMethodAccess == null) {
-				defaultControllerMethodAccess = ControllerMethodAccess.builder().setAllEnabled().build();
+                defaultControllerMethodAccess = ControllerMethodAccess.allEnabled();
 			}
 
 			ServiceMethodAccess defaultServiceMethodAccess = this.defaultServiceMethodAccess;
 			if (defaultServiceMethodAccess == null) {
-				defaultServiceMethodAccess = ServiceMethodAccess.builder().setAllEnabled().build();
+                defaultServiceMethodAccess = ServiceMethodAccess.allEnabled();
 			}
 
 			Pagination pagination = defaultPagination;
@@ -439,12 +431,12 @@ public interface RegistrySettings {
 
 			ResourcePathsProvider defaultSparseFields = this.defaultSparseFieldsProvider;
 			if (defaultSparseFields == null) {
-				defaultSparseFields = AllResourcePathsProvider.getDefaultSparseFieldsProvider();
+                defaultSparseFields = ResourcePathsProvider.allApiFields();
 			}
 
 			ResourcePathsProvider restrictedFields = this.defaultRestrictedFieldsProvider;
 			if (restrictedFields == null) {
-				restrictedFields = new EmptyResourcePathsProvider();
+                restrictedFields = ResourcePathsProvider.empty();
 			}
 
 			String basePath = Resource.cleanBasePath(this.basePath);

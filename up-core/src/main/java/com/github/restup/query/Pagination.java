@@ -7,6 +7,8 @@ package com.github.restup.query;
  */
 public interface Pagination {
 
+    Integer getMaxLimit();
+
     Integer getLimit();
 
     Integer getOffset();
@@ -36,6 +38,10 @@ public interface Pagination {
     
     static Pagination of(Integer limit, Integer offset, boolean withTotalsDisabled) {
         return new BasicPagination(limit, offset, withTotalsDisabled);
+    }
+
+    static Pagination of(Integer maxLimit, Integer limit, Integer offset, boolean withTotalsDisabled) {
+        return new BasicPagination(maxLimit, limit, offset, withTotalsDisabled);
     }
 
     static Pagination disabled() {

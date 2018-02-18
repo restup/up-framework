@@ -1,25 +1,21 @@
 package com.github.restup.path;
 
-import com.github.restup.registry.Resource;
 import java.util.List;
+import com.github.restup.registry.Resource;
 
-public class AllResourcePathsProvider implements ResourcePathsProvider {
+class AllResourcePathsProvider implements ResourcePathsProvider {
 
     private final boolean includeTransient;
     private final boolean apiFieldsOnly;
 
-    public AllResourcePathsProvider(boolean includeTransient, boolean apiFieldsOnly) {
+    AllResourcePathsProvider(boolean includeTransient, boolean apiFieldsOnly) {
         super();
         this.includeTransient = includeTransient;
         this.apiFieldsOnly = apiFieldsOnly;
     }
 
-    public AllResourcePathsProvider() {
+    AllResourcePathsProvider() {
         this(true, true);
-    }
-
-    public static ResourcePathsProvider getDefaultSparseFieldsProvider() {
-        return new AllResourcePathsProvider(false, true);
     }
 
     @Override

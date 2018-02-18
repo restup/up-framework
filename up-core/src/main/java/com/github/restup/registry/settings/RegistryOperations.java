@@ -100,8 +100,8 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
         Assert.notNull(resource.getName(), "resource name must not be null");
         Assert.notNull(resource.getType(), "resource type must not be null");
         Assert.notNull(resource.getServiceOperations(), "resource service must not be null");
-        Assert.notNull(resource.getControllerAccess(), "resource httpAccess must not be null");
-        Assert.notNull(resource.getServiceAccess(), "resource internalAccess must not be null");
+        Assert.notNull(resource.getControllerMethodAccess(), "resource httpAccess must not be null");
+        Assert.notNull(resource.getServiceMethodAccess(), "resource internalAccess must not be null");
         Assert.notNull(resource.getIdentityField(), "resource identityField must not be null");
         Assert.notNull(resource.getMapping(), "resource mapping must not be null");
         resourceRepository.registerResource(resource);

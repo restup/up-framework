@@ -10,7 +10,7 @@ public class EmptyResourcePathsProviderTest {
 
     @Test
     public void testGetPaths() {
-        EmptyResourcePathsProvider provider = new EmptyResourcePathsProvider();
+        ResourcePathsProvider provider = ResourcePathsProvider.empty();
         assertEquals(Collections.emptyList(), provider.getPaths(mock(Resource.class)));
     }
 }

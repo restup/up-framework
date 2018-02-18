@@ -13,6 +13,10 @@ public interface ControllerMethodAccess extends ServiceMethodAccess {
         return new Builder();
     }
 
+    static ControllerMethodAccess allEnabled() {
+        return builder().setAllEnabled().build();
+    }
+
     boolean isGetByIdsDisabled();
 
     boolean isPatchByIdsDisabled();

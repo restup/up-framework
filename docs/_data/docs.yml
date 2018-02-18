@@ -1,6 +1,13 @@
 - title: About
   docs:
   - home
+  - resourceRegistry
+  - resources
+  - services
+  - repositories
+  - annotations
+  - methodsWithoutSignatures
+  - patch
 
 - title: Test Support
   docs:

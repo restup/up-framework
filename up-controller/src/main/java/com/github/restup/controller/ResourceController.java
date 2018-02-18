@@ -293,8 +293,8 @@ public class ResourceController {
     }
 
     private static ControllerMethodAccess getMethodAccess(ResourceRegistry registry, Resource<?, ?> resource) {
-        if (resource != null && resource.getControllerAccess() != null) {
-            return resource.getControllerAccess();
+        if (resource != null && resource.getControllerMethodAccess() != null) {
+            return resource.getControllerMethodAccess();
         }
         return registry.getSettings().getDefaultControllerAccess();
     }

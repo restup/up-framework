@@ -15,7 +15,7 @@ public class AnnotatedResourceRepositoryTest {
     public void testGetRepository() {
         ResourceRepository<?,?> repo = mock(ResourceRepository.class);
         Resource<?,?> resource = mock(Resource.class);
-        when(resource.getServiceAccess()).thenReturn(mock(ServiceMethodAccess.class));
+        when(resource.getServiceMethodAccess()).thenReturn(mock(ServiceMethodAccess.class));
         ResourceRegistry registry = mock(ResourceRegistry.class);
         when(resource.getRegistry()).thenReturn(registry);
         when(registry.getSettings()).thenReturn(mock(RegistrySettings.class));
