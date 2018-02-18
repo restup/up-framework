@@ -4,6 +4,7 @@ name: Up! Framework • REST APIs made easy
 description: Build RESTful APIs
 url: https://restup.github.io/up-framework/
 repository: https://github.com/restup/up-framework
+baseurl: /up-framework
 timezone: America/New_York
 collections:
   docs:
@@ -29,3 +30,5 @@ plugins:
 - jekyll-seo-tag
 sass:
   style: compressed
+exclude:
+- run.sh
