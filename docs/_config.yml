@@ -1,0 +1,31 @@
+---
+version: 0.0.1
+name: Up! Framework • REST APIs made easy
+description: Build RESTful APIs
+url: https://restup.github.io/up-framework/
+repository: https://github.com/restup/up-framework
+timezone: America/New_York
+collections:
+  docs:
+    permalink: "/:collection/:path/"
+    output: true
+  posts:
+    permalink: "/news/:year/:month/:day/:title/"
+    output: true
+defaults:
+- scope:
+    path: _docs
+    type: docs
+  values:
+    layout: docs
+- scope:
+    path: _posts
+    type: posts
+  values:
+    layout: news_item
+plugins:
+- jekyll-avatar
+- jekyll-feed
+- jekyll-seo-tag
+sass:
+  style: compressed

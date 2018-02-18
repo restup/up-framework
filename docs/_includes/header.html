@@ -1,0 +1,27 @@
+<header>
+  <div class="flexbox">
+    <div class="center-on-mobiles">
+      <h1>
+        <a href="/" class="logo">
+          <span class="fa">Up! Framework</span>
+        </a>
+      </h1>
+    </div>
+    <nav class="main-nav hide-on-mobiles">
+      {% include primary-nav-items.html %}
+    </nav>
+    <div class="meta hide-on-mobiles">
+      <ul>
+        <li>
+          <a href="{{ site.repository }}/releases/tag/up-framework-{{ site.version }}">v{{ site.version }}</a>
+        </li>
+        <li>
+          <a href="{{ site.repository }}">GitHub</a>
+        </li>
+      </ul>
+    </div>
+  </div>
+  <nav class="mobile-nav show-on-mobiles">
+    {% include mobile-nav-items.html %}
+  </nav>
+</header>
