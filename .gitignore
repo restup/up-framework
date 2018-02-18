@@ -36,3 +36,6 @@ target
 # Mac
 .DS_Store
 
+# Jekyll
+docs/.sass-cache
+docs/_site
