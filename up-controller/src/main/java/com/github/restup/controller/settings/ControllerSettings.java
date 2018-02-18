@@ -219,7 +219,7 @@ public interface ControllerSettings {
             registry.registerResource(
                     Resource.builder(Resource.class)
                             .service(new DiscoveryService(linkBuilderFactory))
-                            .excludeDefaultServiceFilters(true)
+                            .excludeFrameworkFilters(true)
                             .mapping(
                                     MappedClass.builder(Resource.class)
                                             .name(UP_RESOURCE_DISCOVERY)

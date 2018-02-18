@@ -96,7 +96,6 @@ public class ResourceRegistryTest {
             .defaultServiceFilters("")
             .defaultSparseFieldsProvider(defaultSparseFieldsProvider)
             .errorFactory(errorFactory)
-            .excludeDefaultConverters(true)
             .excludeFrameworkFilters(true)
             .mappedClassFactory(mappedClassFactory)
             .mappedFieldBuilderVisitors(visitor)

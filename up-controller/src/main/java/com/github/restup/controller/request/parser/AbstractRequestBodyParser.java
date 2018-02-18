@@ -28,7 +28,7 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
             }
             return;
         } else if (isArray(body)) {
-            ControllerMethodAccess controllerMethodAccess = resource.getControllerAccess();
+            ControllerMethodAccess controllerMethodAccess = resource.getControllerMethodAccess();
             if (!request.getMethod().supportsMultiple(controllerMethodAccess)) {
                 builder.addError(ErrorCode.BODY_ARRAY_NOT_SUPPORTED);
                 return;

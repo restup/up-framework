@@ -181,7 +181,7 @@ public class FilteredServiceTest {
     private ResourceServiceOperations getService(Object repo, Object... filters) {
         Resource<?, ?> resource = Resource.builder(Company.class)
                 .registry(mapBackedRegistry()).repository(repo)
-                .excludeDefaultServiceFilters(true)
+                .excludeFrameworkFilters(true)
                 .serviceFilters(new ServiceFilter() {
                     @Override
                     public <T, ID extends Serializable> boolean accepts(Resource<T, ID> resource) {

@@ -65,7 +65,7 @@ public class FilteredService extends MethodCommandOperations implements Resource
             this.resource = resource;
             this.repository = repository;
             this.filters = filters;
-            this.access = resource.getServiceAccess();
+            this.access = resource.getServiceMethodAccess();
 
             defaultBulkRepo = new DefaultBulkRepository<>(); // TODO
 

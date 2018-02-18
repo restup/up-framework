@@ -3,11 +3,10 @@ package com.github.restup.registry.settings;
 import java.lang.reflect.Type;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.IdentityHashMap;
 import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
 import java.util.function.Predicate;
-
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
@@ -28,7 +27,7 @@ class DefaultResourceRegistryRepository implements ResourceRegistryRepository {
     private final Table<String, String, ResourceRelationship<?, ?, ?, ?>> relationships;
 
     DefaultResourceRegistryRepository() {
-        resources = new HashMap<>();
+        resources = new ConcurrentHashMap<>();
         mappings = new IdentityHashMap<>();
         relationships = HashBasedTable.create();
     }

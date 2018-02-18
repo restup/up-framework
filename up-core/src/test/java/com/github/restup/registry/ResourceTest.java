@@ -8,6 +8,11 @@ import java.util.Arrays;
 import java.util.List;
 import org.junit.Test;
 import com.github.restup.annotations.ApiName;
+import com.github.restup.mapping.MappedClass;
+import com.github.restup.path.ResourcePathsProvider;
+import com.github.restup.query.Pagination;
+import com.github.restup.registry.settings.ControllerMethodAccess;
+import com.github.restup.registry.settings.ServiceMethodAccess;
 
 public class ResourceTest {
 
@@ -65,6 +70,29 @@ public class ResourceTest {
 
     private Resource<Foo, Long> foo(ResourceRegistry registry) {
         return Resource.builder(Foo.class, Long.class).registry(registry).build();
+    }
+
+    public void testBuilder() {
+        Resource.builder()
+                .basePath("/")
+                .controllerMethodAccess(ControllerMethodAccess.allEnabled())
+                .defaultPagination(Pagination.disabled())
+                .excludeFrameworkFilters(true)
+                .name("foo")
+                .pluralName("foos")
+
+                // TODO ???
+                .mappedClassFactory(null)
+                .mapping(MappedClass.builder().build())
+                .registry(null)
+
+                .repository("")
+                .restrictedFieldsProvider(ResourcePathsProvider.empty())
+                .service("")
+                .serviceMethodAccess(ServiceMethodAccess.allEnabled())
+                .serviceFilters("")
+                .sparseFieldsProvider(ResourcePathsProvider.allApiFields());
+
     }
 
     @SuppressWarnings("unused")

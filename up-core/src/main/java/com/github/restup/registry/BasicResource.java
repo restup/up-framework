@@ -31,8 +31,8 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     private final MappedClass<T> mapping;
     private final MappedField<ID> identityField;
 
-    private final ControllerMethodAccess controllerAccess;
-    private final ServiceMethodAccess serviceAccess;
+    private final ControllerMethodAccess controllerMethodAccess;
+    private final ServiceMethodAccess serviceMethodAccess;
     private final Pagination defaultPagination;
     private final ResourcePathsProvider defaultSparseFieldsProvider;
     private final ResourcePathsProvider restrictedFieldsProvider;
@@ -59,8 +59,8 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.registry = registry;
         this.mapping = mapping;
         this.identityField = identityField;
-        this.controllerAccess = controllerAccess;
-        this.serviceAccess = serviceAccess;
+        this.controllerMethodAccess = controllerAccess;
+        this.serviceMethodAccess = serviceAccess;
         this.defaultPagination = pagination;
         this.defaultSparseFieldsProvider = defaultSparseFields;
         this.restrictedFieldsProvider = restrictedFields;
@@ -162,13 +162,13 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     }
 
     @Override
-    public ControllerMethodAccess getControllerAccess() {
-        return controllerAccess;
+    public ControllerMethodAccess getControllerMethodAccess() {
+        return controllerMethodAccess;
     }
 
     @Override
-    public ServiceMethodAccess getServiceAccess() {
-        return serviceAccess;
+    public ServiceMethodAccess getServiceMethodAccess() {
+        return serviceMethodAccess;
     }
 
     @Override

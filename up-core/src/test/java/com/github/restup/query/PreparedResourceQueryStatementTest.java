@@ -17,7 +17,6 @@ import org.junit.Test;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
-import com.github.restup.path.AllResourcePathsProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.ResourceQueryStatement.Builder;
@@ -41,7 +40,7 @@ public class PreparedResourceQueryStatementTest {
     @Before
     public void setup() {
         sparseFieldsDefaultsProvider = new TestResourcePathsProvider();
-        sparseFieldsDefaultsProvider.delegate = AllResourcePathsProvider.getDefaultSparseFieldsProvider();
+        sparseFieldsDefaultsProvider.delegate = ResourcePathsProvider.allApiFields();
         restrictedFieldsProvider = new TestResourcePathsProvider();
         ResourceRegistry registry = mapBackedRegistryBuilder()
                 .mappedFieldBuilderVisitors(
@@ -54,7 +53,7 @@ public class PreparedResourceQueryStatementTest {
                         }).build();
         registry
                 .registerResource(Resource.builder(A2J.class)
-                        .sparseFieldsDefaultsProvider(sparseFieldsDefaultsProvider)
+                        .sparseFieldsProvider(sparseFieldsDefaultsProvider)
                         .restrictedFieldsProvider(restrictedFieldsProvider));
 
         a2j = registry.getResource(A2J.class);

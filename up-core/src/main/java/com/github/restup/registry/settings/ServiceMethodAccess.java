@@ -30,6 +30,10 @@ public interface ServiceMethodAccess {
         return new Builder();
     }
 
+    static ServiceMethodAccess allEnabled() {
+        return builder().setAllEnabled().build();
+    }
+
     static class Builder extends AbstractMethodAccessBuilder<Builder, ServiceMethodAccess> {
 
         private Builder() {

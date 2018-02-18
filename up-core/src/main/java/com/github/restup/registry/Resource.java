@@ -66,9 +66,9 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
 
     ResourceRepositoryOperations getRepositoryOperations();
 
-    ControllerMethodAccess getControllerAccess();
+    ControllerMethodAccess getControllerMethodAccess();
 
-    ServiceMethodAccess getServiceAccess();
+    ServiceMethodAccess getServiceMethodAccess();
 
     ResourceRegistry getRegistry();
 
@@ -226,7 +226,6 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         private Object repository;
         private Object service;
         private Object[] serviceFilters;
-        private RegistrySettings settings;
         private boolean excludeDefaultServiceFilters;
         private ControllerMethodAccess controllerAccess;
         private ServiceMethodAccess serviceAccess;
@@ -239,26 +238,21 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         private MappedClass<T> mappedClass;
         private MappedClassRegistry mappedClassRegistry;
 
-        public Builder(Type resourceClass) {
+        Builder(Type resourceClass) {
             Assert.notNull(resourceClass, "resource class must not be null");
             this.type = resourceClass;
         }
 
-        public Builder() {
+        Builder() {
             this(new UntypedClass<>());
         }
 
-        public Builder<T, ID> me() {
+        Builder<T, ID> me() {
             return this;
         }
 
         public Builder<T, ID> registry(ResourceRegistry registry) {
             this.registry = registry;
-            return me();
-        }
-
-        public Builder<T, ID> settings(RegistrySettings settings) {
-            this.settings = settings;
             return me();
         }
 
@@ -277,12 +271,12 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             return me();
         }
 
-        public Builder<T, ID> controllerAccess(ControllerMethodAccess controllerAccess) {
+        public Builder<T, ID> controllerMethodAccess(ControllerMethodAccess controllerAccess) {
             this.controllerAccess = controllerAccess;
             return me();
         }
 
-        public Builder<T, ID> serviceAccess(ServiceMethodAccess serviceAccess) {
+        public Builder<T, ID> serviceMethodAccess(ServiceMethodAccess serviceAccess) {
             this.serviceAccess = serviceAccess;
             return me();
         }
@@ -302,7 +296,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             return me();
         }
 
-        public Builder<T, ID> excludeDefaultServiceFilters(boolean excludeDefaultServiceFilters) {
+        public Builder<T, ID> excludeFrameworkFilters(boolean excludeDefaultServiceFilters) {
             this.excludeDefaultServiceFilters = excludeDefaultServiceFilters;
             return me();
         }
@@ -312,7 +306,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             return me();
         }
 
-        public Builder<T, ID> sparseFieldsDefaultsProvider(ResourcePathsProvider sparseFieldsDefaultsProvider) {
+        public Builder<T, ID> sparseFieldsProvider(ResourcePathsProvider sparseFieldsDefaultsProvider) {
             this.sparseFieldsDefaultsProvider = sparseFieldsDefaultsProvider;
             return me();
         }
@@ -362,15 +356,13 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             Assert.notNull(type, "resource class must not be null");
             Assert.notNull(registry, "registry must not be null");
 
-            RegistrySettings registrySettings = this.settings;
-            if (registrySettings == null) {
-                registrySettings = registry.getSettings();
-            }
+            RegistrySettings registrySettings = registry.getSettings();
 
             ControllerMethodAccess controllerMethodAccess = this.controllerAccess;
             if (controllerMethodAccess == null) {
                 controllerMethodAccess = registrySettings.getDefaultControllerAccess();
             }
+
             ServiceMethodAccess serviceMethodAccess = this.serviceAccess;
             if (serviceMethodAccess == null) {
                 serviceMethodAccess = registrySettings.getDefaultServiceAccess();
