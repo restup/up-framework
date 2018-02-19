@@ -2,7 +2,7 @@ package com.github.restup.controller;
 
 import org.junit.Before;
 import org.junit.Test;
-
+import com.github.restup.controller.mock.AbstractMockTest;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;

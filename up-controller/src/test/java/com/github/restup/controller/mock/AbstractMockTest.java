@@ -1,10 +1,8 @@
-package com.github.restup.controller;
+package com.github.restup.controller.mock;
 
 import org.junit.Before;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.restup.controller.mock.MockApiExecutor;
-import com.github.restup.controller.mock.MockContentNegotiation;
-import com.github.restup.controller.mock.MockJacksonContentNegotiation;
+import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.model.MediaType;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;

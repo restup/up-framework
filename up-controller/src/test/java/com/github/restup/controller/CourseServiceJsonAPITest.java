@@ -1,5 +1,6 @@
 package com.github.restup.controller;
 
+import com.github.restup.controller.mock.AbstractMockTest;
 import com.github.restup.test.RestApiAssertions;
 import com.university.Course;
 import com.university.Student;

@@ -13,7 +13,7 @@ public abstract class AbstractApiRequestBuilder<B extends AbstractApiRequestBuil
     private Class<?> testClass;
     private String testName;
     private String testFileExtension;
-    private Contents bodyResource;
+    private Contents bodyContents;
 
     @SuppressWarnings({"unchecked"})
     protected B me() {
@@ -28,8 +28,8 @@ public abstract class AbstractApiRequestBuilder<B extends AbstractApiRequestBuil
         return body(Contents.of(body));
     }
 
-    public B body(Contents bodyResource) {
-        this.bodyResource = bodyResource;
+    public B body(Contents bodyContents) {
+        this.bodyContents = bodyContents;
         return me();
     }
 
@@ -80,12 +80,12 @@ public abstract class AbstractApiRequestBuilder<B extends AbstractApiRequestBuil
     }
 
     protected boolean hasConfiguredBody() {
-        return bodyResource != null || isDefaultTestResourceAllowed();
+        return bodyContents != null || isDefaultTestResourceAllowed();
     }
 
     public Contents getBody() {
-        if (bodyResource != null) {
-            return bodyResource;
+        if (bodyContents != null) {
+            return bodyContents;
         }
         if (isDefaultTestResourceAllowed()) {
             RelativeTestResource resource = new RelativeTestResource(testClass, getTestDir(), testName, testFileExtension);

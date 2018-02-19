@@ -1,6 +1,5 @@
 ---
-title: Rpc API Assertions
+title: RpcApiAssertions
 permalink: /docs/rpcApiAssertions/
 ---
 
-todo
