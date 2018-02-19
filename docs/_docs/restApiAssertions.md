@@ -1,6 +1,5 @@
 ---
-title: Rest API Assertions
+title: RestApiAssertions
 permalink: /docs/restApiAssertions/
 ---
 
-todo

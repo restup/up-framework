@@ -6,6 +6,7 @@ url: https://restup.github.io/up-framework/
 repository: https://github.com/restup/up-framework
 baseurl: /up-framework
 timezone: America/New_York
+google_analytics_id: UA-114393794-1
 collections:
   docs:
     permalink: "/:collection/:path/"
@@ -32,3 +33,4 @@ sass:
   style: compressed
 exclude:
 - run.sh
+- _config_local.yml
