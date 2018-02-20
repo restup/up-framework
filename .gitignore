@@ -39,3 +39,7 @@ target
 # Jekyll
 docs/.sass-cache
 docs/_site
+
+# Gradle
+.gradle
+build

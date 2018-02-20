@@ -1,0 +1,22 @@
+rootProject.name = 'up-framework'
+include ':up-parent:up-annotations'
+include ':up-parent:up-test-model'
+include ':up-parent:up-test'
+include ':up-parent:up-test-spring'
+include ':up-parent:up-core'
+include ':up-parent:up-test-repository'
+include ':up-parent:up-controller'
+include ':up-parent:up-repository-jpa'
+include ':up-parent:up-http'
+include ':up-parent:up-spring-mvc'
+
+project(':up-parent:up-annotations').projectDir = "$rootDir/up-annotations" as File
+project(':up-parent:up-test-model').projectDir = "$rootDir/up-test-model" as File
+project(':up-parent:up-test').projectDir = "$rootDir/up-test" as File
+project(':up-parent:up-test-spring').projectDir = "$rootDir/up-test-spring" as File
+project(':up-parent:up-core').projectDir = "$rootDir/up-core" as File
+project(':up-parent:up-test-repository').projectDir = "$rootDir/up-test-repository" as File
+project(':up-parent:up-controller').projectDir = "$rootDir/up-controller" as File
+project(':up-parent:up-repository-jpa').projectDir = "$rootDir/up-repository-jpa" as File
+project(':up-parent:up-http').projectDir = "$rootDir/up-http" as File
+project(':up-parent:up-spring-mvc').projectDir = "$rootDir/up-spring-mvc" as File
