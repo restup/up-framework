@@ -1,6 +1,7 @@
 package com.github.restup.test.spring;
 
 import org.junit.Before;
+import org.junit.Ignore;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +12,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 import org.springframework.test.context.web.WebAppConfiguration;
 import org.springframework.test.web.servlet.setup.MockMvcBuilders;
 import org.springframework.web.context.WebApplicationContext;
+import com.github.restup.test.assertions.Assertions;
 
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class})
 @RunWith(SpringJUnit4ClassRunner.class)
@@ -37,23 +39,15 @@ public class MockServiceTest {
     
     @Test
     public void testAdd() {
-        swallow(() -> test.add() );
+        Assertions.assertThrows(() -> test.add(), AssertionError.class);
     }
     
     @Test
     public void testList() {
-        swallow(() -> test.list());
+        Assertions.assertThrows(() -> test.list(), AssertionError.class);
     }
     
-    private void swallow(Runnable r) {
-        // we don't care about the mock test assertions
-        try {
-            r.run();
-        } catch (Error e) {
-            
-        }
-    }
-    
+    @Ignore
     final static class MockMVCTest extends AbstractMockMVCTest {
 
         public MockMVCTest() {

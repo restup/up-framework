@@ -216,6 +216,7 @@ public class JpaRepositoryTest {
             Course c = new Course();
             c.setName(name);
             c.setNameLowerCase(name.toLowerCase());
+            c.setUniversityId(1l);
             create(c);
         }
     }
