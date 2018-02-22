@@ -1,6 +1,17 @@
+plugins {
+  id 'com.github.kt3k.coveralls' version '2.6.3'
+  id 'net.saliman.cobertura' version '2.5.4'
+}
+
 allprojects  {
   apply plugin: 'maven'
   apply plugin: 'jacoco'
+  apply plugin: 'cobertura'
+
+  repositories {
+    mavenCentral()
+    maven { url "http://repo.maven.apache.org/maven2" }
+  } 
 
   group = 'com.github.restup'
   version = '0.0.2-SNAPSHOT'
@@ -11,14 +22,15 @@ subprojects {
   sourceCompatibility = 1.8
   targetCompatibility = 1.8
   tasks.withType(JavaCompile) {
-  	options.encoding = 'UTF-8'
+    options.encoding = 'UTF-8'
   }
 
-  
+  dependencies {
+    testRuntime "org.slf4j:slf4j-api:1.7.10"
+  }
+
   repositories {
     mavenLocal()
-    
-    maven { url "http://repo.maven.apache.org/maven2" }
   }
 
   jacocoTestReport {
