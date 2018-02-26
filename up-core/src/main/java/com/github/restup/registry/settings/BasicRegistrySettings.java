@@ -76,7 +76,7 @@ public class BasicRegistrySettings implements RegistrySettings {
 
 		MappedClassFactory factory = mappedClassFactory;
 		if (mappedClassFactory == null) {
-			factory = new DefaultMappedClassFactory(this);
+            factory = new DefaultMappedClassFactory(mappedFieldFactory, this.packagesToScan, mappedFieldOrderComparator);
 		}
 
 		// wrap with operations

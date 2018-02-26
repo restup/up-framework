@@ -45,7 +45,7 @@ public abstract class AbstractMockTest {
                 .repositoryFactory(new MapBackedRepositoryFactory())
         .build();
 
-        registry.registerResource(resourceClasses);
+        registry.registerResources(resourceClasses);
         return registry;
     }
 

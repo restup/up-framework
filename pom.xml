@@ -157,6 +157,7 @@
         <module>up-repository-jpa</module>
         <module>up-http</module>
         <module>up-spring-mvc</module>
+        <module>up-spring-boot-starter</module>
     </modules>
 
 </project>

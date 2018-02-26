@@ -4,17 +4,16 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
-
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.query.ResourceQueryStatement.Type;
 import org.junit.Test;
 import org.mockito.Mockito;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.query.ResourceQueryStatement.Type;
 
 public class IncludeParserTest {
 
     @Test
     public void testAccept() {
-        IncludeParser parser = new IncludeParser();
+        IncludeParser parser = new IncludeParser("query");
         assertTrue(parser.accept("query"));
         assertFalse(parser.accept("field"));
         assertFalse(parser.accept("query[foo]"));

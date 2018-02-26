@@ -1,27 +1,24 @@
 package com.github.restup.registry.settings;
 
-import java.util.ArrayList;
 import java.util.Comparator;
 import java.util.List;
 import javax.validation.Validation;
 import javax.validation.Validator;
 import javax.validation.ValidatorFactory;
 import org.apache.commons.lang3.ArrayUtils;
-import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorFactory;
+import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.DefaultMappedFieldFactory;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.MappedFieldFactory;
-import com.github.restup.mapping.fields.visitors.IdentityByConventionMappedFieldBuilderVisitor;
-import com.github.restup.mapping.fields.visitors.JacksonMappedFieldBuilderVisitor;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.Resource;
@@ -348,16 +345,11 @@ public interface RegistrySettings {
 			}
 			Comparator<MappedField<?>> mappedFieldOrderComparator = this.mappedFieldOrderComparator;
 			if (mappedFieldOrderComparator == null) {
-				mappedFieldOrderComparator = new MappedFieldComparator();
+                mappedFieldOrderComparator = MappedClass.getDefaultFieldComparator();
 			}
 			MappedFieldBuilderVisitor[] mappedFieldVisitors = this.mappedFieldVisitors;
 			if (ArrayUtils.isEmpty(mappedFieldVisitors)) {
-				List<MappedFieldBuilderVisitor> visitors = new ArrayList<MappedFieldBuilderVisitor>();
-				visitors.add(new IdentityByConventionMappedFieldBuilderVisitor());
-				if (AutoDetectConstants.JACKSON2_EXISTS) {
-					visitors.add(new JacksonMappedFieldBuilderVisitor());
-				}
-				mappedFieldVisitors = visitors.toArray(new MappedFieldBuilderVisitor[0]);
+                mappedFieldVisitors = MappedFieldBuilderVisitor.getDefaultVisitors();
 			}
 			MappedFieldFactory mappedFieldFactory = this.mappedFieldFactory;
 			if (mappedFieldFactory == null) {
@@ -406,7 +398,7 @@ public interface RegistrySettings {
             ConverterFactory converterFactory = this.converterFactory;
 
             if (converterFactory == null) {
-                converterFactory = ConverterFactory.builder().addDefaults().build();
+                converterFactory = ConverterFactory.getDefaultConverterFactory();
 			}
 
 			ParameterConverterFactory parameterConverterFactory = ParameterConverterFactory
@@ -450,32 +442,6 @@ public interface RegistrySettings {
 					methodArgumentFactory, converterFactory, parameterConverterFactory, defaultServiceFilters,
 					pagination, defaultSparseFields, restrictedFields, basePath);
 		}
-	}
-
-	static class MappedFieldComparator implements Comparator<MappedField<?>> {
-
-		@Override
-        public int compare(MappedField<?> a, MappedField<?> b) {
-			if (a == null) {
-                return b == null ? 0 : 1;
-			}
-            if (b == null) {
-                return -1;
-            }
-			if (a.isIdentifier()) {
-                if (!b.isIdentifier()) {
-                    return -1;
-                }
-            } else if (b.isIdentifier()) {
-				return 1;
-			}
-            int result = StringUtils.compare(a.getApiName(), b.getApiName());
-            if (result == 0) {
-                result = StringUtils.compare(a.getBeanName(), b.getBeanName());
-			}
-            return result;
-		}
-
 	}
 
 }

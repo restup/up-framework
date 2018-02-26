@@ -1,0 +1,120 @@
+<?xml version="1.0"?>
+<project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
+    <modelVersion>4.0.0</modelVersion>
+
+    <parent>
+        <groupId>com.github.restup</groupId>
+        <artifactId>up-parent</artifactId>
+        <version>0.0.2-SNAPSHOT</version>
+        <relativePath>../up-parent</relativePath>
+    </parent>
+
+    <artifactId>up-spring-boot-starter</artifactId>
+    <name>Up! :: spring boot starter</name>
+
+    <properties>
+        <spring-boot.version>1.5.10.RELEASE</spring-boot.version>
+    </properties>
+
+	<dependencyManagement>
+		<dependencies>
+			<dependency>
+				<!-- Import dependency management from Spring Boot -->
+				<groupId>org.springframework.boot</groupId>
+				<artifactId>spring-boot-dependencies</artifactId>
+				<version>${spring-boot.version}</version>
+				<type>pom</type>
+				<scope>import</scope>
+			</dependency>
+		</dependencies>
+	</dependencyManagement>
+
+    <dependencies>
+
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter</artifactId>
+        </dependency>
+ 
+        <dependency>
+            <groupId>com.github.restup</groupId>
+            <artifactId>up-controller</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <dependency>
+            <groupId>com.github.restup</groupId>
+            <artifactId>up-spring-mvc</artifactId>
+            <version>${project.version}</version>
+        </dependency>
+        
+        <!-- optional dependencies -->
+        
+        <dependency>
+            <groupId>com.github.restup</groupId>
+            <artifactId>up-repository-jpa</artifactId>
+            <version>${project.version}</version>
+            <optional>true</optional>
+        </dependency>
+
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+            <optional>true</optional>
+        </dependency>
+        
+        <!-- test dependencies -->
+		
+        <dependency>
+            <groupId>junit</groupId>
+            <artifactId>junit</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.mockito</groupId>
+            <artifactId>mockito-core</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.restup.test</groupId>
+            <artifactId>up-test-model</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope> 
+        </dependency>
+
+        <dependency>
+            <groupId>com.github.restup.test</groupId>
+            <artifactId>up-test</artifactId>
+            <version>${project.version}</version>
+            <scope>test</scope> 
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-test</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-data-jpa</artifactId>
+            <scope>test</scope>
+        </dependency>
+        
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-web</artifactId>
+            <scope>test</scope>
+        </dependency>
+
+        <dependency>
+            <groupId>com.h2database</groupId>
+            <artifactId>h2</artifactId>
+            <scope>test</scope> 
+        </dependency>
+        
+    </dependencies>
+
+</project>

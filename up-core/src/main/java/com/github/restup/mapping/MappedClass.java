@@ -5,7 +5,6 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
-import java.util.Map;
 import org.apache.commons.lang3.StringUtils;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.util.Assert;
@@ -17,12 +16,16 @@ import com.github.restup.util.Assert;
  */
 public interface MappedClass<T> {
 
-    public static Builder<Object> builder() {
+    static Builder<Object> builder() {
         return new AnonymousBuilder();
     }
 
-    public static <T> Builder<T> builder(Class<T> type) {
+    static <T> Builder<T> builder(Class<T> type) {
         return new Builder<T>(type);
+    }
+
+    static Comparator<MappedField<?>> getDefaultFieldComparator() {
+        return new DefaultMappedFieldComparator();
     }
 
     /**

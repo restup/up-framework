@@ -6,7 +6,7 @@ package com.github.restup.registry.settings;
  * settings. Similarly, enabled methods may still be disabled if the service method setting is
  * disabled. By default, all are enabled.
  */
-public interface ControllerMethodAccess extends ServiceMethodAccess {
+public interface ControllerMethodAccess extends MethodAccess {
 
 
     static Builder builder() {

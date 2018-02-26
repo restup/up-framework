@@ -25,7 +25,7 @@ public class TestRegistries {
     
     public static ResourceRegistry universityRegistry() {
         ResourceRegistry registry = mapBackedRegistry();
-        registry.registerResource(University.class, Course.class);
+        registry.registerResources(University.class, Course.class);
         return registry;
     }
     

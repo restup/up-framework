@@ -1,7 +1,7 @@
 package com.github.restup.controller.linking;
 
+import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.controller.settings.ControllerSettings;
 
 /**
  * A factory for providing {@link LinkBuilder} implementations which may be configured using {@link ControllerSettings.Builder#linkBuilderFactory(LinkBuilderFactory)}
@@ -18,5 +18,9 @@ public interface LinkBuilderFactory {
      * @return a link builder for the request.
      */
     LinkBuilder getLinkBuilder(ParsedResourceControllerRequest<?> request, Object result);
+
+    static LinkBuilderFactory getDefaultLinkBuilderFactory(ServiceDiscovery discovery) {
+        return new DefaultLinkBuilderFactory(discovery);
+    }
 
 }

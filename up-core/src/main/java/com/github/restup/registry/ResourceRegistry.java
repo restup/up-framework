@@ -19,6 +19,7 @@ import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.registry.settings.ServiceMethodAccess;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
+import com.github.restup.util.Streams;
 
 /**
  * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data,
@@ -31,12 +32,19 @@ import com.github.restup.service.model.request.RequestObjectFactory;
  */
 public interface ResourceRegistry extends MappedClassRegistry {
 
-
     void registerResource(Resource.Builder<?, ?> b);
 
-    void registerResource(Class<?> resourceClass);
+    default void registerResource(Class<?> resourceClass) {
+        registerResource(Resource.builder(resourceClass));
+    }
 
-    void registerResource(Class<?>... resourceClasses);
+    default void registerResources(Class<?>... resourceClasses) {
+        Streams.forEach(resourceClasses, this::registerResource);
+    }
+
+    default void registerResources(Collection<Class<?>> collection) {
+        collection.stream().forEach(c -> registerResource(c));
+    }
 
     RegistrySettings getSettings();
 

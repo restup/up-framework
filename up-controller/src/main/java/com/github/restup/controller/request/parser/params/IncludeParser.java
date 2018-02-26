@@ -1,20 +1,19 @@
 package com.github.restup.controller.request.parser.params;
 
-import com.github.restup.annotations.field.Relationship;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.query.ResourceQueryStatement.Type;
 
 /**
  * <p>
- * Parses query parameters
+ * Parses include parameters
  * <p>
  * <p>
  * Ex: For a resource with relationships to resources named foo &amp; bar
  * </p>
  * 
  * <pre>
- * ?query=foo,bar
+ * ?include=foo,bar
  * </pre>
  * <p>
  * Since a resource may have multiple relationships to a resource, the path may be targeted as well.
@@ -23,18 +22,18 @@ import com.github.restup.query.ResourceQueryStatement.Type;
  * </p>
  * 
  * <pre>
- * /foo?query=bar[goodBarId]
- * /bar?query=foo[goodBarId]
+ * /foo?include=bar[goodBarId]
+ * /bar?include=foo[goodBarId]
  * </pre>
  *
  * @author abuttaro
  */
 public class IncludeParser extends AbstractDelimitedParamParser<String> {
 
-    // TODO nested includes /foo?query[bar]=boo
+    // TODO nested includes /foo?include[bar]=boo
 
     public IncludeParser() {
-        this("query");
+        this("include");
     }
 
     public IncludeParser(String parameterName) {

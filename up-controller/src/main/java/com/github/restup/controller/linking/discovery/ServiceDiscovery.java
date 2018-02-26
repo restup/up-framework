@@ -17,4 +17,8 @@ public interface ServiceDiscovery {
      */
     String locateResourceUrl(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource);
 
+    static ServiceDiscovery getDefaultServiceDiscovery() {
+        return new DefaultServiceDiscovery();
+    }
+
 }
