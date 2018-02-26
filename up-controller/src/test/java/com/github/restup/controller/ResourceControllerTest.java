@@ -77,12 +77,13 @@ public class ResourceControllerTest {
 
     public ResourceController controller(ResourceRegistry registry) {
         return ResourceController.builder()
-                .requestParsers(bodyParser)
-                .contentNegotiators(contentNegotiatorA, contentNegotiatorB, contentNegotiatorC, new NoOpContentNegotiator())
+                .autoDetectDisabled(true)
+                .requestParser(RequestParser.builder()
+                        .requestParsers(bodyParser))
+                .contentNegotiator(ContentNegotiator.builder()
+                        .contentNegotiators(contentNegotiatorA, contentNegotiatorB, contentNegotiatorC, new NoOpContentNegotiator()))
                 .interceptors(interceptorA, interceptorB, new NoOpRequestInterceptor())
                 .registry(registry)
-                .requestParamParsers()
-                .autoDetectDisabled(true)
                 .build();
     }
 
@@ -205,12 +206,12 @@ public class ResourceControllerTest {
         controller.requestInternal(request, response);
         
         assertInvocations(1, service);
-        verify(interceptorA, times(1)).before(any(ParsedResourceControllerRequest.class));
-        verify(interceptorA, times(1)).before(any(ParsedResourceControllerRequest.class));
-        verify(interceptorB, times(1)).after(any(ParsedResourceControllerRequest.class));
-        verify(interceptorB, times(1)).after(any(ParsedResourceControllerRequest.class));
-        verify(contentNegotiatorA, times(1)).accept(any(ResourceControllerRequest.class));
-        verify(contentNegotiatorA, times(1)).formatResponse(any(ParsedResourceControllerRequest.class), any(ResourceControllerResponse.class), nullable(Object.class));
+        verify(interceptorA).before(any(ParsedResourceControllerRequest.class));
+        verify(interceptorA).before(any(ParsedResourceControllerRequest.class));
+        verify(interceptorB).after(any(ParsedResourceControllerRequest.class));
+        verify(interceptorB).after(any(ParsedResourceControllerRequest.class));
+        verify(contentNegotiatorA, times(2)).accept(any(ResourceControllerRequest.class));
+        verify(contentNegotiatorA).formatResponse(any(ParsedResourceControllerRequest.class), any(ResourceControllerResponse.class), nullable(Object.class));
         verify(contentNegotiatorB, times(0)).formatResponse(any(ParsedResourceControllerRequest.class), any(ResourceControllerResponse.class), nullable(Object.class));
     }
 
@@ -218,13 +219,13 @@ public class ResourceControllerTest {
     public void testPost() {
         fields("name,id", "workers");
         post(company());
-        verify(service, times(1)).create(any(CreateRequest.class));
+        verify(service).create(any(CreateRequest.class));
     }
 
     @Test
     public void testPostMultiple() {
         post(company(), company());
-        verify(service, times(1)).create(any(BulkRequest.class));
+        verify(service).create(any(BulkRequest.class));
     }
 
     @Test
@@ -247,19 +248,19 @@ public class ResourceControllerTest {
         fields("name,id");
         body(company());
         put(1);
-        verify(service, times(1)).update(any(UpdateRequest.class));
+        verify(service).update(any(UpdateRequest.class));
     }
 
     @Test
     public void testPutMultiple() {
         put(company(), company());
-        verify(service, times(1)).update(any(BulkRequest.class));
+        verify(service).update(any(BulkRequest.class));
     }
 
     @Test
     public void testGet() {
         get(1);
-        verify(service, times(1)).find(any(ReadRequest.class));
+        verify(service).find(any(ReadRequest.class));
     }
 
     @Test
@@ -270,7 +271,7 @@ public class ResourceControllerTest {
         include("person");
         page(1, 2);
         get();
-        verify(service, times(1)).list(any(ListRequest.class));
+        verify(service).list(any(ListRequest.class));
     }
 
     @Test
@@ -278,7 +279,7 @@ public class ResourceControllerTest {
         fields("name,workers");
         include("person");
         get(1, 2, 3);
-        verify(service, times(1)).list(any(ListRequest.class));
+        verify(service).list(any(ListRequest.class));
     }
 
     @Test
@@ -291,45 +292,45 @@ public class ResourceControllerTest {
     public void testDelete() {
         fields("name,id");
         delete(1);
-        verify(service, times(1)).delete(any(DeleteRequest.class));
+        verify(service).delete(any(DeleteRequest.class));
     }
 
     @Test
     public void testDeleteByIds() {
         delete(1, 2, 3);
-        verify(service, times(1)).delete(any(BulkRequest.class));
+        verify(service).delete(any(BulkRequest.class));
     }
 
     @Test
     public void testDeleteByFilter() {
         filter("name", "boo");
         delete();
-        verify(service, times(1)).deleteByQueryCriteria(any(DeleteRequest.class));
+        verify(service).deleteByQueryCriteria(any(DeleteRequest.class));
     }
 
     @Test
     public void testPatch() {
         patchById(company(), 1);
-        verify(service, times(1)).update(any(UpdateRequest.class));
+        verify(service).update(any(UpdateRequest.class));
     }
 
     @Test
     public void testPatchMultipleDocuments() {
         patch(company(), company());
-        verify(service, times(1)).update(any(BulkRequest.class));
+        verify(service).update(any(BulkRequest.class));
     }
 
     @Test
     public void testPatchByIds() {
         patchById(company(), 1, 2, 3);
-        verify(service, times(1)).updateByQueryCriteria(any(UpdateRequest.class));
+        verify(service).updateByQueryCriteria(any(UpdateRequest.class));
     }
 
     @Test
     public void testPatchByFilter() {
         filter("name", "boo");
         patch(company());
-        verify(service, times(1)).updateByQueryCriteria(any(UpdateRequest.class));
+        verify(service).updateByQueryCriteria(any(UpdateRequest.class));
     }
 
     private Company company() {

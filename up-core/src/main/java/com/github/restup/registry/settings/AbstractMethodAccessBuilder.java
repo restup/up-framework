@@ -1,6 +1,6 @@
 package com.github.restup.registry.settings;
 
-public abstract class AbstractMethodAccessBuilder<T extends AbstractMethodAccessBuilder<T, R>, R extends ServiceMethodAccess> {
+public abstract class AbstractMethodAccessBuilder<T extends AbstractMethodAccessBuilder<T, R>, R extends MethodAccess> {
 
     boolean createDisabled;
     boolean createMultipleDisabled;
@@ -89,7 +89,6 @@ public abstract class AbstractMethodAccessBuilder<T extends AbstractMethodAccess
         return me();
     }
 
-    public ServiceMethodAccess build() {
-        return new BasicServiceMethodAccess(createDisabled, createMultipleDisabled, getByIdDisabled, listDisabled, deleteByIdDisabled, deleteByIdsDisabled, patchByIdDisabled, patchMultipleDisabled, deleteByQueryDisabled, patchByQueryDisabled);
-    }
+    abstract MethodAccess build();
+
 }

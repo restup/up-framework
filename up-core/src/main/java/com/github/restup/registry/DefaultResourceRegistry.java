@@ -5,7 +5,6 @@ import java.util.Collection;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
-import com.github.restup.util.Streams;
 
 /**
  * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data, field mappings, repository, and service details for each registered each resource <p> A singleton instance exists for convenience, but it is possible to construct multiple {@link DefaultResourceRegistry}s instances if needed.
@@ -36,16 +35,6 @@ public class DefaultResourceRegistry implements ResourceRegistry {
     @SuppressWarnings("rawtypes")
     public void registerResource(Resource.Builder b) {
         registerResource(b.registry(this).build());
-    }
-
-    @Override
-    public void registerResource(Class<?> resourceClass) {
-        registerResource(Resource.builder(resourceClass));
-    }
-
-    @Override
-    public void registerResource(Class<?>... resourceClasses) {
-    		Streams.forEach(resourceClasses, this::registerResource);
     }
 
     @Override

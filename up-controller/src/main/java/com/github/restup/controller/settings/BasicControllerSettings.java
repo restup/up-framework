@@ -9,18 +9,18 @@ import com.github.restup.registry.ResourceRegistry;
 public class BasicControllerSettings implements ControllerSettings {
 
     private final ResourceRegistry registry;
-    private final ContentNegotiator[] contentNegotiators;
+    private final ContentNegotiator contentNegotiator;
     private final RequestInterceptor requestInterceptor;
     private final RequestParser requestParser;
     private final ExceptionHandler exceptionHandler;
     private final String defaultMediaType;
 
-    protected BasicControllerSettings(ResourceRegistry registry, ContentNegotiator[] contentNegotiators,
+    protected BasicControllerSettings(ResourceRegistry registry, ContentNegotiator contentNegotiator,
             RequestInterceptor requestInterceptor, RequestParser requestParsers,
             ExceptionHandler exceptionHandler, String defaultMediaType) {
         super();
         this.registry = registry;
-        this.contentNegotiators = contentNegotiators;
+        this.contentNegotiator = contentNegotiator;
         this.requestInterceptor = requestInterceptor;
         this.requestParser = requestParsers;
         this.exceptionHandler = exceptionHandler;
@@ -38,8 +38,8 @@ public class BasicControllerSettings implements ControllerSettings {
     }
 
     @Override
-    public ContentNegotiator[] getContentNegotiators() {
-        return contentNegotiators;
+    public ContentNegotiator getContentNegotiator() {
+        return contentNegotiator;
     }
 
     @Override

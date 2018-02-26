@@ -78,6 +78,7 @@
 		<asm.version>3.3.1</asm.version>
 		<openpojo.version>0.8.7</openpojo.version>
 		<equalsverifier.version>2.4.2</equalsverifier.version>
+		
 	</properties>
 
 	<dependencyManagement>
@@ -176,6 +177,7 @@
 			<plugin>
 				<groupId>org.apache.maven.plugins</groupId>
 				<artifactId>maven-compiler-plugin</artifactId>
+				<version>3.7.0</version>
 				<configuration>
 					<source>${java.version}</source>
 					<target>${java.version}</target>

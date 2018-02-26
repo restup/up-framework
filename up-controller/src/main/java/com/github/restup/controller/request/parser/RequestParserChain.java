@@ -26,4 +26,8 @@ public class RequestParserChain implements RequestParser {
         }
     }
 
+    RequestParser[] getParsers() {
+        return parsers;
+    }
+
 }

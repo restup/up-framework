@@ -25,7 +25,6 @@ import com.github.restup.controller.model.MediaType;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
-import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.settings.ControllerSettings;
 import com.github.restup.errors.RequestError;
@@ -38,7 +37,6 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Assert;
-import com.google.gson.Gson;
 
 /**
  * <ol>
@@ -153,7 +151,7 @@ public class ResourceController {
 
     private final static Logger log = LoggerFactory.getLogger(ResourceController.class);
     private final ResourceRegistry registry;
-    private final ContentNegotiator[] contentNegotiators;
+    private final ContentNegotiator contentNegotiator;
     private final RequestParser requestParser;
     private final RequestInterceptor interceptor;
     private final ExceptionHandler exceptionHandler;
@@ -173,7 +171,7 @@ public class ResourceController {
         Assert.notNull(settings, "settings are required");
 
         this.registry = settings.getRegistry();
-        this.contentNegotiators = settings.getContentNegotiators();
+        this.contentNegotiator = settings.getContentNegotiator();
         this.requestParser = settings.getRequestParser();
         this.interceptor = settings.getRequestInterceptor();
         this.exceptionHandler = settings.getExceptionHandler();
@@ -366,7 +364,7 @@ public class ResourceController {
         boolean itemOperation = ids == 1;
 
         // confirm content type is supported ahead of parsing work
-        ContentNegotiator contentNegotiator = getContentNegotiator(request);
+        accept(request);
 
         MethodController<T, ID> methodController = getMethodController(request, access, itemOperation);
 
@@ -386,20 +384,13 @@ public class ResourceController {
         return contentNegotiator.formatResponse(parsedRequest, response, result);
     }
 
-    /**
-     * @return ContentNegotiator for content type passed
-     * @throws RequestErrorException if content type is not supported
-     */
-    private ContentNegotiator getContentNegotiator(ResourceControllerRequest request) {
-        for (ContentNegotiator contentNegotiator : contentNegotiators) {
-            if (contentNegotiator.accept(request)) {
-                return contentNegotiator;
-            }
+    private void accept(ResourceControllerRequest request) {
+        if (!contentNegotiator.accept(request)) {
+            throw RequestError.builder(request.getResource())
+                    .status(StatusCode.UNSUPPORTED_MEDIA_TYPE)
+                    .meta(ContentTypeNegotiation.CONTENT_TYPE, request.getContentType())
+                    .buildException();
         }
-        throw RequestError.builder(request.getResource())
-                .status(StatusCode.UNSUPPORTED_MEDIA_TYPE)
-                .meta(ContentTypeNegotiation.CONTENT_TYPE, request.getContentType())
-                .buildException();
     }
 
     @SuppressWarnings({"rawtypes"})
@@ -458,8 +449,13 @@ public class ResourceController {
             return me();
         }
 
-        public Builder contentNegotiators(ContentNegotiator... contentNegotiator) {
-            settings.contentNegotiators(contentNegotiator);
+        public Builder contentNegotiator(ContentNegotiator contentNegotiator) {
+            settings.contentNegotiator(contentNegotiator);
+            return me();
+        }
+
+        public Builder contentNegotiator(ContentNegotiator.Builder contentNegotiator) {
+            settings.contentNegotiator(contentNegotiator);
             return me();
         }
 
@@ -468,23 +464,18 @@ public class ResourceController {
             return me();
         }
 
-        public Builder requestParsers(RequestParser... requestParsers) {
-            settings.requestParsers(requestParsers);
+        public Builder requestParser(RequestParser requestParser) {
+            settings.requestParser(requestParser);
             return me();
         }
 
-        public Builder requestParamParsers(RequestParamParser... requestParamParsers) {
-            settings.requestParamParsers(requestParamParsers);
+        public Builder requestParser(RequestParser.Builder requestParser) {
+            settings.requestParser(requestParser);
             return me();
         }
 
         public Builder exceptionHandler(ExceptionHandler exceptionHandler) {
             settings.exceptionHandler(exceptionHandler);
-            return me();
-        }
-
-        public Builder relationshipParser(RequestParser relationshipParser) {
-            settings.relationshipParser(relationshipParser);
             return me();
         }
 
@@ -500,11 +491,6 @@ public class ResourceController {
 
         public Builder jacksonObjectMapper(ObjectMapper mapper) {
             settings.jacksonObjectMapper(mapper);
-            return me();
-        }
-
-        public Builder gson(Gson gson) {
-            settings.gson(gson);
             return me();
         }
 

@@ -17,7 +17,7 @@ public class PojoTest {
                 .addMatching(5, "com.github.restup.mapping.fields.composition", regex)
                 .addMatching(5, "com.github.restup.service.model.request", regex)
                 .addMatching(4, "com.github.restup.service.model.response", regex)
-                .addMatchingRecursively(6, "com.github.restup.registry", regex)
+                .addMatchingRecursively(7, "com.github.restup.registry", regex)
                 .addMatching(7, "com.github.restup.path", ".+PathValue$")
         .validate();
     }

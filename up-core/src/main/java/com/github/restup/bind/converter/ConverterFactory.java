@@ -29,6 +29,10 @@ public interface ConverterFactory {
 		return builder().addDefaults();
 	}
 
+    static ConverterFactory getDefaultConverterFactory() {
+        return builder().addDefaults().build();
+    }
+
     static class Builder {
 		private ImmutableTable.Builder<Type,Type,Function<?,?>> table = ImmutableTable.builder();
 
@@ -96,4 +100,5 @@ public interface ConverterFactory {
             return new DefaultConverterFactory(table);
 		}
 	}
+
 }

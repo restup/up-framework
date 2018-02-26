@@ -1,9 +1,9 @@
 package com.github.restup.controller.linking.discovery;
 
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.registry.Resource;
 import java.util.Map;
 import java.util.concurrent.ConcurrentHashMap;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.registry.Resource;
 
 /**
  * A simple Map backed cache of discovered service urls.
@@ -18,7 +18,11 @@ public class CachedServiceDiscovery implements ServiceDiscovery {
         this.cache = cache;
     }
 
-    public CachedServiceDiscovery(ServiceDiscovery delegate) {
+    public static ServiceDiscovery cache(ServiceDiscovery serviceDiscovery) {
+        return new CachedServiceDiscovery(serviceDiscovery);
+    }
+
+    CachedServiceDiscovery(ServiceDiscovery delegate) {
         this(delegate, new ConcurrentHashMap<>());
     }
 

@@ -6,7 +6,7 @@ import com.github.restup.registry.Resource;
 /**
  * Default implementation builds urls based upon request &amp; registry details
  */
-public class DefaultServiceDiscovery implements ServiceDiscovery {
+class DefaultServiceDiscovery implements ServiceDiscovery {
 
     @Override
     public String locateResourceUrl(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource) {

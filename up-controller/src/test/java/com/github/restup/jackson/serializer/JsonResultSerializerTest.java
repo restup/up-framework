@@ -49,7 +49,7 @@ public class JsonResultSerializerTest {
                             }
                         }).build();
 
-        registry.registerResource(A2J.class, Shallow.class);
+        registry.registerResources(A2J.class, Shallow.class);
 
         a2j = registry.getResource(A2J.class);
         shallow = registry.getResource(Shallow.class);

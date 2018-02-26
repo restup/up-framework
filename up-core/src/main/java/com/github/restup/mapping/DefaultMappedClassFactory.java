@@ -9,7 +9,6 @@ import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldFactory;
-import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.google.common.collect.ImmutableList;
@@ -36,16 +35,14 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     private final Comparator<MappedField<?>> fieldComparator;
     private final MappedFieldFactory mappedFieldFactory;
 
-    /**
-     * @param settings define packagesToScan, fieldComparator, and mappedFieldFactory.
-     */
-    public DefaultMappedClassFactory(RegistrySettings settings) {
-        Assert.notNull(settings.getMappedFieldFactory(), "mappedFieldFactory is required");
-        Assert.notNull(settings.getPackagesToScan(), "packagesToScan are required");
-        Assert.notNull(settings.getMappedFieldOrderComparator(), "mappedFieldOrderComparator is required");
-        this.packagesToScan = settings.getPackagesToScan();
-        this.fieldComparator = settings.getMappedFieldOrderComparator();
-        this.mappedFieldFactory = settings.getMappedFieldFactory();
+    public DefaultMappedClassFactory(MappedFieldFactory mappedFieldFactory, List<String> packagesToScan,
+            Comparator<MappedField<?>> mappedFieldComparator) {
+        Assert.notNull(mappedFieldFactory, "mappedFieldFactory is required");
+        Assert.notNull(packagesToScan, "packagesToScan are required");
+        Assert.notNull(mappedFieldComparator, "mappedFieldOrderComparator is required");
+        this.packagesToScan = ImmutableList.copyOf(packagesToScan);
+        this.fieldComparator = mappedFieldComparator;
+        this.mappedFieldFactory = mappedFieldFactory;
         this.packagesToIgnore = ImmutableList.of("java");
     }
 

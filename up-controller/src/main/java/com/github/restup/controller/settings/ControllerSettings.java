@@ -5,29 +5,16 @@ import org.apache.commons.lang3.ArrayUtils;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
-import com.github.restup.controller.content.negotiation.DefaultContentNegotiator;
-import com.github.restup.controller.content.negotiation.JsonApiContentNegotiator;
-import com.github.restup.controller.content.negotiation.JsonContentNegotiator;
 import com.github.restup.controller.interceptor.NoOpRequestInterceptor;
 import com.github.restup.controller.interceptor.RequestInterceptor;
 import com.github.restup.controller.interceptor.RequestInterceptorChain;
-import com.github.restup.controller.linking.DefaultLinkBuilderFactory;
 import com.github.restup.controller.linking.LinkBuilderFactory;
-import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
-import com.github.restup.controller.linking.discovery.DefaultServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
-import com.github.restup.controller.request.parser.DefaultRelationshipsParser;
-import com.github.restup.controller.request.parser.ParameterParserChain;
-import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
-import com.github.restup.controller.request.parser.RequestParserChain;
-import com.github.restup.jackson.JacksonConfiguration;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.AutoDetectConstants;
 import com.github.restup.service.registry.DiscoveryService;
-import com.google.gson.Gson;
 
 public interface ControllerSettings {
 
@@ -40,7 +27,7 @@ public interface ControllerSettings {
 
     ResourceRegistry getRegistry();
 
-    ContentNegotiator[] getContentNegotiators();
+    ContentNegotiator getContentNegotiator();
 
     RequestInterceptor getRequestInterceptor();
 
@@ -51,41 +38,16 @@ public interface ControllerSettings {
     static class Builder {
 
         private ResourceRegistry registry;
-        private ContentNegotiator[] contentNegotiator;
+        private ContentNegotiator contentNegotiator;
         private RequestInterceptor[] interceptors;
-        private RequestParser[] requestParsers;
-        private RequestParamParser[] requestParamParsers;
-        private RequestParser relationshipParser;
+        private RequestParser requestParser;
         private ExceptionHandler exceptionHandler;
         private ObjectMapper mapper;
-        private Gson gson;
-        private boolean autoDetectDisabled = false;
-        private LinkBuilderFactory linkBuilderFactory;
-        private ServiceDiscovery serviceDiscovery;
-        private String defaultMediaType;
+        private BuilderSettingsCaptor settingsCaptor;
         
         private Builder() {
             super();
-        }
-
-        private static RequestParser getRequestParser(RequestParser[] requestParsers, RequestParamParser[] requestParamParsers, RequestParser relationshipParser) {
-            RequestParser[] arr = requestParsers;
-            ParameterParserChain paramParser = getRequestParamParser(requestParamParsers);
-            int size = ArrayUtils.getLength(arr);
-            if (size == 0) {
-                return new RequestParserChain(paramParser, relationshipParser);
-            }
-            return new RequestParserChain(ArrayUtils.addAll(arr, paramParser, relationshipParser));
-        }
-
-        private static ParameterParserChain getRequestParamParser(RequestParamParser[] requestParamParsers) {
-            RequestParamParser[] arr = requestParamParsers;
-            int size = ArrayUtils.getLength(arr);
-            if (size == 0) {
-                // with defaults
-                return new ParameterParserChain();
-            }
-            return new ParameterParserChain(arr);
+            settingsCaptor = new BuilderSettingsCaptor();
         }
 
         private static RequestInterceptor getInterceptor(RequestInterceptor[] interceptors) {
@@ -99,34 +61,6 @@ public interface ControllerSettings {
             return new RequestInterceptorChain(arr);
         }
 
-        private ContentNegotiator[] getContentNegotiator(ContentNegotiator[] contentNegotiators) {
-            ContentNegotiator[] arr = contentNegotiators;
-            if (!autoDetectDisabled) {
-                ServiceDiscovery discovery = serviceDiscovery;
-                LinkBuilderFactory factory = linkBuilderFactory;
-                if (discovery == null) {
-                    discovery = new DefaultServiceDiscovery();
-                    discovery = new CachedServiceDiscovery(discovery);
-                }
-                if (factory == null) {
-                    factory = new DefaultLinkBuilderFactory(discovery);
-                }
-                if (AutoDetectConstants.JACKSON2_EXISTS) {
-                    arr = ArrayUtils.addAll(arr, new JsonContentNegotiator()
-                            , new JsonApiContentNegotiator(factory));
-                }
-                linkBuilderFactory = factory;
-            }
-            if (defaultMediaType != null) {
-                DefaultContentNegotiator defaultContentNegotiator = new DefaultContentNegotiator(defaultMediaType, arr);
-                arr = ArrayUtils.add(arr, defaultContentNegotiator);
-            }
-            if (arr == null) {
-                return new ContentNegotiator[]{};
-            }
-            return arr;
-        }
-
         private Builder me() {
             return this;
         }
@@ -136,9 +70,13 @@ public interface ControllerSettings {
             return me();
         }
 
-        public Builder contentNegotiators(ContentNegotiator... contentNegotiator) {
+        public Builder contentNegotiator(ContentNegotiator contentNegotiator) {
             this.contentNegotiator = contentNegotiator;
             return me();
+        }
+
+        public Builder contentNegotiator(ContentNegotiator.Builder contentNegotiator) {
+            return contentNegotiator(contentNegotiator.capture(settingsCaptor).build());
         }
 
         public Builder interceptors(RequestInterceptor... interceptors) {
@@ -146,18 +84,12 @@ public interface ControllerSettings {
             return me();
         }
 
-        public Builder requestParsers(RequestParser... requestParsers) {
-            this.requestParsers = requestParsers;
-            return me();
+        public Builder requestParser(RequestParser.Builder requestParser) {
+            return requestParser(requestParser.capture(settingsCaptor).build());
         }
 
-        public Builder relationshipParser(RequestParser relationshipParser) {
-            this.relationshipParser = relationshipParser;
-            return me();
-        }
-
-        public Builder requestParamParsers(RequestParamParser... requestParamParsers) {
-            this.requestParamParsers = requestParamParsers;
+        public Builder requestParser(RequestParser requestParser) {
+            this.requestParser = requestParser;
             return me();
         }
 
@@ -172,44 +104,42 @@ public interface ControllerSettings {
         }
 
         public Builder serviceDiscovery(ServiceDiscovery serviceDiscovery) {
-            this.serviceDiscovery = serviceDiscovery;
+            settingsCaptor.setServiceDiscovery(serviceDiscovery);
             return me();
         }
 
         public Builder linkBuilderFactory(LinkBuilderFactory linkBuilderFactory) {
-            this.linkBuilderFactory = linkBuilderFactory;
-            return me();
-        }
-
-        public Builder gson(Gson gson) {
-            this.gson = gson;
+            settingsCaptor.setLinkBuilderFactory(linkBuilderFactory);
             return me();
         }
 
         public Builder autoDetectDisabled(boolean autoDetectDisabled) {
-            this.autoDetectDisabled = autoDetectDisabled;
+            settingsCaptor.setAutoDetectDisabled(autoDetectDisabled);
             return me();
         }
 
         public Builder defaultMediaType(String mediaType) {
-            this.defaultMediaType = mediaType;
+            settingsCaptor.setDefaultMediaType(mediaType);
             return me();
         }
 
         public ControllerSettings build() {
+            settingsCaptor.build();
 
-            if (!autoDetectDisabled) {
-                if (AutoDetectConstants.JACKSON2_EXISTS) {
-                    requestParsers(JacksonConfiguration.parser(mapper, defaultMediaType));
-                }
-            }
-            RequestParser relationshipsParser = this.relationshipParser;
-            if (relationshipsParser == null) {
-                relationshipsParser = new DefaultRelationshipsParser();
-            }
             RequestInterceptor interceptor = getInterceptor(this.interceptors);
-            RequestParser requestParser = getRequestParser(requestParsers, requestParamParsers, relationshipsParser);
-            ContentNegotiator[] contentNegotiators = getContentNegotiator(this.contentNegotiator);
+            RequestParser requestParser = this.requestParser;
+            if (requestParser == null) {
+                requestParser = RequestParser.builder()
+                        .capture(settingsCaptor)
+                        .jacksonObjectMapper(mapper)
+                        .build();
+            }
+            ContentNegotiator contentNegotiator = this.contentNegotiator;
+            if ( contentNegotiator == null ) {
+                contentNegotiator = ContentNegotiator.builder()
+                        .capture(settingsCaptor)
+                        .build();
+            }
             ExceptionHandler exceptionHandler = this.exceptionHandler;
             if (exceptionHandler == null) {
                 exceptionHandler = ExceptionHandler.getDefaultInstance();
@@ -218,7 +148,7 @@ public interface ControllerSettings {
             //TODO
             registry.registerResource(
                     Resource.builder(Resource.class)
-                            .service(new DiscoveryService(linkBuilderFactory))
+                            .service(new DiscoveryService(settingsCaptor.getLinkBuilderFactory()))
                             .excludeFrameworkFilters(true)
                             .mapping(
                                     MappedClass.builder(Resource.class)
@@ -227,7 +157,7 @@ public interface ControllerSettings {
                                             .id(String.class, "name")
                             )
             );
-            return new BasicControllerSettings(registry, contentNegotiators, interceptor, requestParser, exceptionHandler, defaultMediaType);
+            return new BasicControllerSettings(registry, contentNegotiator, interceptor, requestParser, exceptionHandler, settingsCaptor.getDefaultMediaType());
         }
     }
 

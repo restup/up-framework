@@ -2,7 +2,6 @@ package com.github.restup.mapping.fields;
 
 import java.lang.reflect.Type;
 import java.util.Objects;
-import com.github.restup.annotations.field.Param;
 import com.github.restup.mapping.fields.composition.CaseSensitivity;
 import com.github.restup.mapping.fields.composition.Identifier;
 import com.github.restup.mapping.fields.composition.Immutability;

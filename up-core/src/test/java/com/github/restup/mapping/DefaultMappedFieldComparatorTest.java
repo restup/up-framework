@@ -1,15 +1,15 @@
-package com.github.restup.registry.settings;
+package com.github.restup.mapping;
 
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
 import org.junit.Test;
+import com.github.restup.mapping.DefaultMappedFieldComparator;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.registry.settings.RegistrySettings.MappedFieldComparator;
 
-public class MappedFieldComparatorTest {
+public class DefaultMappedFieldComparatorTest {
 
-    MappedFieldComparator comparator = new MappedFieldComparator();
+    DefaultMappedFieldComparator comparator = new DefaultMappedFieldComparator();
 
     @Test
     public void testCompareTo() {
