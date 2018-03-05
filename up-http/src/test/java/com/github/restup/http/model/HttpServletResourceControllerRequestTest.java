@@ -16,6 +16,7 @@ import org.mockito.junit.MockitoJUnitRunner;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.model.MediaType;
 import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.registry.settings.RegistrySettings;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpServletResourceControllerRequestTest {
@@ -62,6 +63,7 @@ public class HttpServletResourceControllerRequestTest {
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://www.foo.com/"));
         when(httpRequest.getRequestURI()).thenReturn("/");
         when(httpRequest.getParameterNames()).thenReturn(mock(Enumeration.class));
+        when(registry.getSettings()).thenReturn(mock(RegistrySettings.class));
 
         HttpServletResourceControllerRequest request = HttpServletResourceControllerRequest.builder(httpRequest)
                 .setRegistry(registry)

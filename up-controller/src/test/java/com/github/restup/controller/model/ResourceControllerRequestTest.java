@@ -7,8 +7,8 @@ import java.util.Arrays;
 import java.util.Map;
 import org.assertj.core.api.Assertions;
 import org.junit.Test;
-import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.model.test.company.Company;
@@ -95,7 +95,7 @@ public class ResourceControllerRequestTest {
         assertEquals(value, m.get(key));
     }
 
-    private final static class Builder extends ResourceControllerRequest.AbstractBuilder<Builder, ParsedResourceControllerRequest> {
+    private final static class Builder extends AbstractResourceControllerRequestBuilder<Builder, ParsedResourceControllerRequest> {
 
         @Override
         public ParsedResourceControllerRequest build() {

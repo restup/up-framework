@@ -3,7 +3,6 @@ package com.github.restup.controller.model;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -35,35 +34,25 @@ import com.github.restup.service.model.ResourceData;
  */
 public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
 
-
-    public static <T> Builder<T> builder(ResourceRegistry registry, ResourceControllerRequest request) {
+    static <T> Builder<T> builder(ResourceRegistry registry, ResourceControllerRequest request) {
         return new Builder<T>(registry, request);
     }
 
-    public T getData();
+    T getData();
 
-    public List<ResourcePath> getRequestedPaths();
+    List<ResourcePath> getRequestedPaths();
 
-    public List<ResourceQueryStatement> getRequestedQueries();
+    List<ResourceQueryStatement> getRequestedQueries();
 
-    @Override
-    public List<String> getParameterNames();
+    String getPageLimitParameterName();
 
-    @Override
-    public String[] getParameter(String parameterName);
+    String getPageOffsetParameterName();
 
-    @Override
-    public Enumeration<String> getHeaders(String name);
+    List<String> getAcceptedParameterNames();
 
-    public String getPageLimitParameterName();
+    boolean isPageOffsetOneBased();
 
-    public String getPageOffsetParameterName();
-
-    public List<String> getAcceptedParameterNames();
-
-    public boolean isPageOffsetOneBased();
-
-    public static class Builder<T> implements Errors {
+    static class Builder<T> implements Errors {
 
         private final ResourceRegistry registry;
         private final ResourceControllerRequest request;
@@ -82,7 +71,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         private int maxPageSize;
 
-        public Builder(ResourceRegistry registry, ResourceControllerRequest request) {
+        Builder(ResourceRegistry registry, ResourceControllerRequest request) {
             super();
             maxPageSize = 100;
             this.request = request;

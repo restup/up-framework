@@ -13,7 +13,7 @@
     <name>Up! :: spring boot starter</name>
 
     <properties>
-        <spring-boot.version>1.5.10.RELEASE</spring-boot.version>
+        <spring-boot.version>2.0.0.RELEASE</spring-boot.version>
     </properties>
 
 	<dependencyManagement>
@@ -49,6 +49,12 @@
         </dependency>
         
         <!-- optional dependencies -->
+
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-webmvc</artifactId>
+            <optional>true</optional>
+        </dependency>
         
         <dependency>
             <groupId>com.github.restup</groupId>

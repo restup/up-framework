@@ -35,6 +35,9 @@ public class UpProperties {
     private boolean excludeFrameworkFilters;
     private boolean disableSerializationAutoDetection;
 
+    @Value("${asyncController:true}")
+    private boolean asyncController;
+
     public String getBasePath() {
         return basePath;
     }
@@ -153,6 +156,14 @@ public class UpProperties {
 
     public void setPageNumberParamName(String[] pageNumberParamName) {
         this.pageNumberParamName = pageNumberParamName;
+    }
+
+    public boolean isAsyncController() {
+        return asyncController;
+    }
+
+    public void setAsyncController(boolean asyncController) {
+        this.asyncController = asyncController;
     }
 
 }

@@ -5,6 +5,7 @@ import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ResourceControllerRequest;
@@ -56,7 +57,7 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
         return parameters.get(parameterName);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, MockResourceControllerRequest> {
+    public static class Builder extends AbstractResourceControllerRequestBuilder<Builder, MockResourceControllerRequest> {
 
         private HttpMethod method;
         private String url;

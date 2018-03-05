@@ -4,3 +4,5 @@ org.springframework.boot.autoconfigure.EnableAutoConfiguration=\
   com.github.restup.spring.boot.autoconfigure.UpControllerAutoConfiguration,\
   com.github.restup.spring.boot.autoconfigure.UpSpringMVCControllerAutoConfiguration
 
+
+org.springframework.context.ApplicationListener=com.github.restup.spring.boot.autoconfigure.ResourceRegistrationApplicationListener
