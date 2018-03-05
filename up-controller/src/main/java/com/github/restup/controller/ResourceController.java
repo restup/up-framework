@@ -19,6 +19,7 @@ import com.github.restup.controller.method.MethodController;
 import com.github.restup.controller.method.PatchMethodController;
 import com.github.restup.controller.method.PostMethodController;
 import com.github.restup.controller.method.PutMethodController;
+import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.HttpHeader;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.MediaType;
@@ -331,7 +332,7 @@ public class ResourceController {
      * @param response response object
      * @return response
      */
-    public <T, ID extends Serializable> Object request(ResourceControllerRequest.AbstractBuilder<?, ?> builder,
+    public <T, ID extends Serializable> Object request(AbstractResourceControllerRequestBuilder<?, ?> builder,
             ResourceControllerResponse response) {
         ResourceControllerRequest request = null;
         try {
@@ -416,7 +417,7 @@ public class ResourceController {
     }
 
     private <T> ParsedResourceControllerRequest<T> parseRequest(ResourceControllerRequest request) {
-        ParsedResourceControllerRequest.Builder<T> builder = new ParsedResourceControllerRequest.Builder<T>(registry,
+        ParsedResourceControllerRequest.Builder<T> builder = ParsedResourceControllerRequest.builder(registry,
                 request);
         requestParser.parse(request, builder);
         if (CollectionUtils.size(request.getIds()) > 1) {

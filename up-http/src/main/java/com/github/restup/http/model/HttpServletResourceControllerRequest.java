@@ -6,6 +6,7 @@ import java.util.List;
 import javax.servlet.http.HttpServletRequest;
 import org.apache.commons.lang3.StringUtils;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
+import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.MediaType;
@@ -61,7 +62,7 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
         return request.getParameterValues(parameterName);
     }
 
-    public static class Builder extends AbstractBuilder<Builder, HttpServletResourceControllerRequest> {
+    public static class Builder extends AbstractResourceControllerRequestBuilder<Builder, HttpServletResourceControllerRequest> {
 
         private final HttpServletRequest httpRequest;
 

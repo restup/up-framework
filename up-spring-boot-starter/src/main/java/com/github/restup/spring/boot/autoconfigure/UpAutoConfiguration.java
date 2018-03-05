@@ -85,7 +85,7 @@ public class UpAutoConfiguration {
     public MappedClassFactory defaultUpMappedClassFactory() {
         MappedFieldBuilderVisitor[] visitors = MappedFieldBuilderVisitor.getDefaultVisitors();
         DefaultMappedFieldFactory mappedFieldFactory = new DefaultMappedFieldFactory(visitors);
-        return new DefaultMappedClassFactory(mappedFieldFactory, getPackages(), MappedClass.getDefaultFieldComparator());
+        return new DefaultMappedClassFactory(mappedFieldFactory, getPackages(this.applicationContext), MappedClass.getDefaultFieldComparator());
     }
 
     @Bean
@@ -127,7 +127,7 @@ public class UpAutoConfiguration {
             RestrictedFieldsProviderFactory restrictedFieldsProviderFactory,
             SparseFieldsProviderFactory sparseFieldsProviderFactory) throws ClassNotFoundException {
 
-        ResourceRegistry registry = ResourceRegistry.builder()
+        return ResourceRegistry.builder()
                 .basePath(props.getBasePath())
                 .excludeFrameworkFilters(props.isExcludeFrameworkFilters())
                 .packagesToScan("com.foo", "com.bar")
@@ -143,21 +143,17 @@ public class UpAutoConfiguration {
                 .defaultRestrictedFieldsProvider(restrictedFieldsProviderFactory.getRestrictedFieldsProvider())
                 .defaultSparseFieldsProvider(sparseFieldsProviderFactory.getSparseFieldsProvider())
                 .build();
-
-        registry.registerResources(getResources());
-
-        return registry;
     }
 
-    private Set<Class<?>> getResources() throws ClassNotFoundException {
-        return new EntityScanner(this.applicationContext)
+    static Set<Class<?>> getResources(ApplicationContext applicationContext) throws ClassNotFoundException {
+        return new EntityScanner(applicationContext)
                 .scan(Resource.class, ApiName.class, Plural.class);
     }
 
-    private List<String> getPackages() {
-        List<String> packages = EntityScanPackages.get(this.applicationContext).getPackageNames();
-        if (packages.isEmpty() && AutoConfigurationPackages.has(this.applicationContext)) {
-            packages = AutoConfigurationPackages.get(this.applicationContext);
+    static List<String> getPackages(ApplicationContext applicationContext) {
+        List<String> packages = EntityScanPackages.get(applicationContext).getPackageNames();
+        if (packages.isEmpty() && AutoConfigurationPackages.has(applicationContext)) {
+            packages = AutoConfigurationPackages.get(applicationContext);
         }
         return packages;
     }
