@@ -56,7 +56,7 @@ public class RpcApiAssertions {
          * Uses the calling method's name as the test name
          */
         public Builder test() {
-            return test(RelativeTestResource.getCallingStackElement().getMethodName());
+            return test(RelativeTestResource.getCallingMethodName());
         }
 
         /**

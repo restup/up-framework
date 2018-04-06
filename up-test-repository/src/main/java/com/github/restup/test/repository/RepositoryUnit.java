@@ -86,7 +86,7 @@ public class RepositoryUnit {
                 mapper = getMapper();
             }
             if (fileName == null) {
-                fileName = RelativeTestResource.getCallingStackElement().getMethodName();
+                fileName = RelativeTestResource.getCallingMethodName();
             }
             if (relativeTo == null) {
                 relativeTo = RelativeTestResource.getClassFromStack();
