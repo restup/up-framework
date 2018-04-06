@@ -55,6 +55,13 @@ public class RelativeTestResource implements ResourceContents {
         return el;
     }
 
+    /**
+     * @return first non Up! test element from the stack
+     */
+    public static String getCallingMethodName() {
+        return getCallingStackElement().getMethodName();
+    }
+
     public static Class<?> getClassFromStack() {
         try {
             return Class.forName(getCallingStackElement().getClassName());

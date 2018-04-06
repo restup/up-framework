@@ -214,7 +214,15 @@ public class ContentsAssertions {
             Contents expectedContents = expected.build();
             Contents actualContents = actual.build();
 
-            String expected = expectedContents.getContentAsString();
+
+            String expected = null;
+            String message = "Contents";
+            if (ContentsAssertions.tddCheat(expectedContents, actualContents)) {
+                message = "Result has been written for convenience. Verify correctness of results for future executions";
+            } else {
+                expected = expectedContents.getContentAsString();
+            }
+
             String actual = actualContents.getContentAsString();
             if (matcher == null) {
                 if (json) {
@@ -222,10 +230,6 @@ public class ContentsAssertions {
                 } else {
                     matcher = is(expected);
                 }
-            }
-            String message = "Contents";
-            if (ContentsAssertions.tddCheat(expectedContents, actualContents)) {
-                message = "Result has been written for convenience. Verify correctness of results for future executions";
             }
             log.debug("Expected:\n{}", expected);
             log.debug("Actual:\n{}", actual);

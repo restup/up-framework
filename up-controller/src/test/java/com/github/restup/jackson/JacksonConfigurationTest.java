@@ -6,7 +6,7 @@ import com.github.restup.test.assertions.Assertions;
 public class JacksonConfigurationTest {
 
     @Test
-    public void testtPrivateConstructor() {
+    public void testPrivateConstructor() {
         Assertions.assertPrivateConstructor(JacksonConfiguration.class);
     }
 

@@ -55,8 +55,12 @@ public interface Contents {
 
         public Contents build() {
             Contents result = this.contents;
-            if (result == null && StringUtils.isNotBlank(testName)) {
-                result = new RelativeTestResource(testClass, null, testName, "txt");
+            if (result == null ) {
+                String name = testName;
+                if (StringUtils.isBlank(testName)) {
+                    name = RelativeTestResource.getCallingMethodName();
+                }
+                result = new RelativeTestResource(testClass, null, name, "txt");
             }
             return result;
         }
