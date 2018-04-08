@@ -1,31 +1,32 @@
 package com.github.restup.test.resource;
 
-import org.junit.Test;
-import static org.junit.Assert.*;
+import static com.github.restup.test.resource.Contents.builder;
+import static org.junit.Assert.assertEquals;
+
 import com.github.restup.test.resource.Contents.Builder;
-import static com.github.restup.test.resource.Contents.*;
+import org.junit.Test;
 
 public class ContentsTest {
     
 
     @Test
     public void testContentsBuilderString() {
-        assertContents("foo", builder().contents("foo"));
+        this.assertContents("foo", builder().contents("foo"));
     }
     
     @Test
     public void testContentsBuilderBytes() {
-        assertContents("bytes", builder().contents("bytes".getBytes()));
+        this.assertContents("bytes", builder().contents("bytes".getBytes()));
     }
     
     @Test
     public void testContentsBuilderContents() {
-        assertContents("contents", builder().contents(Contents.of("contents")));
+        this.assertContents("contents", builder().contents(Contents.of("contents")));
     }
     
     @Test
     public void testContentsBuilderRelativeResource() {
-        assertContents("file", builder().testClass(getClass()).testName("contents"));
+        this.assertContents("file", builder().relativeTo(this.getClass()).name("contents"));
     }
 
     private void assertContents(String expected, Builder builder) {

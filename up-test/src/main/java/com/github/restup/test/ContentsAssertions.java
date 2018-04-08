@@ -136,9 +136,9 @@ public class ContentsAssertions {
 
         Builder(final Class<?> unitTest) {
             this.actual = Contents.builder();
-            this.actual.testClass(unitTest);
+            this.actual.relativeTo(unitTest);
             this.expected = Contents.builder();
-            this.expected.testClass(unitTest);
+            this.expected.relativeTo(unitTest);
         }
 
         Builder result(final byte[] body) {
@@ -217,6 +217,9 @@ public class ContentsAssertions {
 
         public Builder json(final boolean json) {
             this.json = json;
+            String type = json ? "json" : null;
+            this.expected.type(type);
+            this.actual.type(type);
             return this.me();
         }
 
@@ -266,8 +269,8 @@ public class ContentsAssertions {
          * @return builder this builder
          */
         public Builder test(final String testName) {
-            this.actual.testName(testName);
-            this.expected.testName(testName);
+            this.actual.name(testName);
+            this.expected.name(testName);
             return this.me();
         }
 
