@@ -18,7 +18,7 @@ public class Assertions {
 
     /**
      * Assert that the classes have a private constructor
-     * @param classes
+     * @param classes to test
      */
     public static void assertPrivateConstructor(Class<?>... classes) {
         for ( Class<?> clazz : classes ) {
@@ -36,11 +36,11 @@ public class Assertions {
     /**
      * Convenience method to use assertJ to assert that the an instance of e is thrown by f.
      *
-     * <p>Ex.<br/> {@code assertThrows( () -> foo(), NullPointerException.class) }</p>
-     * @param f
-     * @param e
-     * @param <E>
-     * @return
+     * <p>Ex. {@code assertThrows( () -> foo(), NullPointerException.class) }</p>
+     * @param f callable that is expected to throw excpetion e
+     * @param e expected exception
+     * @param <E> exception type
+     * @return AbstractThrowableAssert which may be used for additional asserj assertions
      */
     public static <E extends Throwable> AbstractThrowableAssert<?, ?> assertThrows(ThrowingCallable f, Class<E> e) {
         Throwable thrownException = catchThrowable(f);
@@ -52,9 +52,9 @@ public class Assertions {
     /**
      * Creates {@link PojoAssertions} to validate pojos using open pojo.
      * <b>Must call validate()</b>
-     * <p>Ex.<br/> {@code pojo(MyClass.class).validate()</p>
-     * @param classes
-     * @return
+     * <p>Ex. {@code pojo(MyClass.class).validate()}</p>
+     * @param classes to test
+     * @return a PojoAssertions builder
      */
     public static PojoAssertions pojo(Class<?>... classes) {
         return new PojoAssertions().add(classes);
@@ -63,8 +63,8 @@ public class Assertions {
     /**
      * Convenience method to verify hashCode and equals on a class using {@link EqualsVerifier}
      * using specified fields
-     * @param clazz
-     * @param usingFields
+     * @param clazz to test
+     * @param usingFields to be passed to {@link EqualsVerifier#withOnlyTheseFields(String...)}
      */
     public static void assertHashCodeEquals(Class<?> clazz, String... usingFields) {
         EqualsVerifier.forClass(clazz)
@@ -74,7 +74,7 @@ public class Assertions {
 
     /**
      * Convenience method to verify hashCode and equals on a class using {@link EqualsVerifier}
-     * @param clazz
+     * @param clazz to test
      */
     public static void assertHashCodeEquals(Class<?> clazz) {
         EqualsVerifier.forClass(clazz)
@@ -83,7 +83,7 @@ public class Assertions {
 
     /**
      * Convenience method to verify hashCode and equals on multiple classes using {@link EqualsVerifier}
-     * @param classes
+     * @param classes to test
      */
     public static void assertHashCodeEquals(Class<?>... classes) {
         for (Class<?> clazz : classes ) {

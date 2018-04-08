@@ -3,9 +3,7 @@ package com.github.restup.test;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import org.hamcrest.Matcher;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
@@ -15,6 +13,9 @@ import com.github.restup.test.serializer.GsonSerializer;
 import com.github.restup.test.serializer.JacksonSerializer;
 import com.github.restup.test.serializer.ResultSerializer;
 import com.google.gson.Gson;
+import org.hamcrest.Matcher;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Provides a {@link Builder} to build and compare expected and actual result {@link Contents}
@@ -41,43 +42,99 @@ public class ContentsAssertions {
         return false;
     }
 
+
+    /**
+     * Creates a {@link Builder} to assert contents using the calling class for relative path {@link
+     * Contents}
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder builder() {
+        return ContentsAssertions.builder(RelativeTestResource.getClassFromStack());
+    }
+
+    /**
+     * Creates a {@link Builder} to assert contents using a specific class for relative path {@link
+     * Contents}
+     *
+     * @return a new contents assertions builder
+     */
     public static Builder builder(Class<?> unitTest) {
         return new Builder(unitTest);
     }
 
-    public static Builder json(Class<?> unitTest) {
+    /**
+     * An alias for {@link #builder()} for fluently asserting a assertText match
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder assertText() {
+        return ContentsAssertions.builder();
+    }
+
+    /**
+     * An alias for {@link #builder(Class)} for fluently asserting a assertText match
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder assertText(Class<?> unitTest) {
+        return ContentsAssertions.builder(unitTest);
+    }
+
+    /**
+     * A convenience method to create a {@link Builder} to assert assertJson contents using a
+     * specific class for any relative path {@link Contents\}
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder assertJson(Class<?> unitTest) {
         return new Builder(unitTest).json();
     }
 
-    public static Builder builder() {
-        return builder(RelativeTestResource.getClassFromStack());
+    /**
+     * A convenience method to create a {@link Builder} to assert assertJson contents using the
+     * calling class for relative path {@link Contents}
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder assertJson() {
+        return ContentsAssertions.assertJson(RelativeTestResource.getClassFromStack());
     }
 
-    public static Builder json() {
-        return json(RelativeTestResource.getClassFromStack());
+
+    /**
+     * A convenience method to create a {@link Builder} to assert assertJson contents using a
+     * specific Jackson {@link ObjectMapper} instance
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder assertJson(ObjectMapper mapper) {
+        return ContentsAssertions.assertJson().mapper(mapper);
     }
 
-    public static Builder json(ObjectMapper mapper) {
-        return json().mapper(mapper);
-    }
-
-    public static Builder json(Gson gson) {
-        return json().gson(gson);
+    /**
+     * A convenience method to create a {@link Builder} to assert assertJson contents using a
+     * specific {@link Gson} instance
+     *
+     * @return a new contents assertions builder
+     */
+    public static Builder assertJson(Gson gson) {
+        return ContentsAssertions.assertJson().gson(gson);
     }
 
     public static class Builder {
 
-        private Contents.Builder actual;
-        private Contents.Builder expected;
+        private final Contents.Builder actual;
+        private final Contents.Builder expected;
         private Matcher<String> matcher;
         private ResultSerializer serializer;
         private boolean json;
 
         Builder(Class<?> unitTest) {
-            this.actual = Contents.builder();
-            this.actual.testClass(unitTest);
-            this.expected = Contents.builder();
-            this.expected.testClass(unitTest);
+            actual = Contents.builder();
+            actual.testClass(unitTest);
+            expected = Contents.builder();
+            expected.testClass(unitTest);
         }
 
         Builder result(byte[] body) {
@@ -166,7 +223,7 @@ public class ContentsAssertions {
         /**
          * assert expected matches the provided contents
          * 
-         * @param contents
+         * @param contents to match
          */
         public void matches(byte[] contents) {
             result(contents).build();
@@ -175,7 +232,7 @@ public class ContentsAssertions {
         /**
          * assert expected matches the provided contents
          * 
-         * @param contents
+         * @param contents to match
          */
         public void matches(String contents) {
             result(contents).build();
@@ -184,7 +241,7 @@ public class ContentsAssertions {
         /**
          * assert expected matches the provided contents
          * 
-         * @param contents
+         * @param contents to match
          */
         public void matches(Contents contents) {
             result(contents).build();
@@ -193,16 +250,16 @@ public class ContentsAssertions {
         /**
          * assert expected matches the provided contents
          * 
-         * @param contents
+         * @param contents to match
          */
         public void matches(Object contents) {
             result(contents).build();
         }
 
         /**
-         * Set
          * 
-         * @param testName
+         * @param testName name of test to use.  Used by default for relative resource file names.
+         * @return builder this builder
          */
         public Builder test(String testName) {
             actual.testName(testName);
@@ -231,8 +288,8 @@ public class ContentsAssertions {
                     matcher = is(expected);
                 }
             }
-            log.debug("Expected:\n{}", expected);
-            log.debug("Actual:\n{}", actual);
+            ContentsAssertions.log.debug("Expected:\n{}", expected);
+            ContentsAssertions.log.debug("Actual:\n{}", actual);
             assertThat(message, actual, matcher);
         }
     }

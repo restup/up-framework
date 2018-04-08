@@ -95,7 +95,8 @@ public class RestApiAssertions {
         }
 
         /**
-         * If true, the test name will be detected and applied automatically based upon the calling method's name
+         * @param testName used as default relative resource file names
+         * @return this builder
          */
         public Builder test(String testName) {
             this.testName = testName;

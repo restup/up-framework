@@ -53,7 +53,8 @@ public class RpcApiAssertions {
         }
 
         /**
-         * Uses the calling method's name as the test name
+         * Uses the calling method's name as the test name]
+         * @return this builder
          */
         public Builder test() {
             return test(RelativeTestResource.getCallingMethodName());
@@ -61,6 +62,9 @@ public class RpcApiAssertions {
 
         /**
          * If true, the test name will be detected and applied automatically based upon the calling method's name
+         *
+         * @param testNameAsMethodName if true use the calling methods name as the default test name.  true by default
+         * @return thid builder
          */
         public Builder testNameAsMethodName(boolean testNameAsMethodName) {
             this.testNameAsMethodName = testNameAsMethodName;
@@ -276,10 +280,14 @@ public class RpcApiAssertions {
         }
 
         /**
-         * Equivalent to <p>
+         * Equivalent to
          * <pre>
          * param("offset", String.valueOf(offset)).param("limit", String.valueOf(limit))
          * </pre>
+         *
+         * @param offset page offset
+         * @param limit page limit
+         * @return this builder
          */
         public Builder page(int offset, int limit) {
             return param("offset", String.valueOf(offset)).param("limit", String.valueOf(limit));

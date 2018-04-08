@@ -1,16 +1,10 @@
 package com.github.restup.jackson.serializer;
 
-import static com.github.restup.test.ContentsAssertions.json;
+import static com.github.restup.test.ContentsAssertions.assertJson;
 import static com.github.restup.util.ReflectionUtils.getAnnotation;
 import static com.github.restup.util.TestRegistries.mapBackedRegistryBuilder;
 import static org.mockito.Mockito.when;
-import java.util.Arrays;
-import javax.persistence.Transient;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+
 import com.deep.Shallow;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -27,6 +21,13 @@ import com.github.restup.service.model.response.ReadResult;
 import com.github.restup.test.ContentsAssertions.Builder;
 import com.github.restup.util.ReflectionUtils;
 import com.many.fields.A2J;
+import java.util.Arrays;
+import javax.persistence.Transient;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
 public class JsonResultSerializerTest {
@@ -39,40 +40,41 @@ public class JsonResultSerializerTest {
 
     @Before
     public void setup() {
-        ResourceRegistry registry = mapBackedRegistryBuilder()
+        final ResourceRegistry registry = mapBackedRegistryBuilder()
                 .mappedFieldBuilderVisitors(
                         new IdentityByConventionMappedFieldBuilderVisitor()
                         , new MappedFieldBuilderVisitor() {
                             @Override
-                            public <T> void visit(MappedField.Builder<T> b, ReflectionUtils.BeanInfo<T> bi, ReflectionUtils.PropertyDescriptor pd) {
+                            public <T> void visit(
+                                final MappedField.Builder<T> b,
+                                final ReflectionUtils.BeanInfo<T> bi,
+                                final ReflectionUtils.PropertyDescriptor pd) {
                                 b.transientField(null != getAnnotation(Transient.class, pd));
                             }
                         }).build();
 
         registry.registerResources(A2J.class, Shallow.class);
 
-        a2j = registry.getResource(A2J.class);
-        shallow = registry.getResource(Shallow.class);
+        this.a2j = registry.getResource(A2J.class);
+        this.shallow = registry.getResource(Shallow.class);
     }
 
-    private JsonResult result(Object object) {
-        return new JsonResult(request, ReadResult.of(object));
+    private JsonResult result(final Object object) {
+        return new JsonResult(this.request, ReadResult.of(object));
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private Builder a2j() {
-        when(request.getResource()).thenReturn((Resource) a2j);
-        return json(mapper);
+        when(this.request.getResource()).thenReturn((Resource) this.a2j);
+        return assertJson(this.mapper);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private Builder shallow() {
-        when(request.getResource()).thenReturn((Resource) shallow);
-        return json(mapper);
+        when(this.request.getResource()).thenReturn((Resource) this.shallow);
+        return assertJson(this.mapper);
     }
 
-    private void query(Resource<?, ?> resource, String... paths) {
-        when(request.getRequestedQueries()).thenReturn(Arrays.asList(
+    private void query(final Resource<?, ?> resource, final String... paths) {
+        when(this.request.getRequestedQueries()).thenReturn(Arrays.asList(
                 ResourceQueryStatement.builder(resource)
                         .addRequestedPaths(paths)
                         .build()));
@@ -80,39 +82,40 @@ public class JsonResultSerializerTest {
 
     @Test
     public void testNull() throws JsonProcessingException {
-        a2j().expect(result(null))
+        this.a2j().expect(this.result(null))
                 .matches("{\"data\":null}");
     }
 
     @Test
     public void testA2J() throws JsonProcessingException {
-        a2j().test("a2j.json")
-                .matches(result(new A2J(1l, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J")));;
+        this.a2j().test("a2j.json")
+            .matches(this.result(new A2J(1l, "A", "B", "C", "D", "E", "F", "G", "H", "I", "J")));
     }
 
     @Test
     public void testGraph() throws JsonProcessingException {
-        shallow().test("graph.json").matches(result(Shallow.graph()));
+        this.shallow().test("graph.json").matches(this.result(Shallow.graph()));
     }
 
     @Test
     public void testPath() throws JsonProcessingException {
-        query(shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name");
-        shallow().test("path.json").matches(result(Shallow.graph()));
+        this.query(this.shallow, "name", "deep.name", "deep.deeper.name",
+            "deep.deeper.deepest.name");
+        this.shallow().test("path.json").matches(this.result(Shallow.graph()));
     }
 
     @Test
     public void testPathArraysIndexed() throws JsonProcessingException {
-        query(shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name"
+        this.query(this.shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name"
                 , "deeps.1.name", "deeps.0.deepers.1.name", "deeps.1.deepers.0.deepests.0.name");
-        shallow().test("pathArraysIndexed.json").matches(result(Shallow.graph()));
+        this.shallow().test("pathArraysIndexed.json").matches(this.result(Shallow.graph()));
     }
 
     @Test
     public void testPathArrays() throws JsonProcessingException {
-        query(shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name"
+        this.query(this.shallow, "name", "deep.name", "deep.deeper.name", "deep.deeper.deepest.name"
                 , "deeps.name", "deeps.deepers.name", "deeps.deepers.deepests.name");
-        shallow().test("pathArrays.json").matches(result(Shallow.graph()));
+        this.shallow().test("pathArrays.json").matches(this.result(Shallow.graph()));
     }
 
 }
