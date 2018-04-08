@@ -9,17 +9,17 @@ public interface RequestInterceptor {
 
     /**
      * called after request is parsed and validated and before method is executed
-     * 
-     * @param request
-     * @param <T>
+     *
+     * @param request intercepted
+     * @param <T> of resource
      */
     <T> void before(ParsedResourceControllerRequest<T> request);
 
     /**
      * called immediately after method is executed, prior to content negotiation
-     * 
-     * @param request
-     * @param <T>
+     *
+     * @param request intercepted
+     * @param <T> of resource
      */
     <T> void after(ParsedResourceControllerRequest<T> request);
 

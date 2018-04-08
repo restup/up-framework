@@ -10,7 +10,7 @@ import com.github.restup.controller.model.ResourceControllerResponse;
 public class NoOpContentNegotiator implements ContentNegotiator {
 
     @Override
-    public <T> boolean accept(ResourceControllerRequest request) {
+    public boolean accept(ResourceControllerRequest request) {
         return request != null;
     }
 

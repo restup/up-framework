@@ -1,9 +1,7 @@
 package com.github.restup.controller.request.parser;
 
 import static com.github.restup.util.Streams.forEachNonNull;
-import java.util.ArrayList;
-import java.util.List;
-import org.apache.commons.lang3.ArrayUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
@@ -17,23 +15,27 @@ import com.github.restup.controller.request.parser.params.SortParamParser;
 import com.github.restup.controller.settings.BuilderSettingsCaptor;
 import com.github.restup.jackson.JacksonConfiguration;
 import com.github.restup.registry.settings.AutoDetectConstants;
+import java.util.ArrayList;
+import java.util.List;
+import org.apache.commons.lang3.ArrayUtils;
 
 /**
  * Parses {@link ResourceControllerRequest}
  */
 public interface RequestParser {
 
-    /**
-     * parse request appending results to builder
-     * 
-     * @param request
-     * @param builder
-     */
-    void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder);
-
     static Builder builder() {
         return new Builder();
     }
+
+    /**
+     * parse request appending results to builder
+     *
+     * @param request to parse
+     * @param builder handling request
+     */
+    void parse(ResourceControllerRequest request,
+        ParsedResourceControllerRequest.Builder<?> builder);
 
     static class Builder {
 
@@ -52,7 +54,7 @@ public interface RequestParser {
 
         Builder() {
             super();
-            settingsCaptor = new BuilderSettingsCaptor();
+            this.settingsCaptor = new BuilderSettingsCaptor();
         }
 
         Builder me() {
@@ -61,93 +63,96 @@ public interface RequestParser {
 
         public Builder pageOffsetParamName(String... names) {
             this.pageOffsetParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder pageLimitParamName(String... names) {
             this.pageLimitParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder sortParamName(String... names) {
             this.sortParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder filterParamName(String... names) {
             this.filterParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder includeParamName(String... names) {
             this.includeParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder fieldsParamName(String... names) {
             this.fieldsParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder pageNumberParamName(String... names) {
             this.pageNumberParamName = names;
-            return me();
+            return this.me();
         }
 
         public Builder requestParsers(RequestParser... requestParsers) {
             this.requestParsers = requestParsers;
-            return me();
+            return this.me();
         }
 
         public Builder relationshipParser(RequestParser relationshipParser) {
             this.relationshipParser = relationshipParser;
-            return me();
+            return this.me();
         }
 
         public Builder requestParamParsers(RequestParamParser... requestParamParsers) {
             this.requestParamParsers = requestParamParsers;
-            return me();
+            return this.me();
         }
 
         public Builder jacksonObjectMapper(ObjectMapper mapper) {
             this.mapper = mapper;
-            return me();
+            return this.me();
         }
 
 
         public Builder autoDetectDisabled(boolean autoDetectDisabled) {
-            settingsCaptor.setAutoDetectDisabled(autoDetectDisabled);
-            return me();
+            this.settingsCaptor.setAutoDetectDisabled(autoDetectDisabled);
+            return this.me();
         }
 
         public Builder defaultMediaType(String mediaType) {
-            settingsCaptor.setDefaultMediaType(mediaType);
-            return me();
+            this.settingsCaptor.setDefaultMediaType(mediaType);
+            return this.me();
         }
 
         public Builder capture(BuilderSettingsCaptor settingsCaptor) {
             this.settingsCaptor = settingsCaptor.capture(this.settingsCaptor);
-            return me();
+            return this.me();
         }
 
         public RequestParser build() {
-            settingsCaptor.build();
+            this.settingsCaptor.build();
 
             List<RequestParamParser> paramParsers = new ArrayList<>();
-            forEachNonNull(requestParamParsers, p -> paramParsers.add(p));
-            forEachNonNull(pageOffsetParamName, s -> paramParsers.add(new PageOffsetParser(s)));
-            forEachNonNull(pageLimitParamName, s -> paramParsers.add(new PageLimitParser(s)));
-            forEachNonNull(sortParamName, s -> paramParsers.add(new SortParamParser(s)));
-            forEachNonNull(filterParamName, s -> paramParsers.add(new FilterParser(s)));
-            forEachNonNull(includeParamName, s -> paramParsers.add(new IncludeParser(s)));
-            forEachNonNull(fieldsParamName, s -> paramParsers.add(new FieldsParser(s)));
-            forEachNonNull(pageNumberParamName, s -> paramParsers.add(new PageNumberParser(s)));
+            forEachNonNull(this.requestParamParsers, p -> paramParsers.add(p));
+            forEachNonNull(this.pageOffsetParamName,
+                s -> paramParsers.add(new PageOffsetParser(s)));
+            forEachNonNull(this.pageLimitParamName, s -> paramParsers.add(new PageLimitParser(s)));
+            forEachNonNull(this.sortParamName, s -> paramParsers.add(new SortParamParser(s)));
+            forEachNonNull(this.filterParamName, s -> paramParsers.add(new FilterParser(s)));
+            forEachNonNull(this.includeParamName, s -> paramParsers.add(new IncludeParser(s)));
+            forEachNonNull(this.fieldsParamName, s -> paramParsers.add(new FieldsParser(s)));
+            forEachNonNull(this.pageNumberParamName,
+                s -> paramParsers.add(new PageNumberParser(s)));
 
             ParameterParserChain parameterParserChain = ParameterParserChain.of(paramParsers);
 
-            if (!settingsCaptor.getAutoDetectDisabled()) {
+            if (!this.settingsCaptor.getAutoDetectDisabled()) {
                 if (AutoDetectConstants.JACKSON2_EXISTS) {
-                    requestParsers(JacksonConfiguration.parser(mapper, settingsCaptor.getDefaultMediaType()));
+                    this.requestParsers(JacksonConfiguration
+                        .parser(this.mapper, this.settingsCaptor.getDefaultMediaType()));
                 }
             }
 
@@ -156,10 +161,11 @@ public interface RequestParser {
                 relationshipsParser = new DefaultRelationshipsParser();
             }
 
-            if (ArrayUtils.getLength(requestParsers) == 0) {
+            if (ArrayUtils.getLength(this.requestParsers) == 0) {
                 return new RequestParserChain(parameterParserChain, relationshipsParser);
             }
-            return new RequestParserChain(ArrayUtils.addAll(requestParsers, parameterParserChain, relationshipsParser));
+            return new RequestParserChain(
+                ArrayUtils.addAll(this.requestParsers, parameterParserChain, relationshipsParser));
         }
 
     }

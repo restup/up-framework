@@ -1,12 +1,7 @@
 package com.github.restup.jackson.serializer;
 
 import static com.github.restup.jackson.serializer.LinksSerializer.writeLinksObject;
-import java.io.IOException;
-import java.util.Collection;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import org.apache.commons.collections4.CollectionUtils;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.restup.controller.linking.Link;
@@ -17,22 +12,28 @@ import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
+import java.io.IOException;
+import java.util.Collection;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Custom serialization for JSON API content.
  */
 public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiResult> {
 
-    /**
+    /*TODO
      * add top level linking
      */
     @Override
     protected void writeLinking(JsonApiResult result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         List<Link> links = result.getTopLevelLinks();
-        writeLinks(jgen, links);
+        this.writeLinks(jgen, links);
     }
 
-    /**
+    /*TODO
      * Identifier is always a string
      */
     @Override
@@ -42,14 +43,14 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         return result;
     }
 
-    /**
+    /*TODO
      * writes json api Resource objects with id, type, attributes, relationships, links.
      */
     @Override
     protected void writeResourceObject(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, JsonApiResult result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartObject();
-        Object id = writeIdentifier(resource, data, result, jgen, provider);
-        writeType(resource, data, result, jgen, provider);
+        Object id = this.writeIdentifier(resource, data, result, jgen, provider);
+        this.writeType(resource, data, result, jgen, provider);
 
         jgen.writeFieldName(JsonApiResult.ATTRIBUTES);
         jgen.writeStartObject();
@@ -60,9 +61,9 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         super.writeAttributes(resource, paths, data, result, jgen, provider, false);
         jgen.writeEndObject();
 
-        writeResourceRelationships(resource, paths, data, result, jgen, provider);
+        this.writeResourceRelationships(resource, paths, data, result, jgen, provider);
 
-        writeLinks(jgen, result.getLinks(resource, id));
+        this.writeLinks(jgen, result.getLinks(resource, id));
 
         //TODO meta
 
@@ -73,7 +74,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             SerializerProvider provider) throws Exception {
         //TODO toMany relationshps
         Collection<ResourceRelationship<?,?,?,?>> relationships = resource.getRelationshipsTo();
-        if (hasRelationships(paths) || CollectionUtils.isNotEmpty(relationships)) {
+        if (this.hasRelationships(paths) || CollectionUtils.isNotEmpty(relationships)) {
             jgen.writeFieldName(JsonApiResult.RELATIONSHIPS);
             jgen.writeStartObject();
             Object id = resource.getIdentityField().readValue(data);
@@ -92,10 +93,10 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
                     jgen.writeStartObject();
 
                     // write the resource linkage "data" object
-                    writeResourceIdentifierObject(jgen, rel, value);
+                    this.writeResourceIdentifierObject(jgen, rel, value);
 
                     // write relationship links
-                    writeLinks(jgen, result.getRelationshipLinks(rel, id));
+                    this.writeLinks(jgen, result.getRelationshipLinks(rel, id));
 
                     jgen.writeEndObject();
                 }
@@ -108,7 +109,8 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
                     jgen.writeStartObject();
 
                     // write relationship links
-                    writeLinks(jgen, result.getRelationshipLinks(relationship.getFrom(), id, relationship.getType(resource)));
+                    this.writeLinks(jgen, result.getRelationshipLinks(relationship.getFrom(), id,
+                        relationship.getType(resource)));
 
                     jgen.writeEndObject();
 
@@ -118,7 +120,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         }
     }
 
-    /**
+    /*TODO
      * Writes the resource identifier object for a relationship
      * <pre>
      * "data": { "type": "people", "id": "9" }
@@ -132,12 +134,12 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             jgen.writeStartArray();
             Iterator<?> it = ((Iterable<?>) value).iterator();
             while (it.hasNext()) {
-                writeResourceIdentifierFields(jgen, type, it.next());
+                this.writeResourceIdentifierFields(jgen, type, it.next());
             }
             jgen.writeEndArray();
         } else {
             jgen.writeStartObject();
-            id = writeResourceIdentifierFields(jgen, type, value);
+            id = this.writeResourceIdentifierFields(jgen, type, value);
             jgen.writeEndObject();
         }
         return id;
@@ -145,7 +147,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
 
     protected Object writeResourceIdentifierFields(JsonGenerator jgen, String type, Object id) throws Exception {
         jgen.writeStringField(JsonApiResult.TYPE, type);
-        return writeIdentifier(jgen, JsonApiResult.ID, id);
+        return this.writeIdentifier(jgen, JsonApiResult.ID, id);
     }
 
     protected boolean hasRelationships(Map<PathValue, ?> paths) {

@@ -1,11 +1,11 @@
 package com.github.restup.controller.request.parser.params;
 
-import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.util.Assert;
+import java.util.Objects;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * provides base implementation and support for parameter parsing
@@ -70,15 +70,14 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
         return null;
     }
 
-    /**
+    /*TODO
      * @return null if any errors with parameter. Any other value will be passed to #app
      */
-    @SuppressWarnings("unchecked")
     protected <T> P getParsedParameter(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, String parameterName, String[] parameterValues) {
         return (P) parameterName;
     }
 
-    /**
+    /*TODO
      * Apply the param/value to builder
      */
     abstract <T> void apply(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, P parsedParameterName, String value, String rawParamName, String rawValue);
@@ -87,21 +86,23 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
     public <T> void parse(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<T> builder, final String rawParamName, String[] parameterValues) {
         if (parameterValues == null || parameterValues.length < 1) {
             // apply with null to handle empty param error
-            applyNonNull(builder, rawParamName);
+            this.applyNonNull(builder, rawParamName);
         } else {
             // parse param (if necessary) and continue if non null
-            P parsedParameterName = getParsedParameter(details, builder, rawParamName, parameterValues);
+            P parsedParameterName = this
+                .getParsedParameter(details, builder, rawParamName, parameterValues);
             if (parsedParameterName != null) {
                 // process each value
                 for (String rawValue : parameterValues) {
                     if (StringUtils.isBlank(rawValue)) {
                         // add error if blank unless set to ignore blank values
-                        if (!isIgnoreBlank()) {
+                        if (!this.isIgnoreBlank()) {
                             builder.addParameterError(rawParamName, rawValue);
                         }
                     } else {
                         // apply param/value to builder
-                        apply(details, builder, parsedParameterName, rawValue.trim(), rawParamName, rawValue);
+                        this.apply(details, builder, parsedParameterName, rawValue.trim(),
+                            rawParamName, rawValue);
                     }
                 }
             }
@@ -109,22 +110,22 @@ public abstract class AbstractRequestParamParser<P> implements RequestParamParse
     }
 
     protected <T> void applyNonNull(ParsedResourceControllerRequest.Builder<T> builder, String paramName) {
-        if (!ignoreNull) {
+        if (!this.ignoreNull) {
             builder.addParameterError(paramName, null);
         }
     }
 
     @Override
     public boolean accept(String paramName) {
-        return Objects.equals(paramName, parameterName);
+        return Objects.equals(paramName, this.parameterName);
     }
 
     public String getParameterName() {
-        return parameterName;
+        return this.parameterName;
     }
 
     public boolean isIgnoreBlank() {
-        return ignoreBlank;
+        return this.ignoreBlank;
     }
 
 }

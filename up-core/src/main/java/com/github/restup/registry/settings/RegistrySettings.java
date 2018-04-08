@@ -1,13 +1,5 @@
 package com.github.restup.registry.settings;
 
-import java.util.Comparator;
-import java.util.List;
-import javax.validation.Validation;
-import javax.validation.Validator;
-import javax.validation.ValidatorFactory;
-import org.apache.commons.lang3.ArrayUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
@@ -34,6 +26,14 @@ import com.github.restup.service.filters.RelationshipValidationFilter;
 import com.github.restup.service.filters.SequencedIdValidationFilter;
 import com.github.restup.service.model.request.DefaultRequestObjectFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
+import java.util.Comparator;
+import java.util.List;
+import javax.validation.Validation;
+import javax.validation.Validator;
+import javax.validation.ValidatorFactory;
+import org.apache.commons.lang3.ArrayUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Configures settings and implementations to be used by registry.
@@ -125,16 +125,16 @@ public interface RegistrySettings {
          */
 		public Builder resourceRegistryRepository(ResourceRegistryRepository resourceRegistryMap) {
 			this.resourceRegistryMap = resourceRegistryMap;
-			return me();
+			return this.me();
 		}
 
 		/**
-         * @param packagesToScan used by {@link ResourceRegistry} to filter acceptable {@link Resource}s
+		 * @param packagesToScan used by {@link com.github.restup.registry.ResourceRegistry} to filter acceptable {@link Resource}s
          * @return this builder
          */
 		public Builder packagesToScan(String... packagesToScan) {
 			this.packagesToScan = packagesToScan;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -145,7 +145,7 @@ public interface RegistrySettings {
          */
 		public Builder mappedFieldOrderComparator(Comparator<MappedField<?>> mappedFieldOrderComparator) {
 			this.mappedFieldOrderComparator = mappedFieldOrderComparator;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -156,7 +156,7 @@ public interface RegistrySettings {
          */
 		public Builder mappedFieldFactory(MappedFieldFactory mappedFieldFactory) {
 			this.mappedFieldFactory = mappedFieldFactory;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -169,7 +169,7 @@ public interface RegistrySettings {
          */
 		public Builder mappedFieldBuilderVisitors(MappedFieldBuilderVisitor... visitors) {
 			this.mappedFieldVisitors = visitors;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -181,7 +181,7 @@ public interface RegistrySettings {
          */
 		public Builder repositoryFactory(RepositoryFactory repositoryFactory) {
 			this.repositoryFactory = repositoryFactory;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -192,7 +192,7 @@ public interface RegistrySettings {
          */
 		public Builder errorFactory(ErrorFactory errorFactory) {
 			this.errorFactory = errorFactory;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -203,7 +203,7 @@ public interface RegistrySettings {
          */
 		public Builder methodArgumentFactory(MethodArgumentFactory methodArgumentFactory) {
 			this.methodArgumentFactory = methodArgumentFactory;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -214,7 +214,7 @@ public interface RegistrySettings {
          */
 		public Builder serviceMethodAccess(ServiceMethodAccess defaultServiceMethodAccess) {
 			this.defaultServiceMethodAccess = defaultServiceMethodAccess;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -225,7 +225,7 @@ public interface RegistrySettings {
          */
 		public Builder controllerMethodAccess(ControllerMethodAccess defaultControllerMethodAccess) {
 			this.defaultControllerMethodAccess = defaultControllerMethodAccess;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -236,7 +236,7 @@ public interface RegistrySettings {
          */
 		public Builder requestObjectFactory(RequestObjectFactory requestObjectFactory) {
 			this.requestObjectFactory = requestObjectFactory;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -247,7 +247,7 @@ public interface RegistrySettings {
          */
 		public Builder mappedClassFactory(MappedClassFactory mappedClassFactory) {
 			this.mappedClassFactory = mappedClassFactory;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -259,7 +259,7 @@ public interface RegistrySettings {
          */
 		public Builder excludeFrameworkFilters(boolean excludeFrameworkFilters) {
 			this.excludeFrameworkFilters = excludeFrameworkFilters;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -271,29 +271,29 @@ public interface RegistrySettings {
          */
 		public Builder defaultServiceFilters(Object... filters) {
 			this.defaultServiceFilters = filters;
-			return me();
+			return this.me();
 		}
 
         public Builder defaultPagination(Pagination defaultPagination) {
             this.defaultPagination = defaultPagination;
-            return me();
+					return this.me();
         }
 
         public Builder defaultPaginationDisabled() {
-            return defaultPagination(Pagination.disabled());
+					return this.defaultPagination(Pagination.disabled());
         }
 
         public Builder defaultPagination(Integer pageLimit, Integer pageOffset, boolean withTotalsDisabled) {
-            return defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
+					return this.defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
         }
 
 		public Builder defaultPagination(Integer pageLimit) {
-			return defaultPagination(pageLimit, 0, false);
+			return this.defaultPagination(pageLimit, 0, false);
 		}
 
 		public Builder validator(Validator validator) {
 			this.validator = validator;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -304,7 +304,7 @@ public interface RegistrySettings {
          */
 		public Builder defaultRestrictedFieldsProvider(ResourcePathsProvider restrictedFieldsProvider) {
 			this.defaultRestrictedFieldsProvider = restrictedFieldsProvider;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -315,7 +315,7 @@ public interface RegistrySettings {
          */
 		public Builder defaultSparseFieldsProvider(ResourcePathsProvider defaultSparseFieldsProvider) {
 			this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
-			return me();
+			return this.me();
 		}
 
 		/**
@@ -326,7 +326,7 @@ public interface RegistrySettings {
          */
         public Builder basePath(String basePath) {
             this.basePath = basePath;
-            return me();
+					return this.me();
         }
 
         /**
@@ -335,7 +335,7 @@ public interface RegistrySettings {
          */
         public Builder converterFactory(ConverterFactory converterFactory) {
             this.converterFactory = converterFactory;
-            return me();
+					return this.me();
         }
 
 		public RegistrySettings build() {
@@ -367,7 +367,7 @@ public interface RegistrySettings {
 
 			Object[] defaultServiceFilters = this.defaultServiceFilters;
 
-			if (!excludeFrameworkFilters) {
+			if (!this.excludeFrameworkFilters) {
 				defaultServiceFilters = ArrayUtils.addAll(defaultServiceFilters, new BulkOperationByQueryFilter(),
 						new ImmutableFieldValidationFilter(), new IncludeFilter(), new NotFoundFilter(),
 						new RelationshipValidationFilter(), new SequencedIdValidationFilter(),
@@ -416,7 +416,7 @@ public interface RegistrySettings {
                 defaultServiceMethodAccess = ServiceMethodAccess.allEnabled();
 			}
 
-			Pagination pagination = defaultPagination;
+			Pagination pagination = this.defaultPagination;
 			if (pagination == null) {
 				pagination = Pagination.of(10, 0);
 			}
@@ -436,10 +436,12 @@ public interface RegistrySettings {
 				basePath = "/";
 			}
 
-            return new BasicRegistrySettings(resourceRegistryMap, mappedClassFactory, mappedClassRegistry, packagesToScan,
+			return new BasicRegistrySettings(resourceRegistryMap, this.mappedClassFactory,
+				this.mappedClassRegistry, packagesToScan,
 					mappedFieldFactory, mappedFieldVisitors, mappedFieldOrderComparator, defaultControllerMethodAccess,
-					defaultServiceMethodAccess, repositoryFactory, errorFactory, requestObjectFactory,
-					methodArgumentFactory, converterFactory, parameterConverterFactory, defaultServiceFilters,
+				defaultServiceMethodAccess, this.repositoryFactory, errorFactory, requestObjectFactory,
+				this.methodArgumentFactory, converterFactory, parameterConverterFactory,
+				defaultServiceFilters,
 					pagination, defaultSparseFields, restrictedFields, basePath);
 		}
 	}

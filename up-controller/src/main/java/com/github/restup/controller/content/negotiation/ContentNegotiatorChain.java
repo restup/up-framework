@@ -13,21 +13,21 @@ public class ContentNegotiatorChain implements ContentNegotiator {
     }
 
     @Override
-    public <T> boolean accept(ResourceControllerRequest request) {
-        return null != getContentNegotiator(request);
+    public boolean accept(ResourceControllerRequest request) {
+        return null != this.getContentNegotiator(request);
     }
 
     @Override
     public <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response, Object result) {
-        return getContentNegotiator(request).formatResponse(request, response, result);
+        return this.getContentNegotiator(request).formatResponse(request, response, result);
     }
 
     /**
      * @return ContentNegotiator for content type passed
-     * @throws RequestErrorException if content type is not supported
+     * @throws com.github.restup.errors.RequestErrorException if content type is not supported
      */
     private ContentNegotiator getContentNegotiator(ResourceControllerRequest request) {
-        for (ContentNegotiator contentNegotiator : contentNegotiators) {
+        for (ContentNegotiator contentNegotiator : this.contentNegotiators) {
             if (contentNegotiator.accept(request)) {
                 return contentNegotiator;
             }

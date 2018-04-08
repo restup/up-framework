@@ -1,9 +1,9 @@
 package com.github.restup.controller.linking;
 
-import java.util.List;
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.registry.Resource;
+import java.util.List;
 
 /**
  * A {@link LinkBuilder} provides all of the links required for a response.
@@ -24,7 +24,7 @@ public interface LinkBuilder {
      */
     List<Link> getTopLevelLinks(ParsedResourceControllerRequest<?> request, Object result);
 
-    /**
+    /*TODO
      * @param request
      * @param Result
      * @param resource
@@ -33,7 +33,7 @@ public interface LinkBuilder {
      */
     List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object Result, Resource<?, ?> resource, Object id);
 
-    /**
+    /*TODO
      * @param request
      * @param Result
      * @param relationship

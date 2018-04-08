@@ -1,13 +1,13 @@
 package com.github.restup.service;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.github.restup.errors.RequestError;
 import com.github.restup.registry.Resource;
 import com.github.restup.util.Assert;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
- * {@link MethodCommand} which always throws an {@link RequestErrorException} indicating that the operation is not supported.  Serves as a placeholder for services with missing operations
+ * {@link MethodCommand} which always throws an {@link com.github.restup.errors.RequestErrorException} indicating that the operation is not supported.  Serves as a placeholder for services with missing operations
  *
  * @author abuttaro
  */
@@ -27,20 +27,20 @@ public class UnsupportedMethodCommand implements MethodCommand<Object> {
 
     @Override
     public Object execute(Object... args) {
-        log.warn("{} {} not supported", operation, resource);
+        log.warn("{} {} not supported", this.operation, this.resource);
         throw RequestError.builder()
-                .codePrefix(operation)
+            .codePrefix(this.operation)
                 .codeSuffix("NOT_SUPPORTED")
-                .resource(resource)
+            .resource(this.resource)
                 .buildException();
     }
 
     public String getOperation() {
-        return operation;
+        return this.operation;
     }
 
     public Resource<?, ?> getResource() {
-        return resource;
+        return this.resource;
     }
 
 }
