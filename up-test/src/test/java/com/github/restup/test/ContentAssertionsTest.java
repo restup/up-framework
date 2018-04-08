@@ -57,7 +57,7 @@ public class ContentAssertionsTest {
 
     @Test
     public void testContents() {
-        assertText(getClass())
+        assertText(this.getClass())
             .expect(Contents.of("foo"))
             .matches(Contents.of("foo"));
     }
