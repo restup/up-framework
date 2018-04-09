@@ -4,7 +4,7 @@
 
 	<groupId>com.github.restup</groupId>
 	<artifactId>up-parent</artifactId>
-	<version>0.0.3</version>
+	<version>0.0.4-SNAPSHOT</version>
 	<packaging>pom</packaging>
 	<name>Up! :: parent</name>
 	<description>REST Up!</description>
@@ -31,7 +31,7 @@
 		<connection>scm:git:git://github.com/restup/up-framework.git</connection>
 		<developerConnection>scm:git:ssh://github.com:restup/up-framework.git</developerConnection>
 		<url>http://github.com/restup/up-framework/tree/master</url>
-	  <tag>up-framework-0.0.3</tag>
+	  <tag>HEAD</tag>
   </scm>
 
 	<distributionManagement>
