@@ -4,27 +4,22 @@ import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import java.util.Arrays;
-import java.util.List;
-import org.junit.Test;
+
 import com.github.restup.annotations.ApiName;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.registry.settings.ServiceMethodAccess;
+import java.util.Arrays;
+import java.util.List;
+import org.junit.Test;
 
 public class ResourceTest {
 
-
-    @Test
-    public void testToString() {
-        assertEquals("foo", foo().toString());
-    }
-
     @Test
     public void testGetRelationshipsTo() {
-        Resource<Foo, Long> resource = foo();
+        Resource<Foo, Long> resource = this.foo();
         assertEquals(0, resource.getRelationshipsTo().size());
 
 
@@ -35,7 +30,7 @@ public class ResourceTest {
         when(registry.getSettings()).thenReturn(mapBackedRegistry().getSettings());
         when(registry.getRelationships("foo")).thenReturn(relationships);
 
-        resource = foo(registry);
+        resource = this.foo(registry);
         assertEquals(relationships, resource.getRelationships());
         assertEquals(0, resource.getRelationshipsTo().size());
 
@@ -45,12 +40,12 @@ public class ResourceTest {
 
     @Test
     public void testDefaultBuilderTyped() {
-        test(Resource.builder(Foo.class, Long.class));
+        this.test(Resource.builder(Foo.class, Long.class));
     }
 
     @Test
     public void testDefaultBuilder() {
-        test(Resource.builder(Foo.class));
+        this.test(Resource.builder(Foo.class));
     }
 
     public <T> void test(Resource.Builder<T, ?> builder) {
@@ -65,7 +60,7 @@ public class ResourceTest {
     }
 
     private Resource<Foo, Long> foo() {
-        return foo(mapBackedRegistry());
+        return this.foo(mapBackedRegistry());
     }
 
     private Resource<Foo, Long> foo(ResourceRegistry registry) {
@@ -95,7 +90,6 @@ public class ResourceTest {
 
     }
 
-    @SuppressWarnings("unused")
     @ApiName("foo")
     private final static class Foo {
 

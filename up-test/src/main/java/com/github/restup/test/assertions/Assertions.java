@@ -3,18 +3,23 @@ package com.github.restup.test.assertions;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
+
 import java.lang.reflect.Constructor;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Modifier;
+import nl.jqno.equalsverifier.EqualsVerifier;
 import org.assertj.core.api.AbstractThrowableAssert;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
-import nl.jqno.equalsverifier.EqualsVerifier;
 
 /**
  * Provides convenience methods for testing using various open source projects using sensible defaults
  * or offering more concise test methods.
  */
 public class Assertions {
+
+    private Assertions() {
+        super();
+    }
 
     /**
      * Assert that the classes have a private constructor
@@ -44,9 +49,9 @@ public class Assertions {
      */
     public static <E extends Throwable> AbstractThrowableAssert<?, ?> assertThrows(ThrowingCallable f, Class<E> e) {
         Throwable thrownException = catchThrowable(f);
-        
+
         return org.assertj.core.api.Assertions.assertThat(thrownException)
-                .isInstanceOf(e);
+            .isInstanceOf(e);
     }
 
     /**
@@ -89,10 +94,6 @@ public class Assertions {
         for (Class<?> clazz : classes ) {
             assertHashCodeEquals(clazz);
         }
-    }
-    
-    private Assertions() {
-        super();
     }
 
 }

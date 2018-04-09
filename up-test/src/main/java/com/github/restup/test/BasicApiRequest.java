@@ -1,7 +1,7 @@
 package com.github.restup.test;
 
-import java.util.Map;
 import com.github.restup.test.resource.Contents;
+import java.util.Map;
 
 class BasicApiRequest implements ApiRequest {
 
@@ -25,27 +25,37 @@ class BasicApiRequest implements ApiRequest {
 
     @Override
     public HttpMethod getMethod() {
-        return method;
+        return this.method;
     }
 
     @Override
     public Contents getBody() {
-        return body;
+        return this.body;
     }
 
     @Override
     public Map<String, String[]> getHeaders() {
-        return headers;
+        return this.headers;
     }
 
     @Override
     public boolean isHttps() {
-        return https;
+        return this.https;
     }
 
     @Override
     public String getUrl() {
-        return url;
+        return this.url;
     }
 
+    @Override
+    public String toString() {
+        return "BasicApiRequest{" +
+            "method=" + this.method +
+            ", headers=" + this.headers +
+            ", url='" + this.url + '\'' +
+            ", body=" + this.body +
+            ", https=" + this.https +
+            '}';
+    }
 }

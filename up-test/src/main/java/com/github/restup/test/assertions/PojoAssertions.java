@@ -1,8 +1,5 @@
 package com.github.restup.test.assertions;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
 import com.openpojo.reflection.PojoClass;
 import com.openpojo.reflection.PojoClassFilter;
 import com.openpojo.reflection.filters.FilterClassName;
@@ -22,6 +19,9 @@ import com.openpojo.validation.test.Tester;
 import com.openpojo.validation.test.impl.DefaultValuesNullTester;
 import com.openpojo.validation.test.impl.GetterTester;
 import com.openpojo.validation.test.impl.SetterTester;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * Assertions using openpojo with sensible defaults and utility methods 
@@ -40,15 +40,11 @@ public class PojoAssertions {
     private int expectedClasses;
 
     PojoAssertions() {
-        classes = new ArrayList<>();
-        rules = new ArrayList<>();
-        testers = new ArrayList<>();
-        includeDefaultTesters = true;
-        includeDefaultRules = true;
-    }
-
-    private PojoAssertions me() {
-        return this;
+        this.classes = new ArrayList<>();
+        this.rules = new ArrayList<>();
+        this.testers = new ArrayList<>();
+        this.includeDefaultTesters = true;
+        this.includeDefaultRules = true;
     }
 
     public static List<Rule> defaultRules() {
@@ -64,91 +60,97 @@ public class PojoAssertions {
         // Add Testers to validate behaviour for POJO_PACKAGE
         // See com.openpojo.validation.test.impl for more ...
         return Arrays.asList(
-                new SetterTester(), new GetterTester(), new DefaultValuesNullTester());
+            new SetterTester(), new GetterTester(), new DefaultValuesNullTester(),
+            new ToStringTester());
+    }
+
+    private PojoAssertions me() {
+        return this;
     }
 
     public PojoAssertions with(Rule... rules) {
         this.rules.addAll(Arrays.asList(rules));
-        return me();
+        return this.me();
     }
 
     public PojoAssertions with(Tester... testers) {
         this.testers.addAll(Arrays.asList(testers));
-        return me();
+        return this.me();
     }
 
     public PojoAssertions add(Class<?>... classes) {
         for (Class<?> clazz : classes) {
             this.classes.add(PojoClassFactory.getPojoClass(clazz));
-            expectedClasses++;
+            this.expectedClasses++;
         }
-        return me();
+        return this.me();
     }
 
     public PojoAssertions addMatching(int expected, String packageName, String regex) {
-        return add(expected, new FilterClassName("^" + packageName + "\\." + regex), packageName);
+        return this
+            .add(expected, new FilterClassName("^" + packageName + "\\." + regex), packageName);
     }
 
     public PojoAssertions addMatching(int expected, Class<?> relativeTo, String regex) {
         String packageName = relativeTo.getPackage().getName();
-        return addMatching(expected, packageName, regex);
+        return this.addMatching(expected, packageName, regex);
     }
 
     public PojoAssertions addMatchingRecursively(int expected, String packageName, String regex) {
-        return addRecursively(expected, new FilterClassName(regex), packageName);
+        return this.addRecursively(expected, new FilterClassName(regex), packageName);
     }
 
     public PojoAssertions add(int expected, String... packages) {
-        return add(expected, new FilterPackageInfo(), packages);
+        return this.add(expected, new FilterPackageInfo(), packages);
     }
 
     public PojoAssertions add(int expected, PojoClassFilter pojoClassFilter, String... packages) {
-        expectedClasses += expected;
+        this.expectedClasses += expected;
         for (String pkg : packages) {
             this.classes.addAll(PojoClassFactory.getPojoClasses(pkg, pojoClassFilter));
         }
-        return me();
+        return this.me();
     }
 
     public PojoAssertions addRecursively(int expected, String... packages) {
-        return addRecursively(expected, new FilterPackageInfo(), packages);
+        return this.addRecursively(expected, new FilterPackageInfo(), packages);
     }
 
     public PojoAssertions addRecursively(int expected, PojoClassFilter pojoClassFilter, String... packages) {
-        expectedClasses += expected;
+        this.expectedClasses += expected;
         for (String pkg : packages) {
             this.classes.addAll(PojoClassFactory.getPojoClassesRecursively(pkg, pojoClassFilter));
         }
-        return me();
+        return this.me();
     }
     
     public PojoAssertions includeDefaultRules(boolean b) {
         this.includeDefaultRules = b;
-        return me();
+        return this.me();
     }
     
     public PojoAssertions includeDefaultTesters(boolean b) {
         this.includeDefaultTesters = b;
-        return me();
+        return this.me();
     }
 
     public void validate() {
 
         ValidatorBuilder builder = ValidatorBuilder.create();
 
-        addRules(builder);
+        this.addRules(builder);
 
-        addTesters(builder);
+        this.addTesters(builder);
 
-        Affirm.affirmEquals("Classes added / removed?", expectedClasses, classes.size());
+        Affirm.affirmEquals("Classes added / removed?", this.expectedClasses, this.classes.size());
 
         Validator validator = builder.build();
-        validator.validate(classes);
+        validator.validate(this.classes);
     }
 
     private void addTesters(ValidatorBuilder validator) {
-        List<Tester> validatorTesters = new ArrayList<>(testers);
-        if (includeDefaultTesters) {
+        List<Tester> validatorTesters = new ArrayList<>(this.testers);
+        if (this.includeDefaultTesters) {
             validatorTesters.addAll(defaultTesters());
         }
 
@@ -156,8 +158,8 @@ public class PojoAssertions {
     }
 
     private void addRules(ValidatorBuilder validator) {
-        List<Rule> validatorRules = new ArrayList<>(rules);
-        if (includeDefaultRules) {
+        List<Rule> validatorRules = new ArrayList<>(this.rules);
+        if (this.includeDefaultRules) {
             validatorRules.addAll(defaultRules());
         }
         validatorRules.forEach(r -> validator.with(r));

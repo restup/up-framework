@@ -5,7 +5,7 @@ public class Foo {
     private String name;
 
     public String getName() {
-        return name;
+        return this.name;
     }
 
     public void setName(String name) {
@@ -15,5 +15,11 @@ public class Foo {
     public String getFoo() {
         throw new IllegalStateException();
     }
-    
+
+    @Override
+    public String toString() {
+        return "Foo{" +
+            "name='" + this.name + '\'' +
+            '}';
+    }
 }
