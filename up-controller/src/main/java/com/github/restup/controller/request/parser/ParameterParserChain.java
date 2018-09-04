@@ -1,6 +1,5 @@
 package com.github.restup.controller.request.parser;
 
-import java.util.List;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.params.FieldsParser;
@@ -11,6 +10,7 @@ import com.github.restup.controller.request.parser.params.PageNumberParser;
 import com.github.restup.controller.request.parser.params.PageOffsetParser;
 import com.github.restup.controller.request.parser.params.SortParamParser;
 import com.github.restup.util.Assert;
+import java.util.List;
 
 /**
  * Iterates over all parameter names executing the first {@link RequestParamParser} that accepts the parameter for each
@@ -21,14 +21,6 @@ public class ParameterParserChain implements RequestParser {
 
     private final RequestParamParser[] parsers;
 
-
-    public static ParameterParserChain of(List<RequestParamParser> parsers) {
-        return of(parsers.toArray(new RequestParamParser[parsers.size()]));
-    }
-
-    public static ParameterParserChain of(RequestParamParser... parsers) {
-        return new ParameterParserChain(parsers);
-    }
 
     public ParameterParserChain(RequestParamParser... parsers) {
         super();
@@ -63,6 +55,14 @@ public class ParameterParserChain implements RequestParser {
                 , new FilterParser("q"));
     }
 
+    public static ParameterParserChain of(List<RequestParamParser> parsers) {
+        return of(parsers.toArray(new RequestParamParser[parsers.size()]));
+    }
+
+    public static ParameterParserChain of(RequestParamParser... parsers) {
+        return new ParameterParserChain(parsers);
+    }
+
     /**
      * Iterate over the {@link #parsers} and execute the first which accepts the parameter
      */
@@ -74,7 +74,7 @@ public class ParameterParserChain implements RequestParser {
                 if (param != null) {
                     for (RequestParamParser parser : parsers) {
                         if (parser.accept(param)) {
-                            builder.addAcceptedParameterName(param);
+                            builder.addAcceptedResourceParameterName(param);
                             parser.parse(request, builder, param, request.getParameter(param));
                             break;
                         }

@@ -5,6 +5,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.service.model.response.PagedResult;
 import java.util.ArrayList;
 import java.util.List;
 import org.junit.Before;
@@ -12,20 +16,15 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.github.restup.controller.linking.discovery.ServiceDiscovery;
-import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.service.model.response.PagedResult;
 
 @RunWith(MockitoJUnitRunner.class)
 public class DefaultLinkBuilderTest {
 
+    final String requestUrl = "http://www.foo.com/bars/1";
     @Mock
     ServiceDiscovery serviceDiscovery;
     @Mock
     ParsedResourceControllerRequest<?> request;
-
-    final String requestUrl = "http://www.foo.com/bars/1";
-
     DefaultLinkBuilder linkBuilder;
 
     @Before
@@ -36,6 +35,7 @@ public class DefaultLinkBuilderTest {
     private void verifyTopLevelLinks() {
         verify(request).getRequestUrl();
         verify(request).getAcceptedParameterNames();
+        verify(request).getAcceptedResourceParameterNames();
         verify(request).getRelationship();
         verifyNoMoreInteractions(serviceDiscovery, request);
     }

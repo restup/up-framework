@@ -1,11 +1,12 @@
 package com.github.restup.controller.model;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-import java.util.Enumeration;
-import java.util.List;
+
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.service.model.ResourceData;
+import java.util.Enumeration;
+import java.util.List;
 
 /**
  * Contains result of parsing parameters
@@ -17,18 +18,23 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     private final List<ResourceQueryStatement> requestedQueries;
     private final ResourceControllerRequest request;
     private final List<String> acceptedParameterNames;
+    private final List<String> acceptedResourceParameterNames;
     private final String pageLimitParameterName;
     private final String pageOffsetParameterName;
     private final boolean pageOffsetOneBased;
 
     BasicParsedResourceControllerRequest(T data, List<ResourcePath> requestedPaths,
-            List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request, ResourceData<?> body, List<String> acceptedParameterNames, String pageLimitParameterName, String pageOffsetParameterName, boolean pageOffsetOneBased) {
+        List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request,
+        ResourceData<?> body, List<String> acceptedParameterNames,
+        List<String> acceptedResourceParameterNames, String pageLimitParameterName,
+        String pageOffsetParameterName, boolean pageOffsetOneBased) {
         super(request.getMethod(), request.getResource(), request.getIds(), request.getRelationship(), request.getResourceRelationship(), body, request.getContentType(), request.getBaseRequestUrl(), request.getRequestUrl());
         this.data = data;
         this.requestedPaths = unmodifiableList(requestedPaths);
         this.requestedQueries = unmodifiableList(requestedQueries);
         this.request = request;
         this.acceptedParameterNames = acceptedParameterNames;
+        this.acceptedResourceParameterNames = acceptedResourceParameterNames;
         this.pageLimitParameterName = pageLimitParameterName;
         this.pageOffsetParameterName = pageOffsetParameterName;
         this.pageOffsetOneBased = pageOffsetOneBased;
@@ -72,6 +78,11 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     @Override
     public String getPageOffsetParameterName() {
         return pageOffsetParameterName;
+    }
+
+    @Override
+    public List<String> getAcceptedResourceParameterNames() {
+        return acceptedResourceParameterNames;
     }
 
     @Override

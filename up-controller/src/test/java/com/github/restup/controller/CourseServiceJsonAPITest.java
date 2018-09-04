@@ -1,21 +1,19 @@
 package com.github.restup.controller;
 
-import com.github.restup.controller.mock.AbstractMockTest;
+import com.github.restup.controller.mock.AbstractMockJsonApiTest;
 import com.github.restup.test.RestApiAssertions;
 import com.university.Course;
 import com.university.Student;
 import com.university.University;
-
 import org.junit.Before;
 import org.junit.Test;
 
-public class CourseServiceJsonAPITest extends AbstractMockTest {
+public class CourseServiceJsonAPITest extends AbstractMockJsonApiTest {
 
     public CourseServiceJsonAPITest() {
         super(Course.PLURAL_NAME, Course.class
                 , Student.class
                 , University.class);
-        jsonapi();
     }
 
     @Override

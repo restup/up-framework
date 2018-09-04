@@ -1,0 +1,23 @@
+{
+  "data": {
+    "id": "2",
+    "type": "course",
+    "attributes": {
+      "name": "Spanish 101"
+    },
+    "relationships": {
+      "university": {
+        "data": {
+          "type": "university",
+          "id": "1"
+        },
+        "links": {
+          "related": "http://localhost/courses/2/university?mt=application%2Fvnd.api%2Bjson"
+        }
+      }
+    },
+    "links": {
+      "self": "http://localhost/courses/2?mt=application%2Fvnd.api%2Bjson"
+    }
+  }
+}

@@ -1,5 +1,6 @@
 package com.github.restup.test;
 
+import com.github.restup.test.RpcApiAssertions.Decorator;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
 
@@ -37,13 +38,17 @@ public class RestApiAssertions {
         private String testName;
         private MediaType mediaType;
         private boolean https;
+        private Decorator decorator;
+        private boolean createMissingResource;
 
         Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... args) {
             this.executor = executor;
             this.unitTest = unitTest;
             this.path = path;
-            this.defaultArgs = args;
+            defaultArgs = args;
             mediaType = MediaType.APPLICATION_JSON;
+            decorator = (b) -> b;
+            createMissingResource = true;
         }
 
         Builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
@@ -56,6 +61,17 @@ public class RestApiAssertions {
 
         private Builder me() {
             return this;
+        }
+
+        /**
+         * Create missing expected result files if true.  Tests will still fail, however the result
+         * will be saved to the expected file
+         *
+         * @param createMissingResource if true, create missing resource
+         */
+        public Builder createMissingResource(boolean createMissingResource) {
+            this.createMissingResource = createMissingResource;
+            return me();
         }
 
         private Builder method(HttpMethod method) {
@@ -76,6 +92,11 @@ public class RestApiAssertions {
             return me();
         }
 
+        public Builder decorator(Decorator decorator) {
+            this.decorator = decorator;
+            return me();
+        }
+
         private Builder args(Object[] args) {
             this.args = args;
             return me();
@@ -90,7 +111,7 @@ public class RestApiAssertions {
         }
 
         private Builder itemResource(boolean item) {
-            this.itemResource = item;
+            itemResource = item;
             return me();
         }
 
@@ -204,13 +225,15 @@ public class RestApiAssertions {
                 testPath += "/{id}";
             }
 
-            return new RpcApiAssertions.Builder(executor, unitTest, testPath, defaultArgs)
+            return decorator
+                .decorate(new RpcApiAssertions.Builder(executor, unitTest, testPath, defaultArgs)
                     .pathArgs(args)
                     .method(method)
                     .test(testName)
                     .mediaType(mediaType)
                     .https(https)
-                    .okStatus(okStatus);
+                    .createMissingResource(createMissingResource)
+                    .okStatus(okStatus));
         }
 
     }

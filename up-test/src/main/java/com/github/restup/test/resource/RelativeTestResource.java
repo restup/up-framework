@@ -1,5 +1,7 @@
 package com.github.restup.test.resource;
 
+import com.github.restup.test.ApiExecutor;
+import com.github.restup.test.utils.TestResourceUtils;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
@@ -7,8 +9,6 @@ import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.restup.test.ApiExecutor;
-import com.github.restup.test.utils.TestResourceUtils;
 
 public class RelativeTestResource implements ResourceContents {
 
@@ -38,7 +38,7 @@ public class RelativeTestResource implements ResourceContents {
         sb.append(System.getProperty("user.dir"));
         sb.append("/src/test/resources");
         sb.append(TestResourceUtils.getRelativePath(relativeTo, true, fileExtension, dir, fileName));
-        this.path = sb.toString();
+        path = sb.toString();
     }
 
     /**

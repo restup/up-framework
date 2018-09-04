@@ -5,14 +5,15 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+
+import com.github.restup.test.assertions.Assertions;
+import com.github.restup.test.resource.Contents;
 import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.github.restup.test.assertions.Assertions;
-import com.github.restup.test.resource.Contents;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RestApiAssertionsTest {
@@ -25,6 +26,13 @@ public class RestApiAssertionsTest {
     Contents expectedContents;
     @Mock
     Contents resultContents;
+
+    static void assertHeaders(ApiRequest request, String mediaType) {
+        assertEquals(2, request.getHeaders().size());
+        String[] header = {mediaType};
+        assertThat(request.getHeaders().get("Content-Type"), is(header));
+        assertThat(request.getHeaders().get("Accept"), is(header));
+    }
 
     @Test
     public void testPrivateConstructor() {
@@ -88,13 +96,14 @@ public class RestApiAssertionsTest {
     @Test
     public void testTestFileNotFound() {
         request();
-        assertThrows(".json not found", () -> api().update().ok());
+        assertThrows(".json not found", () -> api().createMissingResource(false).update().ok());
     }
 
     @Test
     public void testTestFileNotFoundTestName() {
         request();
-        assertThrows("foo.json not found", () -> api().test("foo").update().ok());
+        assertThrows("foo.json not found",
+            () -> api().test("foo").createMissingResource(false).update().ok());
     }
 
     @Test
@@ -192,7 +201,6 @@ public class RestApiAssertionsTest {
         assertCollectionRequest(requestCaptor, HttpMethod.GET);
     }
 
-
     private void assertItemRequest(ArgumentCaptor<ApiRequest> requestCaptor, HttpMethod method) {
         assertItemRequest(requestCaptor, method, false);
     }
@@ -233,12 +241,5 @@ public class RestApiAssertionsTest {
         assertHeaders(request, contentType);
         assertEquals(method, request.getMethod());
         assertEquals(url, request.getUrl());
-    }
-
-    static void assertHeaders(ApiRequest request, String mediaType) {
-        assertEquals(2, request.getHeaders().size());
-        String[] header = {mediaType};
-        assertThat(request.getHeaders().get("Content-Type"), is(header));
-        assertThat(request.getHeaders().get("Accept"), is(header));
     }
 }

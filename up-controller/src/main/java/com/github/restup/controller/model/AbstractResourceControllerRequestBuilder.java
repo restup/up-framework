@@ -1,12 +1,8 @@
 package com.github.restup.controller.model;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Objects;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.lang3.StringUtils.isNotBlank;
+
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
@@ -19,6 +15,13 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Supplier;
+import org.apache.commons.lang3.StringUtils;
 
 public abstract class AbstractResourceControllerRequestBuilder<T extends AbstractResourceControllerRequestBuilder<T, R>, R extends ResourceControllerRequest> {
 
@@ -30,6 +33,7 @@ public abstract class AbstractResourceControllerRequestBuilder<T extends Abstrac
     protected ResourceData<?> body;
     protected String baseRequestUrl;
     protected String requestPath;
+    protected String contentTypeParam;
     private ResourceRegistry registry;
 
     private static String getPath(String[] path, int current) {
@@ -84,58 +88,78 @@ public abstract class AbstractResourceControllerRequestBuilder<T extends Abstrac
                 .buildException();
     }
 
+    static String getPathFromBasePath(String basePath, String requestPath) {
+        String result = requestPath;
+        if (basePath != null) {
+            int i = requestPath.indexOf(basePath);
+            if (i < 0) {
+                if (basePath.length() > 1 && basePath.endsWith("/")) {
+                    result = getPathFromBasePath(basePath.substring(0, basePath.length() - 1),
+                        requestPath);
+                }
+            } else {
+                result = requestPath.substring(i + basePath.length());
+            }
+        }
+        return result.startsWith("/") ? result.substring(1) : result;
+    }
+
     public abstract R build();
 
-    @SuppressWarnings("unchecked")
     protected T me() {
         return (T) this;
     }
 
-    public T setRegistry(ResourceRegistry registry) {
+    public T registry(ResourceRegistry registry) {
         this.registry = registry;
         return me();
     }
 
-    public T setBaseRequestUrl(String baseRequestUrl) {
+    public T baseRequestUrl(String baseRequestUrl) {
         this.baseRequestUrl = baseRequestUrl;
         return me();
     }
 
-    public T setRequestPath(String requestPath) {
+    public T requestPath(String requestPath) {
         this.requestPath = requestPath;
         return me();
     }
 
-    public T setBody(ResourceData<?> body) {
+    public T contentTypeParam(String contentTypeParam) {
+        this.contentTypeParam = contentTypeParam;
+        return me();
+    }
+
+    public T body(ResourceData<?> body) {
         this.body = body;
         return me();
     }
 
-    public T setMethod(HttpMethod method) {
+    public T method(HttpMethod method) {
         this.method = method;
         return me();
     }
 
-    public T setResource(Resource<?, ?> resource) {
+    public T resource(Resource<?, ?> resource) {
         this.resource = resource;
         return me();
     }
 
-    public T setRelationship(Resource<?, ?> relationship) {
+    public T relationship(Resource<?, ?> relationship) {
         this.relationship = relationship;
         return me();
     }
 
-    public T setResourceRelationship(ResourceRelationship<?, ?, ?, ?> resourceRelationship) {
+    public T resourceRelationship(ResourceRelationship<?, ?, ?, ?> resourceRelationship) {
         this.resourceRelationship = resourceRelationship;
         return me();
     }
 
-    public T setIds(Object... ids) {
-        return setIds(Arrays.asList(ids));
+    public T ids(Object... ids) {
+        return ids(Arrays.asList(ids));
     }
 
-    public T setIds(List<?> ids) {
+    public T ids(List<?> ids) {
         this.ids = ids;
         return me();
     }
@@ -143,6 +167,21 @@ public abstract class AbstractResourceControllerRequestBuilder<T extends Abstrac
     protected boolean isDiscoveryPath(String requestPath) {
         return StringUtils.isBlank(requestPath)
                 || Objects.equals("/", requestPath);
+    }
+
+    protected String getContentType(Supplier<String[]> contentTypeFromParamSupplier,
+        Supplier<String> contentTypeFromRequestSupplier) {
+        if (contentTypeParam != null) {
+            String[] arr = contentTypeFromParamSupplier.get();
+            if (arr != null) {
+                for (String s : arr) {
+                    if (isNotBlank(s)) {
+                        return s;
+                    }
+                }
+            }
+        }
+        return contentTypeFromRequestSupplier.get();
     }
 
     public void parsePath() {
@@ -221,25 +260,25 @@ public abstract class AbstractResourceControllerRequestBuilder<T extends Abstrac
                 throw invalidPath(requestPath, arr);
             }
 
-            setResourceRelationship(resourceRelationship);
+            resourceRelationship(resourceRelationship);
             if (relationship != null) {
-                setResource(relationship)
-                        .setRelationship(resource);
+                resource(relationship)
+                    .relationship(resource);
             } else {
-                setResource(resource);
+                resource(resource);
             }
 
             if (idString != null) {
                 Type type = resource.getIdentityField().getType();
                 String[] ids = idString.split(",");
-                List<Object> list = new ArrayList<Object>(ids.length);
+                List<Object> list = new ArrayList<>(ids.length);
                 ParameterConverterFactory f = registry.getSettings().getParameterConverterFactory();
                 ParameterConverter<String, ?> converter = f.getConverter(type);
                 Errors errors = null;
                 for (String s : ids) {
                     list.add(converter.convert("ids", s, errors));
                 }
-                setIds(list);
+                ids(list);
             }
 
             if (basePath != null) {
@@ -249,21 +288,6 @@ public abstract class AbstractResourceControllerRequestBuilder<T extends Abstrac
                 }
             }
         }
-    }
-
-    static String getPathFromBasePath(String basePath, String requestPath) {
-        String result = requestPath;
-        if (basePath != null) {
-            int i = requestPath.indexOf(basePath);
-            if (i < 0) {
-                if (basePath.length() > 1 && basePath.endsWith("/")) {
-                    result = getPathFromBasePath(basePath.substring(0, basePath.length() - 1), requestPath);
-                }
-            } else {
-                result = requestPath.substring(i + basePath.length());
-            }
-        }
-        return result.startsWith("/") ? result.substring(1) : result;
     }
 
 }

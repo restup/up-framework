@@ -39,14 +39,18 @@ public interface ContentNegotiator {
      */
     <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response, Object result);
 
-    static class Builder {
+    static Builder builder() {
+        return new Builder();
+    }
+
+    class Builder {
 
         private ContentNegotiator[] contentNegotiators;
         private BuilderSettingsCaptor settingsCaptor;
 
         Builder() {
             super();
-            this.settingsCaptor = new BuilderSettingsCaptor();
+            settingsCaptor = new BuilderSettingsCaptor();
         }
 
         Builder me() {

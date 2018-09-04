@@ -5,6 +5,10 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
+
+import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
+import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.registry.settings.RegistrySettings;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -13,10 +17,6 @@ import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
-import com.github.restup.controller.model.MediaType;
-import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.RegistrySettings;
 
 @RunWith(MockitoJUnitRunner.class)
 public class HttpServletResourceControllerRequestTest {
@@ -26,16 +26,6 @@ public class HttpServletResourceControllerRequestTest {
 
     @Mock
     ResourceRegistry registry;
-
-    @Test
-    public void testGetContentTypeParam() {
-        String mediaType = "application/json";
-        when(httpRequest.getParameter(MediaType.PARAM)).thenReturn(mediaType);
-        assertEquals(mediaType, HttpServletResourceControllerRequest.getContentType(httpRequest));
-
-        verify(httpRequest).getParameter(MediaType.PARAM);
-        verifyNoMoreInteractions(httpRequest);
-    }
 
     @Test
     public void testGetContentTypeHeader() {
@@ -52,12 +42,10 @@ public class HttpServletResourceControllerRequestTest {
         when(httpRequest.getHeaders(ContentTypeNegotiation.CONTENT_TYPE)).thenReturn(headers);
         assertEquals(expected, HttpServletResourceControllerRequest.getContentType(httpRequest));
 
-        verify(httpRequest).getParameter(MediaType.PARAM);
         verify(httpRequest).getHeaders(ContentTypeNegotiation.CONTENT_TYPE);
         verifyNoMoreInteractions(httpRequest);
     }
 
-    @SuppressWarnings("unchecked")
     @Test
     public void testRequest() {
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://www.foo.com/"));
@@ -66,7 +54,7 @@ public class HttpServletResourceControllerRequestTest {
         when(registry.getSettings()).thenReturn(mock(RegistrySettings.class));
 
         HttpServletResourceControllerRequest request = HttpServletResourceControllerRequest.builder(httpRequest)
-                .setRegistry(registry)
+            .registry(registry)
                 .build();
 
         request.getParameterNames();
@@ -76,7 +64,6 @@ public class HttpServletResourceControllerRequestTest {
         verify(httpRequest).getRequestURL();
         verify(httpRequest).getRequestURI();
         verify(httpRequest).getMethod();
-        verify(httpRequest).getParameter("mediaType");
         verify(httpRequest).getHeaders("Content-Type");
         verify(httpRequest).getParameterNames();
         verify(httpRequest).getParameterValues("foo");

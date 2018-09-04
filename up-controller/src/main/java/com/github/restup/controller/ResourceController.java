@@ -1,12 +1,7 @@
 package com.github.restup.controller;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
@@ -38,6 +33,13 @@ import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Assert;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * <ol>
@@ -161,21 +163,22 @@ public class ResourceController {
     private final PatchMethodController<?, ?> patchController;
     private final PostMethodController<?, ?> postController;
     private final PutMethodController<?, ?> putController;
+    private final String mediaTypeParam;
 
     public ResourceController(ControllerSettings.Builder settings) {
         this(settings.build());
     }
 
-    @SuppressWarnings("rawtypes")
     public ResourceController(ControllerSettings settings) {
         super();
         Assert.notNull(settings, "settings are required");
 
-        this.registry = settings.getRegistry();
-        this.contentNegotiator = settings.getContentNegotiator();
-        this.requestParser = settings.getRequestParser();
-        this.interceptor = settings.getRequestInterceptor();
-        this.exceptionHandler = settings.getExceptionHandler();
+        registry = settings.getRegistry();
+        contentNegotiator = settings.getContentNegotiator();
+        requestParser = settings.getRequestParser();
+        interceptor = settings.getRequestInterceptor();
+        exceptionHandler = settings.getExceptionHandler();
+        mediaTypeParam = settings.getMediaTypeParam();
 
         RequestObjectFactory factory = getFactory(registry);
         getController = new GetMethodController(factory);
@@ -195,8 +198,8 @@ public class ResourceController {
 
     private static <T> void validateData(ParsedResourceControllerRequest<T> parsedRequest,
             ResourceControllerRequest request, ControllerMethodAccess access, boolean itemOperation, int ids) {
-        final HttpMethod method = request.getMethod();
-        final int items = count(parsedRequest.getData());
+        HttpMethod method = request.getMethod();
+        int items = count(parsedRequest.getData());
         if (items == 0) {
             if (method.requiresData()) {
                 throw error(request, "DATA_REQUIRED", "Document is required");
@@ -228,7 +231,7 @@ public class ResourceController {
     }
 
     private static void validateIds(ResourceControllerRequest request, ControllerMethodAccess access, int ids) {
-        final HttpMethod method = request.getMethod();
+        HttpMethod method = request.getMethod();
         if (ids == 1) {
             if (!method.supportsItemOperation(access)) {
                 throw itemResourceNotAllowed(request, access);
@@ -262,7 +265,7 @@ public class ResourceController {
 
     private static RequestErrorException itemResourceNotAllowed(ResourceControllerRequest request,
             ControllerMethodAccess access) {
-        List<HttpMethod> supported = new ArrayList<HttpMethod>(HttpMethod.values().length - 1);
+        List<HttpMethod> supported = new ArrayList<>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
             if (m.supportsItemOperation(access)) {
                 supported.add(m);
@@ -273,7 +276,7 @@ public class ResourceController {
 
     private static RequestErrorException collectionResourceNotAllowed(ResourceControllerRequest request,
             ControllerMethodAccess access) {
-        List<HttpMethod> supported = new ArrayList<HttpMethod>(HttpMethod.values().length - 1);
+        List<HttpMethod> supported = new ArrayList<>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
             if (m.supportsCollectionOperation(access)) {
                 supported.add(m);
@@ -298,7 +301,6 @@ public class ResourceController {
         return registry.getSettings().getDefaultControllerAccess();
     }
 
-    @SuppressWarnings({"unused", "rawtypes"})
     private static void addUpdateFields(ParsedResourceControllerRequest.Builder<?> builder,
             List<MappedField<?>> fields) {
         if (builder.getData() instanceof Collection) {
@@ -325,7 +327,7 @@ public class ResourceController {
 
     /**
      * Handles exceptions when building {@link ResourceControllerRequest} and handling request
-     * 
+     *
      * @param <T> resource type
      * @param <ID> resource id type
      * @param builder request builder
@@ -336,23 +338,15 @@ public class ResourceController {
             ResourceControllerResponse response) {
         ResourceControllerRequest request = null;
         try {
-            request = builder.build();
+            request = builder
+                .contentTypeParam(mediaTypeParam)
+                .build();
             return requestInternal(request, response);
         } catch (Throwable e) {
             return handleException(request, response, e);
         }
     }
 
-    public <T, ID extends Serializable> Object request(ResourceControllerRequest request,
-            ResourceControllerResponse response) {
-        try {
-            return requestInternal(request, response);
-        } catch (Throwable e) {
-            return handleException(request, response, e);
-        }
-    }
-
-    @SuppressWarnings("unchecked")
     <T, ID extends Serializable> Object requestInternal(ResourceControllerRequest request,
             ResourceControllerResponse response) {
         Assert.notNull(request, "request is required");
@@ -360,8 +354,8 @@ public class ResourceController {
         Assert.notNull(request.getMethod(), "method is required");
         Assert.notNull(request.getResource(), "resource is required");
 
-        final ControllerMethodAccess access = getMethodAccess(registry, request.getResource());
-        final int ids = CollectionUtils.size(request.getIds());
+        ControllerMethodAccess access = getMethodAccess(registry, request.getResource());
+        int ids = CollectionUtils.size(request.getIds());
         boolean itemOperation = ids == 1;
 
         // confirm content type is supported ahead of parsing work
@@ -394,7 +388,6 @@ public class ResourceController {
         }
     }
 
-    @SuppressWarnings({"rawtypes"})
     private MethodController getMethodController(ResourceControllerRequest request, ControllerMethodAccess access,
             boolean itemOperation) {
         switch (request.getMethod()) {
@@ -419,6 +412,9 @@ public class ResourceController {
     private <T> ParsedResourceControllerRequest<T> parseRequest(ResourceControllerRequest request) {
         ParsedResourceControllerRequest.Builder<T> builder = ParsedResourceControllerRequest.builder(registry,
                 request);
+        if (hasMediaTypeParam(request)) {
+            builder.addAcceptedParameterName(mediaTypeParam);
+        }
         requestParser.parse(request, builder);
         if (CollectionUtils.size(request.getIds()) > 1) {
             // Add filter for ids
@@ -431,6 +427,10 @@ public class ResourceController {
             addUpdateFields(builder, fields);
         }
         return builder.build();
+    }
+
+    private boolean hasMediaTypeParam(ResourceControllerRequest request) {
+        return mediaTypeParam != null && isNotEmpty(request.getParameter(mediaTypeParam));
     }
 
     public static class Builder {
@@ -497,6 +497,11 @@ public class ResourceController {
 
         public Builder autoDetectDisabled(boolean b) {
             settings.autoDetectDisabled(b);
+            return me();
+        }
+
+        public Builder mediaTypeParam(String mediaTypeParam) {
+            settings.mediaTypeParam(mediaTypeParam);
             return me();
         }
 
