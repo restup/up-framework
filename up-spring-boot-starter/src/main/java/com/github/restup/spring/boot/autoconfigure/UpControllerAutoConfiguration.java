@@ -1,12 +1,7 @@
 package com.github.restup.spring.boot.autoconfigure;
 
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.ResourceControllerBuilderDecorator;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
@@ -15,6 +10,12 @@ import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.registry.ResourceRegistry;
+import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass({ResourceController.class})
@@ -56,6 +57,12 @@ public class UpControllerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
+    public ResourceControllerBuilderDecorator defaultUpResourceControllerBuilderDecorator() {
+        return (b) -> b;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
     public RequestParser defaultUpRequestParser(ObjectMapper mapper) {
         return RequestParser.builder()
                 .autoDetectDisabled(props.isDisableSerializationAutoDetection())
@@ -90,8 +97,9 @@ public class UpControllerAutoConfiguration {
             LinkBuilderFactory linkBuilderFactory,
             ExceptionHandler exceptionHandler,
             RequestParser requestParser,
+        ResourceControllerBuilderDecorator decorator,
             ContentNegotiator contentNegotiator) {
-        return ResourceController.builder()
+        return decorator.decorate(ResourceController.builder()
                 .registry(registry)
                 .serviceDiscovery(serviceDiscovery)
                 .linkBuilderFactory(linkBuilderFactory)
@@ -101,7 +109,7 @@ public class UpControllerAutoConfiguration {
                 .requestParser(requestParser)
                 .contentNegotiator(contentNegotiator)
                 // .interceptors(interceptorA, interceptorB, new NoOpRequestInterceptor())
-                .build();
+        ).build();
     }
 
 }

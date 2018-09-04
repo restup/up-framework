@@ -1,5 +1,10 @@
 package com.github.restup.spring.mvc.controller;
 
+import com.github.restup.controller.ResourceController;
+import com.github.restup.http.model.HttpServletResourceControllerRequest;
+import com.github.restup.http.model.HttpServletResourceControllerResponse;
+import com.github.restup.jackson.service.model.JacksonRequestBody;
+import com.github.restup.registry.ResourceRegistry;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.concurrent.Callable;
@@ -10,11 +15,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
 import org.springframework.web.servlet.HandlerMapping;
 import org.springframework.web.servlet.handler.SimpleUrlHandlerMapping;
-import com.github.restup.controller.ResourceController;
-import com.github.restup.http.model.HttpServletResourceControllerRequest;
-import com.github.restup.http.model.HttpServletResourceControllerResponse;
-import com.github.restup.jackson.service.model.JacksonRequestBody;
-import com.github.restup.registry.ResourceRegistry;
 
 /**
  * Implementation or example implementation for using Up! with Spring MVC
@@ -47,12 +47,22 @@ public class SpringMVCResourceController {
         return simpleUrlHandlerMapping;
     }
 
+    static String cleanRequestMapping(String requestMapping) {
+        if (requestMapping.endsWith("/**")) {
+            return requestMapping;
+        } else if (requestMapping.endsWith("/")) {
+            return requestMapping + "**";
+        } else {
+            return requestMapping + "/**";
+        }
+    }
+
     @ResponseBody
     public Object request(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) JacksonRequestBody body) {
         response.setStatus(200);
         return controller.request(HttpServletResourceControllerRequest.builder(request)
-                .setBody(body)
-                .setRegistry(registry), new HttpServletResourceControllerResponse(response));
+            .body(body)
+                .registry(registry), new HttpServletResourceControllerResponse(response));
 
     }
 
@@ -64,16 +74,6 @@ public class SpringMVCResourceController {
                 return request(request, response, body);
             }
         };
-    }
-
-    static String cleanRequestMapping(String requestMapping) {
-        if (requestMapping.endsWith("/**")) {
-            return requestMapping;
-        } else if (requestMapping.endsWith("/")) {
-            return requestMapping + "**";
-        } else {
-            return requestMapping + "/**";
-        }
     }
 
     public String getRequestMapping() {

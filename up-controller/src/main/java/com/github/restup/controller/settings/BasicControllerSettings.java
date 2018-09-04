@@ -14,22 +14,29 @@ public class BasicControllerSettings implements ControllerSettings {
     private final RequestParser requestParser;
     private final ExceptionHandler exceptionHandler;
     private final String defaultMediaType;
+    private final String mediaTypeParam;
 
     protected BasicControllerSettings(ResourceRegistry registry, ContentNegotiator contentNegotiator,
             RequestInterceptor requestInterceptor, RequestParser requestParsers,
-            ExceptionHandler exceptionHandler, String defaultMediaType) {
+        ExceptionHandler exceptionHandler, String defaultMediaType, String mediaTypeParam) {
         super();
         this.registry = registry;
         this.contentNegotiator = contentNegotiator;
         this.requestInterceptor = requestInterceptor;
-        this.requestParser = requestParsers;
+        requestParser = requestParsers;
         this.exceptionHandler = exceptionHandler;
         this.defaultMediaType = defaultMediaType;
+        this.mediaTypeParam = mediaTypeParam;
     }
 
     @Override
     public String getDefaultMediaType() {
         return defaultMediaType;
+    }
+
+    @Override
+    public String getMediaTypeParam() {
+        return mediaTypeParam;
     }
 
     @Override

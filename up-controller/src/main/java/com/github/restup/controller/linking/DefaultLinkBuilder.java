@@ -1,14 +1,5 @@
 package com.github.restup.controller.linking;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.List;
-import java.util.Objects;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.model.HttpMethod;
@@ -18,6 +9,15 @@ import com.github.restup.controller.request.parser.params.PageOffsetParser;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.List;
+import java.util.Objects;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default implementation of {@link LinkBuilder}
@@ -52,7 +52,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
 
     @Override
     public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object Result, Resource<?, ?> relationship, Object id) {
-        List<Link> links = new ArrayList<Link>();
+        List<Link> links = new ArrayList<>();
 
         links.add(link(request, LinkRelations.related, request.getResource(), id, relationship));
 
@@ -62,7 +62,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
 
     @Override
     public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> relationship, Object id, RelationshipType type) {
-        List<Link> links = new ArrayList<Link>();
+        List<Link> links = new ArrayList<>();
 
         String name = RelationshipType.isToOne(type) ? relationship.getName() : relationship.getPluralName();
 
@@ -73,9 +73,9 @@ public class DefaultLinkBuilder implements LinkBuilder {
 
     @Override
     public List<Link> getTopLevelLinks(ParsedResourceControllerRequest<?> request, Object result) {
-        List<Link> links = new ArrayList<Link>();
-        String baseUrl = buildResourceRequestBaseUrl(request);
+        List<Link> links = new ArrayList<>();
         if (result instanceof PagedResult) {
+            String baseUrl = buildResourceRequestBaseUrl(request);
             PagedResult<?> paged = (PagedResult<?>) result;
             Integer offset = paged.getOffset();
             Integer limit = paged.getLimit();
@@ -98,6 +98,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
                 links.add(new BasicLink(LinkRelations.self, baseUrl));
             }
         } else if (isIterable(result)) {
+            String baseUrl = buildResourceRequestBaseUrl(request);
             links.add(new BasicLink(LinkRelations.self, baseUrl));
         } else {
             return links;
@@ -135,20 +136,8 @@ public class DefaultLinkBuilder implements LinkBuilder {
     public String buildResourceRequestBaseUrl(ParsedResourceControllerRequest<?> request) {
         StringBuilder sb = new StringBuilder();
         sb.append(request.getRequestUrl());
-        char delimiter = '?';
-
-        List<String> params = request.getAcceptedParameterNames();
-        if (params != null) {
-            for (String param : params) {
-                if (includeParam(request, param)) {
-                    String[] values = request.getParameter(param);
-                    for (String value : values) {
-                        param(sb, delimiter, param, value);
-                        delimiter = '&';
-                    }
-                }
-            }
-        }
+        appendParams(request, sb, request.getAcceptedParameterNames());
+        appendParams(request, sb, request.getAcceptedResourceParameterNames());
         return sb.toString();
     }
 
@@ -208,7 +197,24 @@ public class DefaultLinkBuilder implements LinkBuilder {
         for (Object s : path) {
             sb.append("/").append(s);
         }
+        appendParams(request, sb, request.getAcceptedParameterNames());
         return sb.toString();
+    }
+
+    private void appendParams(ParsedResourceControllerRequest<?> request, StringBuilder sb,
+        List<String> params) {
+        if (params != null) {
+            char delimiter = '?';
+            for (String param : params) {
+                if (includeParam(request, param)) {
+                    String[] values = request.getParameter(param);
+                    for (String value : values) {
+                        param(sb, delimiter, param, value);
+                        delimiter = '&';
+                    }
+                }
+            }
+        }
     }
 
     private Object getId(ParsedResourceControllerRequest<?> request) {

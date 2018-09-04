@@ -1,8 +1,7 @@
 package com.github.restup.controller.mock;
 
 import static com.github.restup.controller.mock.MockResourceControllerRequest.getUrl;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.github.restup.controller.ResourceController;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
@@ -11,6 +10,8 @@ import com.github.restup.test.ApiRequest;
 import com.github.restup.test.ApiResponse;
 import com.github.restup.test.BasicApiResponse;
 import com.github.restup.test.resource.Contents;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Mock {@link ApiExecutor} for testing {@link ResourceController} directly outside of a container or other framework support
@@ -37,22 +38,20 @@ public class MockApiExecutor implements ApiExecutor {
         			.method(request.getMethod().name())
         			.url(request.getUrl())
         			.headers(request.getHeaders())
-        			.setRegistry(registry);
+            .registry(registry);
 
         ResourceData<?> body = contentNegotiation.getBody(request.getBody());
-        mockRequestBuilder.setBody(body);
+        mockRequestBuilder.body(body);
 
         MockResourceControllerResponse mockResponse = new MockResourceControllerResponse();
-        MockResourceControllerRequest mockRequest = null;
         Object result = null;
         try {
-	        mockRequest = mockRequestBuilder.build();
-	        result = controller.request(mockRequest, mockResponse);
+            result = controller.request(mockRequestBuilder, mockResponse);
         } catch ( Throwable t) {
-            result = controller.handleException(mockRequest, mockResponse, t);
+            result = controller.handleException(mockRequestBuilder.getResult(), mockResponse, t);
         }
 
-        Contents resultContents = serialize(mockRequest, mockResponse, result);
+        Contents resultContents = serialize(mockRequestBuilder.getResult(), mockResponse, result);
 
         if (log.isDebugEnabled()) {
             log.debug("\n\nRequest:\n{} {}"
@@ -61,7 +60,8 @@ public class MockApiExecutor implements ApiExecutor {
                     resultContents.getContentAsString());
         }
 
-        return new BasicApiResponse<String[]>(mockResponse.getStatus(), mockResponse.getHeaders(), resultContents);
+        return new BasicApiResponse<>(mockResponse.getStatus(), mockResponse.getHeaders(),
+            resultContents);
     }
 
     private Contents serialize(MockResourceControllerRequest mockRequest, MockResourceControllerResponse mockResponse, Object result) {

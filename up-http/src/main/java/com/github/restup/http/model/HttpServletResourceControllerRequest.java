@@ -1,18 +1,16 @@
 package com.github.restup.http.model;
 
-import java.util.Collections;
-import java.util.Enumeration;
-import java.util.List;
-import javax.servlet.http.HttpServletRequest;
-import org.apache.commons.lang3.StringUtils;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
-import com.github.restup.controller.model.MediaType;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
+import java.util.Collections;
+import java.util.Enumeration;
+import java.util.List;
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Wraps {@link HttpServletRequest} to pass parameter details for Filtereds
@@ -28,10 +26,6 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
     }
 
     public static String getContentType(HttpServletRequest request) {
-        String param = request.getParameter(MediaType.PARAM);
-        if (StringUtils.isNotEmpty(param)) {
-            return param;
-        }
         Enumeration<String> e = request.getHeaders(ContentTypeNegotiation.CONTENT_TYPE);
         if (e != null) {
             while (e.hasMoreElements()) {
@@ -79,11 +73,13 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
         public HttpServletResourceControllerRequest build() {
             String url = httpRequest.getRequestURL().toString();
             String path = httpRequest.getRequestURI();
-            setBaseRequestUrl(url.substring(0, url.length() - path.length()));
-            setRequestPath(path);
-            setMethod(HttpMethod.of(httpRequest.getMethod()));
+            baseRequestUrl(url.substring(0, url.length() - path.length()));
+            requestPath(path);
+            method(HttpMethod.of(httpRequest.getMethod()));
             parsePath();
-            String contentType = getContentType(httpRequest);
+            String contentType = getContentType(
+                () -> httpRequest.getParameterValues(contentTypeParam)
+                , () -> HttpServletResourceControllerRequest.getContentType(httpRequest));
             return new HttpServletResourceControllerRequest(httpRequest, method, resource, ids, relationship, resourceRelationship, body, baseRequestUrl, url, contentType);
         }
     }

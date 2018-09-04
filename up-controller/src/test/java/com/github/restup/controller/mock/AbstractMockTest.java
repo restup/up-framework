@@ -1,13 +1,13 @@
 package com.github.restup.controller.mock;
 
-import org.junit.Before;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.ResourceController;
-import com.github.restup.controller.model.MediaType;
+import com.github.restup.controller.ResourceController.Builder;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.github.restup.test.RestApiAssertions;
 import com.github.restup.test.repository.RepositoryUnit;
+import org.junit.Before;
 
 public abstract class AbstractMockTest {
 
@@ -15,7 +15,6 @@ public abstract class AbstractMockTest {
     private final Object[] pathArgs;
     protected RestApiAssertions.Builder api;
     protected ResourceRegistry registry;
-    private boolean jsonapi;
 
     protected AbstractMockTest(String path, Object... pathArgs) {
         this.path = path;
@@ -29,7 +28,7 @@ public abstract class AbstractMockTest {
     }
 
     protected AbstractMockTest(Class<?>[] resourceClasses, String path, Object... pathArgs) {
-    		this.registry = registry(resourceClasses);
+        registry = registry(resourceClasses);
         this.path = path;
         this.pathArgs = pathArgs;
     }
@@ -63,12 +62,9 @@ public abstract class AbstractMockTest {
         MockContentNegotiation contentNegotiation = new MockJacksonContentNegotiation(mapper);
         MockApiExecutor executor = new MockApiExecutor(registry, controller, contentNegotiation);
         RestApiAssertions.Builder b = RestApiAssertions.builder(executor, getRelativeToClass(), path, pathArgs);
-        if (jsonapi) {
-            b.jsonapi();
-        }
-        return b;
+        return configureRestApiAssertions(b);
     }
-    
+
     protected Class<?> getRelativeToClass() {
     		return getClass();
     }
@@ -78,18 +74,18 @@ public abstract class AbstractMockTest {
     public ResourceController resourceController(ResourceRegistry registry, ObjectMapper mapper) {
         // create new resource controller
         // a Spring MVC Controller is configured by UpSpringMVCConfiguration imported above
-        return ResourceController.builder()
+        return configureResourceController(ResourceController.builder()
                 .jacksonObjectMapper(mapper)
-                .registry(registry)
-                .defaultMediaType(MediaType.APPLICATION_JSON_API)
+            .registry(registry))
                 .build();
     }
 
-    /**
-     * {@link #api} will call jsonapi() for testing jsonapi request/responses
-     */
-    public void jsonapi() {
-        this.jsonapi = true;
+    protected Builder configureResourceController(ResourceController.Builder b) {
+        return b;
+    }
+
+    protected RestApiAssertions.Builder configureRestApiAssertions(RestApiAssertions.Builder b) {
+        return b;
     }
 
     protected RepositoryUnit.Loader loader() {

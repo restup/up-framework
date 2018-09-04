@@ -3,11 +3,12 @@ package com.github.restup.test;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
-import java.util.Map;
-import org.hamcrest.Matcher;
+
 import com.github.restup.test.matchers.ContentTypeMatcher;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
+import java.util.Map;
+import org.hamcrest.Matcher;
 
 /**
  * Provides a {@link Builder} with some defaults and support for easy file comparisons
@@ -22,6 +23,11 @@ public class RpcApiAssertions {
         return new Builder(executor, unitTest, path, defaultPathArgs);
     }
 
+    public static interface Decorator {
+
+        Builder decorate(Builder b);
+    }
+
     public static class Builder {
 
         private final ApiExecutor executor;
@@ -32,14 +38,16 @@ public class RpcApiAssertions {
         private Matcher<Object> bodyMatcher;
         private int okStatus = 200;
         private boolean testNameAsMethodName;
+        private boolean createMissingResource;
 
         Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
             this.executor = executor;
-            this.request = ApiRequest.builder(path, defaultPathArgs);
-            this.request.testClass(unitTest);
-            this.expected = new ApiResponse.Builder();
-            this.expected.testClass(unitTest);
-            this.testNameAsMethodName = true;
+            request = ApiRequest.builder(path, defaultPathArgs);
+            request.testClass(unitTest);
+            expected = new ApiResponse.Builder();
+            expected.testClass(unitTest);
+            testNameAsMethodName = true;
+            createMissingResource = true;
         }
 
         protected Builder me() {
@@ -166,6 +174,17 @@ public class RpcApiAssertions {
             return me();
         }
 
+        /**
+         * Create missing expected result files if true.  Tests will still fail, however the result
+         * will be saved to the expected file
+         *
+         * @param createMissingResource if true, create missing resource
+         */
+        public Builder createMissingResource(boolean createMissingResource) {
+            this.createMissingResource = createMissingResource;
+            return me();
+        }
+
         public ApiResponse<String[]> error400() {
             return error(400);
         }
@@ -221,12 +240,13 @@ public class RpcApiAssertions {
             // failure messages are meaningful
             boolean assertUsingString = isAssertByteAsString(response);
 
-            Object expectedValue = getContent(expectedBody, assertUsingString);
+            boolean tddCheat =
+                createMissingResource && ContentsAssertions.tddCheat(expectedBody, responseBody);
+            Object expectedValue = tddCheat ? null : getContent(expectedBody, assertUsingString);
             Object responseValue = getContent(responseBody, assertUsingString);
 
             String message = "Body";
 
-            boolean tddCheat = ContentsAssertions.tddCheat(expectedBody, responseBody);
             if (tddCheat) {
                 message = "Result has been written for convenience. Verify correctness of results for future executions";
             }

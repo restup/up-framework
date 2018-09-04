@@ -41,14 +41,14 @@ public interface ContentNegotiator {
         return new Builder();
     }
 
-    static class Builder {
+    class Builder {
 
         private ContentNegotiator[] contentNegotiators;
         private BuilderSettingsCaptor settingsCaptor;
 
         Builder() {
             super();
-            this.settingsCaptor = new BuilderSettingsCaptor();
+            settingsCaptor = new BuilderSettingsCaptor();
         }
 
         Builder me() {

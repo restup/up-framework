@@ -29,6 +29,7 @@ public class JsonApiResult extends NegotiatedResult {
         return linkBuilder.getTopLevelLinks(getRequest(), getResult());
     }
 
+
     public List<Link> getLinks(Resource<?, ?> resource, Object id) {
         return linkBuilder.getLinks(getRequest(), getResult(), resource, id);
     }
@@ -40,7 +41,7 @@ public class JsonApiResult extends NegotiatedResult {
     public List<Link> getRelationshipLinks(Resource<?, ?> relationship, Object id, RelationshipType type) {
         return linkBuilder.getRelationshipLinks(getRequest(), getResult(), relationship, id, type);
     }
-    
+
     public LinkBuilder getLinkBuilder() {
         return linkBuilder;
     }

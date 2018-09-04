@@ -3,18 +3,18 @@ package com.github.restup.controller.model;
 import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
-import java.util.Arrays;
-import java.util.Map;
-import org.assertj.core.api.Assertions;
-import org.junit.Test;
+
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.RequestErrorException;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
+import java.util.Arrays;
+import java.util.Map;
+import org.assertj.core.api.Assertions;
+import org.junit.Test;
 
-@SuppressWarnings({"rawtypes"})
 public class ResourceControllerRequestTest {
 
     @Test
@@ -72,8 +72,8 @@ public class ResourceControllerRequestTest {
         registry.registerResource(Resource.builder(Person.class)
                 .name("person").pluralName("peeps"));
         Builder b = new Builder()
-                .setRequestPath(path)
-                .setRegistry(registry);
+            .requestPath(path)
+            .registry(registry);
         b.parsePath();
         return b;
     }

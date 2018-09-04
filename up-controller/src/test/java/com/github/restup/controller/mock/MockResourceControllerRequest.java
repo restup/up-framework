@@ -1,10 +1,5 @@
 package com.github.restup.controller.mock;
 
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
@@ -14,6 +9,11 @@ import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
 import com.github.restup.util.UpUtils;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 
 /**
  * Mock {@link ResourceControllerRequest} for testing
@@ -47,7 +47,7 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
 
     @Override
     public List<String> getParameterNames() {
-        List<String> result = new ArrayList<String>(parameters.keySet());
+        List<String> result = new ArrayList<>(parameters.keySet());
         Collections.sort(result);
         return result;
     }
@@ -59,14 +59,9 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
 
     public static class Builder extends AbstractResourceControllerRequestBuilder<Builder, MockResourceControllerRequest> {
 
-        private HttpMethod method;
         private String url;
-        private Map<String, String[]> headers = new HashMap<String, String[]>();
-
-        public Builder method(HttpMethod method) {
-            this.method = method;
-            return me();
-        }
+        private Map<String, String[]> headers = new HashMap<>();
+        private MockResourceControllerRequest result;
 
         public Builder method(String method) {
             return method(HttpMethod.valueOf(method));
@@ -93,16 +88,26 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
 
             String path = parts[0];
             String url = getUrl(path);
-            String contentType = headers.get("Content-Type")[0].split(";")[0];
-            setBaseRequestUrl(LOCALHOST);
-            setRequestPath(path);
-            setMethod(method);
-            parsePath();
-            return new MockResourceControllerRequest(parameters, method, resource, ids, relationship, resourceRelationship, body, contentType, baseRequestUrl, url);
+            String contentType = getContentType(
+                () -> parameters.get(contentTypeParam),
+                () -> headers.get("Content-Type")[0].split(";")[0]);
+
+            baseRequestUrl(LOCALHOST)
+                .requestPath(path)
+                .method(method)
+                .parsePath();
+
+            result = new MockResourceControllerRequest(parameters, method, resource, ids,
+                relationship, resourceRelationship, body, contentType, baseRequestUrl, url);
+            return result;
+        }
+
+        MockResourceControllerRequest getResult() {
+            return result;
         }
 
         private Map<String, String[]> parseParams(String part) {
-            Map<String, String[]> map = new HashMap<String, String[]>();
+            Map<String, String[]> map = new HashMap<>();
             if (part != null) {
                 String[] pairs = part.split("&");
                 for (String pair : pairs) {

@@ -1,7 +1,7 @@
 package com.github.restup.controller.settings;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
-import org.apache.commons.lang3.ArrayUtils;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
@@ -15,6 +15,7 @@ import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.registry.DiscoveryService;
+import org.apache.commons.lang3.ArrayUtils;
 
 public interface ControllerSettings {
 
@@ -35,7 +36,9 @@ public interface ControllerSettings {
 
     ExceptionHandler getExceptionHandler();
 
-    static class Builder {
+    String getMediaTypeParam();
+
+    class Builder {
 
         private ResourceRegistry registry;
         private ContentNegotiator contentNegotiator;
@@ -44,6 +47,7 @@ public interface ControllerSettings {
         private ExceptionHandler exceptionHandler;
         private ObjectMapper mapper;
         private BuilderSettingsCaptor settingsCaptor;
+        private String mediaTypeParam;
         
         private Builder() {
             super();
@@ -123,10 +127,15 @@ public interface ControllerSettings {
             return me();
         }
 
+        public Builder mediaTypeParam(String mediaTypeParam) {
+            this.mediaTypeParam = mediaTypeParam;
+            return me();
+        }
+
         public ControllerSettings build() {
             settingsCaptor.build();
 
-            RequestInterceptor interceptor = getInterceptor(this.interceptors);
+            RequestInterceptor interceptor = getInterceptor(interceptors);
             RequestParser requestParser = this.requestParser;
             if (requestParser == null) {
                 requestParser = RequestParser.builder()
@@ -157,7 +166,9 @@ public interface ControllerSettings {
                                             .id(String.class, "name")
                             )
             );
-            return new BasicControllerSettings(registry, contentNegotiator, interceptor, requestParser, exceptionHandler, settingsCaptor.getDefaultMediaType());
+            return new BasicControllerSettings(registry, contentNegotiator, interceptor,
+                requestParser, exceptionHandler, settingsCaptor.getDefaultMediaType(),
+                mediaTypeParam);
         }
     }
 

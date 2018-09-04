@@ -1,9 +1,9 @@
 package com.github.restup.test;
 
-import java.util.Map;
-import org.hamcrest.Matcher;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
+import java.util.Map;
+import org.hamcrest.Matcher;
 
 public interface ApiResponse<H> {
 
@@ -27,7 +27,7 @@ public interface ApiResponse<H> {
 
     Contents getBody();
 
-    static class Builder extends AbstractApiRequestBuilder<Builder, Matcher<String[]>> {
+    class Builder extends AbstractApiRequestBuilder<Builder, Matcher<String[]>> {
 
         private int status;
 

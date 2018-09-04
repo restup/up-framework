@@ -1,14 +1,5 @@
 package com.github.restup.controller.model;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Objects;
-import java.util.stream.Collectors;
-import org.apache.commons.collections4.list.SetUniqueList;
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorCode;
@@ -26,6 +17,14 @@ import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.list.SetUniqueList;
 
 /**
  * Contains result of parsing parameters
@@ -35,7 +34,7 @@ import com.github.restup.service.model.ResourceData;
 public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
 
     static <T> Builder<T> builder(ResourceRegistry registry, ResourceControllerRequest request) {
-        return new Builder<T>(registry, request);
+        return new Builder<>(registry, request);
     }
 
     T getData();
@@ -48,6 +47,14 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
     String getPageOffsetParameterName();
 
+    /**
+     * Parameters accepted in the request specific to the resource (ex. resource specific filters)
+     */
+    List<String> getAcceptedResourceParameterNames();
+
+    /**
+     * Parameters accepted in the request which may apply to related resources (ex. contentType)
+     */
     List<String> getAcceptedParameterNames();
 
     boolean isPageOffsetOneBased();
@@ -62,6 +69,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         private Map<String, ResourceQueryStatement.Builder> resourceQueries;
 
         private List<String> acceptedParameterNames;
+        private List<String> acceptedResourceParameterNames;
         private String pageLimitParameterName;
         private String pageOffsetParameterName;
         private boolean pageOffsetOneBased;
@@ -76,7 +84,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             maxPageSize = 100;
             this.request = request;
             this.registry = registry;
-            acceptedParameterNames = new ArrayList<String>();
+            acceptedParameterNames = new ArrayList<>();
+            acceptedResourceParameterNames = new ArrayList();
         }
 
         private Builder<T> me() {
@@ -93,7 +102,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         private ResourcePath.Builder builder() {
-            return builder(this.getResource());
+            return builder(getResource());
         }
 
         private ResourcePath.Builder builder(Resource<?, ?> resource) {
@@ -123,7 +132,6 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return addRequestedPath(path(field));
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         public Builder<T> addRequestedPath(ResourcePath path) {
             if (requestedPaths == null) {
                 requestedPaths = SetUniqueList.setUniqueList(new ArrayList());
@@ -134,6 +142,11 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         public Builder<T> addAcceptedParameterName(String p) {
             acceptedParameterNames.add(p);
+            return me();
+        }
+
+        public Builder<T> addAcceptedResourceParameterName(String p) {
+            acceptedResourceParameterNames.add(p);
             return me();
         }
 
@@ -248,7 +261,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             if (builder == null && resource != null) {
                 builder = ResourceQueryStatement.builder(resource, this);
                 if (resourceQueries == null) {
-                    resourceQueries = new HashMap<String, ResourceQueryStatement.Builder>();
+                    resourceQueries = new HashMap<>();
                 }
                 resourceQueries.put(resource.getName(), builder);
             }
@@ -289,7 +302,6 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, value);
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         private Builder<T> addFilterInternal(String rawParameterName, Object rawParameterValue, String field, Operator operator,
                 String value) {
             Resource<?, ?> resource = getResource();
@@ -317,7 +329,6 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return addFilter(new ResourcePathFilter<>(path, operator, converted));
         }
 
-        @SuppressWarnings({"rawtypes", "unchecked"})
         private Object convertValue(ResourcePath path, Object value, String parameterName) {
             if (value instanceof String) {
                 MappedField<?> mf = path.lastMappedField();
@@ -347,7 +358,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         public Builder<T> setPageLimit(String parameterName, Integer value) {
-            if (this.pageLimit != null) {
+            if (pageLimit != null) {
                 addDuplicateParameter(parameterName, value, pageLimitParameterName, pageLimit);
             } else if (hasMinError(parameterName, 0, value)) {
                 return me();
@@ -358,8 +369,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
                 // TODO resource based max page size
                 return me();
             } else {
-                this.pageLimit = value;
-                this.pageLimitParameterName = parameterName;
+                pageLimit = value;
+                pageLimitParameterName = parameterName;
                 ResourceQueryStatement.Builder builder = getOrCreateQuery(getResource());
                 builder.setPageLimit(value);
             }
@@ -371,15 +382,15 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         public Builder<T> setPageOffset(String parameterName, Integer value, boolean pageOffsetAsOneBased) {
-            this.pageOffsetOneBased = pageOffsetAsOneBased;
-            if (this.pageOffset != null) {
+            pageOffsetOneBased = pageOffsetAsOneBased;
+            if (pageOffset != null) {
                 addDuplicateParameter(parameterName, value, pageOffsetParameterName, pageOffset);
             } else if (hasMinError(parameterName, 0, value)) {
                 return me();
             } else {
                 // TODO validate pageOffset is sensible
-                this.pageOffset = value;
-                this.pageOffsetParameterName = parameterName;
+                pageOffset = value;
+                pageOffsetParameterName = parameterName;
                 ResourceQueryStatement.Builder builder = getOrCreateQuery(getResource());
                 builder.setPageOffset(value);
             }
@@ -473,24 +484,17 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             assertErrors();
             List<ResourceQueryStatement> queries = null;
             if (resourceQueries != null) {
-                queries = new ArrayList<ResourceQueryStatement>(resourceQueries.size());
+                queries = new ArrayList<>(resourceQueries.size());
                 for (ResourceQueryStatement.Builder b : resourceQueries.values()) {
                     b.setPagingEnabled(true);
                     queries.add(b.build());
                 }
             }
-            // add mediaType as requested param so that it is carried through for linking
-            // when used
-            String[] mediaTypes = request.getParameter(MediaType.PARAM);
-            if (mediaTypes != null) {
-                for (String s : mediaTypes) {
-                    if (Objects.equals(s, request.getContentType())) {
-                        addAcceptedParameterName(MediaType.PARAM);
-                    }
-                }
-            }
-            ParsedResourceControllerRequest<T> result = new BasicParsedResourceControllerRequest<T>(data, requestedPaths,
-                    queries, request, body, acceptedParameterNames, pageLimitParameterName, pageOffsetParameterName, pageOffsetOneBased);
+            ParsedResourceControllerRequest<T> result = new BasicParsedResourceControllerRequest<>(
+                data, requestedPaths,
+                queries, request, body, acceptedParameterNames, acceptedResourceParameterNames,
+                pageLimitParameterName,
+                pageOffsetParameterName, pageOffsetOneBased);
             return result;
         }
 
