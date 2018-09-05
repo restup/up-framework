@@ -1,16 +1,6 @@
 package com.github.restup.spring.boot.autoconfigure;
 
-import java.util.List;
-import java.util.Set;
-import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
-import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.autoconfigure.domain.EntityScanPackages;
-import org.springframework.boot.autoconfigure.domain.EntityScanner;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
-import org.springframework.context.ApplicationContext;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
+import com.github.restup.ResourceRegistryBuilderDecorator;
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
 import com.github.restup.annotations.Resource;
@@ -30,6 +20,17 @@ import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.spring.boot.autoconfigure.factory.RestrictedFieldsProviderFactory;
 import com.github.restup.spring.boot.autoconfigure.factory.ServiceFilterFactory;
 import com.github.restup.spring.boot.autoconfigure.factory.SparseFieldsProviderFactory;
+import java.util.List;
+import java.util.Set;
+import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
+import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
+import org.springframework.boot.autoconfigure.domain.EntityScanPackages;
+import org.springframework.boot.autoconfigure.domain.EntityScanner;
+import org.springframework.boot.context.properties.EnableConfigurationProperties;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass(ResourceRegistry.class)
@@ -43,6 +44,20 @@ public class UpAutoConfiguration {
         super();
         this.props = props;
         this.applicationContext = applicationContext;
+    }
+
+    static Set<Class<?>> getResources(ApplicationContext applicationContext)
+        throws ClassNotFoundException {
+        return new EntityScanner(applicationContext)
+            .scan(Resource.class, ApiName.class, Plural.class);
+    }
+
+    static List<String> getPackages(ApplicationContext applicationContext) {
+        List<String> packages = EntityScanPackages.get(applicationContext).getPackageNames();
+        if (packages.isEmpty() && AutoConfigurationPackages.has(applicationContext)) {
+            packages = AutoConfigurationPackages.get(applicationContext);
+        }
+        return packages;
     }
 
     @Bean
@@ -85,7 +100,8 @@ public class UpAutoConfiguration {
     public MappedClassFactory defaultUpMappedClassFactory() {
         MappedFieldBuilderVisitor[] visitors = MappedFieldBuilderVisitor.getDefaultVisitors();
         DefaultMappedFieldFactory mappedFieldFactory = new DefaultMappedFieldFactory(visitors);
-        return new DefaultMappedClassFactory(mappedFieldFactory, getPackages(this.applicationContext), MappedClass.getDefaultFieldComparator());
+        return new DefaultMappedClassFactory(mappedFieldFactory, getPackages(applicationContext),
+            MappedClass.getDefaultFieldComparator());
     }
 
     @Bean
@@ -114,23 +130,30 @@ public class UpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public ResourceRegistry defaultUpRegistry(
-            ControllerMethodAccess controllerMethodAccess,
-            ConverterFactory converterFactory,
-            ErrorFactory errorFactory,
-            MappedClassFactory mappedClassFactory,
-            Pagination pagination,
-            RepositoryFactory repositoryFactory,
-            RequestObjectFactory requestObjectFactory,
-            ServiceMethodAccess serviceMethodAccess,
-            ServiceFilterFactory serviceFilterFactory,
-            RestrictedFieldsProviderFactory restrictedFieldsProviderFactory,
-            SparseFieldsProviderFactory sparseFieldsProviderFactory) throws ClassNotFoundException {
+    public ResourceRegistryBuilderDecorator defaultUpResourceRegistryBuilderDecorator() {
+        return (b) -> b;
+    }
 
-        return ResourceRegistry.builder()
+    @Bean
+    @ConditionalOnMissingBean
+    public ResourceRegistry defaultUpRegistry(
+        ControllerMethodAccess controllerMethodAccess,
+        ConverterFactory converterFactory,
+        ErrorFactory errorFactory,
+        MappedClassFactory mappedClassFactory,
+        Pagination pagination,
+        RepositoryFactory repositoryFactory,
+        RequestObjectFactory requestObjectFactory,
+        ServiceMethodAccess serviceMethodAccess,
+        ServiceFilterFactory serviceFilterFactory,
+        RestrictedFieldsProviderFactory restrictedFieldsProviderFactory,
+        SparseFieldsProviderFactory sparseFieldsProviderFactory,
+        ResourceRegistryBuilderDecorator decorator) throws ClassNotFoundException {
+
+        return decorator.decorate(
+            ResourceRegistry.builder()
                 .basePath(props.getBasePath())
                 .excludeFrameworkFilters(props.isExcludeFrameworkFilters())
-                .packagesToScan("com.foo", "com.bar")
                 .controllerMethodAccess(controllerMethodAccess)
                 .defaultPagination(pagination)
                 .errorFactory(errorFactory)
@@ -142,20 +165,7 @@ public class UpAutoConfiguration {
                 .defaultServiceFilters(serviceFilterFactory.getServiceFilters())
                 .defaultRestrictedFieldsProvider(restrictedFieldsProviderFactory.getRestrictedFieldsProvider())
                 .defaultSparseFieldsProvider(sparseFieldsProviderFactory.getSparseFieldsProvider())
-                .build();
-    }
-
-    static Set<Class<?>> getResources(ApplicationContext applicationContext) throws ClassNotFoundException {
-        return new EntityScanner(applicationContext)
-                .scan(Resource.class, ApiName.class, Plural.class);
-    }
-
-    static List<String> getPackages(ApplicationContext applicationContext) {
-        List<String> packages = EntityScanPackages.get(applicationContext).getPackageNames();
-        if (packages.isEmpty() && AutoConfigurationPackages.has(applicationContext)) {
-            packages = AutoConfigurationPackages.get(applicationContext);
-        }
-        return packages;
+        ).build();
     }
 
 }
