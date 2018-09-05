@@ -34,7 +34,9 @@ public class DefaultLinkBuilder implements LinkBuilder {
     @Override
     public Link getCollectionEndpoint(ParsedResourceControllerRequest<?> request, Resource<?, ?> resource) {
         String baseUrl = serviceDiscovery.locateResourceUrl(request, resource);
-        return new BasicLink(resource.getPluralName(), baseUrl);
+        StringBuilder sb = new StringBuilder(baseUrl);
+        appendParams(request, sb, request.getAcceptedParameterNames());
+        return new BasicLink(resource.getPluralName(), sb.toString());
     }
 
     @Override

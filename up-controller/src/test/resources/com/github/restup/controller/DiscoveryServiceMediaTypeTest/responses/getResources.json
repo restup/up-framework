@@ -1,0 +1,5 @@
+{
+  "students": "http://localhost/students?mt=application%2Fvnd.api%2Bjson",
+  "universities": "http://localhost/universities?mt=application%2Fvnd.api%2Bjson",
+  "courses": "http://localhost/courses?mt=application%2Fvnd.api%2Bjson"
+}
