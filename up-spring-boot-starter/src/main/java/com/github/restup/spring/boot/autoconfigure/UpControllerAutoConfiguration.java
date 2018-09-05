@@ -5,10 +5,12 @@ import com.github.restup.ResourceControllerBuilderDecorator;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
+import com.github.restup.controller.content.negotiation.ContentNegotiatorBuilderDecorator;
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.controller.request.parser.RequestParserBuilderDecorator;
 import com.github.restup.registry.ResourceRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -63,8 +65,22 @@ public class UpControllerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RequestParser defaultUpRequestParser(ObjectMapper mapper) {
-        return RequestParser.builder()
+    public RequestParserBuilderDecorator defaultUpRequestParserBuilderDecorator() {
+        return (b) -> b;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ContentNegotiatorBuilderDecorator defaultUpContentNegotiatorBuilderDecorator() {
+        return (b) -> b;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public RequestParser defaultUpRequestParser(ObjectMapper mapper,
+        RequestParserBuilderDecorator decorator) {
+        return decorator.decorate(
+            RequestParser.builder()
                 .autoDetectDisabled(props.isDisableSerializationAutoDetection())
                 .defaultMediaType(props.getDefaultMediaType())
                 .fieldsParamName(props.getFieldsParamName())
@@ -75,19 +91,20 @@ public class UpControllerAutoConfiguration {
                 .pageOffsetParamName(props.getOffsetParamName())
                 .sortParamName(props.getSortParamName())
                 .jacksonObjectMapper(mapper)
-                .build();
+        ).build();
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ContentNegotiator defaultUpContentNegotiator(ServiceDiscovery serviceDiscovery,
-            LinkBuilderFactory linkBuilderFactory) {
-        return ContentNegotiator.builder()
+        LinkBuilderFactory linkBuilderFactory, ContentNegotiatorBuilderDecorator decorator) {
+        return decorator.decorate(
+            ContentNegotiator.builder()
                 .autoDetectDisabled(props.isDisableSerializationAutoDetection())
                 .defaultMediaType(props.getDefaultMediaType())
                 .serviceDiscovery(serviceDiscovery)
                 .linkBuilderFactory(linkBuilderFactory)
-                .build();
+        ).build();
     }
 
     @Bean
@@ -99,7 +116,8 @@ public class UpControllerAutoConfiguration {
             RequestParser requestParser,
         ResourceControllerBuilderDecorator decorator,
             ContentNegotiator contentNegotiator) {
-        return decorator.decorate(ResourceController.builder()
+        return decorator.decorate(
+            ResourceController.builder()
                 .registry(registry)
                 .serviceDiscovery(serviceDiscovery)
                 .linkBuilderFactory(linkBuilderFactory)
