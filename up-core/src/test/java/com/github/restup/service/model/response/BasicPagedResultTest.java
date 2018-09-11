@@ -8,7 +8,7 @@ public class BasicPagedResultTest {
 
     @Test
     public void testLimitAndOffset() {
-        BasicPagedResult<?> result = new BasicPagedResult<>(null, null, 0l);
+        PagedResult result = PagedResult.of(null, null, 0l);
         assertNull(result.getLimit());
         assertNull(result.getOffset());
     }

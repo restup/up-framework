@@ -1,11 +1,14 @@
 package com.github.restup.service.model.response;
 
-class BasicPersistenceResult<T> implements PersistenceResult<T> {
+import java.util.List;
+
+class BasicPersistenceResult<T> extends AbstractBasicResourceResult<T> implements
+    PersistenceResult<T> {
 
     private final T data;
 
-    BasicPersistenceResult(T data) {
-        super();
+    BasicPersistenceResult(T data, List<RelatedResourceResult<?, ?>> relatedResourceResults) {
+        super(relatedResourceResults);
         this.data = data;
     }
 

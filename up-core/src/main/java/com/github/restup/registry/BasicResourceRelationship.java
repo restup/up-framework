@@ -1,5 +1,9 @@
 package com.github.restup.registry;
 
+import com.github.restup.annotations.field.RelationshipType;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.util.Assert;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -8,10 +12,6 @@ import java.util.List;
 import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
-import com.github.restup.annotations.field.RelationshipType;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.util.Assert;
 
 class BasicResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID extends Serializable>
         implements ResourceRelationship<FROM, FROM_ID, TO, TO_ID> {
@@ -50,7 +50,7 @@ class BasicResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID ex
         this.from = from;
         this.to = to;
         this.fromPaths = fromPaths;
-        List<ResourcePath> toPaths = new ArrayList<ResourcePath>();
+        List<ResourcePath> toPaths = new ArrayList<>();
         RelationshipType type = RelationshipType.manyToOne;
         for (ResourcePath path : fromPaths) {
         	
@@ -62,8 +62,8 @@ class BasicResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID ex
             }
         }
         this.toPaths = toPaths;
-        this.fromType = type;
-        this.toType = ResourceRelationship.converse(type, fromPaths);
+        fromType = type;
+        toType = ResourceRelationship.converse(type, fromPaths);
     }
 
     public static String getRelationshipNameForToResource(BasicResourceRelationship<?, ?, ?, ?> relationship) {
@@ -86,7 +86,7 @@ class BasicResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID ex
 
     private static Set<Object> collect(Object instance, List<ResourcePath> list) {
         // TODO Collector
-        Set<Object> result = new HashSet<Object>();
+        Set<Object> result = new HashSet<>();
         for (ResourcePath path : list) {
             path.collectValues(result, instance);
         }
@@ -106,19 +106,16 @@ class BasicResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID ex
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Set<FROM_ID> getFromIds(Object from) {
         return (Set) collect(from, fromPaths);
     }
 
     @Override
-    @SuppressWarnings({"unchecked", "rawtypes"})
     public Set<TO_ID> getToIds(Object to) {
         return (Set) collect(to, toPaths);
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public Set getJoinIds(Resource<?, ?> resource, Object data) {
         if (isFrom(resource)) {
             return getFromIds(data);
@@ -165,16 +162,6 @@ class BasicResourceRelationship<FROM, FROM_ID extends Serializable, TO, TO_ID ex
     @Override
     public List<ResourcePath> getToPaths() {
         return toPaths;
-    }
-
-    @Override
-    public boolean isFrom(Resource<?, ?> resource) {
-        return Objects.equals(resource, from);
-    }
-
-    @Override
-    public boolean isTo(Resource<?, ?> resource) {
-        return Objects.equals(resource, to);
     }
 
     @Override
