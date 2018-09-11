@@ -39,10 +39,6 @@ public interface ContentNegotiator {
      */
     <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response, Object result);
 
-    static Builder builder() {
-        return new Builder();
-    }
-
     class Builder {
 
         private ContentNegotiator[] contentNegotiators;
@@ -59,48 +55,48 @@ public interface ContentNegotiator {
 
         public Builder contentNegotiators(ContentNegotiator... contentNegotiators) {
             this.contentNegotiators = contentNegotiators;
-            return this.me();
+            return me();
         }
 
         public Builder autoDetectDisabled(boolean autoDetectDisabled) {
-            this.settingsCaptor.setAutoDetectDisabled(autoDetectDisabled);
-            return this.me();
+            settingsCaptor.setAutoDetectDisabled(autoDetectDisabled);
+            return me();
         }
 
         public Builder defaultMediaType(String mediaType) {
-            this.settingsCaptor.setDefaultMediaType(mediaType);
-            return this.me();
+            settingsCaptor.setDefaultMediaType(mediaType);
+            return me();
         }
 
         public Builder serviceDiscovery(ServiceDiscovery serviceDiscovery) {
-            this.settingsCaptor.setServiceDiscovery(serviceDiscovery);
-            return this.me();
+            settingsCaptor.setServiceDiscovery(serviceDiscovery);
+            return me();
         }
 
         public Builder linkBuilderFactory(LinkBuilderFactory linkBuilderFactory) {
-            this.settingsCaptor.setLinkBuilderFactory(linkBuilderFactory);
-            return this.me();
+            settingsCaptor.setLinkBuilderFactory(linkBuilderFactory);
+            return me();
         }
 
         public Builder capture(BuilderSettingsCaptor settingsCaptor) {
             this.settingsCaptor = settingsCaptor.capture(this.settingsCaptor);
-            return this.me();
+            return me();
         }
 
         public ContentNegotiator build() {
-            this.settingsCaptor.build();
+            settingsCaptor.build();
 
-            ContentNegotiator[] arr = this.contentNegotiators;
-            if (!this.settingsCaptor.getAutoDetectDisabled()) {
+            ContentNegotiator[] arr = contentNegotiators;
+            if (!settingsCaptor.getAutoDetectDisabled()) {
                 if (AutoDetectConstants.JACKSON2_EXISTS) {
                     arr = ArrayUtils
                         .addAll(arr, new JsonContentNegotiator(), new JsonApiContentNegotiator(
-                            this.settingsCaptor.getLinkBuilderFactory()));
+                            settingsCaptor.getLinkBuilderFactory()));
                 }
             }
-            if (this.settingsCaptor.getDefaultMediaType() != null) {
+            if (settingsCaptor.getDefaultMediaType() != null) {
                 DefaultContentNegotiator defaultContentNegotiator = new DefaultContentNegotiator(
-                    this.settingsCaptor.getDefaultMediaType(), arr);
+                    settingsCaptor.getDefaultMediaType(), arr);
                 arr = ArrayUtils.add(arr, defaultContentNegotiator);
             }
             return arr != null ? new ContentNegotiatorChain(arr) : new ContentNegotiatorChain();

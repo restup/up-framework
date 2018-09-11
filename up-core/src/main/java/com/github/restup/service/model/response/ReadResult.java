@@ -1,5 +1,6 @@
 package com.github.restup.service.model.response;
 
+import java.util.Collections;
 import java.util.List;
 
 /**
@@ -8,11 +9,19 @@ import java.util.List;
 public interface ReadResult<T> extends ResourceResult<T> {
 
     static <T> ReadResult<T> of(T data) {
-        return new BasicReadResult<T>(data);
+        return new BasicReadResult<>(data, Collections.emptyList());
     }
 
-    static <T> BasicListResult<T> of(List<T> data) {
-        return new BasicListResult<T>(data);
+    static <T> ReadResult<List<T>> of(List<T> data) {
+        return new BasicListResult<>(data, Collections.emptyList());
+    }
+
+    static <T> ReadResult<T> of(ReadResult<T> result,
+        List<RelatedResourceResult<?, ?>> relatedResourceResults) {
+        if (result.getData() instanceof List) {
+            return new BasicListResult<>((List) result.getData(), relatedResourceResults);
+        }
+        return new BasicReadResult<>(result.getData(), relatedResourceResults);
     }
 
 }

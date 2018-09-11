@@ -1,11 +1,13 @@
 package com.github.restup.service.model.response;
 
-class BasicReadResult<T> implements ReadResult<T> {
+import java.util.List;
+
+class BasicReadResult<T> extends AbstractBasicResourceResult<T> implements ReadResult<T> {
 
     private final T data;
 
-    BasicReadResult(T data) {
-        super();
+    BasicReadResult(T data, List<RelatedResourceResult<?, ?>> relatedResourceResults) {
+        super(relatedResourceResults);
         this.data = data;
     }
 

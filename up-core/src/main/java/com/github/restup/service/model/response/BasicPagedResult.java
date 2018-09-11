@@ -1,34 +1,26 @@
 package com.github.restup.service.model.response;
 
-import java.util.List;
 import com.github.restup.query.Pagination;
+import java.util.List;
 
 class BasicPagedResult<T> extends BasicListResult<T> implements PagedResult<T> {
 
     private final Pagination pagination;
     private final Long total;
 
-    BasicPagedResult(List<T> data, Pagination pagination, Long totalRecords) {
-        super(data);
+    BasicPagedResult(List<T> data, Pagination pagination, Long totalRecords,
+        List<RelatedResourceResult<?, ?>> relatedResourceResults) {
+        super(data, relatedResourceResults);
         this.pagination = pagination;
-        this.total = totalRecords;
-    }
-
-    @Override
-    public Integer getLimit() {
-        return pagination == null ? null : pagination.getLimit();
-    }
-
-    @Override
-    public Integer getOffset() {
-        return pagination == null ? null : pagination.getOffset();
+        total = totalRecords;
     }
 
     @Override
     public Long getTotal() {
         return total;
     }
-    
+
+    @Override
     public Pagination getPagination() {
         return pagination;
     }

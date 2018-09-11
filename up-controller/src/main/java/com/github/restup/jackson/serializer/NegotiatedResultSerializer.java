@@ -1,5 +1,7 @@
 package com.github.restup.jackson.serializer;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonSerializer;
@@ -17,9 +19,12 @@ import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.PathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.response.PagedResult;
+import com.github.restup.service.model.response.ReadResult;
+import com.github.restup.service.model.response.RelatedResourceResult;
 import com.github.restup.service.model.response.ResourceResult;
 import java.io.IOException;
 import java.util.Iterator;
+import java.util.List;
 import java.util.Map;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -65,8 +70,26 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
         }
     }
 
-    protected void writeIncluded(T result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
-//		jgen.writeObjectField("included", null);
+    protected void writeIncluded(T result, JsonGenerator jgen, SerializerProvider provider)
+        throws Exception {
+        if (result.getResult() instanceof ResourceResult) {
+            ResourceResult resourceResult = (ResourceResult) result.getResult();
+            if (isNotEmpty(resourceResult.getRelatedResourceResults())) {
+                jgen.writeArrayFieldStart("included");
+                List<RelatedResourceResult<?, ?>> list = resourceResult.getRelatedResourceResults();
+                for (RelatedResourceResult<?, ?> relatedResourceResult : list) {
+                    ReadResult<List<?>> r = (ReadResult) relatedResourceResult.getResult();
+                    if (isNotEmpty(r.getData())) {
+                        Resource<?, ?> resource = relatedResourceResult.getResource();
+                        Map<PathValue, ?> paths = result.getMappedPaths(resource);
+                        for (Object data : r.getData()) {
+                            writeObject(resource, paths, data, result, jgen, provider);
+                        }
+                    }
+                }
+                jgen.writeEndArray();
+            }
+        }
     }
 
     /*TODO

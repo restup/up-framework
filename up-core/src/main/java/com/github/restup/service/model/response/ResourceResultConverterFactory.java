@@ -57,7 +57,6 @@ public class ResourceResultConverterFactory {
         return instance;
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private static List<?> asList(Object result) {
         if (result instanceof List) {
             return (List) result;
@@ -90,7 +89,7 @@ public class ResourceResultConverterFactory {
             if (result instanceof PersistenceResult) {
                 return result;
             } else {
-                return new BasicPersistenceResult<>(result);
+                return PersistenceResult.of(result);
             }
         }
     }
@@ -103,7 +102,7 @@ public class ResourceResultConverterFactory {
                 return result;
             } else {
                 List<?> list = asList(result);
-                return new BasicPersistenceResult<>(list);
+                return PersistenceResult.of(list);
             }
         }
     }
@@ -116,7 +115,7 @@ public class ResourceResultConverterFactory {
                 return result;
             } else {
                 List<?> list = asList(result);
-                return new BasicListResult<>(list);
+                return ReadResult.of(list);
             }
         }
     }
@@ -128,7 +127,7 @@ public class ResourceResultConverterFactory {
             if (result instanceof ReadResult) {
                 return result;
             } else {
-                return new BasicReadResult<>(result);
+                return ReadResult.of(result);
             }
         }
     }

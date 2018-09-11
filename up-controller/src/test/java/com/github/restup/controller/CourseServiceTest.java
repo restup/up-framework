@@ -5,7 +5,6 @@ import com.github.restup.test.RestApiAssertions;
 import com.university.Course;
 import com.university.Student;
 import com.university.University;
-
 import org.junit.Before;
 import org.junit.Test;
 
@@ -31,6 +30,11 @@ public class CourseServiceTest extends AbstractMockTest {
     @Test
     public void listCourses() {
         api.list().query("fields=name").ok();
+    }
+
+    @Test
+    public void listCoursesIncludeUniversity() {
+        api.list().query("fields=name&fields[university]=name").ok();
     }
 
     @Test

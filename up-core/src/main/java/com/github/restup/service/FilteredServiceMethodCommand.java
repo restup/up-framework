@@ -9,6 +9,7 @@ import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.service.model.response.RelatedResourceResult;
 import com.github.restup.service.model.response.ResourceResultConverter;
 import com.github.restup.service.model.response.ResourceResultConverterFactory;
 import com.github.restup.util.ReflectionUtils;
@@ -54,8 +55,8 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
             , Object... filters) {
         this.resource = resource;
         ResourceRegistry registry = resource.getRegistry();
-        this.errorFactory = registry.getSettings().getErrorFactory();
-        this.argumentFactory = registry.getSettings().getMethodArgumentFactory();
+        errorFactory = registry.getSettings().getErrorFactory();
+        argumentFactory = registry.getSettings().getMethodArgumentFactory();
 
         // collect method detail for pre/post annotations
         FiltersBuilder filtersBuilder = new FiltersBuilder(resource, preAnnotation, postAnnotation);
@@ -72,10 +73,10 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
         // now build the filters with the argument type detail
         filtersBuilder.argumentTypes = argumentTypes;
 
-        this.preFilters = filtersBuilder.buildPreFilters();
-        this.postFilters = filtersBuilder.buildPostFilters();
+        preFilters = filtersBuilder.buildPreFilters();
+        postFilters = filtersBuilder.buildPostFilters();
         this.repositoryMethod = new AnnotatedRepositoryMethodCommand(resource, objectInstance, repoAnnotation, repositoryMethod, argumentTypes);
-        this.resultConverter = disableAutoWrap ? new NoOpResourceResultConverter() :
+        resultConverter = disableAutoWrap ? new NoOpResourceResultConverter() :
                 ResourceResultConverterFactory.getInstance().getConverter(repoAnnotation);
     }
 
@@ -97,11 +98,16 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
             result = converted;
             ctx.addArgument(result);
         }
-
         ctx.assertErrors();
+
         // execute post filters
         executeFilters(postFilters, ctx);
         ctx.assertErrors();
+
+        RelatedResourceResult.Builder builder = ctx.getRelatedResourceResultBulder();
+        if (builder != null) {
+            result = builder.build(result);
+        }
         return result;
     }
 
@@ -161,17 +167,16 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
             this.resource = resource;
             this.preAnnotation = preAnnotation;
             this.postAnnotation = postAnnotation;
-            this.create = preAnnotation == PreCreateFilter.class;
-            this.update = preAnnotation == PreUpdateFilter.class;
-            this.validations = create || update ? new ArrayList<Pair<Object, Method>>() : null;
-            this.preMethods = new ArrayList<Pair<Object, Method>>();
-            this.postMethods = new ArrayList<Pair<Object, Method>>();
-            this.comparator = new FilterOrderComparator();
+            create = preAnnotation == PreCreateFilter.class;
+            update = preAnnotation == PreUpdateFilter.class;
+            validations = create || update ? new ArrayList<>() : null;
+            preMethods = new ArrayList<>();
+            postMethods = new ArrayList<>();
+            comparator = new FilterOrderComparator();
         }
 
-        @SuppressWarnings("unchecked")
         public List<Method> getMethods() {
-            List<Method> methods = new ArrayList<Method>();
+            List<Method> methods = new ArrayList<>();
             appendMethods(methods, preMethods, postMethods, validations);
             return methods;
         }
@@ -202,7 +207,6 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
             }
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         private void addFilter(Object filter) {
             if (filter != null) {
                 if (filter instanceof Iterable) {
@@ -212,7 +216,7 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
                 } else {
                     if (filter instanceof ServiceFilter) {
                         ServiceFilter serviceFilter = (ServiceFilter) filter;
-                        if (!serviceFilter.accepts(this.resource)) {
+                        if (!serviceFilter.accepts(resource)) {
                             return;
                         }
                     }
@@ -220,11 +224,11 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
                     for (Method m : methods) {
                         Annotation pre = m.getAnnotation(preAnnotation);
                         if (pre != null) {
-                            this.preMethods.add(pair(filter, m));
+                            preMethods.add(pair(filter, m));
                         }
                         Annotation post = m.getAnnotation(postAnnotation);
                         if (post != null) {
-                            this.postMethods.add(pair(filter, m));
+                            postMethods.add(pair(filter, m));
                         }
                         if (create || update) {
                             Validation validation = m.getAnnotation(Validation.class);
@@ -238,14 +242,14 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
         }
 
         private Pair<Object, Method> pair(Object filter, Method m) {
-            return new ImmutablePair<Object, Method>(filter, m);
+            return new ImmutablePair<>(filter, m);
         }
 
         /**
          * Builds a AnnotatedFilterMethodCommand for all {@link #preMethods} found with {@link #preAnnotation}. For {@link #validations} found, builds either an {@link OnCreateFilterMethodCommand} or {@link OnUpdateFilterMethodCommand} as appropriate
          */
         public AnnotatedFilterMethodCommand[] buildPreFilters() {
-            List<AnnotatedFilterMethodCommand> result = new ArrayList<AnnotatedFilterMethodCommand>();
+            List<AnnotatedFilterMethodCommand> result = new ArrayList<>();
             for (Pair<Object, Method> p : preMethods) {
                 result.add(new AnnotatedFilterMethodCommand(resource, p.getKey(), preAnnotation, p.getValue(), argumentTypes));
             }
@@ -267,7 +271,7 @@ class FilteredServiceMethodCommand implements MethodCommand<Object> {
          * Builds a AnnotatedFilterMethodCommand for all {@link #postMethods} found with {@link #postAnnotation}
          */
         public AnnotatedFilterMethodCommand[] buildPostFilters() {
-            List<AnnotatedFilterMethodCommand> result = new ArrayList<AnnotatedFilterMethodCommand>();
+            List<AnnotatedFilterMethodCommand> result = new ArrayList<>();
             for (Pair<Object, Method> p : postMethods) {
                 result.add(new AnnotatedFilterMethodCommand(resource, p.getKey(), postAnnotation, p.getValue(), argumentTypes));
             }

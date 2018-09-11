@@ -12,8 +12,9 @@ import com.github.restup.service.model.request.AbstractRequest;
 import com.github.restup.service.model.request.PersistenceRequest;
 import com.github.restup.service.model.request.QueryRequest;
 import com.github.restup.service.model.request.ResourceRequest;
+import com.github.restup.service.model.response.RelatedResourceResult;
+import com.github.restup.service.model.response.RelatedResourceResult.Builder;
 import com.github.restup.util.Assert;
-
 import java.util.ArrayList;
 import java.util.List;
 
@@ -25,6 +26,7 @@ public class FilterChainContext implements MethodArgumentFactory {
     private final Class<?>[] argumentTypes;
     private Errors errors;
     private PersistenceRequest<?> persistenceRequest;
+    private RelatedResourceResult.Builder relatedResourceResultBulder;
     private ParameterProvider parameterProvider;
     private Object persistedState;
     private Resource<?, ?> resource;
@@ -40,7 +42,7 @@ public class FilterChainContext implements MethodArgumentFactory {
         this.argumentFactory = argumentFactory;
         this.errorFactory = errorFactory;
         this.argumentTypes = argumentTypes;
-        this.arguments = new Object[argumentTypes.length];
+        arguments = new Object[argumentTypes.length];
         added = new ArrayList<>();
     }
 
@@ -62,7 +64,6 @@ public class FilterChainContext implements MethodArgumentFactory {
         }
     }
 
-    @SuppressWarnings("rawtypes")
     public void addArgument(Object arg) {
         if (arg != null) {
             if (arg instanceof Object[]) {
@@ -87,17 +88,20 @@ public class FilterChainContext implements MethodArgumentFactory {
                 addArgument(((PersistenceRequest) arg).getData());
             }
             if (arg instanceof Resource) {
-                this.resource = (Resource) arg;
+                resource = (Resource) arg;
                 addArgument(resource.getMapping());
             }
             if (arg instanceof PersistenceRequest) {
-                this.persistenceRequest = (PersistenceRequest) arg;
+                persistenceRequest = (PersistenceRequest) arg;
+            }
+            if (arg instanceof RelatedResourceResult.Builder) {
+                relatedResourceResultBulder = (RelatedResourceResult.Builder) arg;
             }
             if (arg instanceof Errors) {
-                this.errors = (Errors) arg;
+                errors = (Errors) arg;
             }
             if (arg instanceof ParameterProvider) {
-                this.parameterProvider = (ParameterProvider) arg;
+                parameterProvider = (ParameterProvider) arg;
             }
             if (arg instanceof AbstractRequest) {
                 addArguments(((AbstractRequest) arg).getDelegate());
@@ -111,10 +115,10 @@ public class FilterChainContext implements MethodArgumentFactory {
                 addArgument(request.getQuery());
             }
             if (arg instanceof ResourceQueryStatement) {
-                this.query = (ResourceQueryStatement) arg;
+                query = (ResourceQueryStatement) arg;
             }
             if (arg instanceof ResourceQueryDefaults) {
-                this.template = (ResourceQueryDefaults) arg;
+                template = (ResourceQueryDefaults) arg;
             }
             added.add(arg);
         }
@@ -132,7 +136,6 @@ public class FilterChainContext implements MethodArgumentFactory {
     }
 
     @Override
-    @SuppressWarnings("unchecked")
     public <T> T newInstance(Class<T> clazz) {
         if (Errors.class.isAssignableFrom(clazz)) {
             return (T) getErrors();
@@ -179,4 +182,7 @@ public class FilterChainContext implements MethodArgumentFactory {
         this.persistedState = persistedState;
     }
 
+    public Builder getRelatedResourceResultBulder() {
+        return relatedResourceResultBulder;
+    }
 }
