@@ -11,7 +11,10 @@ public enum ErrorCode {
     INVALID_RELATIONSHIP("Invalid Relationship"),
     ID_REQUIRED("id is required", "Missing identifier at specified path"),
     TYPE_REQUIRED("type is required", "Missing type at specified path"),
-    WRAP_FIELDS_WITH_ATTRIBUTES("field must be wrapped", "The field is valid, but it must be wrapped in attributes");
+    WRAP_FIELDS_WITH_ATTRIBUTES("field must be wrapped",
+        "The field is valid, but it must be wrapped in attributes"),
+    PARAMETER_INVALID("Invalid parameter value"),
+    PARAMETER_INVALID_RESOURCE("Invalid parameter resource specified");
 
     private final String title;
     private final String detail;

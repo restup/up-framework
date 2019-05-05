@@ -1,11 +1,13 @@
 package com.github.restup.util;
 
+import com.github.restup.path.ResourcePath;
+import com.google.common.collect.Iterables;
+import java.text.MessageFormat;
+import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
-import com.github.restup.path.ResourcePath;
-import com.google.common.collect.Iterables;
 
 public class UpUtils {
 
@@ -57,8 +59,20 @@ public class UpUtils {
         }
     }
 
-	public static <T> T nvl(T a, T b) {
+    public static <T> T nvl(T a, T b) {
 		return a == null ? b : a;
 	}
+
+    public static String[] names(Class<? extends Enum<?>> e) {
+        return Arrays.stream(e.getEnumConstants())
+            .map(Enum::name)
+            .toArray(String[]::new);
+    }
+
+    public static String[] names(String pattern, Class<? extends Enum<?>> e) {
+        return Arrays.stream(e.getEnumConstants())
+            .map((value) -> MessageFormat.format(pattern, value.name()))
+            .toArray(String[]::new);
+    }
 
 }
