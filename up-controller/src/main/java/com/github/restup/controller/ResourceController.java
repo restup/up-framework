@@ -418,8 +418,11 @@ public class ResourceController {
         requestParser.parse(request, builder);
         if (CollectionUtils.size(request.getIds()) > 1) {
             // Add filter for ids
-            MappedField<?> field = request.getResource().getIdentityField();
-            builder.addFilter("pathIds", request.getIds(), field.getApiName(), Operator.in, request.getIds());
+            Resource resource = request.getResource();
+            MappedField<?> field = resource.getIdentityField();
+            builder
+                .addFilter(resource, "pathIds", request.getIds(), field.getApiName(), Operator.in,
+                    request.getIds());
         }
         if (HttpMethod.PUT == request.getMethod()) {
             // PUT is effectively PATCH all so we have to update all fields

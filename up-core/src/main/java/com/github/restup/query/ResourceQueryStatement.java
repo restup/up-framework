@@ -1,10 +1,7 @@
 package com.github.restup.query;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
+
 import com.github.restup.errors.Errors;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.path.ResourcePath.Builder.Mode;
@@ -12,6 +9,10 @@ import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
 
 /**
  * Represents a resource query including all fields, criteria, paging behavior and sort criteria.
@@ -129,7 +130,7 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
         /**
          * All transient and non transient fields
          */
-        Every;
+        Every
 
     }
 
@@ -153,13 +154,13 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
         public Builder(Resource<?, ?> resource, Errors errors) {
             this.resource = resource;
             this.errors = errors;
-            this.mode = Mode.API;
+            mode = Mode.API;
         }
 
         public Builder(ResourceQueryStatement query, Errors errors) {
-            this.resource = query.getResource();
+            resource = query.getResource();
             this.errors = errors;
-            this.mode = Mode.API;
+            mode = Mode.API;
 
             Pagination page = query.getPagination();
             setType(query.getType())
@@ -243,6 +244,7 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
         public Builder addIncludeJoinPaths(Resource<?, ?> requestedResource, String path) {
             ResourcePath requestResourceAccessor = path(requestedResource, path);
             ResourcePath criteriaPath;
+            //TODO jo
             if (requestResourceAccessor.isValid()) {
                 // if path is valid on requestedResource, then the join is on the id of
                 // the included resource
@@ -322,22 +324,22 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
 
         public Builder addCriteria(ResourceQueryCriteria filter) {
             if (requestedCriteria == null) {
-                requestedCriteria = new ArrayList<ResourceQueryCriteria>(5);
+                requestedCriteria = new ArrayList<>(5);
             }
             requestedCriteria.add(filter);
             return me();
         }
 
         public Builder addCriteria(ResourcePath path, ResourcePathFilter.Operator operator, Object value) {
-            return addCriteria(new ResourcePathFilter<Object>(path, operator, value));
+            return addCriteria(new ResourcePathFilter<>(path, operator, value));
         }
 
         public Builder addCriteria(String field, ResourcePathFilter.Operator operator, Object value) {
-            return addCriteria(new ResourcePathFilter<Object>(resource, field, operator, value));
+            return addCriteria(new ResourcePathFilter<>(resource, field, operator, value));
         }
 
         public Builder addCriteria(String field, Object value) {
-            return addCriteria(new ResourcePathFilter<Object>(resource, field, value));
+            return addCriteria(new ResourcePathFilter<>(resource, field, value));
         }
 
         public Builder addCriteria(List<ResourcePath> paths, Object value) {
@@ -349,9 +351,9 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
             if (size == 1) {
                 return addCriteria(paths.get(0), operator, value);
             } else if (size > 1) {
-                List<ResourceQueryCriteria> criteria = new ArrayList<ResourceQueryCriteria>();
+                List<ResourceQueryCriteria> criteria = new ArrayList<>();
                 for (ResourcePath path : paths) {
-                    criteria.add(new ResourcePathFilter<Object>(path, operator, value));
+                    criteria.add(new ResourcePathFilter<>(path, operator, value));
                 }
                 return addCriteria(ResourceQueryCriteria.or(criteria));
             }
@@ -369,7 +371,7 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
 
         public Builder addSort(ResourceSort resourceSort) {
             if (requestedSort == null) {
-                requestedSort = new ArrayList<ResourceSort>(3);
+                requestedSort = new ArrayList<>(3);
             }
             requestedSort.add(resourceSort);
             return me();
@@ -378,7 +380,7 @@ public class ResourceQueryStatement extends AbstractResourceQueryStatement {
         private List<ResourcePath> add(List<ResourcePath> set, ResourcePath path) {
             List<ResourcePath> result = set;
             if (result == null) {
-                result = new ArrayList<ResourcePath>();
+                result = new ArrayList<>();
             }
             if (!result.contains(path)) {
                 result.add(path);

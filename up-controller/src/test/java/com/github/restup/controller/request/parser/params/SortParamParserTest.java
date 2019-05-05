@@ -1,40 +1,78 @@
 package com.github.restup.controller.request.parser.params;
 
+import static com.github.restup.controller.request.parser.params.ComposedRequestParamParser.SORT;
+import static com.github.restup.controller.request.parser.params.ComposedRequestParamParser.sort;
+import static com.github.restup.controller.request.parser.params.ParameterParser.ParameterParsers.Bracketed;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import static org.mockito.Mockito.any;
-import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.when;
 
-import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
+import com.github.restup.controller.request.parser.RequestParamParser;
+import org.junit.Before;
 import org.junit.Test;
-import org.mockito.Mockito;
 
-public class SortParamParserTest {
+public class SortParamParserTest extends AbstractRequestParamParserTest {
+
+    protected RequestParamParser parser = sort().build();
+    protected RequestParamParser parserBrackets = sort(Bracketed).build();
+
+    @Override
+    protected String getParameterName() {
+        return SORT;
+    }
+
+    @Override
+    @Before
+    public void before() {
+//        when(ctx.getBuilder()).thenReturn(builder);
+//        when(result.getResource()).thenReturn(resultResource);
+        when(request.getResource()).thenReturn(requestedResource);
+    }
+
 
     @Test
     public void testAccept() {
-        SortParamParser parser = new SortParamParser();
         assertTrue(parser.accept("sort"));
-        assertFalse(parser.accept("sord"));
+        assertFalse(parser.accept("sorted"));
         assertFalse(parser.accept("sort[foo]"));
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
-    public void testParse() {
-        String param = "sort";
-        Builder b = Mockito.mock(Builder.class);
-        SortParamParser parser = new SortParamParser();
-        parser.parse(null, b, param, new String[]{"a,,-b", "d,  ,+c", null});
-        verify(b, times(1)).addSort(param, "a,,-b", "a", null);
-        verify(b, times(1)).addSort(param, "a,,-b", "b", false);
-        verify(b, times(1)).addSort(param, "d,  ,+c", "c", true);
-        verify(b, times(1)).addSort(param, "d,  ,+c", "d", null);
-        verify(b, times(4)).addSort(any(String.class), any(String.class), any(String.class), (Boolean) any());
-        verify(b, times(1)).addParameterError(parser.getParameterName(), null);
-        verify(b, times(1)).addParameterError(parser.getParameterName(), "a,,-b");
-        verify(b, times(1)).addParameterError(parser.getParameterName(), "d,  ,+c");
+    public void testAcceptBrackets() {
+        assertFalse(parserBrackets.accept("sort"));
+        assertFalse(parserBrackets.accept("sort"));
+        assertTrue(parserBrackets.accept("sort[foo]"));
+    }
+
+    @Test
+    public void testRequestParamParserDelimited() {
+        parser.parse(request, builder, getParameterName(), "a ,, -b ,+c");
+        verify(builder).addSort(SORT, "a ", "a", null);
+        verify(builder).addSort(SORT, " -b ", "b", false);
+        verify(builder).addSort(SORT, "+c", "c", true);
+        verifyRequestParamParser();
+    }
+
+    @Test
+    public void testRequestParamParserAscending() {
+        parser.parse(request, builder, getParameterName(), "+a");
+        verify(builder).addSort(SORT, "+a", "a", true);
+        verifyRequestParamParser();
+    }
+
+    @Test
+    public void testRequestParamParserDescending() {
+        parser.parse(request, builder, getParameterName(), "-a");
+        verify(builder).addSort(SORT, "-a", "a", false);
+        verifyRequestParamParser();
+    }
+
+    @Test
+    public void testRequestParamParserDefault() {
+        parser.parse(request, builder, getParameterName(), " a ");
+        verify(builder).addSort(SORT, " a ", "a", null);
+        verifyRequestParamParser();
     }
 
 }

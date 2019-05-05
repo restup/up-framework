@@ -1,6 +1,7 @@
 package com.github.restup.controller.request.parser;
 
 import static org.junit.Assert.assertEquals;
+
 import org.junit.Test;
 
 public class RequestParserTest {
@@ -8,17 +9,17 @@ public class RequestParserTest {
     @Test
     public void testBuilder() {
         RequestParserChain parser = (RequestParserChain) RequestParser.builder()
-                .fieldsParamName("a")
-                .filterParamName("b")
-                .includeParamName("i")
-                .pageLimitParamName("l")
-                .pageOffsetParamName("o")
-                .pageNumberParamName("n")
-                .sortParamName("s")
+            .requestParamParser(RequestParamParser.builder()
+                .withFieldsNamed("a")
+                .withFilterNamed("b")
+                .withIncludeNamed("i")
+                .withPageLimitNamed("l")
+                .withPageOffsetNamed("o")
+                .withPageNumberNamed("n")
+                .withSortNamed("s"))
                 .autoDetectDisabled(true)
                 .defaultMediaType("application/json")
                 .relationshipParser(new DefaultRelationshipsParser())
-                .requestParamParsers()
                 .build();
 
         assertAccepts(parser, true, "a", "i", "l", "o", "s", "n");

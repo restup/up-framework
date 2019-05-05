@@ -4,8 +4,7 @@ import com.github.restup.annotations.field.RelationshipType;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
-import com.github.restup.controller.request.parser.params.PageLimitParser;
-import com.github.restup.controller.request.parser.params.PageOffsetParser;
+import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
@@ -174,7 +173,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         String result = request.getPageLimitParameterName();
         if (result == null) {
             //TODO default to a configured name
-            result = PageLimitParser.LIMIT;
+            result = RequestParamParser.LIMIT;
         }
         return result;
     }
@@ -183,7 +182,7 @@ public class DefaultLinkBuilder implements LinkBuilder {
         String result = request.getPageOffsetParameterName();
         if (result == null) {
             //TODO default to a configured name
-            result = PageOffsetParser.OFFSET;
+            result = RequestParamParser.OFFSET;
         }
         return result;
     }

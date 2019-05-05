@@ -88,6 +88,11 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             acceptedResourceParameterNames = new ArrayList();
         }
 
+        public static RequestError.Builder getParameterError(Builder b, String parameterName,
+            Object value) {
+            return RequestError.parameterError(b.getErrorFactory(), parameterName, value);
+        }
+
         private Builder<T> me() {
             return this;
         }
@@ -154,7 +159,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return addSort(rawParameterName, rawParameterValue, getResource(), field, asc);
         }
 
-        private Builder<T> addSort(String rawParameterName, String rawParameterValue, Resource<?, ?> resource,
+        public Builder<T> addSort(String rawParameterName, String rawParameterValue,
+            Resource<?, ?> resource,
                 String field, Boolean asc) {
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
@@ -180,57 +186,46 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return me();
         }
 
-        public Builder<T> setFieldRequest(String rawParameterName, String rawParameterValue, Resource<?, ?> resource,
+        public Builder<T> setFieldRequest(Resource<?, ?> resource,
                 Type type) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
-            return setType(rawParameterName, rawParameterValue, builder, type);
+            return setType(builder, type);
         }
 
-        public Builder<T> setFieldRequest(String rawParameterName, String rawParameterValue, String resource,
-                Type type) {
-            ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
-            return setType(rawParameterName, rawParameterValue, builder, type);
-        }
-
-        private Builder<T> setType(String rawParameterName, String rawParameterValue,
-                ResourceQueryStatement.Builder builder, Type type) {
+        private Builder<T> setType(ResourceQueryStatement.Builder builder, Type type) {
             if (builder != null) {
                 builder.setType(type);
             }
             return me();
         }
 
-        public Builder<T> addIncludeJoinPaths(String rawParameterName, String rawParameterValue, String resource,
-                String field) {
-            ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
+        public Builder<T> addIncludeJoinPaths(Resource<?, ?> resource, String field) {
+            ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             if (builder != null) {
                 builder.addIncludeJoinPaths(getResource(), field);
             }
             return me();
         }
 
-        public Builder<T> addRequestedField(String rawParameterName, String rawParameterValue, String resource,
-                String field) {
-            // TODO handle *,**, +, -, embedded fields, embedded paths
-            ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
+        public Builder<T> addRequestedField(Resource<?, ?> resource, String field) {
+            ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             if (builder != null) {
                 builder.addRequestedPaths(field);
             }
             return me();
         }
 
-        public Builder<T> addAdditionalField(String rawParameterName, String rawParameterValue, String resource,
-                String field) {
-            ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
+        public Builder<T> addAdditionalField(Resource<?, ?> resource, String field) {
+            ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             if (builder != null) {
                 builder.addRequestedPathsAdded(field);
             }
             return me();
         }
 
-        public Builder<T> addExcludedField(String rawParameterName, String rawParameterValue, String resource,
+        public Builder<T> addExcludedField(Resource<?, ?> resource,
                 String field) {
-            ResourceQueryStatement.Builder builder = getOrCreateQuery(rawParameterName, rawParameterValue, resource);
+            ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             if (builder != null) {
                 builder.addRequestedPathsExcluded(field);
             }
@@ -280,7 +275,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return resourceQueries == null ? null : resourceQueries.get(resourceName);
         }
 
-        public Builder<T> addFilter(String rawParameterName, String rawParameterValue, String field, String operator,
+        public Builder<T> addFilter(Resource resource, String rawParameterName,
+            String rawParameterValue, String field, String operator,
                 String value) {
             Operator op = Operator.of(operator);
             if (op == null) {
@@ -289,22 +285,26 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
                         .detail("{0} specifies an invalid operator, '{1}'", rawParameterName, operator));
                 return me();
             }
-            return addFilter(rawParameterName, rawParameterValue, field, op, value);
-        }
-        
-        public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
-                Collection<?> value) {
-        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, value);
-        }
-        
-        public Builder<T> addFilter(String rawParameterName, Object rawParameterValue, String field, Operator operator,
-                String value) {
-        		return addFilterInternal(rawParameterName, rawParameterValue, field, operator, value);
+            return addFilter(resource, rawParameterName, rawParameterValue, field, op, value);
         }
 
-        private Builder<T> addFilterInternal(String rawParameterName, Object rawParameterValue, String field, Operator operator,
+        public Builder<T> addFilter(Resource resource, String rawParameterName,
+            Object rawParameterValue, String field, Operator operator,
+            Collection<?> value) {
+            return addFilterInternal(resource, rawParameterName, rawParameterValue, field, operator,
+                value);
+        }
+
+        public Builder<T> addFilter(Resource resource, String rawParameterName,
+            Object rawParameterValue, String field, Operator operator,
                 String value) {
-            Resource<?, ?> resource = getResource();
+            return addFilterInternal(resource, rawParameterName, rawParameterValue, field, operator,
+                value);
+        }
+
+        private Builder<T> addFilterInternal(Resource resource, String rawParameterName,
+            Object rawParameterValue, String field, Operator operator,
+                String value) {
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
@@ -313,10 +313,10 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             Object converted = convertValue(path, value, rawParameterName);
             return addFilter(new ResourcePathFilter(path, operator, converted));
         }
-        
-        private Builder<T> addFilterInternal(String rawParameterName, Object rawParameterValue, String field, Operator operator,
+
+        private Builder<T> addFilterInternal(Resource resource, String rawParameterName,
+            Object rawParameterValue, String field, Operator operator,
                 Collection<?> value) {
-            Resource<?, ?> resource = getResource();
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
@@ -325,7 +325,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             Object converted = value.stream()
             		.map( v -> convertValue(path, v, rawParameterName) )
             		.collect(Collectors.toList());
-            
+
             return addFilter(new ResourcePathFilter<>(path, operator, converted));
         }
 
@@ -358,6 +358,10 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         public Builder<T> setPageLimit(String parameterName, Integer value) {
+            return setPageLimit(getResource(), parameterName, value);
+        }
+
+        public Builder<T> setPageLimit(Resource resource, String parameterName, Integer value) {
             if (pageLimit != null) {
                 addDuplicateParameter(parameterName, value, pageLimitParameterName, pageLimit);
             } else if (hasMinError(parameterName, 0, value)) {
@@ -371,17 +375,27 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             } else {
                 pageLimit = value;
                 pageLimitParameterName = parameterName;
-                ResourceQueryStatement.Builder builder = getOrCreateQuery(getResource());
+                ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
                 builder.setPageLimit(value);
             }
             return me();
+        }
+
+        public Builder<T> setPageOffset(Resource resource, String parameterName, Integer value) {
+            return setPageOffset(resource, parameterName, value, false);
         }
 
         public Builder<T> setPageOffset(String parameterName, Integer value) {
             return setPageOffset(parameterName, value, false);
         }
 
-        public Builder<T> setPageOffset(String parameterName, Integer value, boolean pageOffsetAsOneBased) {
+        public Builder<T> setPageOffset(String parameterName, Integer value,
+            boolean pageOffsetAsOneBased) {
+            return setPageOffset(getResource(), parameterName, value, pageOffsetAsOneBased);
+        }
+
+        public Builder<T> setPageOffset(Resource resource, String parameterName, Integer value,
+            boolean pageOffsetAsOneBased) {
             pageOffsetOneBased = pageOffsetAsOneBased;
             if (pageOffset != null) {
                 addDuplicateParameter(parameterName, value, pageOffsetParameterName, pageOffset);
@@ -391,7 +405,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
                 // TODO validate pageOffset is sensible
                 pageOffset = value;
                 pageOffsetParameterName = parameterName;
-                ResourceQueryStatement.Builder builder = getOrCreateQuery(getResource());
+                ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
                 builder.setPageOffset(value);
             }
             return me();
@@ -435,10 +449,14 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             addError(getParameterError(parameterName, value));
         }
 
-        private RequestError.Builder getParameterError(String parameterName, Object value) {
-            return RequestError.builder().code("INVALID_PARAMETER").title("Invalid parameter value")
-                    .detail("'{0}' is not a valid value for {1}", value, parameterName)
-                    .source(getErrorFactory().createParameterError(parameterName, value));
+        public void addParameterError(RequestError.Builder builder, String parameterName,
+            Object value) {
+            addError(builder
+                .source(getErrorFactory().createParameterError(parameterName, value)));
+        }
+
+        public RequestError.Builder getParameterError(String parameterName, Object value) {
+            return getParameterError(this, parameterName, value);
         }
 
         public ErrorFactory getErrorFactory() {

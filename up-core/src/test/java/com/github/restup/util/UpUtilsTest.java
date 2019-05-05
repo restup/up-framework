@@ -2,16 +2,20 @@ package com.github.restup.util;
 
 import static com.github.restup.util.UpUtils.addAll;
 import static com.github.restup.util.UpUtils.getFirst;
+import static com.github.restup.util.UpUtils.names;
 import static com.github.restup.util.UpUtils.put;
 import static com.github.restup.util.UpUtils.removeAll;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.equalTo;
+import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
+import com.github.restup.annotations.field.RelationshipType;
+import com.github.restup.test.assertions.Assertions;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.Map;
 import org.junit.Test;
-import com.github.restup.test.assertions.Assertions;
 
 public class UpUtilsTest {
     
@@ -56,5 +60,32 @@ public class UpUtilsTest {
 //        .usingGetClass()
 //        .verify();
 //    }
-    
+
+    @Test
+    public void testNames() {
+        String[] names = names(RelationshipType.class);
+        assertEquals("oneToOne", names[0]);
+        assertEquals("oneToMany", names[1]);
+        assertEquals("manyToOne", names[2]);
+        assertEquals("manyToMany", names[3]);
+        assertEquals(RelationshipType.values().length, names.length);
+    }
+
+    @Test
+    public void testNamesFormatted() {
+        String[] names = names("{0}_", RelationshipType.class);
+        assertEquals("oneToOne_", names[0]);
+        assertEquals("oneToMany_", names[1]);
+        assertEquals("manyToOne_", names[2]);
+        assertEquals("manyToMany_", names[3]);
+        assertEquals(RelationshipType.values().length, names.length);
+
+        names = names("[{0}]", RelationshipType.class);
+        assertEquals("[oneToOne]", names[0]);
+        assertEquals("[oneToMany]", names[1]);
+        assertEquals("[manyToOne]", names[2]);
+        assertEquals("[manyToMany]", names[3]);
+        assertEquals(RelationshipType.values().length, names.length);
+    }
+
 }

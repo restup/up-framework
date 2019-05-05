@@ -4,16 +4,17 @@ import static org.apache.commons.lang3.StringUtils.isEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
+
+import com.github.restup.path.DataPathValue;
+import com.github.restup.path.MappedFieldPathValue;
+import com.github.restup.path.ResourcePath;
+import com.github.restup.registry.Resource;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.UUID;
-import com.github.restup.path.DataPathValue;
-import com.github.restup.path.MappedFieldPathValue;
-import com.github.restup.path.ResourcePath;
-import com.github.restup.registry.Resource;
 
 /**
  * A request error, providing necessary details for JSON API errors.
@@ -21,6 +22,40 @@ import com.github.restup.registry.Resource;
  * @author andy.buttaro
  */
 public interface RequestError {
+
+    static Builder builder() {
+        return new Builder();
+    }
+
+    static Builder parameterError(ErrorFactory factory, String parameterName,
+        Object parameterValue) {
+        return builder()
+            .code(ErrorCode.PARAMETER_INVALID)
+            .detail("''{0}'' is not a valid value for {1}", parameterValue, parameterName)
+            .source(factory.createParameterError(parameterName, parameterValue));
+    }
+
+    static Builder builder(ResourcePath path) {
+        return builder().source(path);
+    }
+
+    static Builder builder(Resource<?, ?> resource) {
+        return builder().resource(resource);
+    }
+
+    static Builder error(Resource<?, ?> resource, Throwable t) {
+        return new Builder(t)
+                .status(StatusCode.INTERNAL_SERVER_ERROR)
+                .resource(resource);
+    }
+
+    static RequestError of(Throwable t) {
+        return error(null, t).build();
+    }
+
+    static RequestError of(Resource<?, ?> resource, Throwable t) {
+        return error(resource, t).build();
+    }
 
     String getId();
 
@@ -38,34 +73,7 @@ public interface RequestError {
 
     int getHttpStatus();
 
-
-    public static Builder builder() {
-        return new Builder();
-    }
-
-    public static Builder builder(ResourcePath path) {
-        return builder().source(path);
-    }
-
-    public static Builder builder(Resource<?, ?> resource) {
-        return builder().resource(resource);
-    }
-
-    public static Builder error(Resource<?, ?> resource, Throwable t) {
-        return new Builder(t)
-                .status(StatusCode.INTERNAL_SERVER_ERROR)
-                .resource(resource);
-    }
-
-    public static RequestError of(Throwable t) {
-        return error(null, t).build();
-    }
-
-    public static RequestError of(Resource<?, ?> resource, Throwable t) {
-        return error(resource, t).build();
-    }
-
-    public class Builder {
+    class Builder {
 
         // TODO doc
 
@@ -89,7 +97,7 @@ public interface RequestError {
         private Builder() {}
 
         private Builder(Throwable t) {
-            this.cause = t;
+            cause = t;
         }
 
         private Builder me() {
@@ -107,7 +115,7 @@ public interface RequestError {
         }
 
         public Builder code(ErrorCode code) {
-            this.errorCode = code;
+            errorCode = code;
             return me();
         }
 
@@ -121,8 +129,8 @@ public interface RequestError {
 
         private Builder detail(String detail, String pattern, Object[] args) {
             this.detail = detail;
-            this.detailPattern = pattern;
-            this.detailPatternArgs = args;
+            detailPattern = pattern;
+            detailPatternArgs = args;
             return me();
         }
 
@@ -175,7 +183,6 @@ public interface RequestError {
             return me();
         }
 
-        @SuppressWarnings({"rawtypes", "unchecked"})
         public Builder meta(String key, Object value) {
             if (!(meta instanceof Map)) {
                 if (meta == null) {
@@ -189,7 +196,6 @@ public interface RequestError {
             return me();
         }
 
-        @SuppressWarnings("rawtypes")
         private String getDefaultCode() {
             if (status == StatusCode.INTERNAL_SERVER_ERROR) {
                 return StatusCode.INTERNAL_SERVER_ERROR.name();
@@ -203,7 +209,7 @@ public interface RequestError {
                 return status.name();
             }
 
-            List<String> parts = new ArrayList<String>();
+            List<String> parts = new ArrayList<>();
             if (codePrefix != null) {
                 for (String prefix : codePrefix) {
                     parts.add(prefix);
@@ -256,7 +262,6 @@ public interface RequestError {
             return path;
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         public RequestError build() {
             // default id to new UUID
             String id = this.id;

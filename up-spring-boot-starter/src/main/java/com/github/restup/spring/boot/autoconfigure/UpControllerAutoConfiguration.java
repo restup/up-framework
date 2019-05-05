@@ -9,6 +9,7 @@ import com.github.restup.controller.content.negotiation.ContentNegotiatorBuilder
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.request.parser.RequestParserBuilderDecorator;
 import com.github.restup.registry.ResourceRegistry;
@@ -83,13 +84,15 @@ public class UpControllerAutoConfiguration {
             RequestParser.builder()
                 .autoDetectDisabled(props.isDisableSerializationAutoDetection())
                 .defaultMediaType(props.getDefaultMediaType())
-                .fieldsParamName(props.getFieldsParamName())
-                .filterParamName(props.getFilterParamName())
-                .includeParamName(props.getIncludeParamName())
-                .pageLimitParamName(props.getLimitParamName())
-                .pageNumberParamName(props.getPageNumberParamName())
-                .pageOffsetParamName(props.getOffsetParamName())
-                .sortParamName(props.getSortParamName())
+                .requestParamParser(RequestParamParser.builder()
+                    .withFieldsNamed(props.getFieldsParamName())
+                    .withFilterNamed(props.getFilterParamName())
+                    .withIncludeNamed(props.getIncludeParamName())
+                    .withPageLimitNamed(props.getLimitParamName())
+                    .withPageNumberNamed(props.getPageNumberParamName())
+                    .withPageOffsetNamed(props.getOffsetParamName())
+                    .withSortNamed(props.getSortParamName())
+                )
                 .jacksonObjectMapper(mapper)
         ).build();
     }
