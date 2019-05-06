@@ -7,6 +7,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 import org.apache.commons.lang3.ArrayUtils;
 
 public class UpUtils {
@@ -60,8 +61,12 @@ public class UpUtils {
     }
 
     public static <T> T nvl(T a, T b) {
-		return a == null ? b : a;
-	}
+        return a == null ? b : a;
+    }
+
+    public static <T> T nvl(T a, Supplier<T> b) {
+        return a == null ? b.get() : a;
+    }
 
     public static String[] names(Class<? extends Enum<?>> e) {
         return Arrays.stream(e.getEnumConstants())
