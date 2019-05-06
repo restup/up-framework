@@ -1,5 +1,7 @@
 package com.github.restup.controller.settings;
 
+import static com.github.restup.util.UpUtils.nvl;
+
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
@@ -24,30 +26,14 @@ public class BuilderSettingsCaptor {
         return linkBuilderFactory;
     }
 
-    public ServiceDiscovery getServiceDiscovery() {
-        return serviceDiscovery;
-    }
-
-    public Boolean getAutoDetectDisabled() {
-        return autoDetectDisabled;
-    }
-
-    public String getDefaultMediaType() {
-        return defaultMediaType;
-    }
-
-    public BuilderSettingsCaptor capture(BuilderSettingsCaptor settingsCaptor) {
-        setLinkBuilderFactory(settingsCaptor.getLinkBuilderFactory());
-        setAutoDetectDisabled(settingsCaptor.getAutoDetectDisabled());
-        setDefaultMediaType(settingsCaptor.getDefaultMediaType());
-        setServiceDiscovery(settingsCaptor.getServiceDiscovery());
-        return this;
-    }
-
     public void setLinkBuilderFactory(LinkBuilderFactory linkBuilderFactory) {
         if (linkBuilderFactory != null) {
             this.linkBuilderFactory = linkBuilderFactory;
         }
+    }
+
+    public ServiceDiscovery getServiceDiscovery() {
+        return serviceDiscovery;
     }
 
     public void setServiceDiscovery(ServiceDiscovery serviceDiscovery) {
@@ -56,16 +42,32 @@ public class BuilderSettingsCaptor {
         }
     }
 
+    public Boolean getAutoDetectDisabled() {
+        return autoDetectDisabled;
+    }
+
     public void setAutoDetectDisabled(Boolean autoDetectDisabled) {
         if (autoDetectDisabled != null) {
             this.autoDetectDisabled = autoDetectDisabled;
         }
     }
 
+    public String getDefaultMediaType() {
+        return defaultMediaType;
+    }
+
     public void setDefaultMediaType(String defaultMediaType) {
         if (defaultMediaType != null) {
             this.defaultMediaType = defaultMediaType;
         }
+    }
+
+    public BuilderSettingsCaptor capture(BuilderSettingsCaptor settingsCaptor) {
+        setLinkBuilderFactory(nvl(settingsCaptor.getLinkBuilderFactory(), getLinkBuilderFactory()));
+        setAutoDetectDisabled(nvl(settingsCaptor.getAutoDetectDisabled(), getAutoDetectDisabled()));
+        setDefaultMediaType(nvl(settingsCaptor.getDefaultMediaType(), getDefaultMediaType()));
+        setServiceDiscovery(nvl(settingsCaptor.getServiceDiscovery(), getServiceDiscovery()));
+        return this;
     }
 
     public void build() {

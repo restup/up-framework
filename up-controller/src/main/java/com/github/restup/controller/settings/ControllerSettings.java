@@ -1,6 +1,7 @@
 package com.github.restup.controller.settings;
 
 import static com.github.restup.service.registry.DiscoveryService.UP_RESOURCE_DISCOVERY;
+import static com.github.restup.util.UpUtils.nvl;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.ExceptionHandler;
@@ -42,8 +43,10 @@ public interface ControllerSettings {
 
         private ResourceRegistry registry;
         private ContentNegotiator contentNegotiator;
+        private ContentNegotiator.Builder contentNegotiatorBuilder;
         private RequestInterceptor[] interceptors;
         private RequestParser requestParser;
+        private RequestParser.Builder requestParserBuilder;
         private ExceptionHandler exceptionHandler;
         private ObjectMapper mapper;
         private BuilderSettingsCaptor settingsCaptor;
@@ -80,7 +83,8 @@ public interface ControllerSettings {
         }
 
         public Builder contentNegotiator(ContentNegotiator.Builder contentNegotiator) {
-            return contentNegotiator(contentNegotiator.capture(settingsCaptor).build());
+            contentNegotiatorBuilder = contentNegotiator;
+            return me();
         }
 
         public Builder interceptors(RequestInterceptor... interceptors) {
@@ -89,7 +93,8 @@ public interface ControllerSettings {
         }
 
         public Builder requestParser(RequestParser.Builder requestParser) {
-            return requestParser(requestParser.capture(settingsCaptor).build());
+            requestParserBuilder = requestParser;
+            return me();
         }
 
         public Builder requestParser(RequestParser requestParser) {
@@ -133,26 +138,26 @@ public interface ControllerSettings {
         }
 
         public ControllerSettings build() {
+            RequestInterceptor interceptor = getInterceptor(interceptors);
+
+            RequestParser.Builder requestParserBuilder = nvl(this.requestParserBuilder,
+                () -> RequestParser.builder())
+                .capture(settingsCaptor)
+                .jacksonObjectMapper(mapper);
+
+            ContentNegotiator.Builder contentNegotiatorBuilder = nvl(this.contentNegotiatorBuilder,
+                () -> ContentNegotiator.builder())
+                .capture(settingsCaptor);
+
             settingsCaptor.build();
 
-            RequestInterceptor interceptor = getInterceptor(interceptors);
-            RequestParser requestParser = this.requestParser;
-            if (requestParser == null) {
-                requestParser = RequestParser.builder()
-                        .capture(settingsCaptor)
-                        .jacksonObjectMapper(mapper)
-                        .build();
-            }
-            ContentNegotiator contentNegotiator = this.contentNegotiator;
-            if ( contentNegotiator == null ) {
-                contentNegotiator = ContentNegotiator.builder()
-                        .capture(settingsCaptor)
-                        .build();
-            }
-            ExceptionHandler exceptionHandler = this.exceptionHandler;
-            if (exceptionHandler == null) {
-                exceptionHandler = ExceptionHandler.getDefaultInstance();
-            }
+            ContentNegotiator contentNegotiator = nvl(this.contentNegotiator,
+                () -> contentNegotiatorBuilder.build());
+            RequestParser requestParser = nvl(this.requestParser,
+                () -> requestParserBuilder.build());
+
+            ExceptionHandler exceptionHandler = nvl(this.exceptionHandler,
+                () -> ExceptionHandler.getDefaultInstance());
 
             //TODO
             registry.registerResource(

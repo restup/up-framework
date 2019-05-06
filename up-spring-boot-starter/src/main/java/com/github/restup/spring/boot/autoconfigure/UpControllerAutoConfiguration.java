@@ -78,7 +78,7 @@ public class UpControllerAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public RequestParser defaultUpRequestParser(ObjectMapper mapper,
+    public RequestParser.Builder defaultUpRequestParser(ObjectMapper mapper,
         RequestParserBuilderDecorator decorator) {
         return decorator.decorate(
             RequestParser.builder()
@@ -94,12 +94,12 @@ public class UpControllerAutoConfiguration {
                     .withSortNamed(props.getSortParamName())
                 )
                 .jacksonObjectMapper(mapper)
-        ).build();
+        );
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public ContentNegotiator defaultUpContentNegotiator(ServiceDiscovery serviceDiscovery,
+    public ContentNegotiator.Builder defaultUpContentNegotiator(ServiceDiscovery serviceDiscovery,
         LinkBuilderFactory linkBuilderFactory, ContentNegotiatorBuilderDecorator decorator) {
         return decorator.decorate(
             ContentNegotiator.builder()
@@ -107,18 +107,19 @@ public class UpControllerAutoConfiguration {
                 .defaultMediaType(props.getDefaultMediaType())
                 .serviceDiscovery(serviceDiscovery)
                 .linkBuilderFactory(linkBuilderFactory)
-        ).build();
+        );
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ResourceController defaultUpResourceController(ResourceRegistry registry,
+        ObjectMapper mapper,
             ServiceDiscovery serviceDiscovery,
             LinkBuilderFactory linkBuilderFactory,
             ExceptionHandler exceptionHandler,
-            RequestParser requestParser,
+        RequestParser.Builder requestParser,
         ResourceControllerBuilderDecorator decorator,
-            ContentNegotiator contentNegotiator) {
+        ContentNegotiator.Builder contentNegotiator) {
         return decorator.decorate(
             ResourceController.builder()
                 .registry(registry)
@@ -129,6 +130,7 @@ public class UpControllerAutoConfiguration {
                 .defaultMediaType(props.getDefaultMediaType())
                 .requestParser(requestParser)
                 .contentNegotiator(contentNegotiator)
+                .jacksonObjectMapper(mapper)
                 // .interceptors(interceptorA, interceptorB, new NoOpRequestInterceptor())
         ).build();
     }
