@@ -16,19 +16,19 @@
 
 
     <logger name="com.github.restup.errors.BasicRequestError">
-        <level value="debug"/>
+        <level value="error"/>
     </logger>
 
     <logger name="com.github.restup.service.filters.JavaxValidationFilter">
-        <level value="debug"/>
+        <level value="error"/>
     </logger>
 
     <logger name="com.github.restup.service.VarArgsMethodCommand">
-        <level value="debug"/>
+        <level value="error"/>
     </logger>
     
     <logger name="com.github.restup.mapping.DefaultMappedClassFactory">
-        <level value="warn"/>
+        <level value="error"/>
     </logger>
 
     <!-- Root Logger -->

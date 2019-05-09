@@ -16,12 +16,12 @@
 
 
     <logger name="com.github.restup.mapping.DefaultMappedClassFactory">
-        <level value="warn"/>
+        <level value="error"/>
     </logger>
 
     <!-- Root Logger -->
     <root>
-        <priority value="debug"/>
+        <priority value="error"/>
         <appender-ref ref="console"/>
     </root>
 
