@@ -3,17 +3,15 @@ package com.github.restup.errors;
 import static com.github.restup.assertions.Assertions.assertThat;
 import static com.github.restup.assertions.Assertions.assertThrows;
 import static com.github.restup.errors.RequestError.builder;
-import static org.hamcrest.MatcherAssert.assertThat;
-import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertEquals;
-import static org.junit.Assert.assertNotNull;
 import static org.mockito.Mockito.when;
-import org.junit.Test;
-import org.mockito.Mockito;
+
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.test.assertions.Assertions;
+import org.junit.Test;
+import org.mockito.Mockito;
 
 public class RequestErrorTest {
 
@@ -72,7 +70,6 @@ public class RequestErrorTest {
             .hasNoCause();
     }
     
-    @SuppressWarnings({"rawtypes", "unchecked"})
     @Test
     public void testResourcePath() {
         ResourcePath path = Mockito.mock(ResourcePath.class);
@@ -89,13 +86,6 @@ public class RequestErrorTest {
         RequestErrorException ex = RequestErrorException.of(new IllegalArgumentException());
         BasicRequestError err = (BasicRequestError) ex.getPrimaryError();
         assertEquals(err.getCause(), err.logStackTrace());
-    }
-
-    @Test
-    public void testLogError() {
-        BasicRequestError err = (BasicRequestError) builder().title("foo").build();
-        assertThat(err.logStackTrace(), instanceOf(BasicRequestError.StackDetail.class));
-        assertNotNull(err.getStackTrace());
     }
     
     @Test
