@@ -3,6 +3,9 @@ package com.university;
 import static com.university.Course.RESOURCE_NAME;
 import static com.university.Course.TABLE_NAME;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.field.CaseInsensitive;
@@ -19,6 +22,7 @@ import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 
 @Entity(name = TABLE_NAME)
 @ApiName(value = RESOURCE_NAME)
+@DynamoDBTable(tableName = "Course")
 public class Course {
 
     public static final String RESOURCE_NAME = "course";
@@ -27,6 +31,7 @@ public class Course {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @DynamoDBHashKey(attributeName = "Id")
     private Long id;
 
     // use javax validations
@@ -37,6 +42,7 @@ public class Course {
 
     @Column(name = "name_lower_case")
     @JsonIgnore
+    @DynamoDBAttribute(attributeName = "NameLowerCase")
     private String nameLowerCase;
 
     // demonstrate different api/bean, persisted paths
@@ -45,6 +51,7 @@ public class Course {
     @Relationship(resource = University.class)
     // use javax validations
     @NotNull
+    @DynamoDBAttribute(attributeName = "SchoolId")
     private Long universityId;
 
     public Long getId() {
