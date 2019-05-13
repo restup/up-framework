@@ -321,7 +321,8 @@ public class ResourceController {
                 .map(f -> builder.addRequestedPath(i, f));
     }
 
-    public Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e) {
+    public Object handleException(ResourceControllerRequest request,
+        ResourceControllerResponse response, Exception e) {
         return exceptionHandler.handleException(request, response, e);
     }
 
@@ -342,7 +343,7 @@ public class ResourceController {
                 .contentTypeParam(mediaTypeParam)
                 .build();
             return requestInternal(request, response);
-        } catch (Throwable e) {
+        } catch (Exception e) {
             return handleException(request, response, e);
         }
     }

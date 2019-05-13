@@ -1,11 +1,11 @@
 package com.github.restup.service;
 
+import com.github.restup.errors.RequestErrorException;
+import com.github.restup.util.Assert;
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import com.github.restup.errors.RequestErrorException;
-import com.github.restup.util.Assert;
 
 /**
  * Simple Method Executor which uses reflection to invoke a {@link Method} from a variable list of
@@ -98,7 +98,7 @@ public class VarArgsMethodCommand implements MethodCommand<Object> {
         }
     }
 
-    protected RuntimeException handle(Throwable t) {
+    protected RuntimeException handle(Exception t) {
         if (t.getCause() instanceof RequestErrorException) {
             return (RequestErrorException) t.getCause();
         }

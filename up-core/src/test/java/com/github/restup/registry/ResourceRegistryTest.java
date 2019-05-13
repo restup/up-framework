@@ -13,8 +13,7 @@ import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertSame;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
-import java.util.Comparator;
-import org.junit.Test;
+
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClassFactory;
@@ -34,6 +33,8 @@ import com.model.test.company.Contractor;
 import com.model.test.company.Employee;
 import com.model.test.company.Person;
 import com.university.University;
+import java.util.Comparator;
+import org.junit.Test;
 
 public class ResourceRegistryTest {
 
@@ -68,7 +69,6 @@ public class ResourceRegistryTest {
         assertCompany(resource.getMapping());
     }
     
-    @SuppressWarnings("unchecked")
     @Test
     public void testBuilder() {
         ControllerMethodAccess controllerMethodAccess = mock(ControllerMethodAccess.class);
@@ -76,7 +76,7 @@ public class ResourceRegistryTest {
         ResourcePathsProvider defaultSparseFieldsProvider = mock(ResourcePathsProvider.class);
         ErrorFactory errorFactory = mock(ErrorFactory.class);
         MappedClassFactory mappedClassFactory = mock(MappedClassFactory.class);
-        MappedFieldBuilderVisitor visitor = mock(MappedFieldBuilderVisitor.class);
+        MappedFieldBuilderVisitor.Builder visitor = mock(MappedFieldBuilderVisitor.Builder.class);
         Comparator<MappedField<?>> mappedFieldOrderComparator = mock(Comparator.class);
         MethodArgumentFactory methodArgumentFactory = mock(MethodArgumentFactory.class);
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
@@ -98,7 +98,7 @@ public class ResourceRegistryTest {
             .errorFactory(errorFactory)
             .excludeFrameworkFilters(true)
             .mappedClassFactory(mappedClassFactory)
-            .mappedFieldBuilderVisitors(visitor)
+            .mappedFieldVisitorBuilder(visitor)
             .mappedFieldFactory(mappedFieldFactory)
             .mappedFieldOrderComparator(mappedFieldOrderComparator)
             .methodArgumentFactory(methodArgumentFactory)

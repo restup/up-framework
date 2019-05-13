@@ -1,13 +1,8 @@
 package com.github.restup.mapping.fields;
 
 import static com.github.restup.util.ReflectionUtils.makeAccessible;
-import java.lang.reflect.Field;
-import java.lang.reflect.Method;
-import java.lang.reflect.Type;
-import java.util.Collection;
-import java.util.List;
-import java.util.function.Function;
-import org.apache.commons.lang3.StringUtils;
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import com.github.restup.annotations.field.CaseInsensitive;
 import com.github.restup.annotations.field.Immutable;
 import com.github.restup.annotations.field.Param;
@@ -29,6 +24,19 @@ import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
+import java.lang.reflect.Field;
+import java.lang.reflect.Method;
+import java.lang.reflect.Type;
+import java.util.Collection;
+import java.util.Collections;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import java.util.Set;
+import java.util.function.Function;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Captures meta data about fields for mapping api
@@ -55,7 +63,6 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         return toCaseInsensitive(mfpv.getMappedField().getCaseSensitivity(), value);
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     static Object toCaseInsensitive(CaseSensitivity caseSensitivity, Object value) {
         if (value instanceof Collection) {
             Collection result = (Collection) ReflectionUtils.newInstance(value.getClass());
@@ -81,11 +88,11 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
     			.get();
     }
 
-    public static <T> BasicMappedField.Builder<T> builder(Class<T> type) {
-        return new BasicMappedField.Builder<T>(type);
+    static <T> BasicMappedField.Builder<T> builder(Class<T> type) {
+        return new BasicMappedField.Builder<>(type);
     }
 
-    public static BasicMappedField.Builder<?> builder(Type type) {
+    static BasicMappedField.Builder<?> builder(Type type) {
         return new BasicMappedField.Builder<>(type);
     }
 
@@ -99,11 +106,23 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
 
     String getPersistedName();
 
-	boolean isCollection();
+    boolean isCollection();
 
     boolean isTransientField();
 
     boolean isApiProperty();
+
+    Set<MappedIndexField> getIndexes();
+
+    default boolean isIndexed() {
+        return isNotEmpty(getIndexes());
+    }
+
+    /**
+     * Indicates whether the field is sortable. A true value may still be rejected in context if the
+     * underlying implementation requires additional fields to complete a query to sort
+     */
+    boolean isSortable();
 
     Identifier getIdentifier();
 
@@ -212,7 +231,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         return relation == null ? null : f.apply(relation);
     }
 
-    public final static class Builder<T> {
+    final static class Builder<T> {
 
         private Type type;
         private String beanName;
@@ -220,6 +239,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         private String persistedName;
         private boolean apiProperty;
         private boolean transientField;
+        private boolean sortable = true;
         private Identifier identifier;
         private CaseSensitivity caseSensitivity;
         private Relation relation;
@@ -228,6 +248,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         private Field field;
         private Method getter;
         private Method setter;
+        private Map<String, Short> indexes = new HashMap<>();
 
         private Class<?> genericType;
 
@@ -254,7 +275,6 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
             return me();
         }
 
-        @SuppressWarnings("rawtypes")
         public Builder<T> genericType(Type genericType) {
             if (genericType instanceof Class) {
                 return genericType((Class) genericType);
@@ -277,6 +297,11 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
             return me();
         }
 
+        public Builder<T> sortable(boolean sortable) {
+            this.sortable = sortable;
+            return me();
+        }
+
         public Builder<T> immutable(Immutable immutable) {
             return immutability(Immutability.getImmutability(immutable));
         }
@@ -286,10 +311,17 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
             return me();
         }
 
-		public Builder<?> caseSensitiviteField(String searchField) {
+        public Builder<T> index(String name, int position) {
+            if (StringUtils.isNotEmpty(name)) {
+                indexes.put(name, Integer.valueOf(position).shortValue());
+            }
+            return me();
+        }
+
+        public Builder<?> caseSensitiviteField(String searchField) {
             return caseSensitivity(CaseSensitivity.builder()
-            		.searchField(searchField));
-		}
+                .searchField(searchField));
+        }
 
         public Builder<T> caseInsensitive(CaseInsensitive caseInsensitive) {
             return caseSensitivity(CaseSensitivity.getCaseSensitivity(caseInsensitive));
@@ -307,11 +339,11 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         public Builder<T> relationship(Relationship relationship) {
             return relation(Relation.getRelation(relationship));
         }
-        
+
         public Builder<T> relationshipTo(String resource) {
         		return relationshipTo(resource, "id");
         }
-        
+
         public Builder<T> relationshipTo(String resource, String joinField) {
         		return relation(Relation.builder()
         				.joinField(joinField)
@@ -341,16 +373,15 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
             return identifier(isIdField ? Identifier.builder().build() : null);
         }
 
-        @SuppressWarnings({"unchecked", "rawtypes"})
         public MappedField<T> build() {
 
-	    		if ( this.apiProperty ) {
-	    			Assert.notNull(apiProperty, "api name is required for api fields");
+            if (apiProperty) {
+                Assert.notNull(apiProperty, "api name is required for api fields");
 	    		}
-	    		if ( ! this.transientField ) {
-	    			Assert.notNull(persistedName, "persisted name is required for non transient fields");
+            if (!transientField) {
+                Assert
+                    .notNull(persistedName, "persisted name is required for non transient fields");
 	    		}
-	    	
 
             ReadableField readable = null;
             WritableField<Object, ?> writable = null;
@@ -380,19 +411,34 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
             if (identifier != null && immutability == null) {
                 immutability = Immutability.builder().build();
             }
+            Set<MappedIndexField> indexes = new HashSet<>();
+            for (Entry<String, Short> e : this.indexes.entrySet()) {
+                if (StringUtils.isNotBlank(e.getKey())) {
+                    indexes.add(MappedIndexField.of(e.getKey(), e.getValue()));
+                }
+            }
 
             if ( type instanceof Class ) {
             		Class clazz = (Class) type;
 	            if (Iterable.class.isAssignableFrom(clazz)) {
 	            		boolean collection = Collection.class.isAssignableFrom(clazz);
-	                return new BasicIterableField(clazz, beanName, apiName, persistedName, identifier, collection, apiProperty, transientField, caseSensitivity, relation, immutability, parameterNames, readable, writable, genericType);
-	            }
+                  return new BasicIterableField(clazz, beanName, apiName, persistedName, identifier,
+                      indexes,
+                      collection, apiProperty, transientField, sortable, caseSensitivity, relation,
+                      immutability, parameterNames, readable, writable, genericType);
+              }
             }
-            return new BasicMappedField(type, beanName, apiName, persistedName, identifier, false, apiProperty, transientField, caseSensitivity, relation, immutability, parameterNames, readable, writable);
+
+            indexes = Collections.unmodifiableSet(indexes);
+            return new BasicMappedField(type, beanName, apiName, persistedName, identifier,
+                indexes,
+                false,
+                apiProperty, transientField, sortable, caseSensitivity, relation, immutability,
+                parameterNames, readable, writable);
         }
 
-		public void accept(MappedFieldBuilderVisitor[] visitors, BeanInfo<T> bi,
-                PropertyDescriptor pd) {
+        public void accept(MappedFieldBuilderVisitor[] visitors, BeanInfo<T> bi,
+            PropertyDescriptor pd) {
             // visit builders for customization
             if (visitors != null) {
                 for (MappedFieldBuilderVisitor visitor : visitors) {
@@ -402,7 +448,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         }
 
         public void accept(MappedFieldBuilderVisitor visitor, BeanInfo<T> bi,
-                PropertyDescriptor pd) {
+            PropertyDescriptor pd) {
             visitor.visit(this, bi, pd);
         }
 
@@ -434,8 +480,8 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         }
 
 		public void anonymousMapping() {
-			this.beanName = nvl(beanName, apiName, persistedName);
-			if ( ! transientField ) {
+        beanName = nvl(beanName, apiName, persistedName);
+        if (!transientField) {
 				persistedName = nvl(persistedName, beanName);
 			}
 			if ( apiProperty ) {

@@ -1,9 +1,10 @@
-package com.github.restup;
+package com.github.restup.mapping.fields;
 
-import com.github.restup.controller.ResourceController.Builder;
+import com.github.restup.mapping.fields.MappedFieldBuilderVisitor.Builder;
 
 @FunctionalInterface
-public interface ResourceControllerBuilderDecorator {
+public interface MappedFieldBuilderVisitorBuilderDecorator {
+
 
     /**
      * Decorate a {@link Builder}.  Useful in dependency injection frameworks such as Spring where a

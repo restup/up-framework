@@ -7,27 +7,9 @@ package com.github.restup.query;
  */
 public interface Pagination {
 
-    Integer getMaxLimit();
-
-    Integer getLimit();
-
-    Integer getOffset();
-
-    boolean isPagingDisabled();
-
-    default boolean isPagingEnabled() {
-        return !isPagingDisabled();
-    }
-
-    default boolean isWithTotalsEnabled() {
-        return !isWithTotalsDisabled();
-    }
-
-    boolean isWithTotalsDisabled();
-
     /**
      * Pagination with specified limit and offset and paging and totals enabled
-     * 
+     *
      * @param limit value for pagination
      * @param offset value for pagination
      * @return pagination instance
@@ -35,7 +17,7 @@ public interface Pagination {
     static Pagination of(Integer limit, Integer offset) {
         return of(limit, offset, false);
     }
-    
+
     static Pagination of(Integer limit, Integer offset, boolean withTotalsDisabled) {
         return new BasicPagination(limit, offset, withTotalsDisabled);
     }
@@ -63,9 +45,27 @@ public interface Pagination {
     }
 
     static boolean isPagedListRequired(Pagination pagination, Long totalCount) {
-        return (pagination.isWithTotalsDisabled() || totalCount > 0)
+        return (pagination.isWithTotalsDisabled() || (totalCount != null && totalCount > 0))
                 && pagination.getLimit() != null
                 && pagination.getLimit() > 0;
     }
+
+    Integer getMaxLimit();
+
+    Integer getLimit();
+
+    Integer getOffset();
+
+    boolean isPagingDisabled();
+
+    default boolean isPagingEnabled() {
+        return !isPagingDisabled();
+    }
+
+    default boolean isWithTotalsEnabled() {
+        return !isWithTotalsDisabled();
+    }
+
+    boolean isWithTotalsDisabled();
 
 }

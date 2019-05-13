@@ -1,12 +1,13 @@
 package com.github.restup.mapping.fields;
 
-import java.lang.reflect.Type;
-import java.util.Objects;
 import com.github.restup.mapping.fields.composition.CaseSensitivity;
 import com.github.restup.mapping.fields.composition.Identifier;
 import com.github.restup.mapping.fields.composition.Immutability;
 import com.github.restup.mapping.fields.composition.Relation;
 import com.github.restup.util.ReflectionUtils;
+import java.lang.reflect.Type;
+import java.util.Objects;
+import java.util.Set;
 
 class BasicMappedField<T> implements MappedField<T> {
 
@@ -18,6 +19,7 @@ class BasicMappedField<T> implements MappedField<T> {
     private final boolean collection;
     private final boolean apiProperty;
     private final boolean transientField;
+    private final boolean sortable;
 
     private final String[] parameterNames;
     private final Identifier identifier;
@@ -26,18 +28,24 @@ class BasicMappedField<T> implements MappedField<T> {
     private final Relation relation;
     private final WritableField<Object, T> writer;
     private final ReadableField<T> reader;
+    private final Set<MappedIndexField> indexes;
 
     BasicMappedField(Type type, String beanName, String apiName, String persistedName,
-            Identifier identifier, boolean collection, boolean apiProperty, boolean transientField, CaseSensitivity caseSensitivity,
+        Identifier identifier, Set<MappedIndexField> indexes, boolean collection,
+        boolean apiProperty,
+        boolean transientField,
+        boolean sortable, CaseSensitivity caseSensitivity,
             Relation relationship, Immutability immutability, String[] parameterNames, ReadableField<T> reader,
             WritableField<Object, T> writer) {
         this.type = type;
         this.beanName = beanName;
         this.apiName = apiName;
         this.persistedName = persistedName;
+        this.indexes = indexes;
         this.collection = collection;
         this.apiProperty = apiProperty;
         this.transientField = transientField;
+        this.sortable = sortable;
         this.parameterNames = parameterNames;
 
         this.identifier = identifier;
@@ -45,7 +53,7 @@ class BasicMappedField<T> implements MappedField<T> {
         this.writer = writer;
         this.caseSensitivity = caseSensitivity;
         this.immutability = immutability;
-        this.relation = relationship;
+        relation = relationship;
     }
     
     @Override
@@ -73,10 +81,15 @@ class BasicMappedField<T> implements MappedField<T> {
     public String getPersistedName() {
         return persistedName;
     }
-    
+
+    @Override
+    public Set<MappedIndexField> getIndexes() {
+        return indexes;
+    }
+
     @Override
     public boolean isCollection() {
-    		return collection;
+        return collection;
     }
 
     @Override
@@ -87,6 +100,11 @@ class BasicMappedField<T> implements MappedField<T> {
     @Override
     public boolean isApiProperty() {
         return apiProperty;
+    }
+
+    @Override
+    public boolean isSortable() {
+        return sortable;
     }
 
     @Override

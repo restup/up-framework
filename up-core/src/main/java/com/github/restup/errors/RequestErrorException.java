@@ -2,13 +2,14 @@ package com.github.restup.errors;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
+
+import com.github.restup.registry.Resource;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.List;
 import java.util.Optional;
 import org.apache.commons.lang3.StringUtils;
-import com.github.restup.registry.Resource;
 
 /**
  * An exception containing {@link RequestError}s
@@ -44,19 +45,19 @@ public class RequestErrorException extends RuntimeException {
      * 
      * @param t cause of {@link RequestError}
      */
-	public RequestErrorException(Throwable t) {
+	public RequestErrorException(Exception t) {
 		this(RequestError.error(null, t).build());
 	}
 
-    public static RequestErrorException of(Throwable t) {
+	public static RequestErrorException of(Exception t) {
         return new RequestErrorException(RequestError.of(t));
     }
 
-    public static RequestErrorException of(Resource<?, ?> resource, Throwable t) {
+	public static RequestErrorException of(Resource<?, ?> resource, Exception t) {
         return new RequestErrorException(RequestError.of(resource, t));
     }
 
-    public static void rethrow(Throwable t) {
+	public static void rethrow(Exception t) {
         throw of(t);
     }
 

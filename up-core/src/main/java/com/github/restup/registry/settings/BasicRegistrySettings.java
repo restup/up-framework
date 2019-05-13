@@ -1,8 +1,5 @@
 package com.github.restup.registry.settings;
 
-import java.util.Comparator;
-import java.util.List;
-import org.apache.commons.lang3.StringUtils;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
@@ -19,6 +16,8 @@ import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.google.common.collect.ImmutableList;
+import java.util.Comparator;
+import java.util.List;
 
 /**
  * Configures settings and implementations to be used by registry.
@@ -61,8 +60,8 @@ public class BasicRegistrySettings implements RegistrySettings {
 		this.mappedFieldFactory = mappedFieldFactory;
 		this.mappedFieldVisitors = mappedFieldVisitors;
 		this.mappedFieldOrderComparator = mappedFieldOrderComparator;
-		this.defaultControllerAccess = defaultControllerMethodAccess;
-		this.defaultServiceAccess = defaultServiceMethodAccess;
+			defaultControllerAccess = defaultControllerMethodAccess;
+			defaultServiceAccess = defaultServiceMethodAccess;
 		this.repositoryFactory = repositoryFactory;
 		this.errorFactory = errorFactory;
 		this.requestObjectFactory = requestObjectFactory;
@@ -83,7 +82,7 @@ public class BasicRegistrySettings implements RegistrySettings {
 		RegistryOperations operations = new RegistryOperations(resourceRegistryMap, factory);
 		this.mappedClassFactory = mappedClassFactory;
 		this.mappedClassRegistry = operations;
-		this.resourceRegistryRepository = operations;
+			resourceRegistryRepository = operations;
 
 		if (methodArgumentFactory == null) {
             this.methodArgumentFactory = MethodArgumentFactory.getDefaultInstance(this.mappedClassRegistry, this.parameterConverterFactory);
@@ -190,32 +189,6 @@ public class BasicRegistrySettings implements RegistrySettings {
 	@Override
     public String getBasePath() {
 		return basePath;
-	}
-
-	static class MappedFieldComparator implements Comparator<MappedField<?>> {
-
-		@Override
-        public int compare(MappedField<?> a, MappedField<?> b) {
-			if (a == null) {
-                return b == null ? 0 : 1;
-			}
-            if (b == null) {
-                return -1;
-            }
-			if (a.isIdentifier()) {
-                if (!b.isIdentifier()) {
-                    return -1;
-                }
-            } else if (b.isIdentifier()) {
-				return 1;
-			}
-            int result = StringUtils.compare(a.getApiName(), b.getApiName());
-            if (result == 0) {
-                result = StringUtils.compare(a.getBeanName(), b.getBeanName());
-			}
-            return result;
-		}
-
 	}
 
 }

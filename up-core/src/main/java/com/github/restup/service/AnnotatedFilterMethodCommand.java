@@ -25,7 +25,7 @@ public class AnnotatedFilterMethodCommand extends FilterChainContextMethodComman
         super(objectInstance, methodAnnotation, method, arguments);
         Assert.notNull(resource, "A resource instance is required");
         this.resource = resource;
-        this.rank = getRank(this.getMethod());
+        rank = getRank(getMethod());
     }
 
     private static int getRank(Method method) {
@@ -35,21 +35,21 @@ public class AnnotatedFilterMethodCommand extends FilterChainContextMethodComman
 
     @Override
     protected void debug(Object[] params) {
-        log.debug("Executing {} ranked {} for {} resource {}.{}(...)", this.getLabel(), this.rank,
-            this.resource, this.getObjectInstance().getClass(), this.getMethod().getName());
+        log.debug("Executing {} ranked {} for {} resource {}.{}(...)", getLabel(), rank,
+            resource, getObjectInstance().getClass(), getMethod().getName());
     }
 
     @Override
-    protected RuntimeException handle(Throwable t) {
-        return RequestErrorException.of(this.resource, t);
+    protected RuntimeException handle(Exception t) {
+        return RequestErrorException.of(resource, t);
     }
 
     public int getRank() {
-        return this.rank;
+        return rank;
     }
 
     public Resource<?, ?> getResource() {
-        return this.resource;
+        return resource;
     }
 
 }

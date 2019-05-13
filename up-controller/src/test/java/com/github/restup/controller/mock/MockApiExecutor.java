@@ -47,7 +47,7 @@ public class MockApiExecutor implements ApiExecutor {
         Object result = null;
         try {
             result = controller.request(mockRequestBuilder, mockResponse);
-        } catch ( Throwable t) {
+        } catch (Exception t) {
             result = controller.handleException(mockRequestBuilder.getResult(), mockResponse, t);
         }
 

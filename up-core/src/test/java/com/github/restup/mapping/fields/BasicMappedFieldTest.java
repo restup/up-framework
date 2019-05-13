@@ -5,11 +5,13 @@ import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.instanceOf;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import java.util.HashMap;
-import org.junit.Test;
+
 import com.github.restup.test.assertions.Assertions;
 import com.model.test.company.Person;
 import com.test.model.animals.Zoo;
+import java.util.Collections;
+import java.util.HashMap;
+import org.junit.Test;
 
 public class BasicMappedFieldTest {
     
@@ -50,7 +52,9 @@ public class BasicMappedFieldTest {
                 .transientField(true)
                 .build()
                 .isDeclaredBy(Zoo.class));
-        BasicMappedField<?> field = new BasicMappedField<>(null, null, null, null, null, false,false, false, null, null, null, null, null, null);
+        BasicMappedField<?> field = new BasicMappedField<>(null, null, null, null, null,
+            Collections.emptySet(), false,
+            false, false, false, null, null, null, null, null, null);
         assertFalse(field.isDeclaredBy(String.class));
     }
     

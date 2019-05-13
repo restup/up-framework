@@ -1,9 +1,9 @@
-package com.github.restup;
+package com.github.restup.controller;
 
-import com.github.restup.registry.ResourceRegistry.Builder;
+import com.github.restup.controller.ResourceController.Builder;
 
 @FunctionalInterface
-public interface ResourceRegistryBuilderDecorator {
+public interface ResourceControllerBuilderDecorator {
 
     /**
      * Decorate a {@link Builder}.  Useful in dependency injection frameworks such as Spring where a

@@ -9,21 +9,7 @@ import static org.mockito.Mockito.doAnswer;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
-import org.apache.commons.lang3.ArrayUtils;
-import org.assertj.core.api.Assertions;
-import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.Mockito;
-import org.mockito.invocation.InvocationOnMock;
-import org.mockito.junit.MockitoJUnitRunner;
-import org.mockito.stubbing.Answer;
+
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.NoOpContentNegotiator;
 import com.github.restup.controller.interceptor.NoOpRequestInterceptor;
@@ -45,8 +31,22 @@ import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang3.ArrayUtils;
+import org.assertj.core.api.Assertions;
+import org.assertj.core.api.ThrowableAssert.ThrowingCallable;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.Mockito;
+import org.mockito.invocation.InvocationOnMock;
+import org.mockito.junit.MockitoJUnitRunner;
+import org.mockito.stubbing.Answer;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 @RunWith(MockitoJUnitRunner.class)
 public class ResourceControllerTest {
 
@@ -114,10 +114,10 @@ public class ResourceControllerTest {
         when(request.getRelationship()).thenReturn(Mockito.mock(Resource.class));
     }
 
-    private void body(final Object data) {
+    private void body(Object data) {
         doAnswer(new Answer() {
             @Override
-            public Object answer(InvocationOnMock invocation) throws Throwable {
+            public Object answer(InvocationOnMock invocation) {
                 ParsedResourceControllerRequest.Builder b = (ParsedResourceControllerRequest.Builder) invocation.getArguments()[1];
                 if (data instanceof Object[]) {
                     b.setData(Arrays.asList((Object[]) data));
@@ -185,9 +185,9 @@ public class ResourceControllerTest {
         param("sort", fields);
     }
 
-    private void param(String name, final String... values) {
+    private void param(String name, String... values) {
         if (params == null) {
-            params = new ArrayList<String>();
+            params = new ArrayList<>();
         }
         params.add(name);
         when(request.getParameter(name)).thenReturn(values);

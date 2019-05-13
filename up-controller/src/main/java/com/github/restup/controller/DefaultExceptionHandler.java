@@ -1,13 +1,13 @@
 package com.github.restup.controller;
 
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 import com.github.restup.controller.model.MediaType;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.errors.DebugRequestError;
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.RequestErrorException;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * Default {@link ExceptionHandler} which ensures all Exceptions are wrapped
@@ -38,7 +38,8 @@ class DefaultExceptionHandler implements ExceptionHandler {
     }
 
 	@Override
-    public Object handleException(ResourceControllerRequest request, ResourceControllerResponse response, Throwable e) {
+	public Object handleException(ResourceControllerRequest request,
+		ResourceControllerResponse response, Exception e) {
 		RequestErrorException result;
 		if (e instanceof RequestErrorException) {
 			result = (RequestErrorException) e;

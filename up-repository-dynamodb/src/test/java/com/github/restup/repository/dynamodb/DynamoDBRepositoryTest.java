@@ -24,6 +24,7 @@ import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.query.ResourceSort;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.repository.dynamodb.mapping.OverIndexedTable;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.ReadRequest;
@@ -37,10 +38,7 @@ import java.io.Serializable;
 import java.util.Arrays;
 import java.util.List;
 import java.util.concurrent.atomic.AtomicLong;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
 import org.junit.Before;
-import org.junit.Ignore;
 import org.junit.Test;
 
 public class DynamoDBRepositoryTest {
@@ -49,8 +47,6 @@ public class DynamoDBRepositoryTest {
     private ResourceRegistry registry;
     private Resource<Course, Long> courseResource;
     private DynamoDBRepository<Course, Long> courseRepo;
-    @PersistenceContext
-    private EntityManager entityManager;
 
     @Before
     public void before() {
@@ -79,7 +75,20 @@ public class DynamoDBRepositoryTest {
         DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(mapper);
         DynamoDBRepository<?, ?> repo = (DynamoDBRepository<?, ?>) factory.getRepository(resource);
 
-        CreateTableRequest tableRequest = mapper.generateCreateTableRequest(Course.class)
+        CreateTableRequest tableRequest = mapper.generateCreateTableRequest(OverIndexedTable.class)
+            .withProvisionedThroughput(
+                new ProvisionedThroughput()
+                    .withReadCapacityUnits(1l)
+                    .withWriteCapacityUnits(1l));
+
+        tableRequest.getGlobalSecondaryIndexes().forEach((g) -> g.setProvisionedThroughput(
+            new ProvisionedThroughput()
+                .withReadCapacityUnits(1l)
+                .withWriteCapacityUnits(1l)));
+
+        ddb.createTable(tableRequest);
+
+        tableRequest = mapper.generateCreateTableRequest(Course.class)
             .withProvisionedThroughput(
                 new ProvisionedThroughput()
                     .withReadCapacityUnits(1l)
@@ -91,6 +100,10 @@ public class DynamoDBRepositoryTest {
 
     private Resource<Course, Long> courseResource() {
         return (Resource) registry.getResource(Course.class);
+    }
+
+    private Resource<OverIndexedTable, String> overIndexedTableResource() {
+        return (Resource) registry.getResource(OverIndexedTable.class);
     }
 
     @Test
@@ -154,56 +167,6 @@ public class DynamoDBRepositoryTest {
         when(ps.getRequestedSort())
             .thenReturn(Arrays.asList(ResourceSort.of(courseResource, "name", b)));
     }
-
-    @Test
-    @Ignore
-    public void testPagedListLimit2() {
-        PreparedResourceQueryStatement ps = paginated(2, 0);
-        when(ps.getResource()).thenReturn((Resource) courseResource);
-        PagedResult<Course> result = courseRepo.list(ps);
-        assertList(result, "Alpha", "Bravo");
-        verify(ps).getResource();
-        verifyList(ps);
-    }
-
-    @Test
-    @Ignore
-    public void testPagedListLimit1Offset2() {
-        PreparedResourceQueryStatement ps = paginated(1, 2);
-        PagedResult<Course> result = courseRepo.list(ps);
-        assertList(result, "Charlie");
-        verifyList(ps);
-    }
-
-    @Test
-    @Ignore
-    public void testPagedListLimit1Offset2SortDesc() {
-        PreparedResourceQueryStatement ps = paginated(3, 0);
-        sort(ps, false);
-        PagedResult<Course> result = courseRepo.list(ps);
-        assertList(result, "India", "Hotel", "Golf");
-        verifyList(ps);
-    }
-
-    @Test
-    @Ignore
-    public void testUnpagedSortedList() {
-        PreparedResourceQueryStatement ps = paginated(0, 0);
-        sort(ps, true);
-        PagedResult<Course> result = courseRepo.list(ps);
-        assertList(result, "Alpha", "Bravo", "Charlie", "Delta", "Echo", "Fox Trot", "Golf",
-            "Hotel", "India");
-        verifyList(ps);
-    }
-
-//    @Test
-//    public void testSupportsCollection() {
-//        List<Operator> collections = Arrays.asList(Operator.in, Operator.nin);
-//        for (Operator operator : Operator.values()) {
-//            assertEquals(operator.name(), collections.contains(operator),
-//                courseRepo.supportsCollection(operator));
-//        }
-//    }
 
     private Course update(Course course, String field) {
         UpdateRequest<Course, Long> request = mock(UpdateRequest.class);

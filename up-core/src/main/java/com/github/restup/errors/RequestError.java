@@ -43,17 +43,17 @@ public interface RequestError {
         return builder().resource(resource);
     }
 
-    static Builder error(Resource<?, ?> resource, Throwable t) {
+    static Builder error(Resource<?, ?> resource, Exception t) {
         return new Builder(t)
                 .status(StatusCode.INTERNAL_SERVER_ERROR)
                 .resource(resource);
     }
 
-    static RequestError of(Throwable t) {
+    static RequestError of(Exception t) {
         return error(null, t).build();
     }
 
-    static RequestError of(Resource<?, ?> resource, Throwable t) {
+    static RequestError of(Resource<?, ?> resource, Exception t) {
         return error(resource, t).build();
     }
 

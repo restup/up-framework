@@ -5,6 +5,7 @@ import com.google.common.collect.Iterables;
 import java.text.MessageFormat;
 import java.util.Arrays;
 import java.util.Collections;
+import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Supplier;
@@ -79,5 +80,17 @@ public class UpUtils {
             .map((value) -> MessageFormat.format(pattern, value.name()))
             .toArray(String[]::new);
     }
+
+    public static <K, V> Map<K, V> mapOf(K... contents) {
+        if (contents.length % 2 == 1) {
+            throw new IllegalArgumentException("Map must have name/value pairs");
+        }
+        Map<String, Object> map = new HashMap<>();
+        for (int n = 0; n < contents.length; n += 2) {
+            map.put(String.valueOf(contents[n]), contents[n + 1]);
+        }
+        return (Map) map;
+    }
+
 
 }

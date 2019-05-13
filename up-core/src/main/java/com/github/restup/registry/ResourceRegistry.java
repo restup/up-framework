@@ -1,8 +1,5 @@
 package com.github.restup.registry;
 
-import java.util.Collection;
-import java.util.Comparator;
-import javax.validation.Validator;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.errors.ErrorFactory;
@@ -20,6 +17,9 @@ import com.github.restup.registry.settings.ServiceMethodAccess;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Streams;
+import java.util.Collection;
+import java.util.Comparator;
+import javax.validation.Validator;
 
 /**
  * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data,
@@ -31,6 +31,10 @@ import com.github.restup.util.Streams;
  * @author andy.buttaro
  */
 public interface ResourceRegistry extends MappedClassRegistry {
+
+    static Builder builder() {
+        return new Builder();
+    }
 
     void registerResource(Resource.Builder<?, ?> b);
 
@@ -72,10 +76,6 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
     Collection<ResourceRelationship<?, ?, ?, ?>> getRelationships(String resourceName);
 
-    static Builder builder() {
-        return new Builder();
-    }
-
     public final static class Builder {
         private final RegistrySettings.Builder settings;
 
@@ -112,8 +112,8 @@ public interface ResourceRegistry extends MappedClassRegistry {
             return me();
         }
 
-        public Builder mappedFieldBuilderVisitors(MappedFieldBuilderVisitor... visitors) {
-            settings.mappedFieldBuilderVisitors(visitors);
+        public Builder mappedFieldVisitorBuilder(MappedFieldBuilderVisitor.Builder builder) {
+            settings.mappedFieldVisitorBuilder(builder);
             return me();
         }
 

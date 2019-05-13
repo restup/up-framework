@@ -16,6 +16,6 @@ public interface ExceptionHandler {
     }
 
     Object handleException(ResourceControllerRequest request, ResourceControllerResponse response,
-        Throwable e);
+        Exception e);
 
 }

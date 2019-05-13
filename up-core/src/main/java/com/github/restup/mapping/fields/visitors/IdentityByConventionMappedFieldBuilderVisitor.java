@@ -1,6 +1,6 @@
 package com.github.restup.mapping.fields.visitors;
 
-import com.github.restup.mapping.fields.MappedField.Builder;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
@@ -22,8 +22,8 @@ public class IdentityByConventionMappedFieldBuilderVisitor implements MappedFiel
     }
 
     @Override
-    public <T> void visit(Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
-        if (Objects.equals(this.name, b.getBeanName())) {
+    public <T> void visit(MappedField.Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
+        if (Objects.equals(name, b.getBeanName())) {
             b.idField(true);
         }
     }

@@ -66,7 +66,7 @@ public interface MappedClass<T> {
      */
     T newInstance();
 
-    static class AnonymousBuilder extends Builder<Object> {
+    class AnonymousBuilder extends Builder<Object> {
 
         @Override
         public Builder<Object> addAttribute(MappedField.Builder<?> builder) {
@@ -75,7 +75,7 @@ public interface MappedClass<T> {
         }
     }
 
-    static class Builder<T> {
+    class Builder<T> {
 
         private final Type type;
         private String name;
@@ -87,7 +87,7 @@ public interface MappedClass<T> {
         Builder(Type type) {
             Assert.notNull(type, "type is required");
             this.type = type;
-            this.attributes = new ArrayList<>();
+            attributes = new ArrayList<>();
         }
 
         Builder() {
@@ -100,41 +100,41 @@ public interface MappedClass<T> {
 
         public Builder<T> name(String name) {
             this.name = name;
-            return this.me();
+            return me();
         }
 
         public Builder<T> defaultName(String name) {
             if (StringUtils.isEmpty(this.name)) {
-                return this.name(name);
+                return name(name);
             }
-            return this.me();
+            return me();
         }
 
         public Builder<T> pluralName(String pluralName) {
             this.pluralName = pluralName;
-            return this.me();
+            return me();
         }
 
         public Builder<T> attributes(List<MappedField<?>> attributes) {
             this.attributes = attributes;
-            return this.me();
+            return me();
         }
 
         Builder<T> addAttribute(MappedField<?> attribute) {
-            this.attributes.add(attribute);
-            return this.me();
+            attributes.add(attribute);
+            return me();
         }
 
         public Builder<T> addAttribute(MappedField.Builder<?> builder) {
-            return this.addAttribute(builder.build());
+            return addAttribute(builder.build());
         }
 
         public Builder<T> addAttribute(Class<?> type, String name) {
-            return this.addAttribute(this.attribute(type, name));
+            return addAttribute(attribute(type, name));
         }
 
         public Builder<T> addCaseInsensitiveAttribute(String name, String lowerCaseNameField) {
-            return this.addAttribute(MappedField.builder(String.class)
+            return addAttribute(MappedField.builder(String.class)
                 .apiName(name)
                 .caseSensitiviteField(lowerCaseNameField))
                 // add lowerCaseNameField
@@ -143,11 +143,11 @@ public interface MappedClass<T> {
         }
 
         public Builder<T> id(Class<?> type) {
-            return this.id(type, "id");
+            return id(type, "id");
         }
 
         public Builder<T> id(Class<?> type, String name) {
-            return this.addAttribute(this.attribute(type, name)
+            return addAttribute(attribute(type, name)
                 .idField(true));
         }
 
@@ -160,26 +160,26 @@ public interface MappedClass<T> {
 
         public Builder<T> sortAttributesWith(Comparator<MappedField<?>> fieldComparator) {
             this.fieldComparator = fieldComparator;
-            return this.me();
+            return me();
         }
 
         public Builder<T> parentType(Class<?> parentType) {
             this.parentType = parentType;
-            return this.me();
+            return me();
         }
 
         public MappedClass<T> build() {
-            Assert.notEmpty(this.name, "name is required");
+            Assert.notEmpty(name, "name is required");
             String pluralName = this.pluralName;
-            boolean containsTypedMap = this.type instanceof UntypedClass;
+            boolean containsTypedMap = type instanceof UntypedClass;
             if (StringUtils.isEmpty(pluralName)) {
-                pluralName = this.name + "s";
+                pluralName = name + "s";
             }
-            if (this.fieldComparator != null) {
-                Collections.sort(this.attributes, this.fieldComparator);
+            if (fieldComparator != null) {
+                Collections.sort(attributes, fieldComparator);
             }
-            return new BasicMappedClass<>(this.name, pluralName, this.type, this.parentType,
-                this.attributes, containsTypedMap);
+            return new BasicMappedClass<>(name, pluralName, type, parentType,
+                attributes, containsTypedMap);
         }
 
     }
