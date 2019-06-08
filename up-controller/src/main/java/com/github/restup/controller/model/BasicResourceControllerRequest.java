@@ -1,10 +1,9 @@
 package com.github.restup.controller.model;
 
-import java.util.Enumeration;
-import java.util.List;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
+import java.util.List;
 
 /**
  * In an http request, this is a partially parsed details from the request, having parsed the request path to obtain resource info and ids.
@@ -36,7 +35,7 @@ public abstract class BasicResourceControllerRequest implements ResourceControll
     }
 
     @Override
-    public Enumeration<String> getHeaders(String name) {
+    public Iterable<String> getHeaders(String name) {
         return null;
     }
 

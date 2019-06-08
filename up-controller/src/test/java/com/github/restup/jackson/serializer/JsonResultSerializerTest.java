@@ -12,7 +12,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.result.JsonResult;
 import com.github.restup.jackson.JacksonConfiguration;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -40,12 +40,12 @@ public class JsonResultSerializerTest {
     @Before
     public void setup() {
         ResourceRegistry registry = mapBackedRegistryBuilder()
-            .mappedFieldVisitorBuilder(
-                MappedFieldBuilderVisitor.builder()
+            .mappedFieldBuilderDecoratorBuilder(
+                MappedFieldBuilderDecorator.builder()
                     .withIdentityConvention("id")
-                    .add(new MappedFieldBuilderVisitor() {
+                    .add(new MappedFieldBuilderDecorator() {
                             @Override
-                            public <T> void visit(
+                            public <T> void decorate(
                                 MappedField.Builder<T> b,
                                 ReflectionUtils.BeanInfo<T> bi,
                                 ReflectionUtils.PropertyDescriptor pd) {

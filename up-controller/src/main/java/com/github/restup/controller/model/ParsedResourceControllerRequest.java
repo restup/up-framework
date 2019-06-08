@@ -59,7 +59,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
     boolean isPageOffsetOneBased();
 
-    static class Builder<T> implements Errors {
+    class Builder<T> implements Errors {
 
         private final ResourceRegistry registry;
         private final ResourceControllerRequest request;

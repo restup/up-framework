@@ -37,13 +37,11 @@ public abstract class AbstractMockTest {
     		this(resourceClasses, path, 1);
     }
 
-
     public static ResourceRegistry registry(Class<?>... resourceClasses) {
         // build registry setting, minimally passing in a repository factory
         ResourceRegistry registry = ResourceRegistry.builder()
-                .repositoryFactory(new MapBackedRepositoryFactory())
-        .build();
-
+            .repositoryFactory(new MapBackedRepositoryFactory())
+            .build();
         registry.registerResources(resourceClasses);
         return registry;
     }

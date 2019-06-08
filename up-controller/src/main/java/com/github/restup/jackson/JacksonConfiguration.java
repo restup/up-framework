@@ -8,13 +8,13 @@ import com.github.restup.controller.model.result.JsonResult;
 import com.github.restup.controller.request.parser.ContentNegotiatedRequestParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.request.parser.UnsupportedMediaTypeBodyRequestParser;
-import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.jackson.mixins.BasicPagedResultMixin;
-import com.github.restup.jackson.mixins.RequestErrorExceptionMixin;
 import com.github.restup.jackson.mixins.JsonApiResultMixin;
 import com.github.restup.jackson.mixins.JsonResultMixin;
 import com.github.restup.jackson.mixins.LinksResultMixin;
+import com.github.restup.jackson.mixins.RequestErrorExceptionMixin;
 import com.github.restup.jackson.mixins.RequestErrorMixin;
 import com.github.restup.jackson.mixins.ResourceDataMixin;
 import com.github.restup.jackson.mixins.ResourcePathMixin;
@@ -25,6 +25,10 @@ import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
 
 public class JacksonConfiguration {
+
+    private JacksonConfiguration() {
+
+    }
 
     public static ObjectMapper configure() {
         return configure(null);
@@ -51,16 +55,13 @@ public class JacksonConfiguration {
     }
 
     public static RequestParser parser(ObjectMapper mapper, String defaultMediaType) {
+        mapper = configure(mapper);
         return ContentNegotiatedRequestParser.builder()
-                .addParser(MediaType.APPLICATION_JSON, new JacksonRequestBodyParser(configure(mapper)))
-                .addParser(MediaType.APPLICATION_JSON_API, new JacksonJsonApiRequestBodyParser(configure(mapper)))
+            .addParser(MediaType.APPLICATION_JSON, new JacksonRequestBodyParser(mapper))
+            .addParser(MediaType.APPLICATION_JSON_API, new JacksonJsonApiRequestBodyParser(mapper))
                 .defaultParser(new UnsupportedMediaTypeBodyRequestParser())
                 .defaultMediaType(defaultMediaType)
                 .build();
-    }
-
-    private JacksonConfiguration() {
-
     }
 
 }

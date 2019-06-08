@@ -3,6 +3,14 @@ package com.university;
 import static com.university.University.PLURAL_NAME;
 import static com.university.University.RESOURCE_NAME;
 import static com.university.University.TABLE_NAME;
+
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
+import com.fasterxml.jackson.annotation.JsonIgnore;
+import com.github.restup.annotations.ApiName;
+import com.github.restup.annotations.Plural;
+import com.github.restup.annotations.field.CaseInsensitive;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.GeneratedValue;
@@ -11,14 +19,11 @@ import javax.persistence.Id;
 import org.hibernate.validator.constraints.NotBlank;
 import org.hibernate.validator.constraints.SafeHtml;
 import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
-import com.fasterxml.jackson.annotation.JsonIgnore;
-import com.github.restup.annotations.ApiName;
-import com.github.restup.annotations.Plural;
-import com.github.restup.annotations.field.CaseInsensitive;
 
 @Entity(name = TABLE_NAME)
 @ApiName(value = RESOURCE_NAME)
 @Plural(PLURAL_NAME)
+@DynamoDBTable(tableName = "University")
 public class University {
 
 	public static final String RESOURCE_NAME = "university";
@@ -27,15 +32,18 @@ public class University {
 
 	@Id
 	@GeneratedValue(strategy = GenerationType.AUTO)
+	@DynamoDBHashKey(attributeName = "Id")
 	private final Long id;
 
 	// use javax validations
 	@SafeHtml(whitelistType = WhiteListType.NONE)
 	@NotBlank
 	@CaseInsensitive(searchField = "nameUpperCase", lowerCased = false)
+	@DynamoDBAttribute(attributeName = "Name")
 	private final String name;
 
 	@Column(name = "name_upper_case")
+	@DynamoDBAttribute(attributeName = "NameUpperCase")
 	@JsonIgnore
 	private final String nameUpperCase;
 

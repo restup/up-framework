@@ -18,7 +18,7 @@ import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
@@ -76,7 +76,8 @@ public class ResourceRegistryTest {
         ResourcePathsProvider defaultSparseFieldsProvider = mock(ResourcePathsProvider.class);
         ErrorFactory errorFactory = mock(ErrorFactory.class);
         MappedClassFactory mappedClassFactory = mock(MappedClassFactory.class);
-        MappedFieldBuilderVisitor.Builder visitor = mock(MappedFieldBuilderVisitor.Builder.class);
+        MappedFieldBuilderDecorator.Builder decorator = mock(
+            MappedFieldBuilderDecorator.Builder.class);
         Comparator<MappedField<?>> mappedFieldOrderComparator = mock(Comparator.class);
         MethodArgumentFactory methodArgumentFactory = mock(MethodArgumentFactory.class);
         RepositoryFactory repositoryFactory = mock(RepositoryFactory.class);
@@ -98,7 +99,7 @@ public class ResourceRegistryTest {
             .errorFactory(errorFactory)
             .excludeFrameworkFilters(true)
             .mappedClassFactory(mappedClassFactory)
-            .mappedFieldVisitorBuilder(visitor)
+            .mappedFieldBuilderDecoratorBuilder(decorator)
             .mappedFieldFactory(mappedFieldFactory)
             .mappedFieldOrderComparator(mappedFieldOrderComparator)
             .methodArgumentFactory(methodArgumentFactory)

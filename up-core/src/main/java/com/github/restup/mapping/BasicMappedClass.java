@@ -1,11 +1,12 @@
 package com.github.restup.mapping;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
+
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.util.ReflectionUtils;
 import java.lang.reflect.Type;
 import java.util.List;
 import java.util.Objects;
-import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.util.ReflectionUtils;
 
 /**
  * Provides an api to object to persistence mapping.
@@ -16,18 +17,24 @@ public class BasicMappedClass<T> implements MappedClass<T> {
 
     private final String name;
     private final String pluralName;
+    private final String persistedName;
     private final Type type;
     private final Type parentType;
     private final List<MappedField<?>> attributes;
     private final boolean typedMapPresent;
+    private final boolean indexedQueryOnly;
 
-    protected BasicMappedClass(String name, String pluralName, Type type, Type parentType, List<MappedField<?>> attributes, boolean typedMapPresent) {
+    protected BasicMappedClass(String name, String pluralName, String persistedName, Type type,
+        Type parentType, List<MappedField<?>> attributes, boolean typedMapPresent,
+        boolean indexedQueryOnly) {
         this.name = name;
         this.pluralName = pluralName;
+        this.persistedName = persistedName;
         this.type = type;
         this.parentType = parentType;
         this.attributes = unmodifiableList(attributes);
         this.typedMapPresent = typedMapPresent;
+        this.indexedQueryOnly = indexedQueryOnly;
     }
     
     @Override
@@ -49,6 +56,11 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     @Override
     public String getPluralName() {
         return pluralName;
+    }
+
+    @Override
+    public String getPersistedName() {
+        return persistedName;
     }
 
     /**
@@ -89,6 +101,11 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     @Override
     public boolean isTypedMapPresent() {
     		return typedMapPresent;
+    }
+
+    @Override
+    public boolean isIndexedQueryOnly() {
+        return indexedQueryOnly;
     }
 
     @Override

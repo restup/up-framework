@@ -42,8 +42,9 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
     }
 
     @Override
-    public Enumeration<String> getHeaders(String name) {
-        return request.getHeaders(name);
+    public Iterable<String> getHeaders(String name) {
+        Enumeration<String> headers = request.getHeaders(name);
+        return headers == null ? Collections.emptyList() : Collections.list(headers);
     }
 
     @Override

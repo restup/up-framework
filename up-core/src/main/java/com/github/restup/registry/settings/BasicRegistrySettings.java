@@ -4,11 +4,9 @@ import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorFactory;
-import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
@@ -25,170 +23,164 @@ import java.util.List;
 public class BasicRegistrySettings implements RegistrySettings {
 
     private final ResourceRegistryRepository resourceRegistryRepository;
-	private final MappedClassFactory mappedClassFactory;
-	private final MappedClassRegistry mappedClassRegistry;
+    private final MappedClassFactory mappedClassFactory;
+    private final MappedClassRegistry mappedClassRegistry;
     private final List<String> packagesToScan;
-	private final MappedFieldFactory mappedFieldFactory;
-	private final MappedFieldBuilderVisitor[] mappedFieldVisitors;
-	private final Comparator<MappedField<?>> mappedFieldOrderComparator;
+    private final MappedFieldFactory mappedFieldFactory;
+    private final Comparator<MappedField<?>> mappedFieldOrderComparator;
 
-	private final ControllerMethodAccess defaultControllerAccess;
-	private final ServiceMethodAccess defaultServiceAccess;
-	private final Pagination defaultPagination;
-	private final ResourcePathsProvider defaultSparseFieldsProvider;
-	private final ResourcePathsProvider defaultRestrictedFieldsProvider;
+    private final ControllerMethodAccess defaultControllerAccess;
+    private final ServiceMethodAccess defaultServiceAccess;
+    private final Pagination defaultPagination;
+    private final ResourcePathsProvider defaultSparseFieldsProvider;
+    private final ResourcePathsProvider defaultRestrictedFieldsProvider;
 
-	private final RepositoryFactory repositoryFactory;
-	private final ErrorFactory errorFactory;
-	private final RequestObjectFactory requestObjectFactory;
-	private final MethodArgumentFactory methodArgumentFactory;
-	private final ConverterFactory converterFactory;
-	private final ParameterConverterFactory parameterConverterFactory;
+    private final RepositoryFactory repositoryFactory;
+    private final ErrorFactory errorFactory;
+    private final RequestObjectFactory requestObjectFactory;
+    private final MethodArgumentFactory methodArgumentFactory;
+    private final ConverterFactory converterFactory;
+    private final ParameterConverterFactory parameterConverterFactory;
     private final List<Object> defaultServiceFilters;
-	private final String basePath;
+    private final String basePath;
 
     BasicRegistrySettings(ResourceRegistryRepository resourceRegistryMap,
-			MappedClassFactory mappedClassFactory, MappedClassRegistry mappedClassRegistry, String[] packagesToScan, MappedFieldFactory mappedFieldFactory,
-			MappedFieldBuilderVisitor[] mappedFieldVisitors, Comparator<MappedField<?>> mappedFieldOrderComparator,
-			ControllerMethodAccess defaultControllerMethodAccess, ServiceMethodAccess defaultServiceMethodAccess,
-			RepositoryFactory repositoryFactory, ErrorFactory errorFactory, RequestObjectFactory requestObjectFactory,
-			MethodArgumentFactory methodArgumentFactory, ConverterFactory converterFactory,
-			ParameterConverterFactory parameterConverterFactory, Object[] defaultServiceFilters,
-			Pagination defaultPagination, ResourcePathsProvider defaultSparseFieldsProvider,
-			ResourcePathsProvider defaultRestrictedFieldsProvider, String basePath) {
+        MappedClassFactory mappedClassFactory,
+        String[] packagesToScan, MappedFieldFactory mappedFieldFactory,
+        Comparator<MappedField<?>> mappedFieldOrderComparator,
+        ControllerMethodAccess defaultControllerMethodAccess,
+        ServiceMethodAccess defaultServiceMethodAccess,
+        RepositoryFactory repositoryFactory, ErrorFactory errorFactory,
+        RequestObjectFactory requestObjectFactory,
+        MethodArgumentFactory methodArgumentFactory, ConverterFactory converterFactory,
+        ParameterConverterFactory parameterConverterFactory, Object[] defaultServiceFilters,
+        Pagination defaultPagination, ResourcePathsProvider defaultSparseFieldsProvider,
+        ResourcePathsProvider defaultRestrictedFieldsProvider, String basePath) {
         this.packagesToScan = ImmutableList.copyOf(packagesToScan);
-		this.mappedFieldFactory = mappedFieldFactory;
-		this.mappedFieldVisitors = mappedFieldVisitors;
-		this.mappedFieldOrderComparator = mappedFieldOrderComparator;
-			defaultControllerAccess = defaultControllerMethodAccess;
-			defaultServiceAccess = defaultServiceMethodAccess;
-		this.repositoryFactory = repositoryFactory;
-		this.errorFactory = errorFactory;
-		this.requestObjectFactory = requestObjectFactory;
-		this.converterFactory = converterFactory;
-		this.parameterConverterFactory = parameterConverterFactory;
+        this.mappedFieldFactory = mappedFieldFactory;
+        this.mappedFieldOrderComparator = mappedFieldOrderComparator;
+        defaultControllerAccess = defaultControllerMethodAccess;
+        defaultServiceAccess = defaultServiceMethodAccess;
+        this.repositoryFactory = repositoryFactory;
+        this.errorFactory = errorFactory;
+        this.requestObjectFactory = requestObjectFactory;
+        this.converterFactory = converterFactory;
+        this.parameterConverterFactory = parameterConverterFactory;
         this.defaultServiceFilters = ImmutableList.copyOf(defaultServiceFilters);
-		this.defaultPagination = defaultPagination;
-		this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
-		this.defaultRestrictedFieldsProvider = defaultRestrictedFieldsProvider;
-		this.basePath = basePath;
+        this.defaultPagination = defaultPagination;
+        this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
+        this.defaultRestrictedFieldsProvider = defaultRestrictedFieldsProvider;
+        this.basePath = basePath;
 
-		MappedClassFactory factory = mappedClassFactory;
-		if (mappedClassFactory == null) {
-            factory = new DefaultMappedClassFactory(mappedFieldFactory, this.packagesToScan, mappedFieldOrderComparator);
-		}
+        // wrap with operations
+        RegistryOperations operations = new RegistryOperations(resourceRegistryMap,
+            mappedClassFactory);
+        this.mappedClassFactory = mappedClassFactory;
+        mappedClassRegistry = operations;
+        resourceRegistryRepository = operations;
 
-		// wrap with operations
-		RegistryOperations operations = new RegistryOperations(resourceRegistryMap, factory);
-		this.mappedClassFactory = mappedClassFactory;
-		this.mappedClassRegistry = operations;
-			resourceRegistryRepository = operations;
+        if (methodArgumentFactory == null) {
+            this.methodArgumentFactory = MethodArgumentFactory
+                .getDefaultInstance(mappedClassRegistry, this.parameterConverterFactory);
+        } else {
+            this.methodArgumentFactory = methodArgumentFactory;
+        }
+    }
 
-		if (methodArgumentFactory == null) {
-            this.methodArgumentFactory = MethodArgumentFactory.getDefaultInstance(this.mappedClassRegistry, this.parameterConverterFactory);
-		} else {
-			this.methodArgumentFactory = methodArgumentFactory;
-		}
-	}
-
-	@Override
+    @Override
     public ResourceRegistryRepository getResourceRegistryRepository() {
-		return resourceRegistryRepository;
-	}
+        return resourceRegistryRepository;
+    }
 
-	@Override
+    @Override
     public MappedClassRegistry getMappedClassRegistry() {
-		return mappedClassRegistry;
-	}
+        return mappedClassRegistry;
+    }
 
-	@Override
+    @Override
     public MappedClassFactory getMappedClassFactory() {
-		return mappedClassFactory;
-	}
+        return mappedClassFactory;
+    }
 
-	@Override
+    @Override
     public List<String> getPackagesToScan() {
-		return packagesToScan;
-	}
+        return packagesToScan;
+    }
 
-	@Override
+    @Override
     public MappedFieldFactory getMappedFieldFactory() {
-		return mappedFieldFactory;
-	}
+        return mappedFieldFactory;
+    }
 
-	@Override
+    @Override
     public Comparator<MappedField<?>> getMappedFieldOrderComparator() {
-		return mappedFieldOrderComparator;
-	}
+        return mappedFieldOrderComparator;
+    }
 
-	@Override
+    @Override
     public RepositoryFactory getRepositoryFactory() {
-		return repositoryFactory;
-	}
+        return repositoryFactory;
+    }
 
-	@Override
-    public MappedFieldBuilderVisitor[] getMappedFieldVisitors() {
-		return mappedFieldVisitors;
-	}
 
-	@Override
+    @Override
     public ErrorFactory getErrorFactory() {
-		return errorFactory;
-	}
+        return errorFactory;
+    }
 
-	@Override
+    @Override
     public MethodArgumentFactory getMethodArgumentFactory() {
-		return methodArgumentFactory;
-	}
+        return methodArgumentFactory;
+    }
 
-	@Override
+    @Override
     public ConverterFactory getConverterFactory() {
-		return converterFactory;
-	}
+        return converterFactory;
+    }
 
-	@Override
+    @Override
     public ParameterConverterFactory getParameterConverterFactory() {
-		return parameterConverterFactory;
-	}
+        return parameterConverterFactory;
+    }
 
-	@Override
+    @Override
     public ControllerMethodAccess getDefaultControllerAccess() {
-		return defaultControllerAccess;
-	}
+        return defaultControllerAccess;
+    }
 
-	@Override
+    @Override
     public ServiceMethodAccess getDefaultServiceAccess() {
-		return defaultServiceAccess;
-	}
+        return defaultServiceAccess;
+    }
 
-	@Override
+    @Override
     public List<Object> getDefaultServiceFilters() {
-		return defaultServiceFilters;
-	}
+        return defaultServiceFilters;
+    }
 
-	@Override
+    @Override
     public RequestObjectFactory getRequestObjectFactory() {
-		return requestObjectFactory;
-	}
+        return requestObjectFactory;
+    }
 
-	@Override
+    @Override
     public Pagination getDefaultPagination() {
-		return defaultPagination;
-	}
+        return defaultPagination;
+    }
 
-	@Override
+    @Override
     public ResourcePathsProvider getDefaultRestrictedFieldsProvider() {
-		return defaultRestrictedFieldsProvider;
-	}
+        return defaultRestrictedFieldsProvider;
+    }
 
-	@Override
+    @Override
     public ResourcePathsProvider getDefaultSparseFieldsProvider() {
-		return defaultSparseFieldsProvider;
-	}
+        return defaultSparseFieldsProvider;
+    }
 
-	@Override
+    @Override
     public String getBasePath() {
-		return basePath;
-	}
+        return basePath;
+    }
 
 }

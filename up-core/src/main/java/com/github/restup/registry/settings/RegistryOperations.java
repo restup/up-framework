@@ -1,13 +1,5 @@
 package com.github.restup.registry.settings;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Map.Entry;
-import org.apache.commons.lang3.StringUtils;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
@@ -19,9 +11,19 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.util.Assert;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.Map.Entry;
+import org.apache.commons.lang3.StringUtils;
 
 /**
- * Registry implementation of {@link MappedClassFactory} and {@link ResourceRegistryRepository} allowing implementation to be shared with other Up! implementations without reference to registry itself
+ * Registry implementation of {@link MappedClassFactory} and {@link ResourceRegistryRepository}
+ * allowing implementation to be shared with other Up! implementations without reference to registry
+ * itself
  */
 class RegistryOperations implements MappedClassRegistry, ResourceRegistryRepository {
 
@@ -29,10 +31,11 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
     private final MappedClassFactory mappedClassFactory;
     private Map<Object, List<Resource<?, ?>>> unknown;
 
-    RegistryOperations(ResourceRegistryRepository resourceRegistryMap, MappedClassFactory mappedClassFactory) {
-        this.resourceRepository = resourceRegistryMap;
+    RegistryOperations(ResourceRegistryRepository resourceRegistryMap,
+        MappedClassFactory mappedClassFactory) {
+        resourceRepository = resourceRegistryMap;
         this.mappedClassFactory = mappedClassFactory;
-        unknown = new HashMap<Object, List<Resource<?, ?>>>(3);
+        unknown = new HashMap<>(3);
     }
 
     @Override
@@ -42,12 +45,14 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
 
     @Override
     public Resource<?, ?> getResource(String resourceName) {
-        return StringUtils.isEmpty(resourceName) ? null : resourceRepository.getResource(resourceName);
+        return StringUtils.isEmpty(resourceName) ? null
+            : resourceRepository.getResource(resourceName);
     }
 
     @Override
     public Resource<?, ?> getResourceByPluralName(String pluralName) {
-        return StringUtils.isEmpty(pluralName) ? null : resourceRepository.getResourceByPluralName(pluralName);
+        return StringUtils.isEmpty(pluralName) ? null
+            : resourceRepository.getResourceByPluralName(pluralName);
     }
 
     @Override
@@ -61,10 +66,10 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
         if (resourceClass != null) {
             result = resourceRepository.getMappedClass(resourceClass);
             if (result == null) {
-            		if ( resourceClass instanceof Class ) {
-	                result = mappedClassFactory.getMappedClass((Class<?>)resourceClass);
-	                registerMappedClass(result);
-            		}
+                if (resourceClass instanceof Class) {
+                    result = mappedClassFactory.getMappedClass((Class<?>) resourceClass);
+                    registerMappedClass(result);
+                }
             }
 
         }
@@ -78,7 +83,8 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
 
     @Override
     public boolean hasResource(String resourceName) {
-        return StringUtils.isEmpty(resourceName) ? false : resourceRepository.hasResource(resourceName);
+        return StringUtils.isEmpty(resourceName) ? false
+            : resourceRepository.hasResource(resourceName);
     }
 
     @Override
@@ -100,8 +106,10 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
         Assert.notNull(resource.getName(), "resource name must not be null");
         Assert.notNull(resource.getType(), "resource type must not be null");
         Assert.notNull(resource.getServiceOperations(), "resource service must not be null");
-        Assert.notNull(resource.getControllerMethodAccess(), "resource httpAccess must not be null");
-        Assert.notNull(resource.getServiceMethodAccess(), "resource internalAccess must not be null");
+        Assert
+            .notNull(resource.getControllerMethodAccess(), "resource httpAccess must not be null");
+        Assert
+            .notNull(resource.getServiceMethodAccess(), "resource internalAccess must not be null");
         Assert.notNull(resource.getIdentityField(), "resource identityField must not be null");
         Assert.notNull(resource.getMapping(), "resource mapping must not be null");
         resourceRepository.registerResource(resource);
@@ -118,9 +126,9 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
     private void buildMissingRelationships(Resource<?, ?> resource, String key) {
         List<Resource<?, ?>> from = removeMissingResourceRelationship(key);
         buildRelationships(from, resource);
-	}
+    }
 
-	private void buildRelationships(List<Resource<?, ?>> fromList, Resource<?, ?> to) {
+    private void buildRelationships(List<Resource<?, ?>> fromList, Resource<?, ?> to) {
         if (fromList != null) {
             for (Resource<?, ?> from : fromList) {
                 Map<String, List<ResourcePath>> relationshipPaths = mapRelationships(from);
@@ -148,9 +156,10 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
         }
     }
 
-    private void addRelationship(Resource<?, ?> from, Resource<?, ?> to, List<ResourcePath> fromPaths) {
+    private void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
+        List<ResourcePath> fromPaths) {
         ResourceRelationship<?, ?, ?, ?> relationship
-                = ResourceRelationship.of(from, to, fromPaths);
+            = ResourceRelationship.of(from, to, fromPaths);
         // add relationship in both direction
         addRelationship(from, to, relationship);
         addRelationship(to, from, relationship);
@@ -163,17 +172,18 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
 
     @Override
     public void addRelationship(Resource<?, ?> from, Resource<?, ?> to,
-            ResourceRelationship<?, ?, ?, ?> relationship) {
+        ResourceRelationship<?, ?, ?, ?> relationship) {
         resourceRepository.addRelationship(from, to, relationship);
     }
 
     @Override
-    public Collection<ResourceRelationship<?,?,?,?>> getRelationships(String resourceName) {
+    public Collection<ResourceRelationship<?, ?, ?, ?>> getRelationships(String resourceName) {
         return resourceRepository.getRelationships(resourceName);
     }
 
     /**
-     * Since a relationship to a resource can exist at multiple paths, we map paths by resource name
+     * Since a relationship to a resource can exist at multiple paths, we map paths by resource
+     * name
      */
     private Map<String, List<ResourcePath>> mapRelationships(Resource<?, ?> resource) {
         Map<String, List<ResourcePath>> relationshipsToClass = new HashMap<>();
@@ -182,7 +192,7 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
             String resourceName = getRelationship(resource, path);
             List<ResourcePath> paths = relationshipsToClass.get(resourceName);
             if (paths == null) {
-                paths = new ArrayList<ResourcePath>();
+                paths = new ArrayList<>();
                 relationshipsToClass.put(resourceName, paths);
             }
             paths.add(path);
@@ -208,14 +218,13 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
         synchronized (unknown) {
             List<Resource<?, ?>> list = unknown.get(to);
             if (list == null) {
-                list = new ArrayList<Resource<?, ?>>();
+                list = new ArrayList<>();
                 unknown.put(to, list);
             }
             list.add(resource);
         }
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private void mapGraph(MappedClass<?> mapping) {
         // map parent type
         mapGraph(mapping.getParentType());
@@ -236,15 +245,15 @@ class RegistryOperations implements MappedClassRegistry, ResourceRegistryReposit
     }
 
     private void mapGraph(Type type) {
-    		if ( type instanceof Class ) {
-    			Class<?> clazz = (Class<?>) type;
-	        if (mappedClassFactory.isMappable(clazz)) {
-	            if (!hasMapping(type)) {
-	                MappedClass<?> embeddedMappedClass = mappedClassFactory.getMappedClass(clazz);
-	                registerMappedClass(embeddedMappedClass);
-	            }
-	        }
-    		}
+        if (type instanceof Class) {
+            Class<?> clazz = (Class<?>) type;
+            if (mappedClassFactory.isMappable(clazz)) {
+                if (!hasMapping(type)) {
+                    MappedClass<?> embeddedMappedClass = mappedClassFactory.getMappedClass(clazz);
+                    registerMappedClass(embeddedMappedClass);
+                }
+            }
+        }
     }
 
 }

@@ -1,9 +1,9 @@
 package com.github.restup.mapping.fields;
 
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor.Builder;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator.Builder;
 
 @FunctionalInterface
-public interface MappedFieldBuilderVisitorBuilderDecorator {
+public interface MappedFieldBuilderDecoratorBuilderDecorator {
 
 
     /**

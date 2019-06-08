@@ -1,0 +1,35 @@
+{
+  "limit": 10,
+  "data": [
+    {
+      "id": 2,
+      "type": "course",
+      "name": "Spanish 101"
+    },
+    {
+      "id": 1,
+      "type": "course",
+      "name": "Physics"
+    },
+    {
+      "id": 3,
+      "type": "course",
+      "name": "French 101"
+    },
+    {
+      "id": 5,
+      "type": "course",
+      "name": "Algebra"
+    },
+    {
+      "id": 6,
+      "type": "course",
+      "name": "Calculus"
+    },
+    {
+      "id": 4,
+      "type": "course",
+      "name": "Computer Science"
+    }
+  ]
+}

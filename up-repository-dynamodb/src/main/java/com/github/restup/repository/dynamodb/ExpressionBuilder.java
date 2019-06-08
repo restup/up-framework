@@ -10,6 +10,7 @@ import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang3.StringUtils;
 
 public class ExpressionBuilder {
@@ -51,7 +52,9 @@ public class ExpressionBuilder {
     }
 
     public void addCriteria(Collection<ResourcePathFilter> c) {
-        c.stream().forEach(this::addCriteria);
+        if (c != null) {
+            c.stream().forEach(this::addCriteria);
+        }
     }
 
     public void addCriteria(ResourcePathFilter f) {
@@ -78,13 +81,6 @@ public class ExpressionBuilder {
 //        Map<ResourcePathFilter.Operator, BiC>
 
         switch (operator) {
-            case eq:
-                if (value instanceof Collection) {
-//                    expressions.add(criteria("key", "IN (", bindArg, ")"));
-                } else {
-                    addExpression(key, "=", value);
-                }
-                break;
 //            case like:
 //                if (value instanceof String) {
 //                    String s = (String) value;
@@ -102,8 +98,27 @@ public class ExpressionBuilder {
                 }
                 addExpression(key, "<>", value);
                 return;
-//            case in:
-//                return keyPath.in(cb.literal(value));
+            case in:
+            case eq:
+                if (value instanceof Collection) {
+                    if (CollectionUtils.size(value) == 1) {
+                        value = CollectionUtils.get(value, 0);
+                    } else {
+                        List<String> bindArgs = new ArrayList<>();
+                        for (Object item : (Collection) value) {
+                            String bindArg = nextBindArg(attributeValues);
+                            attributeValues.put(bindArg, withValue(item));
+                            bindArgs.add(bindArg);
+                        }
+                        StringBuilder sb = new StringBuilder();
+                        sb.append(key).append(" IN (").append(StringUtils.join(bindArgs, ","))
+                            .append(")");
+                        addExpression(sb.toString());
+                        return;
+                    }
+                }
+                addExpression(key, "=", value);
+                return;
 //            case nin:
 //                return keyPath.in(cb.literal(value)).not();
             case gt:

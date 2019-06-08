@@ -1,6 +1,7 @@
 package com.github.restup.spring.mvc.controller;
 
 import com.github.restup.controller.ResourceController;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.http.model.HttpServletResourceControllerRequest;
 import com.github.restup.http.model.HttpServletResourceControllerResponse;
 import com.github.restup.jackson.service.model.JacksonRequestBody;
@@ -10,6 +11,7 @@ import java.util.Map;
 import java.util.concurrent.Callable;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.method.HandlerMethod;
@@ -80,4 +82,9 @@ public class SpringMVCResourceController {
         return requestMapping;
     }
 
+    @ExceptionHandler(RequestErrorException.class)
+    public @ResponseBody
+    RequestErrorException handleException(RequestErrorException ex) {
+        return ex;
+    }
 }

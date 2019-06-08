@@ -1,13 +1,13 @@
 package com.github.restup.repository.dynamodb.mapping;
 
-import static com.github.restup.repository.dynamodb.mapping.DynamoDBFieldBuilderVisitor.PRIMARY_KEY;
+import static com.github.restup.repository.dynamodb.mapping.DynamoDBFieldBuilderDecorator.PRIMARY_KEY;
 import static com.github.restup.util.UpUtils.mapOf;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.mapping.fields.MappedIndexField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -18,7 +18,7 @@ import java.util.Set;
 import org.junit.Before;
 import org.junit.Test;
 
-public class DynamoDBFieldBuilderVisitorTest {
+public class DynamoDBFieldBuilderDecoratorTest {
 
     private ResourceRegistry registry;
 
@@ -28,9 +28,9 @@ public class DynamoDBFieldBuilderVisitorTest {
         registry =
             ResourceRegistry.builder()
                 .repositoryFactory(new MapBackedRepositoryFactory())
-                .mappedFieldVisitorBuilder(
-                    MappedFieldBuilderVisitor.builder().withIdentityConvention("id")
-                        .add(new DynamoDBFieldBuilderVisitor())
+                .mappedFieldBuilderDecoratorBuilder(
+                    MappedFieldBuilderDecorator.builder().withIdentityConvention("id")
+                        .add(new DynamoDBFieldBuilderDecorator())
                 ).build();
 
         registry.registerResources(OverIndexedTable.class);

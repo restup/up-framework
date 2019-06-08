@@ -1,12 +1,16 @@
 package com.github.restup.test;
 
+import com.github.restup.test.resource.Contents;
+import com.github.restup.test.resource.RelativeTestResource;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
-import com.github.restup.test.resource.Contents;
-import com.github.restup.test.resource.RelativeTestResource;
 
 public interface ApiRequest {
+
+    static Builder builder(String path, Object... args) {
+        return new Builder(path, args);
+    }
 
     HttpMethod getMethod();
 
@@ -17,10 +21,10 @@ public interface ApiRequest {
     boolean isHttps();
 
     String getUrl();
-    
-    static Builder builder(String path, Object... args) {
-        return new Builder(path, args);
-    }
+
+    String getPath();
+
+    Map<String, String[]> getParams();
 
     static class Builder extends AbstractApiRequestBuilder<Builder, String[]> {
 
@@ -29,11 +33,11 @@ public interface ApiRequest {
         private HttpMethod method;
         private boolean https;
         private Object[] pathArgs;
-        private Map<String, String[]> params = new LinkedHashMap<String, String[]>();
+        private Map<String, String[]> params = new LinkedHashMap<>();
 
         private Builder(String path, Object... args) {
             this.path = path;
-            this.defaultPathArgs = args;
+            defaultPathArgs = args;
         }
 
         @Override
@@ -111,7 +115,6 @@ public interface ApiRequest {
             if (method == null) {
                 method = HttpMethod.GET;
             }
-            StringBuilder url = new StringBuilder();
             String s = path;
             int q = s.indexOf('?');
             if (q > 0) {
@@ -122,6 +125,7 @@ public interface ApiRequest {
             }
             String[] parts = s.split("/");
             int i = 0;
+            StringBuilder url = new StringBuilder();
             for (String part : parts) {
                 if (part.length() > 0) {
                     url.append("/");
@@ -132,6 +136,8 @@ public interface ApiRequest {
                     }
                 }
             }
+
+            String path = url.toString();
 
             if (!params.isEmpty()) {
                 boolean first = true;
@@ -150,7 +156,8 @@ public interface ApiRequest {
                 }
             }
 
-            return new BasicApiRequest(method, getHeaders(), url.toString(), getBody(), https);
+            return new BasicApiRequest(method, getHeaders(), url.toString(), getBody(), https, path,
+                params);
         }
     }
 }

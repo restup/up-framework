@@ -10,7 +10,7 @@ import static com.github.restup.util.TestRegistries.mapBackedRegistryBuilder;
 import static org.junit.Assert.assertEquals;
 
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.ResourceQueryStatement.Builder;
@@ -43,14 +43,16 @@ public class PreparedResourceQueryStatementTest {
         sparseFieldsDefaultsProvider.delegate = ResourcePathsProvider.allApiFields();
         restrictedFieldsProvider = new TestResourcePathsProvider();
         ResourceRegistry registry = mapBackedRegistryBuilder()
-            .mappedFieldVisitorBuilder(
+            .mappedFieldBuilderDecoratorBuilder(
 
-                MappedFieldBuilderVisitor.builder()
+                MappedFieldBuilderDecorator.builder()
                     .withIdentityConvention("id")
                     .add(
-                        new MappedFieldBuilderVisitor() {
+                        new MappedFieldBuilderDecorator() {
                             @Override
-                            public <T> void visit(MappedField.Builder<T> b, ReflectionUtils.BeanInfo<T> bi, ReflectionUtils.PropertyDescriptor pd) {
+                            public <T> void decorate(MappedField.Builder<T> b,
+                                ReflectionUtils.BeanInfo<T> bi,
+                                ReflectionUtils.PropertyDescriptor pd) {
                                 b.transientField(null != getAnnotation(Transient.class, pd));
                             }
                         })).build();

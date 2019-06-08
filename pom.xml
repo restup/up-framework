@@ -148,19 +148,20 @@
 
 
     <modules>
-        <module>up-parent</module>
-        <module>up-annotations</module>
-        <module>up-test-model</module>
-        <module>up-test</module>
-        <module>up-test-spring</module>
-        <module>up-core</module>
-        <module>up-test-repository</module>
-        <module>up-controller</module>
-        <module>up-repository-jpa</module>
-        <module>up-repository-dynamodb</module>
-        <module>up-http</module>
-        <module>up-spring-mvc</module>
-        <module>up-spring-boot-starter</module>
+      <module>up-parent</module>
+      <module>up-annotations</module>
+      <module>up-test-model</module>
+      <module>up-test</module>
+      <module>up-test-spring</module>
+      <module>up-core</module>
+      <module>up-test-repository</module>
+      <module>up-controller</module>
+      <module>up-repository-jpa</module>
+      <module>up-repository-dynamodb</module>
+      <module>up-http</module>
+      <module>up-aws-lambda</module>
+      <module>up-spring-mvc</module>
+      <module>up-spring-boot-starter</module>
     </modules>
 
 </project>

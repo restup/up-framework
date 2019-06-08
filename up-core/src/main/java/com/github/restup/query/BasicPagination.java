@@ -11,6 +11,7 @@ class BasicPagination implements Pagination {
     private final Integer maxLimit;
     private final Integer limit;
     private final Integer offset;
+    private final String key;
     private final boolean pagingDisabled;
     private final boolean withTotalsDisabled;
 
@@ -20,13 +21,15 @@ class BasicPagination implements Pagination {
      * @param offset
      * @param withTotalsDisabled
      */
-    BasicPagination(Integer maxLimit, Integer limit, Integer offset, boolean withTotalsDisabled) {
+    BasicPagination(Integer maxLimit, Integer limit, Integer offset, String key,
+        boolean withTotalsDisabled) {
         super();
         this.maxLimit = maxLimit;
         this.limit = limit;
         this.offset = offset;
+        this.key = key;
         this.withTotalsDisabled = withTotalsDisabled;
-        this.pagingDisabled = false;
+        pagingDisabled = false;
     }
 
     /**
@@ -37,7 +40,7 @@ class BasicPagination implements Pagination {
      * @param withTotalsDisabled
      */
     BasicPagination(Integer limit, Integer offset, boolean withTotalsDisabled) {
-        this(limit, limit, offset, withTotalsDisabled);
+        this(limit, limit, offset, null, withTotalsDisabled);
     }
 
     /**
@@ -45,11 +48,12 @@ class BasicPagination implements Pagination {
      */
     BasicPagination() {
         super();
-        this.maxLimit = null;
-        this.limit = null;
-        this.offset = null;
-        this.pagingDisabled = true;
-        this.withTotalsDisabled = true;
+        maxLimit = null;
+        limit = null;
+        offset = null;
+        key = null;
+        pagingDisabled = true;
+        withTotalsDisabled = true;
     }
 
     @Override
@@ -65,6 +69,11 @@ class BasicPagination implements Pagination {
     @Override
     public Integer getOffset() {
         return offset;
+    }
+
+    @Override
+    public String getKey() {
+        return key;
     }
 
     @Override

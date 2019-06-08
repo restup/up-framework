@@ -18,7 +18,6 @@ import com.model.test.company.Person;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.Collections;
-import java.util.Enumeration;
 import java.util.List;
 import org.apache.commons.collections4.CollectionUtils;
 import org.assertj.core.api.Assertions;
@@ -76,9 +75,10 @@ public class ParsedResourceControllerRequestTest {
     @Test
     public void testGetHeaders() {
         ParsedResourceControllerRequest<?> request = mock().build();
+        when(details.getHeaders("foo")).thenReturn(null);
         assertNull(request.getHeaders("foo"));
 
-        Enumeration e = Mockito.mock(Enumeration.class);
+        List e = Mockito.mock(List.class);
         when(details.getHeaders("foo")).thenReturn(e);
         request = mock().build();
         assertEquals(e, request.getHeaders("foo"));

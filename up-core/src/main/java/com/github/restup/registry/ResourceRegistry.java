@@ -4,10 +4,11 @@ import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClass;
+import com.github.restup.mapping.MappedClassBuilderDecorator;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
@@ -112,8 +113,15 @@ public interface ResourceRegistry extends MappedClassRegistry {
             return me();
         }
 
-        public Builder mappedFieldVisitorBuilder(MappedFieldBuilderVisitor.Builder builder) {
-            settings.mappedFieldVisitorBuilder(builder);
+        public Builder mappedFieldBuilderDecoratorBuilder(
+            MappedFieldBuilderDecorator.Builder builder) {
+            settings.mappedFieldBuilderDecoratorBuilder(builder);
+            return me();
+        }
+
+        public Builder mappedClassBuilderDecoratorBuilder(
+            MappedClassBuilderDecorator.Builder builder) {
+            settings.mappedClassBuilderDecoratorBuilder(builder);
             return me();
         }
 

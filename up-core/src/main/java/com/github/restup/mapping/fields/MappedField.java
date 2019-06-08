@@ -22,8 +22,6 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
-import com.github.restup.util.ReflectionUtils.BeanInfo;
-import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 import java.lang.reflect.Field;
 import java.lang.reflect.Method;
 import java.lang.reflect.Type;
@@ -231,7 +229,7 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
         return relation == null ? null : f.apply(relation);
     }
 
-    final static class Builder<T> {
+    final class Builder<T> {
 
         private Type type;
         private String beanName;
@@ -435,21 +433,6 @@ public interface MappedField<T> extends ReadWriteField<Object, T> {
                 false,
                 apiProperty, transientField, sortable, caseSensitivity, relation, immutability,
                 parameterNames, readable, writable);
-        }
-
-        public void accept(MappedFieldBuilderVisitor[] visitors, BeanInfo<T> bi,
-            PropertyDescriptor pd) {
-            // visit builders for customization
-            if (visitors != null) {
-                for (MappedFieldBuilderVisitor visitor : visitors) {
-                    accept(visitor, bi, pd);
-                }
-            }
-        }
-
-        public void accept(MappedFieldBuilderVisitor visitor, BeanInfo<T> bi,
-            PropertyDescriptor pd) {
-            visitor.visit(this, bi, pd);
         }
 
         public String getBeanName() {

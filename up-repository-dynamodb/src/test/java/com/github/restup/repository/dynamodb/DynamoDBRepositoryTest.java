@@ -8,13 +8,8 @@ import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
-import com.amazonaws.auth.AWSStaticCredentialsProvider;
-import com.amazonaws.auth.BasicAWSCredentials;
-import com.amazonaws.client.builder.AwsClientBuilder.EndpointConfiguration;
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.AmazonDynamoDBClientBuilder;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.local.embedded.DynamoDBEmbedded;
 import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
 import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.github.restup.path.ResourcePath;
@@ -32,6 +27,7 @@ import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PagedResult;
 import com.github.restup.service.model.response.PersistenceResult;
 import com.github.restup.service.model.response.ReadResult;
+import com.github.restup.test.utils.DynamoDBUtils;
 import com.github.restup.util.TestRegistries;
 import com.university.Course;
 import java.io.Serializable;
@@ -57,19 +53,7 @@ public class DynamoDBRepositoryTest {
 
     private <T, ID extends Serializable> DynamoDBRepository<T, ID> getRepository(
         Resource<T, ID> resource) {
-        AmazonDynamoDB ddb;
-        // see https://www.javacodegeeks.com/2019/01/testing-dynamodb-using-junit5.html
-        // also https://github.com/aws-samples/aws-dynamodb-examples/blob/master/pom.xml
-        // with https://github.com/aws-samples/aws-dynamodb-examples/blob/master/src/test/java/com/amazonaws/services/dynamodbv2/local/embedded/DynamoDBEmbeddedTest.java
-        if (null != System.getProperty("sqlite4java.library.path")) {
-            ddb = DynamoDBEmbedded.create().amazonDynamoDB();
-        } else {
-            //XXX might be a nicer way of doing this, but this works in ide vs mvn build
-            ddb = AmazonDynamoDBClientBuilder.standard().withCredentials(
-                new AWSStaticCredentialsProvider(new BasicAWSCredentials("local", "null"))).
-                withEndpointConfiguration(new EndpointConfiguration("http://localhost:8000", ""))
-                .build();
-        }
+        AmazonDynamoDB ddb = DynamoDBUtils.init();
 
         DynamoDBMapper mapper = new DynamoDBMapper(ddb);
         DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(mapper);
@@ -88,12 +72,7 @@ public class DynamoDBRepositoryTest {
 
         ddb.createTable(tableRequest);
 
-        tableRequest = mapper.generateCreateTableRequest(Course.class)
-            .withProvisionedThroughput(
-                new ProvisionedThroughput()
-                    .withReadCapacityUnits(1l)
-                    .withWriteCapacityUnits(1l));
-        ddb.createTable(tableRequest);
+        DynamoDBUtils.createTables(ddb, mapper, Course.class);
         return (DynamoDBRepository) repo;
     }
 

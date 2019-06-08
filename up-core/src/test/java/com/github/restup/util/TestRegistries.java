@@ -1,6 +1,6 @@
 package com.github.restup.util;
 
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.repository.collections.MapBackedRepositoryFactory;
 import com.university.Course;
@@ -19,8 +19,8 @@ public class TestRegistries {
     public static ResourceRegistry.Builder mapBackedRegistryBuilder() {
         return ResourceRegistry.builder()
                         .repositoryFactory(new MapBackedRepositoryFactory())
-            .mappedFieldVisitorBuilder(
-                MappedFieldBuilderVisitor.builder().withIdentityConvention("id")
+            .mappedFieldBuilderDecoratorBuilder(
+                MappedFieldBuilderDecorator.builder().withIdentityConvention("id")
         );
     }
 
@@ -33,4 +33,5 @@ public class TestRegistries {
         registry.registerResources(University.class, Course.class);
         return registry;
     }
+
 }

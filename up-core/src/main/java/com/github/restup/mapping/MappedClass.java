@@ -39,6 +39,11 @@ public interface MappedClass<T> {
     String getPluralName();
 
     /**
+     * @return The persisted name of the object
+     */
+    String getPersistedName();
+
+    /**
      * @return The type of the object
      */
     Type getType();
@@ -66,6 +71,11 @@ public interface MappedClass<T> {
      */
     T newInstance();
 
+    /**
+     * @return true if only indexed queries should be permitted
+     */
+    boolean isIndexedQueryOnly();
+
     class AnonymousBuilder extends Builder<Object> {
 
         @Override
@@ -80,14 +90,17 @@ public interface MappedClass<T> {
         private final Type type;
         private String name;
         private String pluralName;
+        private String persistedName;
         private Type parentType;
         private List<MappedField<?>> attributes;
         private Comparator<MappedField<?>> fieldComparator;
+        private boolean indexedQueryOnly;
 
         Builder(Type type) {
             Assert.notNull(type, "type is required");
             this.type = type;
             attributes = new ArrayList<>();
+            indexedQueryOnly = true;
         }
 
         Builder() {
@@ -112,6 +125,16 @@ public interface MappedClass<T> {
 
         public Builder<T> pluralName(String pluralName) {
             this.pluralName = pluralName;
+            return me();
+        }
+
+        public Builder<T> persistedName(String persistedName) {
+            this.persistedName = persistedName;
+            return me();
+        }
+
+        public Builder<T> indexedQueryOnly(Boolean indexedQueryOnly) {
+            this.indexedQueryOnly = indexedQueryOnly;
             return me();
         }
 
@@ -171,15 +194,19 @@ public interface MappedClass<T> {
         public MappedClass<T> build() {
             Assert.notEmpty(name, "name is required");
             String pluralName = this.pluralName;
+            String persistedName = this.persistedName;
             boolean containsTypedMap = type instanceof UntypedClass;
             if (StringUtils.isEmpty(pluralName)) {
                 pluralName = name + "s";
             }
+            if (StringUtils.isEmpty(persistedName)) {
+                persistedName = name;
+            }
             if (fieldComparator != null) {
                 Collections.sort(attributes, fieldComparator);
             }
-            return new BasicMappedClass<>(name, pluralName, type, parentType,
-                attributes, containsTypedMap);
+            return new BasicMappedClass<>(name, pluralName, persistedName, type, parentType,
+                attributes, containsTypedMap, indexedQueryOnly);
         }
 
     }

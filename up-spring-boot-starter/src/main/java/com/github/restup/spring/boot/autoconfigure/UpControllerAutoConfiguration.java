@@ -1,9 +1,9 @@
 package com.github.restup.spring.boot.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.github.restup.ResourceControllerBuilderDecorator;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.ResourceController;
+import com.github.restup.controller.ResourceControllerBuilderDecorator;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentNegotiatorBuilderDecorator;
 import com.github.restup.controller.linking.LinkBuilderFactory;
@@ -12,6 +12,8 @@ import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.request.parser.RequestParserBuilderDecorator;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecoratorBuilderDecorator;
+import com.github.restup.mapping.fields.decorators.JacksonMappedFieldBuilderDecorator;
 import com.github.restup.registry.ResourceRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
@@ -56,6 +58,11 @@ public class UpControllerAutoConfiguration {
     @ConditionalOnMissingBean(value = {RequestParser.class, ObjectMapper.class})
     public ObjectMapper defaultUpObjectMapper() {
         return new ObjectMapper();
+    }
+
+    @Bean
+    public MappedFieldBuilderDecoratorBuilderDecorator jacksonMappedFieldBuilderDecoratorBuilderDecorator() {
+        return (b) -> b.add(new JacksonMappedFieldBuilderDecorator());
     }
 
     @Bean

@@ -14,6 +14,10 @@
         </layout>
     </appender>
 
+    <logger name="com.github.restup.test">
+        <level value="error"/>
+    </logger>
+
     <!-- Root Logger -->
     <root>
         <priority value="error"/>

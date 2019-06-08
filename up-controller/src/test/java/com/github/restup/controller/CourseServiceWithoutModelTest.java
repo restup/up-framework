@@ -1,13 +1,13 @@
 package com.github.restup.controller;
 
-import org.junit.Before;
-import org.junit.Test;
 import com.github.restup.controller.mock.AbstractMockTest;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.test.RestApiAssertions;
+import org.junit.Before;
+import org.junit.Test;
 
 public class CourseServiceWithoutModelTest extends AbstractMockTest {
 
@@ -16,7 +16,7 @@ public class CourseServiceWithoutModelTest extends AbstractMockTest {
     }
     
 	static ResourceRegistry courseRegistry() {
-		ResourceRegistry registry = registry();
+      ResourceRegistry registry = registry();
 		
 		registry.registerResource(Resource.builder()
 				.name("university")

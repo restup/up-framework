@@ -1,8 +1,9 @@
-package com.github.restup.mapping.fields.visitors;
+package com.github.restup.mapping.fields.decorators;
 
 import static com.github.restup.util.ReflectionUtils.getBeanInfo;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNull;
+
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.restup.mapping.fields.MappedField;
@@ -13,8 +14,7 @@ import org.junit.runner.RunWith;
 import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-@SuppressWarnings("rawtypes")
-public class JacksonMappedFieldBuilderVisitorTest {
+public class JacksonMappedFieldBuilderDecoratorTest {
 
     @Test
     public void testAnnotation() {
@@ -34,18 +34,16 @@ public class JacksonMappedFieldBuilderVisitorTest {
         assertNull(builder.getApiName());
     }
 
-    @SuppressWarnings("unchecked")
     private Builder test(Class<?> clazz, String propertyName) {
         Builder builder = MappedField.builder(clazz);
-        JacksonMappedFieldBuilderVisitor jackson = new JacksonMappedFieldBuilderVisitor();
+        JacksonMappedFieldBuilderDecorator jackson = new JacksonMappedFieldBuilderDecorator();
         BeanInfo bi = getBeanInfo(clazz);
-        jackson.visit(builder, null, bi.getPropertyDescriptor(propertyName));
+        jackson.decorate(builder, null, bi.getPropertyDescriptor(propertyName));
         return builder;
     }
 
     private final class Foo {
 
-        @SuppressWarnings("unused")
         private String name;
     }
 

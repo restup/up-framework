@@ -3,6 +3,9 @@ package com.university;
 import static com.university.Student.RESOURCE_NAME;
 import static com.university.Student.TABLE_NAME;
 
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.restup.annotations.ApiName;
 import javax.persistence.Column;
@@ -16,6 +19,7 @@ import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 
 @Entity(name = TABLE_NAME)
 @ApiName(value = RESOURCE_NAME)
+@DynamoDBTable(tableName = "Student")
 public class Student {
 
     public static final String RESOURCE_NAME = "student";
@@ -23,11 +27,13 @@ public class Student {
 
     @Id
     @GeneratedValue(strategy = GenerationType.AUTO)
+    @DynamoDBHashKey(attributeName = "Id")
     private Long id;
 
     // demonstrate different api, bean, persisted paths
     @JsonProperty("firstName")
     @Column(name = "first_name")
+    @DynamoDBAttribute(attributeName = "FirstName")
     // use javax validations
     @SafeHtml(whitelistType = WhiteListType.NONE)
     @NotBlank
@@ -36,6 +42,7 @@ public class Student {
     // demonstrate different api, bean, persisted paths
     @JsonProperty("lastName")
     @Column(name = "last_name")
+    @DynamoDBAttribute(attributeName = "LastName")
     // use javax validations
     @SafeHtml(whitelistType = WhiteListType.NONE)
     @NotBlank

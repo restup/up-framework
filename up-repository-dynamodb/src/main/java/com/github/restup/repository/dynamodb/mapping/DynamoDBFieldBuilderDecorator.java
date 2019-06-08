@@ -10,14 +10,14 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBIndexRangeKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBRangeKey;
 import com.fasterxml.jackson.annotation.JsonProperty;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 
 /**
- * {@link MappedFieldBuilderVisitor} whic
+ * {@link MappedFieldBuilderDecorator} whic
  */
-public class DynamoDBFieldBuilderVisitor implements MappedFieldBuilderVisitor {
+public class DynamoDBFieldBuilderDecorator implements MappedFieldBuilderDecorator {
 
     public final static String PRIMARY_KEY = "~primary~";
 
@@ -26,7 +26,7 @@ public class DynamoDBFieldBuilderVisitor implements MappedFieldBuilderVisitor {
      * annotation exists
      */
     @Override
-    public <T> void visit(MappedField.Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
+    public <T> void decorate(MappedField.Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
         DynamoDBIgnore ignore = getAnnotation(DynamoDBIgnore.class, pd);
         if (ignore != null) {
             b.persistedName(null).sortable(false);

@@ -23,7 +23,15 @@ public interface Pagination {
     }
 
     static Pagination of(Integer maxLimit, Integer limit, Integer offset, boolean withTotalsDisabled) {
-        return new BasicPagination(maxLimit, limit, offset, withTotalsDisabled);
+        return new BasicPagination(maxLimit, limit, offset, null, withTotalsDisabled);
+    }
+
+    static Pagination of(Integer limit, String key) {
+        return of(limit, limit, key);
+    }
+
+    static Pagination of(Integer maxLimit, Integer limit, String key) {
+        return new BasicPagination(maxLimit, limit, null, key, true);
     }
 
     static Pagination disabled() {
@@ -49,6 +57,12 @@ public interface Pagination {
                 && pagination.getLimit() != null
                 && pagination.getLimit() > 0;
     }
+
+    /**
+     *
+     * @return
+     */
+    String getKey();
 
     Integer getMaxLimit();
 

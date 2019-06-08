@@ -7,55 +7,66 @@ class BasicApiRequest implements ApiRequest {
 
     private final HttpMethod method;
     private final Map<String, String[]> headers;
+    private final Map<String, String[]> params;
+    private final String path;
     private final String url;
     private final Contents body;
     private final boolean https;
 
-    BasicApiRequest(HttpMethod method, Map<String, String[]> headers, String url, Contents body, boolean https) {
+    BasicApiRequest(HttpMethod method, Map<String, String[]> headers, String url, Contents body,
+        boolean https, String path, Map<String, String[]> params) {
         this.method = method;
         this.headers = headers;
+        this.params = params;
         this.url = url;
+        this.path = path;
         this.body = body;
         this.https = https;
     }
 
-    BasicApiRequest(HttpMethod method, Map<String, String[]> headers, String url, byte[] body, boolean https) {
-        this(method, headers, url, Contents.of(body), https);
-    }
-
     @Override
     public HttpMethod getMethod() {
-        return this.method;
+        return method;
     }
 
     @Override
     public Contents getBody() {
-        return this.body;
+        return body;
     }
 
     @Override
     public Map<String, String[]> getHeaders() {
-        return this.headers;
+        return headers;
     }
 
     @Override
     public boolean isHttps() {
-        return this.https;
+        return https;
     }
 
     @Override
     public String getUrl() {
-        return this.url;
+        return url;
+    }
+
+    @Override
+    public String getPath() {
+        return path;
+    }
+
+    @Override
+    public Map<String, String[]> getParams() {
+        return params;
     }
 
     @Override
     public String toString() {
         return "BasicApiRequest{" +
-            "method=" + this.method +
-            ", headers=" + this.headers +
-            ", url='" + this.url + '\'' +
-            ", body=" + this.body +
-            ", https=" + this.https +
+            "method=" + method +
+            ", headers=" + headers +
+            ", url='" + url + '\'' +
+            ", body=" + body +
+            ", https=" + https +
             '}';
     }
 }

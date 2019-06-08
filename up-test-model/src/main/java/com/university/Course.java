@@ -8,6 +8,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBTable;
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.github.restup.annotations.ApiName;
+import com.github.restup.annotations.Resource;
 import com.github.restup.annotations.field.CaseInsensitive;
 import com.github.restup.annotations.field.Relationship;
 import javax.persistence.Column;
@@ -23,6 +24,7 @@ import org.hibernate.validator.constraints.SafeHtml.WhiteListType;
 @Entity(name = TABLE_NAME)
 @ApiName(value = RESOURCE_NAME)
 @DynamoDBTable(tableName = "Course")
+@Resource(indexedQueryOnly = false)
 public class Course {
 
     public static final String RESOURCE_NAME = "course";
@@ -38,6 +40,7 @@ public class Course {
     @SafeHtml(whitelistType = WhiteListType.NONE)
     @NotBlank
     @CaseInsensitive(searchField = "nameLowerCase")
+    @DynamoDBAttribute(attributeName = "Name")
     private String name;
 
     @Column(name = "name_lower_case")

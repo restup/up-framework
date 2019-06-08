@@ -17,4 +17,11 @@ import java.lang.annotation.Target;
 @Documented
 public @interface Resource {
 
+    /**
+     * Enables or disables index requirement in queries.  Use with caution as allowing access withut
+     * using indexes will not perform well in most situations. If false, permits full table scans.
+     * Ultimately it is up to the Repository implementation to enforce this behavior.
+     */
+    boolean indexedQueryOnly() default true;
+
 }

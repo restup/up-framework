@@ -138,19 +138,19 @@ The MappedFieldFactory is used by the DefaultMappedClassFactory to discover fiel
 If a custom MappedClassFactory is used, configuring MappedFieldFactory would have no effect.
 {: .note .warning }
 
-#### MappedFieldBuilderVisitors
+#### MappedFieldBuilderDecorators
 
-MappedFieldBuilderVisitor is used by DefaultMappedFieldFactory to discover third party annotated fields such as Jackson.
+MappedFieldBuilderDecorator is used by DefaultMappedFieldFactory to discover third party annotated fields such as Jackson.
 
 ```java
-.mappedFieldBuilderVisitors(MappedFieldBuilderVisitor... visitors)
+.mappedFieldBuilderDecorators(MappedFieldBuilderDecorator... decorators)
 ```
 
-Up! will add MappedFieldBuilderVisitors automatically when possible.
+Up! will add MappedFieldBuilderDecorators automatically when possible.
 For example, Jackson annotations will be detected automatically
 {: .note .info }
 
-If a custom MappedClassFactory or MappedFieldFactory is used, configuring MappedFieldBuilderVisitors would have no effect.
+If a custom MappedClassFactory or MappedFieldFactory is used, configuring MappedFieldBuilderDecorators would have no effect.
 {: .note .warning }
 
 

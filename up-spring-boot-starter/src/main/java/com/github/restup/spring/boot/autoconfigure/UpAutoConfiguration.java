@@ -1,6 +1,5 @@
 package com.github.restup.spring.boot.autoconfigure;
 
-import com.github.restup.ResourceRegistryBuilderDecorator;
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
 import com.github.restup.annotations.Resource;
@@ -8,11 +7,15 @@ import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
+import com.github.restup.mapping.MappedClassBuilderDecorator;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.fields.DefaultMappedFieldFactory;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator.Builder;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecoratorBuilderDecorator;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.ResourceRegistry;
+import com.github.restup.registry.ResourceRegistryBuilderDecorator;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.registry.settings.ServiceMethodAccess;
 import com.github.restup.repository.RepositoryFactory;
@@ -20,6 +23,7 @@ import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.spring.boot.autoconfigure.factory.RestrictedFieldsProviderFactory;
 import com.github.restup.spring.boot.autoconfigure.factory.ServiceFilterFactory;
 import com.github.restup.spring.boot.autoconfigure.factory.SparseFieldsProviderFactory;
+import com.github.restup.util.ReflectionUtils.BeanInfo;
 import java.util.List;
 import java.util.Set;
 import org.springframework.boot.autoconfigure.AutoConfigurationPackages;
@@ -97,11 +101,37 @@ public class UpAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean
-    public MappedClassFactory defaultUpMappedClassFactory() {
-        MappedFieldBuilderVisitor[] visitors = MappedFieldBuilderVisitor.getDefaultVisitors();
-        DefaultMappedFieldFactory mappedFieldFactory = new DefaultMappedFieldFactory(visitors);
+    public MappedFieldBuilderDecorator.Builder defaultMappedFieldBuilderDecoratorBuilder() {
+        return MappedFieldBuilderDecorator.builder().withIdentityConvention("id");
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MappedClassBuilderDecorator defaultMappedClassBuilderDecorator() {
+        return new MappedClassBuilderDecorator() {
+            @Override
+            public <T> void decorate(MappedClass.Builder<T> builder, BeanInfo<T> bi) {
+
+            }
+        };
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public MappedClassFactory defaultUpMappedClassFactory(
+        Builder mappedFieldBuilderDecoratorBuilder,
+        List<MappedFieldBuilderDecoratorBuilderDecorator> mappedFieldBuilderDecoratorBuilderDecorators,
+        List<MappedClassBuilderDecorator> mappedClassBuilderDecorators) {
+
+        MappedFieldBuilderDecorator.Builder builder = mappedFieldBuilderDecoratorBuilder;
+        for (MappedFieldBuilderDecoratorBuilderDecorator decorator : mappedFieldBuilderDecoratorBuilderDecorators) {
+            builder = decorator.decorate(builder);
+        }
+        DefaultMappedFieldFactory mappedFieldFactory = new DefaultMappedFieldFactory(
+            mappedFieldBuilderDecoratorBuilder.build());
         return new DefaultMappedClassFactory(mappedFieldFactory, getPackages(applicationContext),
-            MappedClass.getDefaultFieldComparator());
+            MappedClass.getDefaultFieldComparator(),
+            mappedClassBuilderDecorators.toArray(new MappedClassBuilderDecorator[0]));
     }
 
     @Bean

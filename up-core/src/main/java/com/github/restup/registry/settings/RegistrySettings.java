@@ -4,12 +4,16 @@ import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
 import com.github.restup.errors.ErrorFactory;
+import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
+import com.github.restup.mapping.MappedClassBuilderDecorator;
+import com.github.restup.mapping.MappedClassBuilderDecoratorSupplier;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.DefaultMappedFieldFactory;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.mapping.fields.MappedFieldBuilderVisitor;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
+import com.github.restup.mapping.fields.MappedFieldBuilderDecoratorSupplier;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
@@ -26,6 +30,7 @@ import com.github.restup.service.filters.RelationshipValidationFilter;
 import com.github.restup.service.filters.SequencedIdValidationFilter;
 import com.github.restup.service.model.request.DefaultRequestObjectFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
+import java.util.Arrays;
 import java.util.Comparator;
 import java.util.List;
 import javax.validation.Validation;
@@ -42,8 +47,8 @@ public interface RegistrySettings {
 
 
     static Builder builder() {
-		return new Builder();
-	}
+        return new Builder();
+    }
 
     ResourceRegistryRepository getResourceRegistryRepository();
 
@@ -58,8 +63,6 @@ public interface RegistrySettings {
     Comparator<MappedField<?>> getMappedFieldOrderComparator();
 
     RepositoryFactory getRepositoryFactory();
-
-    MappedFieldBuilderVisitor[] getMappedFieldVisitors();
 
     ErrorFactory getErrorFactory();
 
@@ -85,248 +88,273 @@ public interface RegistrySettings {
 
     String getBasePath();
 
-    static class Builder {
+    class Builder {
+
         private final static Logger log = LoggerFactory.getLogger(RegistrySettings.class);
 
-		private boolean excludeFrameworkFilters;
+        private boolean excludeFrameworkFilters;
 
-		private ResourceRegistryRepository resourceRegistryMap;
-		private MappedClassFactory mappedClassFactory;
-		private MappedClassRegistry mappedClassRegistry;
-		private String[] packagesToScan;
-		private MappedFieldFactory mappedFieldFactory;
-			private MappedFieldBuilderVisitor.Builder mappedFieldVisitorBuilder;
-		private Comparator<MappedField<?>> mappedFieldOrderComparator;
+        private ResourceRegistryRepository resourceRegistryMap;
+        private MappedClassFactory mappedClassFactory;
+        private MappedClassRegistry mappedClassRegistry;
+        private String[] packagesToScan;
+        private MappedFieldFactory mappedFieldFactory;
+        private MappedFieldBuilderDecorator.Builder mappedFieldBuilderDecoratorBuilder;
+        private MappedClassBuilderDecorator.Builder mappedClassBuilderDecoratorBuilder;
+        private Comparator<MappedField<?>> mappedFieldOrderComparator;
 
-		private ControllerMethodAccess defaultControllerMethodAccess;
-		private ServiceMethodAccess defaultServiceMethodAccess;
+        private ControllerMethodAccess defaultControllerMethodAccess;
+        private ServiceMethodAccess defaultServiceMethodAccess;
 
-		private RepositoryFactory repositoryFactory;
-		private ErrorFactory errorFactory;
-		private RequestObjectFactory requestObjectFactory;
-		private MethodArgumentFactory methodArgumentFactory;
-		private Object[] defaultServiceFilters;
-		private Pagination defaultPagination;
-		private Validator validator;
-		private ResourcePathsProvider defaultSparseFieldsProvider;
-		private ResourcePathsProvider defaultRestrictedFieldsProvider;
-		private String basePath;
+        private RepositoryFactory repositoryFactory;
+        private ErrorFactory errorFactory;
+        private RequestObjectFactory requestObjectFactory;
+        private MethodArgumentFactory methodArgumentFactory;
+        private Object[] defaultServiceFilters;
+        private Pagination defaultPagination;
+        private Validator validator;
+        private ResourcePathsProvider defaultSparseFieldsProvider;
+        private ResourcePathsProvider defaultRestrictedFieldsProvider;
+        private String basePath;
         private ConverterFactory converterFactory;
 
-		private Builder me() {
-			return this;
-		}
+        private Builder me() {
+            return this;
+        }
 
-		/**
+        /**
          * Provided alternate storage for registry meta data
-         * 
+         *
          * @param resourceRegistryMap implementation
          * @return this builder
          */
-		public Builder resourceRegistryRepository(ResourceRegistryRepository resourceRegistryMap) {
-			this.resourceRegistryMap = resourceRegistryMap;
-			return me();
-		}
+        public Builder resourceRegistryRepository(ResourceRegistryRepository resourceRegistryMap) {
+            this.resourceRegistryMap = resourceRegistryMap;
+            return me();
+        }
 
-		/**
-		 * @param packagesToScan used by {@link com.github.restup.registry.ResourceRegistry} to filter acceptable {@link Resource}s
+        /**
+         * @param packagesToScan used by {@link com.github.restup.registry.ResourceRegistry} to
+         * filter acceptable {@link Resource}s
          * @return this builder
          */
-		public Builder packagesToScan(String... packagesToScan) {
-			this.packagesToScan = packagesToScan;
-			return me();
-		}
+        public Builder packagesToScan(String... packagesToScan) {
+            this.packagesToScan = packagesToScan;
+            return me();
+        }
 
-		/**
+        /**
          * Comparator for defining sort order of {@link MappedClass#getAttributes()}
-         * 
+         *
          * @param mappedFieldOrderComparator implementation
          * @return this builder
          */
-		public Builder mappedFieldOrderComparator(Comparator<MappedField<?>> mappedFieldOrderComparator) {
-			this.mappedFieldOrderComparator = mappedFieldOrderComparator;
-			return me();
-		}
+        public Builder mappedFieldOrderComparator(
+            Comparator<MappedField<?>> mappedFieldOrderComparator) {
+            this.mappedFieldOrderComparator = mappedFieldOrderComparator;
+            return me();
+        }
 
-		/**
+        /**
          * Provide an alternate implementation for creating {@link MappedField}
-         * 
+         *
          * @param mappedFieldFactory implementation
          * @return this builder
          */
-		public Builder mappedFieldFactory(MappedFieldFactory mappedFieldFactory) {
-			this.mappedFieldFactory = mappedFieldFactory;
-			return me();
-		}
+        public Builder mappedFieldFactory(MappedFieldFactory mappedFieldFactory) {
+            this.mappedFieldFactory = mappedFieldFactory;
+            return me();
+        }
 
-		/**
-         * If {@link #mappedFieldFactory(MappedFieldFactory)} is not overridden,
-         * {@link MappedFieldBuilderVisitor} implementations may be specified to customize behavior of
+        /**
+         * If {@link #mappedFieldFactory(MappedFieldFactory)} is not overridden, {@link
+         * MappedFieldBuilderDecorator} implementations may be specified to customize behavior of
          * {@link DefaultMappedFieldFactory}
-		 *
-		 * @param builder implementations
+         *
+         * @param builder implementation
          * @return this builder
-		 */
-		public Builder mappedFieldVisitorBuilder(MappedFieldBuilderVisitor.Builder builder) {
-			mappedFieldVisitorBuilder = builder;
-			return me();
-		}
+         */
+        public Builder mappedFieldBuilderDecoratorBuilder(
+            MappedFieldBuilderDecorator.Builder builder) {
+            mappedFieldBuilderDecoratorBuilder = builder;
+            return me();
+        }
 
-		/**
+        /**
+         * If {@link #mappedClassFactory(MappedClassFactory)} is not overridden, {@link
+         * MappedClassBuilderDecorator} implementations may be specified to customize behavior of
+         * {@link DefaultMappedClassFactory}
+         *
+         * @param builder implementation
+         * @return this builder
+         */
+        public Builder mappedClassBuilderDecoratorBuilder(
+            MappedClassBuilderDecorator.Builder builder) {
+            mappedClassBuilderDecoratorBuilder = builder;
+            return me();
+        }
+
+        /**
          * Overrides factory for providing default {@link com.github.restup.repository.Repository}
-         * implementations.
-         * 
+         * implementations.ƒ
+         *
          * @param repositoryFactory implementation
          * @return this builder
          */
-		public Builder repositoryFactory(RepositoryFactory repositoryFactory) {
-			this.repositoryFactory = repositoryFactory;
-			return me();
-		}
+        public Builder repositoryFactory(RepositoryFactory repositoryFactory) {
+            this.repositoryFactory = repositoryFactory;
+            return me();
+        }
 
-		/**
+        /**
          * Overrides factory for providing error objects
-         * 
+         *
          * @param errorFactory implementation
          * @return this builder
          */
-		public Builder errorFactory(ErrorFactory errorFactory) {
-			this.errorFactory = errorFactory;
-			return me();
-		}
+        public Builder errorFactory(ErrorFactory errorFactory) {
+            this.errorFactory = errorFactory;
+            return me();
+        }
 
-		/**
+        /**
          * Provides argument instances for services filters
-         * 
+         *
          * @param methodArgumentFactory implementation
          * @return this builder
          */
-		public Builder methodArgumentFactory(MethodArgumentFactory methodArgumentFactory) {
-			this.methodArgumentFactory = methodArgumentFactory;
-			return me();
-		}
+        public Builder methodArgumentFactory(MethodArgumentFactory methodArgumentFactory) {
+            this.methodArgumentFactory = methodArgumentFactory;
+            return me();
+        }
 
-		/**
+        /**
          * Defines default service method access for resources. Resources may define their own.
-         * 
+         *
          * @param defaultServiceMethodAccess implementation
          * @return this builder
          */
-		public Builder serviceMethodAccess(ServiceMethodAccess defaultServiceMethodAccess) {
-			this.defaultServiceMethodAccess = defaultServiceMethodAccess;
-			return me();
-		}
+        public Builder serviceMethodAccess(ServiceMethodAccess defaultServiceMethodAccess) {
+            this.defaultServiceMethodAccess = defaultServiceMethodAccess;
+            return me();
+        }
 
-		/**
+        /**
          * Defines default service controller access for resources. Resources may define their own.
-         * 
+         *
          * @param defaultControllerMethodAccess implementation
          * @return this builder
          */
-		public Builder controllerMethodAccess(ControllerMethodAccess defaultControllerMethodAccess) {
-			this.defaultControllerMethodAccess = defaultControllerMethodAccess;
-			return me();
-		}
+        public Builder controllerMethodAccess(
+            ControllerMethodAccess defaultControllerMethodAccess) {
+            this.defaultControllerMethodAccess = defaultControllerMethodAccess;
+            return me();
+        }
 
-		/**
+        /**
          * Overrides default {@link RequestObjectFactory}
-         * 
+         *
          * @param requestObjectFactory implementation
          * @return this builder
          */
-		public Builder requestObjectFactory(RequestObjectFactory requestObjectFactory) {
-			this.requestObjectFactory = requestObjectFactory;
-			return me();
-		}
+        public Builder requestObjectFactory(RequestObjectFactory requestObjectFactory) {
+            this.requestObjectFactory = requestObjectFactory;
+            return me();
+        }
 
-		/**
+        /**
          * Overrides default {@link MappedClassFactory}
-         * 
+         *
          * @param mappedClassFactory implementation
          * @return this builder
          */
-		public Builder mappedClassFactory(MappedClassFactory mappedClassFactory) {
-			this.mappedClassFactory = mappedClassFactory;
-			return me();
-		}
+        public Builder mappedClassFactory(MappedClassFactory mappedClassFactory) {
+            this.mappedClassFactory = mappedClassFactory;
+            return me();
+        }
 
-		/**
-         * If true, default filters ({@link NotFoundFilter}, etc) will be excluded from default filters
-         * 
-         * @param excludeFrameworkFilters if true service filters are excluded. if false, Up! filters are
-         *        added.
+        /**
+         * If true, default filters ({@link NotFoundFilter}, etc) will be excluded from default
+         * filters
+         *
+         * @param excludeFrameworkFilters if true service filters are excluded. if false, Up!
+         * filters are added.
          * @return this builder
          */
-		public Builder excludeFrameworkFilters(boolean excludeFrameworkFilters) {
-			this.excludeFrameworkFilters = excludeFrameworkFilters;
-			return me();
-		}
+        public Builder excludeFrameworkFilters(boolean excludeFrameworkFilters) {
+            this.excludeFrameworkFilters = excludeFrameworkFilters;
+            return me();
+        }
 
-		/**
-         * Define default service filters to be used for resources relying on filter based services. This
-         * will add to default Up! filters unless, {@link #excludeFrameworkFilters(boolean)} is set to true
-         * 
+        /**
+         * Define default service filters to be used for resources relying on filter based services.
+         * This will add to default Up! filters unless, {@link #excludeFrameworkFilters(boolean)} is
+         * set to true
+         *
          * @param filters to add as default service filters.
          * @return this builder
          */
-		public Builder defaultServiceFilters(Object... filters) {
-			defaultServiceFilters = filters;
-			return me();
-		}
+        public Builder defaultServiceFilters(Object... filters) {
+            defaultServiceFilters = filters;
+            return me();
+        }
 
         public Builder defaultPagination(Pagination defaultPagination) {
             this.defaultPagination = defaultPagination;
-					return me();
+            return me();
         }
 
         public Builder defaultPaginationDisabled() {
-					return defaultPagination(Pagination.disabled());
+            return defaultPagination(Pagination.disabled());
         }
 
-        public Builder defaultPagination(Integer pageLimit, Integer pageOffset, boolean withTotalsDisabled) {
-					return defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
+        public Builder defaultPagination(Integer pageLimit, Integer pageOffset,
+            boolean withTotalsDisabled) {
+            return defaultPagination(Pagination.of(pageLimit, pageOffset, withTotalsDisabled));
         }
 
-		public Builder defaultPagination(Integer pageLimit) {
-			return defaultPagination(pageLimit, 0, false);
-		}
+        public Builder defaultPagination(Integer pageLimit) {
+            return defaultPagination(pageLimit, 0, false);
+        }
 
-		public Builder validator(Validator validator) {
-			this.validator = validator;
-			return me();
-		}
+        public Builder validator(Validator validator) {
+            this.validator = validator;
+            return me();
+        }
 
-		/**
+        /**
          * Default implementation to be used when resource does not specify it's own implementation
-         * 
+         *
          * @param restrictedFieldsProvider implementation
          * @return this builder
          */
-		public Builder defaultRestrictedFieldsProvider(ResourcePathsProvider restrictedFieldsProvider) {
-			defaultRestrictedFieldsProvider = restrictedFieldsProvider;
-			return me();
-		}
+        public Builder defaultRestrictedFieldsProvider(
+            ResourcePathsProvider restrictedFieldsProvider) {
+            defaultRestrictedFieldsProvider = restrictedFieldsProvider;
+            return me();
+        }
 
-		/**
+        /**
          * Default implementation to be used when resource does not specify it's own implementation
-         * 
+         *
          * @param defaultSparseFieldsProvider implementation
          * @return this builder
          */
-		public Builder defaultSparseFieldsProvider(ResourcePathsProvider defaultSparseFieldsProvider) {
-			this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
-			return me();
-		}
+        public Builder defaultSparseFieldsProvider(
+            ResourcePathsProvider defaultSparseFieldsProvider) {
+            this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
+            return me();
+        }
 
-		/**
+        /**
          * The default base path for all resources
-         * 
+         *
          * @param basePath used for exposed endpoints
          * @return this builder
          */
         public Builder basePath(String basePath) {
             this.basePath = basePath;
-					return me();
+            return me();
         }
 
         /**
@@ -335,116 +363,144 @@ public interface RegistrySettings {
          */
         public Builder converterFactory(ConverterFactory converterFactory) {
             this.converterFactory = converterFactory;
-					return me();
+            return me();
         }
 
-		public RegistrySettings build() {
-			String[] packagesToScan = this.packagesToScan;
-			if (ArrayUtils.isEmpty(packagesToScan)) {
-				packagesToScan = new String[] { "com" };
-			}
-			Comparator<MappedField<?>> mappedFieldOrderComparator = this.mappedFieldOrderComparator;
-			if (mappedFieldOrderComparator == null) {
+        public RegistrySettings build() {
+            String[] packagesToScan = this.packagesToScan;
+            if (ArrayUtils.isEmpty(packagesToScan)) {
+                packagesToScan = new String[]{"com"};
+            }
+            Comparator<MappedField<?>> mappedFieldOrderComparator = this.mappedFieldOrderComparator;
+            if (mappedFieldOrderComparator == null) {
                 mappedFieldOrderComparator = MappedClass.getDefaultFieldComparator();
-			}
-			MappedFieldBuilderVisitor.Builder mappedFieldVisitorBuilder = this.mappedFieldVisitorBuilder;
-			if (mappedFieldVisitorBuilder == null) {
-				mappedFieldVisitorBuilder = MappedFieldBuilderVisitor.builder().withDefaults();
-			}
-			MappedFieldBuilderVisitor[] mappedFieldVisitors = mappedFieldVisitorBuilder.build();
-			MappedFieldFactory mappedFieldFactory = this.mappedFieldFactory;
-			if (mappedFieldFactory == null) {
-				mappedFieldFactory = new DefaultMappedFieldFactory(mappedFieldVisitors);
-			}
+            }
+            MappedFieldFactory mappedFieldFactory = this.mappedFieldFactory;
+            if (mappedFieldFactory == null) {
+                MappedFieldBuilderDecorator.Builder mappedFieldBuilderDecoratorBuilder = this.mappedFieldBuilderDecoratorBuilder;
+                if (mappedFieldBuilderDecoratorBuilder == null) {
+                    mappedFieldBuilderDecoratorBuilder = MappedFieldBuilderDecorator.builder()
+                        .withDefaults();
+                }
+                if (repositoryFactory instanceof MappedFieldBuilderDecoratorSupplier) {
+                    mappedFieldBuilderDecoratorBuilder.addAll(
+                        ((MappedFieldBuilderDecoratorSupplier) repositoryFactory)
+                            .getMappedFieldBuilderDecorators());
+                }
+                MappedFieldBuilderDecorator[] mappedFieldBuilderDecorators = mappedFieldBuilderDecoratorBuilder
+                    .build();
+                mappedFieldFactory = new DefaultMappedFieldFactory(mappedFieldBuilderDecorators);
+            }
 
-			ErrorFactory errorFactory = this.errorFactory;
-			if (errorFactory == null) {
+            ErrorFactory errorFactory = this.errorFactory;
+            if (errorFactory == null) {
                 errorFactory = ErrorFactory.getDefaultErrorFactory();
-			}
-			RequestObjectFactory requestObjectFactory = this.requestObjectFactory;
-			if (requestObjectFactory == null) {
-				requestObjectFactory = new DefaultRequestObjectFactory();
-			}
+            }
+            RequestObjectFactory requestObjectFactory = this.requestObjectFactory;
+            if (requestObjectFactory == null) {
+                requestObjectFactory = new DefaultRequestObjectFactory();
+            }
 
-			Object[] defaultServiceFilters = this.defaultServiceFilters;
+            Object[] defaultServiceFilters = this.defaultServiceFilters;
 
-			if (!excludeFrameworkFilters) {
-				defaultServiceFilters = ArrayUtils.addAll(defaultServiceFilters, new BulkOperationByQueryFilter(),
-						new ImmutableFieldValidationFilter(), new IncludeFilter(), new NotFoundFilter(),
-						new RelationshipValidationFilter(), new SequencedIdValidationFilter(),
-						new CaseInsensitiveSearchFieldFilter());
+            if (!excludeFrameworkFilters) {
+                defaultServiceFilters = ArrayUtils
+                    .addAll(defaultServiceFilters, new BulkOperationByQueryFilter(),
+                        new ImmutableFieldValidationFilter(), new IncludeFilter(),
+                        new NotFoundFilter(),
+                        new RelationshipValidationFilter(), new SequencedIdValidationFilter(),
+                        new CaseInsensitiveSearchFieldFilter());
 
-				Validator javaxValidations = validator;
-				if (javaxValidations == null) {
-					try {
-						ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-						javaxValidations = factory.getValidator();
-					} catch (Exception p) {
-						log.warn(
-								"Unable to add JavaxValidationFilter, because no Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.");
-					}
-				}
-				if (javaxValidations != null) {
-					defaultServiceFilters = ArrayUtils.add(defaultServiceFilters,
-							new JavaxValidationFilter(javaxValidations));
-				}
-			}
+                Validator javaxValidations = validator;
+                if (javaxValidations == null) {
+                    try {
+                        ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
+                        javaxValidations = factory.getValidator();
+                    } catch (Exception p) {
+                        log.warn(
+                            "Unable to add JavaxValidationFilter, because no Bean Validation provider could be found. Add a provider like Hibernate Validator (RI) to your classpath.");
+                    }
+                }
+                if (javaxValidations != null) {
+                    defaultServiceFilters = ArrayUtils.add(defaultServiceFilters,
+                        new JavaxValidationFilter(javaxValidations));
+                }
+            }
 
-			ResourceRegistryRepository resourceRegistryMap = this.resourceRegistryMap;
-			if (resourceRegistryMap == null) {
-				resourceRegistryMap = new DefaultResourceRegistryRepository();
-			}
+            ResourceRegistryRepository resourceRegistryMap = this.resourceRegistryMap;
+            if (resourceRegistryMap == null) {
+                resourceRegistryMap = new DefaultResourceRegistryRepository();
+            }
 
             // builder.add(parameterConverters);
             ConverterFactory converterFactory = this.converterFactory;
 
             if (converterFactory == null) {
                 converterFactory = ConverterFactory.getDefaultConverterFactory();
-			}
+            }
 
-			ParameterConverterFactory parameterConverterFactory = ParameterConverterFactory
-					.builder(errorFactory)
-					.addAll(converterFactory.getConverters(String.class))
-					.build();
+            ParameterConverterFactory parameterConverterFactory = ParameterConverterFactory
+                .builder(errorFactory)
+                .addAll(converterFactory.getConverters(String.class))
+                .build();
 
-			ControllerMethodAccess defaultControllerMethodAccess = this.defaultControllerMethodAccess;
-			if (defaultControllerMethodAccess == null) {
+            ControllerMethodAccess defaultControllerMethodAccess = this.defaultControllerMethodAccess;
+            if (defaultControllerMethodAccess == null) {
                 defaultControllerMethodAccess = ControllerMethodAccess.allEnabled();
-			}
+            }
 
-			ServiceMethodAccess defaultServiceMethodAccess = this.defaultServiceMethodAccess;
-			if (defaultServiceMethodAccess == null) {
+            ServiceMethodAccess defaultServiceMethodAccess = this.defaultServiceMethodAccess;
+            if (defaultServiceMethodAccess == null) {
                 defaultServiceMethodAccess = ServiceMethodAccess.allEnabled();
-			}
+            }
 
-			Pagination pagination = defaultPagination;
-			if (pagination == null) {
-				pagination = Pagination.of(10, 0);
-			}
+            Pagination pagination = defaultPagination;
+            if (pagination == null) {
+                pagination = Pagination.of(10, 0);
+            }
 
-			ResourcePathsProvider defaultSparseFields = defaultSparseFieldsProvider;
-			if (defaultSparseFields == null) {
+            ResourcePathsProvider defaultSparseFields = defaultSparseFieldsProvider;
+            if (defaultSparseFields == null) {
                 defaultSparseFields = ResourcePathsProvider.allApiFields();
-			}
+            }
 
-			ResourcePathsProvider restrictedFields = defaultRestrictedFieldsProvider;
-			if (restrictedFields == null) {
+            ResourcePathsProvider restrictedFields = defaultRestrictedFieldsProvider;
+            if (restrictedFields == null) {
                 restrictedFields = ResourcePathsProvider.empty();
-			}
+            }
 
-			String basePath = Resource.cleanBasePath(this.basePath);
-			if (basePath == null) {
-				basePath = "/";
-			}
+            String basePath = Resource.cleanBasePath(this.basePath);
+            if (basePath == null) {
+                basePath = "/";
+            }
+            MappedClassFactory mappedClassFactory = this.mappedClassFactory;
+            if (mappedClassFactory == null) {
+                MappedClassBuilderDecorator.Builder mappedClassBuilderDecoratorBuilder = this.mappedClassBuilderDecoratorBuilder;
+                if (mappedClassBuilderDecoratorBuilder == null) {
+                    mappedClassBuilderDecoratorBuilder = MappedClassBuilderDecorator.builder();
+                }
+                if (repositoryFactory instanceof MappedClassBuilderDecoratorSupplier) {
+                    mappedClassBuilderDecoratorBuilder.addAll(
+                        ((MappedClassBuilderDecoratorSupplier) repositoryFactory)
+                            .getMappedClassBuilderDecorators());
+                }
+                MappedClassBuilderDecorator[] mappedClassBuilderDecorators = mappedClassBuilderDecoratorBuilder
+                    .build();
+                mappedClassFactory = new DefaultMappedClassFactory(mappedFieldFactory,
+                    Arrays.asList(packagesToScan),
+                    mappedFieldOrderComparator,
+                    mappedClassBuilderDecorators);
+            }
 
-			return new BasicRegistrySettings(resourceRegistryMap, mappedClassFactory,
-				mappedClassRegistry, packagesToScan,
-					mappedFieldFactory, mappedFieldVisitors, mappedFieldOrderComparator, defaultControllerMethodAccess,
-				defaultServiceMethodAccess, repositoryFactory, errorFactory, requestObjectFactory,
-				methodArgumentFactory, converterFactory, parameterConverterFactory,
-				defaultServiceFilters,
-					pagination, defaultSparseFields, restrictedFields, basePath);
-		}
-	}
+            return new BasicRegistrySettings(resourceRegistryMap, mappedClassFactory,
+                packagesToScan,
+                mappedFieldFactory, mappedFieldOrderComparator,
+                defaultControllerMethodAccess,
+                defaultServiceMethodAccess, repositoryFactory, errorFactory, requestObjectFactory,
+                methodArgumentFactory, converterFactory, parameterConverterFactory,
+                defaultServiceFilters,
+                pagination, defaultSparseFields, restrictedFields, basePath);
+        }
+    }
 
 }

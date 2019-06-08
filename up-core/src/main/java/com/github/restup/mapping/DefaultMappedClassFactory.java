@@ -4,6 +4,7 @@ import static com.github.restup.util.ReflectionUtils.getBeanInfo;
 
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
+import com.github.restup.annotations.Resource;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.util.Assert;
@@ -35,16 +36,20 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     private final List<String> packagesToIgnore;
     private final Comparator<MappedField<?>> fieldComparator;
     private final MappedFieldFactory mappedFieldFactory;
+    private final MappedClassBuilderDecorator[] mappedClassBuilderDecorators;
 
-    public DefaultMappedClassFactory(MappedFieldFactory mappedFieldFactory, List<String> packagesToScan,
-            Comparator<MappedField<?>> mappedFieldComparator) {
+    public DefaultMappedClassFactory(MappedFieldFactory mappedFieldFactory,
+        List<String> packagesToScan,
+        Comparator<MappedField<?>> mappedFieldComparator,
+        MappedClassBuilderDecorator[] mappedClassBuilderDecorators) {
+        this.mappedClassBuilderDecorators = mappedClassBuilderDecorators;
         Assert.notNull(mappedFieldFactory, "mappedFieldFactory is required");
         Assert.notNull(packagesToScan, "packagesToScan are required");
         Assert.notNull(mappedFieldComparator, "mappedFieldOrderComparator is required");
         this.packagesToScan = ImmutableList.copyOf(packagesToScan);
-        this.fieldComparator = mappedFieldComparator;
+        fieldComparator = mappedFieldComparator;
         this.mappedFieldFactory = mappedFieldFactory;
-        this.packagesToIgnore = ImmutableList.of("java");
+        packagesToIgnore = ImmutableList.of("java");
     }
 
     public static String getName(Class<?> clazz) {
@@ -70,7 +75,7 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     @Override
     public boolean isMappable(Class<?> type) {
         if (type instanceof Class) {
-            return this.contains(this.packagesToScan, type);
+            return contains(packagesToScan, type);
         }
         return false;
     }
@@ -86,31 +91,42 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
     public <T> MappedClass<T> getMappedClass(Class<T> clazz) {
 
         MappedClass<T> mappedClass = null;
-        if (this.isMappable(clazz)) {
+        if (isMappable(clazz)) {
 
             MappedClass.Builder<T> builder =
                     MappedClass.builder(clazz)
                             .name(getName(clazz))
                             .pluralName(getPluralName(clazz))
-                        .sortAttributesWith(this.fieldComparator);
+                        .sortAttributesWith(fieldComparator);
 
-            if (this.isMappable(clazz.getSuperclass())) {
+            if (isMappable(clazz.getSuperclass())) {
                 builder.parentType(clazz.getSuperclass());
+            }
+
+            Resource resource = clazz.getAnnotation(Resource.class);
+            if (resource != null) {
+                builder.indexedQueryOnly(resource.indexedQueryOnly());
             }
 
             BeanInfo<T> bi = getBeanInfo(clazz);
 
+            if (mappedClassBuilderDecorators != null) {
+                for (MappedClassBuilderDecorator decorator : mappedClassBuilderDecorators) {
+                    decorator.decorate(builder, bi);
+                }
+            }
+
             bi.getPropertyDescriptors().forEach(pd -> {
-                builder.addAttribute(this.mappedFieldFactory.getMappedField(bi, pd));
+                builder.addAttribute(mappedFieldFactory.getMappedField(bi, pd));
             });
 
             mappedClass = builder.build();
             log.debug("Created {}", mappedClass);
         } else if (log.isDebugEnabled()) {
             // just to avoid some nuisance logging
-            if (!this.contains(this.packagesToIgnore, clazz)) {
+            if (!contains(packagesToIgnore, clazz)) {
                 log.debug("Ignore {} is not included in packagesToScan {}", clazz.getName(),
-                    this.packagesToScan);
+                    packagesToScan);
             }
         }
         return mappedClass;

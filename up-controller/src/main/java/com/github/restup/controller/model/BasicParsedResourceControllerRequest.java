@@ -5,7 +5,6 @@ import static com.github.restup.util.UpUtils.unmodifiableList;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.service.model.ResourceData;
-import java.util.Enumeration;
 import java.util.List;
 
 /**
@@ -66,7 +65,7 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     }
 
     @Override
-    public Enumeration<String> getHeaders(String name) {
+    public Iterable<String> getHeaders(String name) {
         return request == null ? null : request.getHeaders(name);
     }
 

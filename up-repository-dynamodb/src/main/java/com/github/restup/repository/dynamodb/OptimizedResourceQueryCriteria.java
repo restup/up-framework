@@ -1,5 +1,7 @@
 package com.github.restup.repository.dynamodb;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
+
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedIndexField;
 import com.github.restup.query.PreparedResourceQueryStatement;
@@ -22,6 +24,14 @@ public interface OptimizedResourceQueryCriteria {
     List<ResourcePathFilter> getIndexCriteria();
 
     List<ResourcePathFilter> getFilterCriteria();
+
+    default boolean hasIndexCriteria() {
+        return isNotEmpty(getIndexCriteria());
+    }
+
+    default boolean hasFilterCriteria() {
+        return isNotEmpty(getFilterCriteria());
+    }
 
     class Builder {
 
@@ -54,6 +64,8 @@ public interface OptimizedResourceQueryCriteria {
 
                     MappedField<?> mf = f.getPath().lastMappedField();
 
+                    //TODO when we get to composited indexes, we have to improve this logic
+                    // as the first position of the identifier may be missing
                     if (mf.isIndexed()) {
                         for (MappedIndexField indexedField : mf.getIndexes()) {
                             List<ResourcePathFilter> values = table
@@ -65,7 +77,7 @@ public interface OptimizedResourceQueryCriteria {
                             }
                             values.add(f);
                         }
-                    } else {
+                    } else if (!mf.isIdentifier()) {
                         nonIndexCriteria.add(f);
                     }
                 }
@@ -87,7 +99,8 @@ public interface OptimizedResourceQueryCriteria {
                 }
             }
 
-            return new BasicOptimizedResourceQueryCriteria(indexCriteria, nonIndexCriteria);
+            return new BasicOptimizedResourceQueryCriteria(indexCriteria,
+                nonIndexCriteria);
         }
 
         private String identifyBestIndex(Table<String, Short, List<ResourcePathFilter>> table) {
@@ -103,12 +116,16 @@ public interface OptimizedResourceQueryCriteria {
                 }
                 for (i = 1; i < 10; i++) {
                     if (!map.containsKey(i)) {
+                        i--;
                         // no additional index criteria specified.
                         break;
                     }
                 }
                 if (i >= max) {
                     result = idx;
+                    if (map.get(i).get(0).getPath().lastMappedField().isIdentifier()) {
+                        break;
+                    }
                 }
             }
             return result;
