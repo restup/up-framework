@@ -5,9 +5,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import java.io.IOException;
-import java.net.URL;
-import org.junit.Test;
+
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.TextNode;
@@ -15,6 +13,7 @@ import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.ErrorCode;
 import com.github.restup.jackson.service.model.JacksonRequestBody;
 import com.github.restup.registry.Resource;
@@ -23,8 +22,10 @@ import com.github.restup.service.model.ResourceData;
 import com.github.restup.test.utils.TestResourceUtils;
 import com.model.test.company.Person;
 import com.music.Label;
+import java.io.IOException;
+import java.net.URL;
+import org.junit.Test;
 
-@SuppressWarnings({"rawtypes", "unchecked"})
 public class JacksonRequestBodyParserTest {
 
     @Test
@@ -36,11 +37,11 @@ public class JacksonRequestBodyParserTest {
         Builder<?> builder = mock(Builder.class);
         Resource resource = mock(Resource.class);
         when(resource.getClassType()).thenReturn(Person.class);
-        when(details.getResource()).thenReturn(resource);
+        when(builder.getResource()).thenReturn(resource);
 
         parser.deserializeObject(details, builder, new TextNode("foo"));
 
-        verify(details).getResource();
+        verify(builder).getResource();
         verify(builder).addError(ErrorCode.BODY_INVALID);
         verifyNoMoreInteractions(details, builder);
     }
@@ -94,14 +95,17 @@ public class JacksonRequestBodyParserTest {
         JacksonRequestBody data = mapper.readValue(url, JacksonRequestBody.class);
 
         ResourceControllerRequest details = mock(ResourceControllerRequest.class);
+        RequestPathParserResult requestPathParserResult = mock(RequestPathParserResult.class);
         when(details.getMethod()).thenReturn(HttpMethod.POST);
         when(details.getBody()).thenReturn((ResourceData) data);
-        when(details.getResource()).thenReturn((Resource) registry.getResource(resourceClass));
+        when(requestPathParserResult.getResource())
+            .thenReturn((Resource) registry.getResource(resourceClass));
 
-        ParsedResourceControllerRequest.Builder<?> builder = ParsedResourceControllerRequest.builder(registry, details);
+        ParsedResourceControllerRequest.Builder<?> builder = ParsedResourceControllerRequest
+            .builder(registry, details, requestPathParserResult);
 
         JacksonRequestBodyParser parser = new JacksonRequestBodyParser(mapper);
-        parser.parse(details, builder);
+        parser.parse(details, requestPathParserResult, builder);
         return builder.build();
     }
 }

@@ -4,8 +4,6 @@ import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -19,9 +17,9 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
 
     private final HttpServletRequest request;
 
-    protected HttpServletResourceControllerRequest(HttpServletRequest request, HttpMethod method, Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship, ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body, String baseRequestUrl, String requestUrl, String contentType) {
-        super(method, resource, ids, relationship, resourceRelationship, body,
-                contentType, baseRequestUrl, requestUrl);
+    protected HttpServletResourceControllerRequest(HttpServletRequest request, HttpMethod method,
+        ResourceData<?> body, String baseRequestUrl, String requestUrl, String contentType) {
+        super(method, body, contentType, baseRequestUrl, requestUrl);
         this.request = request;
     }
 
@@ -77,11 +75,11 @@ public class HttpServletResourceControllerRequest extends BasicResourceControlle
             baseRequestUrl(url.substring(0, url.length() - path.length()));
             requestPath(path);
             method(HttpMethod.of(httpRequest.getMethod()));
-            parsePath();
             String contentType = getContentType(
                 () -> httpRequest.getParameterValues(contentTypeParam)
                 , () -> HttpServletResourceControllerRequest.getContentType(httpRequest));
-            return new HttpServletResourceControllerRequest(httpRequest, method, resource, ids, relationship, resourceRelationship, body, baseRequestUrl, url, contentType);
+            return new HttpServletResourceControllerRequest(httpRequest, method, body,
+                baseRequestUrl, url, contentType);
         }
     }
 }

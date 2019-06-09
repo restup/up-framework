@@ -2,6 +2,7 @@ package com.github.restup.controller.request.parser;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.ErrorCode;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
@@ -26,16 +27,18 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
     }
 
     @Override
-    public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder builder) {
-        Resource resource = request.getResource();
-        T body = this.getBody(request);
+    public void parse(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
+        ParsedResourceControllerRequest.Builder builder) {
+        Resource resource = builder.getResource();
+        T body = getBody(request);
         if (body == null) {
             if (request.getMethod().requiresData()) {
                 // TODO bind params to new instance when method param is present?
                 builder.addError(ErrorCode.BODY_REQUIRED);
             }
             return;
-        } else if (this.isArray(body)) {
+        } else if (isArray(body)) {
             ControllerMethodAccess controllerMethodAccess = resource.getControllerMethodAccess();
             if (!request.getMethod().supportsMultiple(controllerMethodAccess)) {
                 builder.addError(ErrorCode.BODY_ARRAY_NOT_SUPPORTED);
@@ -43,10 +46,10 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
             }
         }
         ResourcePath path = ResourcePath.builder(resource).data().build();
-        this.graph(request, builder, resource, path, body);
+        graph(request, builder, resource, path, body);
 
         if (!builder.hasErrors()) {
-            Object deserialized = this.deserializeBody(request, builder, body);
+            Object deserialized = deserializeBody(request, builder, body);
         		deserialized = Resource.validate(resource, deserialized);
             builder.setData(deserialized);
         }
@@ -107,23 +110,23 @@ public abstract class AbstractRequestBodyParser<T> implements RequestParser {
     abstract protected void graphObject(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, Resource<?, ?> resource, ResourcePath parent, T node);
 
     protected Object deserializeBody(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, T body) {
-        if (this.isArray(body)) {
-            return this.deserializeArray(request, builder, body);
+        if (isArray(body)) {
+            return deserializeArray(request, builder, body);
         } else {
-            return this.deserializeObject(request, builder, body);
+            return deserializeObject(request, builder, body);
         }
     }
 
     protected void graph(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder, Resource<?, ?> resource, ResourcePath parent, T node) {
         if (parent.isValid()) {
-            if (this.isArray(node)) {
-                this.graphArray(request, builder, resource, parent, node);
+            if (isArray(node)) {
+                graphArray(request, builder, resource, parent, node);
 //            } else if (expectsArray(parent)) {
                 //TODO check array required, error
-            } else if (this.isObject(node)) {
+            } else if (isObject(node)) {
                 //TODO if is polymorphic type, type identifier is required.
                 //TODO if patch lookup existing type identifier
-                this.graphObject(request, builder, resource, parent, node);
+                graphObject(request, builder, resource, parent, node);
             } else {
                 builder.addRequestedPath(parent);
             }

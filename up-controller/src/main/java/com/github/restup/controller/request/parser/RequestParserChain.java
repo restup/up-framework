@@ -2,10 +2,11 @@ package com.github.restup.controller.request.parser;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.util.Assert;
 
 /**
- * Iterates over an array of {@link RequestParser}s executing {@link #parse(ResourceControllerRequest, ParsedResourceControllerRequest.Builder)} for each
+ * Iterates over an array of {@link RequestParser}s executing {@link #parse(ResourceControllerRequest, RequestPathParserResult, ParsedResourceControllerRequest.Builder)} for each
  *
  * @author abuttaro
  */
@@ -20,9 +21,11 @@ public class RequestParserChain implements RequestParser {
     }
 
     @Override
-    public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
+    public void parse(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
+        ParsedResourceControllerRequest.Builder<?> builder) {
         for (RequestParser parser : parsers) {
-            parser.parse(request, builder);
+            parser.parse(request, requestPathParserResult, builder);
         }
     }
 

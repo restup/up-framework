@@ -10,9 +10,7 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.io.Serializable;
-import java.util.Arrays;
-import org.junit.Test;
+
 import com.github.restup.annotations.field.Param;
 import com.github.restup.annotations.filter.PostCreateFilter;
 import com.github.restup.annotations.filter.PostDeleteFilter;
@@ -32,8 +30,8 @@ import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
 import com.github.restup.annotations.operations.UpdateResource;
 import com.github.restup.bind.param.ParameterProvider;
-import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.Errors;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -57,6 +55,9 @@ import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PersistenceResult;
 import com.github.restup.service.model.response.ReadResult;
 import com.model.test.company.Company;
+import java.io.Serializable;
+import java.util.Arrays;
+import org.junit.Test;
 public class FilteredServiceTest {
 
     @Test
@@ -67,7 +68,6 @@ public class FilteredServiceTest {
     // test interfaces
 
     @Test
-    @SuppressWarnings({"rawtypes"})
     public void testCreateSupported() {
         test(new CreatableResource() {
             @Override
@@ -78,7 +78,6 @@ public class FilteredServiceTest {
     }
 
     @Test
-    @SuppressWarnings({"rawtypes"})
     public void testFindSupported() {
         test(new ReadableResource() {
             @Override
@@ -89,7 +88,6 @@ public class FilteredServiceTest {
     }
 
     @Test
-    @SuppressWarnings({"rawtypes"})
     public void testUpdateSupported() {
         test(new UpdatableResource() {
             @Override
@@ -100,7 +98,6 @@ public class FilteredServiceTest {
     }
 
     @Test
-    @SuppressWarnings({"rawtypes"})
     public void testDeleteSupported() {
         test(new DeletableResource() {
             @Override
@@ -111,7 +108,6 @@ public class FilteredServiceTest {
     }
 
     @Test
-    @SuppressWarnings({"rawtypes"})
     public void testListSupported() {
         test(new ListableResource() {
             @Override
@@ -177,7 +173,6 @@ public class FilteredServiceTest {
         }, false, false, false, false, true);
     }
 
-    @SuppressWarnings({"rawtypes"})
     private ResourceServiceOperations getService(Object repo, Object... filters) {
         Resource<?, ?> resource = Resource.builder(Company.class)
                 .registry(mapBackedRegistry()).repository(repo)
@@ -213,7 +208,8 @@ public class FilteredServiceTest {
                     @PreUpdateFilter
                     @PreDeleteFilter
                     @Rank(-100)
-                    public Foo pre(Resource resource, ResourceRegistry registry, Bar bar, PersistenceRequest request) {
+                    public Foo pre(Resource<?, ?> resource, ResourceRegistry registry, Bar bar,
+                        PersistenceRequest request) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         // assertNotNull(request);
@@ -223,7 +219,8 @@ public class FilteredServiceTest {
 
                     @PreListFilter
                     @Rank(-100)
-                    public Foo preList(ResourceRegistry registry, Resource resource, ListRequest request) {
+                    public Foo preList(ResourceRegistry registry, Resource<?, ?> resource,
+                        ListRequest request) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         return new Foo("a");
@@ -231,7 +228,8 @@ public class FilteredServiceTest {
 
                     @PreReadFilter
                     @Rank(-100)
-                    public Foo preRead(Resource resource, ReadRequest request, ResourceRegistry registry) {
+                    public Foo preRead(Resource<?, ?> resource, ReadRequest request,
+                        ResourceRegistry registry) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         return new Foo("a");
@@ -242,7 +240,8 @@ public class FilteredServiceTest {
                     @PreDeleteFilter
                     @PreListFilter
                     @PreReadFilter
-                    public void bbb(Resource resource, Foo foo, Bar bar, ResourceRegistry registry) {
+                    public void bbb(Resource<?, ?> resource, Foo foo, Bar bar,
+                        ResourceRegistry registry) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         assertEquals("State returned by prior chain", "a", foo.getName());
@@ -255,7 +254,8 @@ public class FilteredServiceTest {
                     @PreDeleteFilter
                     @PreListFilter
                     @PreReadFilter
-                    public Foo ccc(ResourceRegistry registry, Foo foo, Resource resource, Bar bar,
+                    public Foo ccc(ResourceRegistry registry, Foo foo, Resource<?, ?> resource,
+                        Bar bar,
                             FilterChainContext ctx) {
                         assertNotNull(resource);
                         assertNotNull(registry);
@@ -270,7 +270,8 @@ public class FilteredServiceTest {
                     @PreDeleteFilter
                     @PreListFilter
                     @PreReadFilter
-                    public void ddd(Foo foo, Resource resource, Bar bar, ResourceRegistry registry) {
+                    public void ddd(Foo foo, Resource<?, ?> resource, Bar bar,
+                        ResourceRegistry registry) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         assertEquals("State returned by prior chain", "c", foo.getName());
@@ -284,7 +285,8 @@ public class FilteredServiceTest {
                     @PostListFilter
                     @PostReadFilter
                     @Rank(-1)
-                    public void zzz(Foo foo, Bar bar, FilterChainContext ctx, Resource resource,
+                    public void zzz(Foo foo, Bar bar, FilterChainContext ctx,
+                        Resource<?, ?> resource,
                             ResourceRegistry registry) {
                         assertNotNull(resource);
                         assertNotNull(registry);
@@ -299,7 +301,8 @@ public class FilteredServiceTest {
                     @PostDeleteFilter
                     @PostListFilter
                     @PostReadFilter
-                    public void fff(Foo foo, Resource resource, Bar bar, ResourceRegistry registry) {
+                    public void fff(Foo foo, Resource<?, ?> resource, Bar bar,
+                        ResourceRegistry registry) {
                         assertNotNull(resource);
                         assertNotNull(registry);
                         assertEquals("State returned by prior chain", "e", foo.getName());
@@ -309,7 +312,6 @@ public class FilteredServiceTest {
         return resource.getServiceOperations();
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private void test(Object repo, boolean create, boolean find, boolean update, boolean delete, boolean list) {
         ResourceServiceOperations service = getService(repo);
         ParameterProvider parameterProvider = mock(ParameterProvider.class);
@@ -357,7 +359,7 @@ public class FilteredServiceTest {
 
         public Foo(String name) {
             super();
-            this.setName(name);
+            setName(name);
         }
 
         public String getName() {

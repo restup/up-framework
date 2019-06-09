@@ -12,6 +12,8 @@ import com.github.restup.controller.interceptor.RequestInterceptorChain;
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.controller.request.parser.path.DefaultRequestPathParser;
+import com.github.restup.controller.request.parser.path.RequestPathParser;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -35,6 +37,8 @@ public interface ControllerSettings {
 
     RequestParser getRequestParser();
 
+    RequestPathParser getRequestPathParser();
+
     ExceptionHandler getExceptionHandler();
 
     String getMediaTypeParam();
@@ -46,6 +50,7 @@ public interface ControllerSettings {
         private ContentNegotiator.Builder contentNegotiatorBuilder;
         private RequestInterceptor[] interceptors;
         private RequestParser requestParser;
+        private RequestPathParser requestPathParser;
         private RequestParser.Builder requestParserBuilder;
         private ExceptionHandler exceptionHandler;
         private ObjectMapper mapper;
@@ -102,6 +107,11 @@ public interface ControllerSettings {
             return me();
         }
 
+        public Builder requestPathParser(RequestPathParser requestPathParser) {
+            requestPathParser = requestPathParser;
+            return me();
+        }
+
         public Builder exceptionHandler(ExceptionHandler exceptionHandler) {
             this.exceptionHandler = exceptionHandler;
             return me();
@@ -155,6 +165,8 @@ public interface ControllerSettings {
                 () -> contentNegotiatorBuilder.build());
             RequestParser requestParser = nvl(this.requestParser,
                 () -> requestParserBuilder.build());
+            RequestPathParser requestPathParser = nvl(this.requestPathParser,
+                () -> new DefaultRequestPathParser(registry));
 
             ExceptionHandler exceptionHandler = nvl(this.exceptionHandler,
                 () -> ExceptionHandler.getDefaultInstance());
@@ -172,7 +184,8 @@ public interface ControllerSettings {
                             )
             );
             return new BasicControllerSettings(registry, contentNegotiator, interceptor,
-                requestParser, exceptionHandler, settingsCaptor.getDefaultMediaType(),
+                requestParser, requestPathParser, exceptionHandler,
+                settingsCaptor.getDefaultMediaType(),
                 mediaTypeParam);
         }
     }

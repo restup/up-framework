@@ -4,6 +4,9 @@ import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.assertj.core.api.Assertions.catchThrowable;
 import static org.junit.Assert.assertEquals;
 
+import com.github.restup.controller.mock.MockResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.DefaultRequestPathParser;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.RequestErrorException;
 import com.github.restup.registry.Resource;
@@ -19,9 +22,9 @@ public class ResourceControllerRequestTest {
 
     @Test
     public void testItemResource() {
-        Builder b = path("/peeps/123");
-        assertEquals("person", b.resource.getName());
-        assertEquals(Arrays.asList(123l), b.ids);
+        RequestPathParserResult b = path("/peeps/123");
+        assertEquals("person", b.getResource().getName());
+        assertEquals(Arrays.asList(123l), b.getIds());
     }
 
     @Test
@@ -35,47 +38,48 @@ public class ResourceControllerRequestTest {
 
     @Test
     public void testItemResourceIds() {
-        Builder b = path("/companies/1,2,3");
-        assertEquals("company", b.resource.getName());
-        assertEquals(Arrays.asList("1", "2", "3"), b.ids);
+        RequestPathParserResult b = path("/companies/1,2,3");
+        assertEquals("company", b.getResource().getName());
+        assertEquals(Arrays.asList("1", "2", "3"), b.getIds());
     }
 
     @Test
     public void testCollectionResource() {
-        Builder b = path("/peeps");
-        assertEquals("person", b.resource.getName());
+        RequestPathParserResult b = path("/peeps");
+        assertEquals("person", b.getResource().getName());
 
         b = path("/companies");
-        assertEquals("company", b.resource.getName());
+        assertEquals("company", b.getResource().getName());
     }
 
     @Test
     public void testRelationshipList() {
-        Builder b = path("/companies/1/peeps");
-        assertEquals("person", b.resource.getName());
-        assertEquals("company", b.relationship.getName());
-        assertEquals(Arrays.asList("1"), b.ids);
+        RequestPathParserResult b = path("/companies/1/peeps");
+        assertEquals("person", b.getResource().getName());
+        assertEquals("company", b.getRelationship().getName());
+        assertEquals(Arrays.asList("1"), b.getIds());
     }
 
     @Test
     public void testRelationshipItem() {
-        Builder b = path("/peeps/123/company");
-        assertEquals("company", b.resource.getName());
-        assertEquals("person", b.relationship.getName());
-        assertEquals(Arrays.asList(123l), b.ids);
+        RequestPathParserResult b = path("/peeps/123/company");
+        assertEquals("company", b.getResource().getName());
+        assertEquals("person", b.getRelationship().getName());
+        assertEquals(Arrays.asList(123l), b.getIds());
     }
 
-    private Builder path(String path)  {
+    private RequestPathParserResult path(String path) {
         ResourceRegistry registry = mapBackedRegistry();
         registry.registerResource(Resource.builder(Company.class)
                 .pluralName("companies"));
         registry.registerResource(Resource.builder(Person.class)
                 .name("person").pluralName("peeps"));
-        Builder b = new Builder()
-            .requestPath(path)
-            .registry(registry);
-        b.parsePath();
-        return b;
+        DefaultRequestPathParser parser = new DefaultRequestPathParser(registry);
+        return parser.parsePath(
+            MockResourceControllerRequest.builder()
+                .url(path)
+                .registry(registry)
+                .build());
     }
 
     private void pathError(String code, String path, String resourceName) {
@@ -93,13 +97,5 @@ public class ResourceControllerRequestTest {
         RequestError err = ((RequestErrorException)e).getErrors().iterator().next();
         Map m = (Map) err.getMeta();
         assertEquals(value, m.get(key));
-    }
-
-    private final static class Builder extends AbstractResourceControllerRequestBuilder<Builder, ParsedResourceControllerRequest> {
-
-        @Override
-        public ParsedResourceControllerRequest build() {
-            return null;
-        }
     }
 }

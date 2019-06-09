@@ -19,6 +19,7 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.RequestErrorException;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -57,6 +58,8 @@ public class ResourceControllerTest {
     @Mock
     private ResourceControllerResponse response;
     @Mock
+    private RequestPathParserResult requestPathParserResult;
+    @Mock
     private RequestParser bodyParser;
     @Mock
     private RequestInterceptor interceptorA;
@@ -68,6 +71,8 @@ public class ResourceControllerTest {
     private ContentNegotiator contentNegotiatorB;
     @Mock
     private ContentNegotiator contentNegotiatorC;
+    @Mock
+    private Resource resource;
     private ResourceController controller;
     private List<String> params;
 
@@ -93,7 +98,8 @@ public class ResourceControllerTest {
         registry.registerResource(Resource.builder(Company.class).service(service));
         registry.registerResource(Resource.builder(Person.class).name("person"));
         controller = controller(registry);
-        when(request.getResource()).thenReturn((Resource) registry.getResource(Company.class));
+        when(requestPathParserResult.getResource())
+            .thenReturn((Resource) registry.getResource(Company.class));
     }
 
     private void error(String code, ThrowingCallable f) {
@@ -111,14 +117,15 @@ public class ResourceControllerTest {
     }
 
     private void relationship() {
-        when(request.getRelationship()).thenReturn(Mockito.mock(Resource.class));
+        when(requestPathParserResult.getRelationship()).thenReturn(Mockito.mock(Resource.class));
     }
 
     private void body(Object data) {
         doAnswer(new Answer() {
             @Override
             public Object answer(InvocationOnMock invocation) {
-                ParsedResourceControllerRequest.Builder b = (ParsedResourceControllerRequest.Builder) invocation.getArguments()[1];
+                ParsedResourceControllerRequest.Builder b = (ParsedResourceControllerRequest.Builder) invocation
+                    .getArguments()[2];
                 if (data instanceof Object[]) {
                     b.setData(Arrays.asList((Object[]) data));
                 } else {
@@ -126,7 +133,9 @@ public class ResourceControllerTest {
                 }
                 return null;
             }
-        }).when(bodyParser).parse(any(ResourceControllerRequest.class), any(ParsedResourceControllerRequest.Builder.class));
+        }).when(bodyParser)
+            .parse(any(ResourceControllerRequest.class), any(RequestPathParserResult.class),
+                any(ParsedResourceControllerRequest.Builder.class));
     }
 
     private void get(Integer... ids) {
@@ -198,12 +207,12 @@ public class ResourceControllerTest {
     private void request(HttpMethod method, Integer... ids) {
         when(request.getMethod()).thenReturn(method);
         if (ArrayUtils.isNotEmpty(ids)) {
-            when(request.getIds()).thenReturn((List) Arrays.asList(ids));
+            when(requestPathParserResult.getIds()).thenReturn((List) Arrays.asList(ids));
         }
         when(request.getParameterNames()).thenReturn(params);
         when(contentNegotiatorA.accept(any(ResourceControllerRequest.class))).thenReturn(true);
-        
-        controller.requestInternal(request, response);
+
+        controller.requestInternal(request, requestPathParserResult, response);
         
         assertInvocations(1, service);
         verify(interceptorA).before(any(ParsedResourceControllerRequest.class));

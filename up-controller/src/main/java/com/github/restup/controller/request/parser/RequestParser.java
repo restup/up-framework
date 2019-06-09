@@ -3,6 +3,7 @@ package com.github.restup.controller.request.parser;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.controller.settings.BuilderSettingsCaptor;
 import com.github.restup.jackson.JacksonConfiguration;
 import com.github.restup.registry.settings.AutoDetectConstants;
@@ -23,7 +24,7 @@ public interface RequestParser {
      * @param request
      * @param builder
      */
-    void parse(ResourceControllerRequest request,
+    void parse(ResourceControllerRequest request, RequestPathParserResult requestPathParserResult,
         ParsedResourceControllerRequest.Builder<?> builder);
 
     class Builder {

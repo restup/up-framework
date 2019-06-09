@@ -1,8 +1,5 @@
 package com.github.restup.jackson.parser;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
@@ -12,6 +9,9 @@ import com.github.restup.controller.request.parser.AbstractRequestBodyParser;
 import com.github.restup.errors.ErrorCode;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
 
 public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode> {
 
@@ -65,7 +65,7 @@ public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode
     @Override
     protected Object deserializeObject(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<?> builder, JsonNode node) {
         try {
-            return mapper.treeToValue(node, details.getResource().getClassType());
+            return mapper.treeToValue(node, builder.getResource().getClassType());
         } catch (JsonProcessingException e) {
             builder.addError(ErrorCode.BODY_INVALID);
             return null;
@@ -74,7 +74,7 @@ public class JacksonRequestBodyParser extends AbstractRequestBodyParser<JsonNode
 
     @Override
     protected Object deserializeArray(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<?> builder, JsonNode node) {
-        List<Object> result = new ArrayList<Object>();
+        List<Object> result = new ArrayList<>();
         Iterator<JsonNode> it = node.iterator();
         while (it.hasNext()) {
             JsonNode item = it.next();

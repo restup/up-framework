@@ -71,6 +71,16 @@ public interface MappedFieldBuilderDecorator {
             return me();
         }
 
+        public Builder addSuppliers(Object... arr) {
+            for (Object o : arr) {
+                if (o instanceof MappedFieldBuilderDecoratorSupplier) {
+                    addAll(((MappedFieldBuilderDecoratorSupplier) o)
+                        .getMappedFieldBuilderDecorators());
+                }
+            }
+            return me();
+        }
+
         public MappedFieldBuilderDecorator[] build() {
             List<MappedFieldBuilderDecorator> result = new ArrayList<>(decorators);
             if (defaults) {
@@ -82,7 +92,6 @@ public interface MappedFieldBuilderDecorator {
             }
             return result.toArray(new MappedFieldBuilderDecorator[0]);
         }
-
     }
 
 

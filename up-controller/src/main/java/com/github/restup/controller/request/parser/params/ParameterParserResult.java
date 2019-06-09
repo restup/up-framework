@@ -7,12 +7,12 @@ public class ParameterParserResult {
     private final Resource resource;
     private final String[] tokens;
 
-    private ParameterParserResult(Resource resource, String[] tokens) {
+    private ParameterParserResult(Resource<?, ?> resource, String[] tokens) {
         this.resource = resource;
         this.tokens = tokens;
     }
 
-    public static ParameterParserResult of(Resource resource, String... tokens) {
+    public static ParameterParserResult of(Resource<?, ?> resource, String... tokens) {
         return new ParameterParserResult(resource, tokens);
     }
 

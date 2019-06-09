@@ -7,8 +7,6 @@ import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.model.AbstractResourceControllerRequestBuilder;
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import java.util.ArrayList;
 import java.util.List;
@@ -22,10 +20,9 @@ public class APIGatewayProxyEventResourceControllerRequest extends BasicResource
 
     protected APIGatewayProxyEventResourceControllerRequest(APIGatewayProxyRequestEvent event,
         HttpMethod method,
-        Resource<?, ?> resource, List<?> ids, Resource<?, ?> relationship,
-        ResourceRelationship<?, ?, ?, ?> resourceRelationship, ResourceData<?> body,
+        ResourceData<?> body,
         String baseRequestUrl, String requestUrl, String contentType) {
-        super(method, resource, ids, relationship, resourceRelationship, body,
+        super(method, body,
             contentType, baseRequestUrl, requestUrl);
         this.event = event;
     }
@@ -76,13 +73,11 @@ public class APIGatewayProxyEventResourceControllerRequest extends BasicResource
         public APIGatewayProxyEventResourceControllerRequest build() {
             requestPath(event.getPath());
             method(HttpMethod.of(event.getHttpMethod()));
-            parsePath();
             String contentType = getContentType(
                 () -> toArray(event.getMultiValueQueryStringParameters().get(contentTypeParam))
                 , () -> APIGatewayProxyEventResourceControllerRequest.getContentType(event));
-            return new APIGatewayProxyEventResourceControllerRequest(event, method, resource, ids,
-                relationship, resourceRelationship, body, baseRequestUrl,
-                baseRequestUrl + requestPath, contentType);
+            return new APIGatewayProxyEventResourceControllerRequest(event, method, body,
+                baseRequestUrl, baseRequestUrl + requestPath, contentType);
         }
     }
 }

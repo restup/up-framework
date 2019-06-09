@@ -20,13 +20,13 @@ public interface ParameterResourceParser {
         Requested {
             @Override
             public Resource parseResource(ParameterParsingContext ctx, String... tokens) {
-                return ctx.getRequest().getResource();
+                return ctx.getResource();
             }
 
             @Override
             public Resource parseResourceAt(ParameterParsingContext ctx, int index,
                 String... tokens) {
-                return ctx.getRequest().getResource();
+                return ctx.getResource();
             }
         },
         /**
@@ -63,7 +63,7 @@ public interface ParameterResourceParser {
                     RequestError.Builder error = ParameterParsingContext
                         .parameterError(ctx, ctx.getRawParameterValues())
                         .code(ErrorCode.PARAMETER_INVALID_RESOURCE)
-                        .resource(ctx.getRequest().getResource())
+                        .resource(ctx.getResource())
                         .detail("Parameter ''{0}'' does not specify a valid resource",
                             ctx.getRawParameterName());
                     ctx.addError(error);

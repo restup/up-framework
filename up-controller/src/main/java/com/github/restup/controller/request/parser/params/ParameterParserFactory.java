@@ -96,7 +96,7 @@ public interface ParameterParserFactory {
                     }
                 }
 
-                return ctx.getRequest().getResource();
+                return ctx.getResource();
             }
 
             @Override

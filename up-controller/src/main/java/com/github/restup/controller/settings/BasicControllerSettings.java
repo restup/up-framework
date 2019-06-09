@@ -4,6 +4,7 @@ import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.interceptor.RequestInterceptor;
 import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.controller.request.parser.path.RequestPathParser;
 import com.github.restup.registry.ResourceRegistry;
 
 public class BasicControllerSettings implements ControllerSettings {
@@ -12,18 +13,21 @@ public class BasicControllerSettings implements ControllerSettings {
     private final ContentNegotiator contentNegotiator;
     private final RequestInterceptor requestInterceptor;
     private final RequestParser requestParser;
+    private final RequestPathParser requestPathParser;
     private final ExceptionHandler exceptionHandler;
     private final String defaultMediaType;
     private final String mediaTypeParam;
 
     protected BasicControllerSettings(ResourceRegistry registry, ContentNegotiator contentNegotiator,
-            RequestInterceptor requestInterceptor, RequestParser requestParsers,
+        RequestInterceptor requestInterceptor, RequestParser requestParser,
+        RequestPathParser requestPathParser,
         ExceptionHandler exceptionHandler, String defaultMediaType, String mediaTypeParam) {
         super();
         this.registry = registry;
         this.contentNegotiator = contentNegotiator;
         this.requestInterceptor = requestInterceptor;
-        requestParser = requestParsers;
+        this.requestParser = requestParser;
+        this.requestPathParser = requestPathParser;
         this.exceptionHandler = exceptionHandler;
         this.defaultMediaType = defaultMediaType;
         this.mediaTypeParam = mediaTypeParam;
@@ -57,6 +61,11 @@ public class BasicControllerSettings implements ControllerSettings {
     @Override
     public RequestParser getRequestParser() {
         return requestParser;
+    }
+
+    @Override
+    public RequestPathParser getRequestPathParser() {
+        return requestPathParser;
     }
 
     @Override

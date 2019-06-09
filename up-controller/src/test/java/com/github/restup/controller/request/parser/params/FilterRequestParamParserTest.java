@@ -24,7 +24,7 @@ public class FilterRequestParamParserTest extends AbstractRequestParamParserTest
     @Override
     @Before
     public void before() {
-        when(request.getResource()).thenReturn(requestedResource);
+        when(builder.getResource()).thenReturn(requestedResource);
         when(requestedResource.getRegistry()).thenReturn(registry);
     }
 

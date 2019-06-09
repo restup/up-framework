@@ -3,6 +3,7 @@ package com.github.restup.controller.request.parser;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.StatusCode;
 
@@ -13,8 +14,10 @@ import com.github.restup.errors.StatusCode;
 public class UnsupportedMediaTypeBodyRequestParser implements RequestParser {
 
     @Override
-    public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
-        throw RequestError.builder(request.getResource())
+    public void parse(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
+        ParsedResourceControllerRequest.Builder<?> builder) {
+        throw RequestError.builder(requestPathParserResult.getResource())
                 .status(StatusCode.UNSUPPORTED_MEDIA_TYPE)
                 .meta(ContentTypeNegotiation.CONTENT_TYPE, request.getContentType())
                 .buildException();

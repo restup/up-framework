@@ -38,6 +38,16 @@ public interface MappedClassBuilderDecorator {
             return me();
         }
 
+        public Builder addSuppliers(Object... arr) {
+            for (Object o : arr) {
+                if (o instanceof MappedClassBuilderDecoratorSupplier) {
+                    addAll(((MappedClassBuilderDecoratorSupplier) o)
+                        .getMappedClassBuilderDecorators());
+                }
+            }
+            return me();
+        }
+
         public MappedClassBuilderDecorator[] build() {
             List<MappedClassBuilderDecorator> result = new ArrayList<>(decorators);
             return result.toArray(new MappedClassBuilderDecorator[0]);

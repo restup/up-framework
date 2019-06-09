@@ -9,14 +9,16 @@ import com.github.restup.registry.ResourceRegistry;
 public class ParameterParsingContext<T> {
 
     private final ResourceControllerRequest request;
+    private final Resource resource;
     private final Builder<T> builder;
     private final String rawParameterName;
     private final String[] rawParameterValues;
 
     private ParameterParsingContext(
-        ResourceControllerRequest request,
+        ResourceControllerRequest request, Resource<?, ?> resource,
         Builder<T> builder, String rawParameterName, String[] rawParameterValues) {
         this.request = request;
+        this.resource = resource;
         this.builder = builder;
         this.rawParameterName = rawParameterName;
         this.rawParameterValues = rawParameterValues;
@@ -25,7 +27,8 @@ public class ParameterParsingContext<T> {
     public static <T> ParameterParsingContext of(ResourceControllerRequest request,
         Builder<T> builder,
         String parameterName, String[] parameterValues) {
-        return new ParameterParsingContext(request, builder, parameterName, parameterValues);
+        return new ParameterParsingContext(request, builder.getResource(), builder, parameterName,
+            parameterValues);
     }
 
     public static RequestError.Builder parameterError(ParameterParsingContext ctx, Object value) {
@@ -56,8 +59,12 @@ public class ParameterParsingContext<T> {
         builder.addError(error);
     }
 
+    public Resource getResource() {
+        return resource;
+    }
+
     public Resource getResource(String resourceName) {
-        ResourceRegistry registry = getRequest().getResource().getRegistry();
+        ResourceRegistry registry = getResource().getRegistry();
         return registry.getResource(resourceName);
     }
 }

@@ -42,10 +42,9 @@ public class ParameterResourceParserTest {
     public void setup() {
         when(ctx.getResource("foo")).thenReturn(resource);
         when(ctx.getBuilder()).thenReturn(requestBuilder);
-        when(ctx.getRequest()).thenReturn(request);
         when(ctx.getRawParameterName()).thenReturn("filter[foo][gt]");
         when(ctx.getRawParameterValues()).thenReturn(values);
-        when(request.getResource()).thenReturn(resource);
+        when(ctx.getResource()).thenReturn(resource);
         when(resource.getName()).thenReturn("foo");
         when(requestBuilder.getErrorFactory()).thenReturn(ErrorFactory.getDefaultErrorFactory());
     }
@@ -104,11 +103,10 @@ public class ParameterResourceParserTest {
             verify(ctx).getResource(attempt);
         }
         verify(ctx).getBuilder();
-        verify(ctx).getRequest();
+        verify(ctx).getResource();
         verify(ctx, times(2)).getRawParameterName();
         verify(ctx).getRawParameterValues();
         verify(ctx).addError(any());
-        verify(request).getResource();
         verify(resource).getName();
         verify(requestBuilder).getErrorFactory();
     }

@@ -22,6 +22,8 @@ import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.request.parser.RequestParser;
+import com.github.restup.controller.request.parser.path.RequestPathParser;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.controller.settings.ControllerSettings;
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.RequestErrorException;
@@ -156,6 +158,7 @@ public class ResourceController {
     private final ResourceRegistry registry;
     private final ContentNegotiator contentNegotiator;
     private final RequestParser requestParser;
+    private final RequestPathParser requestPathParser;
     private final RequestInterceptor interceptor;
     private final ExceptionHandler exceptionHandler;
     private final GetMethodController<?, ?> getController;
@@ -176,6 +179,7 @@ public class ResourceController {
         registry = settings.getRegistry();
         contentNegotiator = settings.getContentNegotiator();
         requestParser = settings.getRequestParser();
+        requestPathParser = settings.getRequestPathParser();
         interceptor = settings.getRequestInterceptor();
         exceptionHandler = settings.getExceptionHandler();
         mediaTypeParam = settings.getMediaTypeParam();
@@ -197,26 +201,33 @@ public class ResourceController {
     }
 
     private static <T> void validateData(ParsedResourceControllerRequest<T> parsedRequest,
-            ResourceControllerRequest request, ControllerMethodAccess access, boolean itemOperation, int ids) {
+        ResourceControllerRequest request, RequestPathParserResult requestPathParserResult,
+        ControllerMethodAccess access,
+        boolean itemOperation, int ids) {
         HttpMethod method = request.getMethod();
         int items = count(parsedRequest.getData());
         if (items == 0) {
             if (method.requiresData()) {
-                throw error(request, "DATA_REQUIRED", "Document is required");
+                throw error(request, requestPathParserResult, "DATA_REQUIRED",
+                    "Document is required");
             }
         } else {
             if (!method.requiresData()) {
-                throw error(request, "DATA_NOT_SUPPORTED", "Document is not supported");
+                throw error(request, requestPathParserResult, "DATA_NOT_SUPPORTED",
+                    "Document is not supported");
             } else {
                 if (items == 1) {
                     if (!itemOperation && !method.supportsCollectionOperation(access)) {
-                        throw collectionResourceNotAllowed(request, access);
+                        throw collectionResourceNotAllowed(request, requestPathParserResult,
+                            access);
                     }
                 } else if (items > 1) {
                     if (itemOperation || !method.supportsMultiple(access)
                     // array not supported in combination with multiple ids
                             || ids > 1) {
-                        throw error(request, "DOCUMENT_ARRAY_NOT_SUPPORTED", "Array of documents not supported");
+                        throw error(request, requestPathParserResult,
+                            "DOCUMENT_ARRAY_NOT_SUPPORTED",
+                            "Array of documents not supported");
                     }
                 }
             }
@@ -230,40 +241,49 @@ public class ResourceController {
         return data == null ? 0 : 1;
     }
 
-    private static void validateIds(ResourceControllerRequest request, ControllerMethodAccess access, int ids) {
+    private static void validateIds(ResourceControllerRequest request,
+        RequestPathParserResult pathParserResult,
+        ControllerMethodAccess access, int ids) {
         HttpMethod method = request.getMethod();
         if (ids == 1) {
             if (!method.supportsItemOperation(access)) {
-                throw itemResourceNotAllowed(request, access);
+                throw itemResourceNotAllowed(request, pathParserResult, access);
             }
         } else if (ids > 1) {
             if (!method.supportsAccessByIds(access)) {
                 // if it doesn't support access by id then it is malformed
                 if (!method.supportsItemOperation(access)) {
-                    throw itemResourceNotAllowed(request, access);
+                    throw itemResourceNotAllowed(request, pathParserResult, access);
                 } else {
-                    throw error(request, "MULTIPLE_IDS_NOT_SUPPORTED", "Multiple ids not supported");
+                    throw error(request, pathParserResult, "MULTIPLE_IDS_NOT_SUPPORTED",
+                        "Multiple ids not supported");
                 }
-            } else if (request.getRelationship() != null) {
-                throw error(request, "RELATIONSHIP_IDS_NOT_SUPPORTED",
+            } else if (pathParserResult.getRelationship() != null) {
+                throw error(request, pathParserResult, "RELATIONSHIP_IDS_NOT_SUPPORTED",
                         "Multiple ids not supported when requesting a relationship");
             }
         } else if (ids == 0) {
-            if (request.getRelationship() != null) {
-                throw error(request, "RELATIONSHIP_ID_REQUIRED", "ID is required when requesting a relationship");
+            if (pathParserResult.getRelationship() != null) {
+                throw error(request, pathParserResult, "RELATIONSHIP_ID_REQUIRED",
+                    "ID is required when requesting a relationship");
             }
         }
     }
 
-    private static RequestErrorException error(ResourceControllerRequest request, String code, String detail) {
-        return error(request).code(code).title("Not supported").detail(detail).buildException();
+    private static RequestErrorException error(ResourceControllerRequest request,
+        RequestPathParserResult pathParserResult,
+        String code, String detail) {
+        return error(request, pathParserResult).code(code).title("Not supported").detail(detail)
+            .buildException();
     }
 
-    private static RequestError.Builder error(ResourceControllerRequest request) {
-        return RequestError.builder().resource(request.getResource());
+    private static RequestError.Builder error(ResourceControllerRequest request,
+        RequestPathParserResult pathParserResult) {
+        return RequestError.builder().resource(pathParserResult.getResource());
     }
 
     private static RequestErrorException itemResourceNotAllowed(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
             ControllerMethodAccess access) {
         List<HttpMethod> supported = new ArrayList<>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
@@ -271,10 +291,11 @@ public class ResourceController {
                 supported.add(m);
             }
         }
-        return methodNotAllowed(request, access, supported);
+        return methodNotAllowed(request, requestPathParserResult, access, supported);
     }
 
-    private static RequestErrorException collectionResourceNotAllowed(ResourceControllerRequest request,
+    private static RequestErrorException collectionResourceNotAllowed(
+        ResourceControllerRequest request, RequestPathParserResult requestPathParserResult,
             ControllerMethodAccess access) {
         List<HttpMethod> supported = new ArrayList<>(HttpMethod.values().length - 1);
         for (HttpMethod m : HttpMethod.values()) {
@@ -282,12 +303,13 @@ public class ResourceController {
                 supported.add(m);
             }
         }
-        return methodNotAllowed(request, access, supported);
+        return methodNotAllowed(request, requestPathParserResult, access, supported);
     }
 
     private static RequestErrorException methodNotAllowed(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
             ControllerMethodAccess access, List<HttpMethod> supported) {
-        return error(request).status(StatusCode.METHOD_NOT_ALLOWED)
+        return error(request, requestPathParserResult).status(StatusCode.METHOD_NOT_ALLOWED)
                 .code(StatusCode.METHOD_NOT_ALLOWED.name()).meta(HttpHeader.Allow.name(), supported)
                 // TODO The response MUST query an Allow header containing a list of valid
                 // methods for the requested resource.
@@ -342,35 +364,46 @@ public class ResourceController {
             request = builder
                 .contentTypeParam(mediaTypeParam)
                 .build();
-            return requestInternal(request, response);
+            return request(request, response);
         } catch (Exception e) {
             return handleException(request, response, e);
         }
     }
 
+    <T, ID extends Serializable> Object request(ResourceControllerRequest request,
+        ResourceControllerResponse response) {
+        RequestPathParserResult requestPathParserResult = requestPathParser
+            .parsePath(request); //TODO
+        return requestInternal(request, requestPathParserResult, response);
+    }
+
     <T, ID extends Serializable> Object requestInternal(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
             ResourceControllerResponse response) {
         Assert.notNull(request, "request is required");
         Assert.notNull(response, "response is required");
         Assert.notNull(request.getMethod(), "method is required");
-        Assert.notNull(request.getResource(), "resource is required");
 
-        ControllerMethodAccess access = getMethodAccess(registry, request.getResource());
-        int ids = CollectionUtils.size(request.getIds());
+        ControllerMethodAccess access = getMethodAccess(registry,
+            requestPathParserResult.getResource());
+        int ids = CollectionUtils.size(requestPathParserResult.getIds());
         boolean itemOperation = ids == 1;
 
         // confirm content type is supported ahead of parsing work
-        accept(request);
+        accept(request, requestPathParserResult.getResource());
 
-        MethodController<T, ID> methodController = getMethodController(request, access, itemOperation);
+        MethodController<T, ID> methodController = getMethodController(request,
+            requestPathParserResult, access,
+            itemOperation);
 
-        validateIds(request, access, ids);
+        validateIds(request, requestPathParserResult, access, ids);
 
         // parse the request
-        ParsedResourceControllerRequest<T> parsedRequest = parseRequest(request);
+        ParsedResourceControllerRequest<T> parsedRequest = parseRequest(request,
+            requestPathParserResult);
 
         // validate data passed in the message body
-        validateData(parsedRequest, request, access, itemOperation, ids);
+        validateData(parsedRequest, request, requestPathParserResult, access, itemOperation, ids);
 
         interceptor.before(parsedRequest);
         Object result = methodController.request(parsedRequest);
@@ -380,16 +413,17 @@ public class ResourceController {
         return contentNegotiator.formatResponse(parsedRequest, response, result);
     }
 
-    private void accept(ResourceControllerRequest request) {
+    private void accept(ResourceControllerRequest request, Resource resource) {
         if (!contentNegotiator.accept(request)) {
-            throw RequestError.builder(request.getResource())
+            throw RequestError.builder(resource)
                     .status(StatusCode.UNSUPPORTED_MEDIA_TYPE)
                     .meta(ContentTypeNegotiation.CONTENT_TYPE, request.getContentType())
                     .buildException();
         }
     }
 
-    private MethodController getMethodController(ResourceControllerRequest request, ControllerMethodAccess access,
+    private MethodController getMethodController(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult, ControllerMethodAccess access,
             boolean itemOperation) {
         switch (request.getMethod()) {
             case GET:
@@ -404,30 +438,33 @@ public class ResourceController {
                 return deleteController;
         }
         if (itemOperation) {
-            throw itemResourceNotAllowed(request, access);
+            throw itemResourceNotAllowed(request, requestPathParserResult, access);
         } else {
-            throw collectionResourceNotAllowed(request, access);
+            throw collectionResourceNotAllowed(request, requestPathParserResult, access);
         }
     }
 
-    private <T> ParsedResourceControllerRequest<T> parseRequest(ResourceControllerRequest request) {
+    private <T> ParsedResourceControllerRequest<T> parseRequest(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult) {
+        Resource<?, ?> resource = requestPathParserResult.getResource();
         ParsedResourceControllerRequest.Builder<T> builder = ParsedResourceControllerRequest.builder(registry,
-                request);
+            request, requestPathParserResult);
+
         if (hasMediaTypeParam(request)) {
             builder.addAcceptedParameterName(mediaTypeParam);
         }
-        requestParser.parse(request, builder);
-        if (CollectionUtils.size(request.getIds()) > 1) {
+        requestParser.parse(request, requestPathParserResult, builder);
+        if (CollectionUtils.size(requestPathParserResult.getIds()) > 1) {
             // Add filter for ids
-            Resource resource = request.getResource();
             MappedField<?> field = resource.getIdentityField();
             builder
-                .addFilter(resource, "pathIds", request.getIds(), field.getApiName(), Operator.in,
-                    request.getIds());
+                .addFilter(resource, "pathIds", requestPathParserResult.getIds(),
+                    field.getApiName(), Operator.in,
+                    requestPathParserResult.getIds());
         }
         if (HttpMethod.PUT == request.getMethod()) {
             // PUT is effectively PATCH all so we have to update all fields
-            List<MappedField<?>> fields = request.getResource().getMapping().getAttributes();
+            List<MappedField<?>> fields = resource.getMapping().getAttributes();
             addUpdateFields(builder, fields);
         }
         return builder.build();

@@ -8,7 +8,6 @@ import static org.mockito.Mockito.when;
 
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.registry.settings.RegistrySettings;
 import java.util.Arrays;
 import java.util.Collections;
 import java.util.Enumeration;
@@ -51,7 +50,6 @@ public class HttpServletResourceControllerRequestTest {
         when(httpRequest.getRequestURL()).thenReturn(new StringBuffer("http://www.foo.com/"));
         when(httpRequest.getRequestURI()).thenReturn("/");
         when(httpRequest.getParameterNames()).thenReturn(mock(Enumeration.class));
-        when(registry.getSettings()).thenReturn(mock(RegistrySettings.class));
 
         HttpServletResourceControllerRequest request = HttpServletResourceControllerRequest.builder(httpRequest)
             .registry(registry)

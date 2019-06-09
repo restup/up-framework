@@ -1,12 +1,13 @@
 package com.github.restup.controller.request.parser;
 
-import java.util.HashMap;
-import java.util.Map;
-import org.apache.commons.lang3.StringUtils;
 import com.github.restup.controller.model.MediaType;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.util.Assert;
+import java.util.HashMap;
+import java.util.Map;
+import org.apache.commons.lang3.StringUtils;
 
 public class ContentNegotiatedRequestParser implements RequestParser {
 
@@ -35,18 +36,20 @@ public class ContentNegotiatedRequestParser implements RequestParser {
     }
 
     @Override
-    public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
+    public void parse(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
+        ParsedResourceControllerRequest.Builder<?> builder) {
         RequestParser parser = parsers.get(getContentType(request));
         if (parser == null) {
             parser = defaultParser;
         }
 
-        parser.parse(request, builder);
+        parser.parse(request, requestPathParserResult, builder);
     }
 
     public final static class Builder {
 
-        private Map<String, RequestParser> parsers = new HashMap<String, RequestParser>();
+        private Map<String, RequestParser> parsers = new HashMap<>();
         private RequestParser defaultParser;
         private String defaultMediaType;
 

@@ -2,6 +2,7 @@ package com.github.restup.controller.request.parser;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.util.Assert;
 import java.util.List;
 
@@ -32,7 +33,9 @@ public class ParameterParserChain implements RequestParser {
      * Iterate over the {@link #parsers} and execute the first which accepts the parameter
      */
     @Override
-    public void parse(ResourceControllerRequest request, ParsedResourceControllerRequest.Builder<?> builder) {
+    public void parse(ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
+        ParsedResourceControllerRequest.Builder<?> builder) {
         List<String> params = request.getParameterNames();
         if (params != null) {
             for (String param : params) {

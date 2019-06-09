@@ -33,7 +33,7 @@ public class IncludeRequestParamParserTest extends AbstractRequestParamParserTes
     public void before() {
         when(ctx.getBuilder()).thenReturn(builder);
 //        when(ctx.getRequest()).thenReturn(request);
-        when(request.getResource()).thenReturn(requestedResource);
+        when(builder.getResource()).thenReturn(requestedResource);
         when(requestedResource.getRegistry()).thenReturn(registry);
 //        when(builder.getErrorFactory()).thenReturn(ErrorFactory.getDefaultErrorFactory());
     }
@@ -78,7 +78,7 @@ public class IncludeRequestParamParserTest extends AbstractRequestParamParserTes
         when(registry.getResource("bar")).thenReturn(bar);
         parser.parse(request, builder, getParameterName(), " foo , bar ");
         // new ctx is created
-        verify(request, times(3)).getResource();
+        verify(builder, times(1)).getResource();
         verify(requestedResource, times(2)).getRegistry();
         verify(registry).getResource("foo");
         verify(registry).getResource("bar");
@@ -98,7 +98,7 @@ public class IncludeRequestParamParserTest extends AbstractRequestParamParserTes
         parserBrackets
             .parse(request, builder, "include[foo]", " baz, bar[goodBarId] ");
         // new ctx is created
-        verify(request, times(3)).getResource();
+        verify(builder, times(1)).getResource();
         verify(requestedResource, times(3)).getRegistry();
         verify(registry).getResource("foo");
         verify(registry).getResource("bar");

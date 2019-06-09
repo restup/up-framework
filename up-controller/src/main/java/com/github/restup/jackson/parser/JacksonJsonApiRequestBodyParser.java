@@ -11,8 +11,8 @@ import com.fasterxml.jackson.databind.node.ObjectNode;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
-import com.github.restup.errors.RequestError;
 import com.github.restup.errors.ErrorCode;
+import com.github.restup.errors.RequestError;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import java.util.Iterator;
@@ -75,7 +75,7 @@ public class JacksonJsonApiRequestBodyParser extends JacksonRequestBodyParser {
     @Override
     protected Object deserializeObject(ResourceControllerRequest details, ParsedResourceControllerRequest.Builder<?> builder, JsonNode node) {
         try {
-            Resource<?, ?> resource = details.getResource();
+            Resource<?, ?> resource = builder.getResource();
             ObjectNode attributes = (ObjectNode) node.get(ATTRIBUTES);
             attributes.set(ID, node.get(ID));
             if (resource.hasApiField(TYPE)) {

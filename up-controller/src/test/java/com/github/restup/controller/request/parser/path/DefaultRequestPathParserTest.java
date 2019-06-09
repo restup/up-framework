@@ -1,11 +1,12 @@
-package com.github.restup.controller.model;
+package com.github.restup.controller.request.parser.path;
 
-import static com.github.restup.controller.model.AbstractResourceControllerRequestBuilder.getPathFromBasePath;
+import static com.github.restup.controller.request.parser.path.DefaultRequestPathParser.getPathFromBasePath;
 import static org.junit.Assert.assertEquals;
+
 import java.util.function.Consumer;
 import org.junit.Test;
 
-public class AbstractResourceControllerRequestBuilderTest {
+public class DefaultRequestPathParserTest {
 
     @Test
     public void testGetPathFromBasePath() {

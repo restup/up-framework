@@ -1,9 +1,5 @@
 package com.github.restup.service;
 
-import java.lang.annotation.Annotation;
-import java.lang.reflect.Method;
-import org.apache.commons.lang3.tuple.ImmutablePair;
-import org.apache.commons.lang3.tuple.Pair;
 import com.github.restup.annotations.filter.PostBulkCreateFilter;
 import com.github.restup.annotations.filter.PostBulkDeleteFilter;
 import com.github.restup.annotations.filter.PostBulkUpdateFilter;
@@ -39,6 +35,10 @@ import com.github.restup.registry.settings.ServiceMethodAccess;
 import com.github.restup.repository.DefaultBulkRepository;
 import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils;
+import java.lang.annotation.Annotation;
+import java.lang.reflect.Method;
+import org.apache.commons.lang3.tuple.ImmutablePair;
+import org.apache.commons.lang3.tuple.Pair;
 
 /**
  * {@link FilteredService} is a {@link ResourceService} which executes annotated repository methods preceded by annotated filter methods and followed by annotated filter methods.
@@ -65,7 +65,7 @@ public class FilteredService extends MethodCommandOperations implements Resource
             this.resource = resource;
             this.repository = repository;
             this.filters = filters;
-            this.access = resource.getServiceMethodAccess();
+            access = resource.getServiceMethodAccess();
 
             defaultBulkRepo = new DefaultBulkRepository<>(); // TODO
 
@@ -85,8 +85,7 @@ public class FilteredService extends MethodCommandOperations implements Resource
          * @param repositories available repositories for operation
          * @return methodCommand
          */
-        @SuppressWarnings({"rawtypes"})
-        protected MethodCommand<?> getMethod(Resource resource, String operation
+        protected MethodCommand<?> getMethod(Resource<?, ?> resource, String operation
                 , Class<? extends Annotation> repoAnnotation
                 , Class<? extends Annotation> preAnnotation
                 , Class<? extends Annotation> postAnnotation

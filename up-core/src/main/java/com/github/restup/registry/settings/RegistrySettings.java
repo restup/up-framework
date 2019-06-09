@@ -7,13 +7,11 @@ import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassBuilderDecorator;
-import com.github.restup.mapping.MappedClassBuilderDecoratorSupplier;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.fields.DefaultMappedFieldFactory;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
-import com.github.restup.mapping.fields.MappedFieldBuilderDecoratorSupplier;
 import com.github.restup.mapping.fields.MappedFieldFactory;
 import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
@@ -382,11 +380,7 @@ public interface RegistrySettings {
                     mappedFieldBuilderDecoratorBuilder = MappedFieldBuilderDecorator.builder()
                         .withDefaults();
                 }
-                if (repositoryFactory instanceof MappedFieldBuilderDecoratorSupplier) {
-                    mappedFieldBuilderDecoratorBuilder.addAll(
-                        ((MappedFieldBuilderDecoratorSupplier) repositoryFactory)
-                            .getMappedFieldBuilderDecorators());
-                }
+                mappedFieldBuilderDecoratorBuilder.addSuppliers(repositoryFactory);
                 MappedFieldBuilderDecorator[] mappedFieldBuilderDecorators = mappedFieldBuilderDecoratorBuilder
                     .build();
                 mappedFieldFactory = new DefaultMappedFieldFactory(mappedFieldBuilderDecorators);
@@ -479,11 +473,9 @@ public interface RegistrySettings {
                 if (mappedClassBuilderDecoratorBuilder == null) {
                     mappedClassBuilderDecoratorBuilder = MappedClassBuilderDecorator.builder();
                 }
-                if (repositoryFactory instanceof MappedClassBuilderDecoratorSupplier) {
-                    mappedClassBuilderDecoratorBuilder.addAll(
-                        ((MappedClassBuilderDecoratorSupplier) repositoryFactory)
-                            .getMappedClassBuilderDecorators());
-                }
+
+                mappedClassBuilderDecoratorBuilder.addSuppliers(repositoryFactory);
+
                 MappedClassBuilderDecorator[] mappedClassBuilderDecorators = mappedClassBuilderDecoratorBuilder
                     .build();
                 mappedClassFactory = new DefaultMappedClassFactory(mappedFieldFactory,

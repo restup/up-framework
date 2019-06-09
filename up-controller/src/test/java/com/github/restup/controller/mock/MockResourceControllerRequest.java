@@ -4,8 +4,6 @@ import com.github.restup.controller.model.AbstractResourceControllerRequestBuild
 import com.github.restup.controller.model.BasicResourceControllerRequest;
 import com.github.restup.controller.model.HttpMethod;
 import com.github.restup.controller.model.ResourceControllerRequest;
-import com.github.restup.registry.Resource;
-import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
 import com.github.restup.util.UpUtils;
@@ -25,15 +23,11 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
 
     protected MockResourceControllerRequest(Map<String, String[]> parameters
             , HttpMethod method
-            , Resource<?, ?> resource
-            , List<?> ids
-            , Resource<?, ?> relationship
-            , ResourceRelationship<?, ?, ?, ?> resourceRelationship
             , ResourceData<?> body
             , String contentType
             , String baseRequestUrl
             , String requestUrl) {
-        super(method, resource, ids, relationship, resourceRelationship, body, contentType, baseRequestUrl, requestUrl);
+        super(method, body, contentType, baseRequestUrl, requestUrl);
         this.parameters = parameters;
     }
 
@@ -77,6 +71,14 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
             return me();
         }
 
+        private String getContentTypeHeader() {
+            String[] contentType = headers.get("Content-Type");
+            if (contentType != null && contentType.length > 0) {
+                return contentType[0].split(";")[0];
+            }
+            return null;
+        }
+
         @Override
         public MockResourceControllerRequest build() {
             Assert.notNull(url, "URL must not be null");
@@ -90,15 +92,14 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
             String url = getUrl(path);
             String contentType = getContentType(
                 () -> parameters.get(contentTypeParam),
-                () -> headers.get("Content-Type")[0].split(";")[0]);
+                this::getContentTypeHeader);
 
             baseRequestUrl(LOCALHOST)
                 .requestPath(path)
-                .method(method)
-                .parsePath();
+                .method(method);
 
-            result = new MockResourceControllerRequest(parameters, method, resource, ids,
-                relationship, resourceRelationship, body, contentType, baseRequestUrl, url);
+            result = new MockResourceControllerRequest(parameters, method, body, contentType,
+                baseRequestUrl, url);
             return result;
         }
 

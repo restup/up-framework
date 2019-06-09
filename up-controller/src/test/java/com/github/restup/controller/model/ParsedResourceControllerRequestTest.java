@@ -9,6 +9,7 @@ import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.github.restup.controller.model.ParsedResourceControllerRequest.Builder;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.RequestErrorException;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
@@ -34,6 +35,8 @@ public class ParsedResourceControllerRequestTest {
     ResourceRegistry registry;
     @Mock
     ResourceControllerRequest details;
+    @Mock
+    RequestPathParserResult requestPathParserResult;
 
     private static void assertSize(int size, Collection c) {
         assertEquals(size, CollectionUtils.size(c));
@@ -44,12 +47,12 @@ public class ParsedResourceControllerRequestTest {
         registry = mapBackedRegistry();
         registry.registerResource(Company.class);
         registry.registerResource(Resource.builder(Person.class).name("person"));
-        when(details.getResource()).thenReturn((Resource) registry.getResource(Company.class));
+        when(requestPathParserResult.getResource())
+            .thenReturn((Resource) registry.getResource(Company.class));
     }
 
     private Builder mock() {
-
-        return builder(registry, details);
+        return builder(registry, details, requestPathParserResult);
     }
 
     private ResourceQueryStatement rql(Builder b) {

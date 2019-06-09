@@ -2,8 +2,11 @@ package com.github.restup.controller.model;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
 
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
+import com.github.restup.registry.Resource;
+import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.model.ResourceData;
 import java.util.List;
 
@@ -16,6 +19,7 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     private final List<ResourcePath> requestedPaths;
     private final List<ResourceQueryStatement> requestedQueries;
     private final ResourceControllerRequest request;
+    private final RequestPathParserResult requestPathParserResult;
     private final List<String> acceptedParameterNames;
     private final List<String> acceptedResourceParameterNames;
     private final String pageLimitParameterName;
@@ -24,14 +28,17 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
 
     BasicParsedResourceControllerRequest(T data, List<ResourcePath> requestedPaths,
         List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult,
         ResourceData<?> body, List<String> acceptedParameterNames,
         List<String> acceptedResourceParameterNames, String pageLimitParameterName,
         String pageOffsetParameterName, boolean pageOffsetOneBased) {
-        super(request.getMethod(), request.getResource(), request.getIds(), request.getRelationship(), request.getResourceRelationship(), body, request.getContentType(), request.getBaseRequestUrl(), request.getRequestUrl());
+        super(request.getMethod(), body, request.getContentType(),
+            request.getBaseRequestUrl(), request.getRequestUrl());
         this.data = data;
         this.requestedPaths = unmodifiableList(requestedPaths);
         this.requestedQueries = unmodifiableList(requestedQueries);
         this.request = request;
+        this.requestPathParserResult = requestPathParserResult;
         this.acceptedParameterNames = acceptedParameterNames;
         this.acceptedResourceParameterNames = acceptedResourceParameterNames;
         this.pageLimitParameterName = pageLimitParameterName;
@@ -42,6 +49,26 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     @Override
     public T getData() {
         return data;
+    }
+
+    @Override
+    public Resource<?, ?> getResource() {
+        return requestPathParserResult.getResource();
+    }
+
+    @Override
+    public Resource<?, ?> getRelationship() {
+        return requestPathParserResult.getRelationship();
+    }
+
+    @Override
+    public ResourceRelationship<?, ?, ?, ?> getResourceRelationship() {
+        return requestPathParserResult.getResourceRelationship();
+    }
+
+    @Override
+    public List<?> getIds() {
+        return requestPathParserResult.getIds();
     }
 
     @Override
@@ -98,4 +125,7 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
         return request;
     }
 
+    public RequestPathParserResult getRequestPathParserResult() {
+        return requestPathParserResult;
+    }
 }

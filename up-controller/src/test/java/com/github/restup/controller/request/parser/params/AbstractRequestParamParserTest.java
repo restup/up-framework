@@ -75,9 +75,8 @@ abstract class AbstractRequestParamParserTest {
         when(builder.getParameterError(any(), any())).thenCallRealMethod();
 //        doCallRealMethod().when(builder).addError(any(RequestError.Builder.class));
         when(builder.getErrorFactory()).thenReturn(ErrorFactory.getDefaultErrorFactory());
-        when(request.getResource()).thenReturn(requestedResource);
+        when(builder.getResource()).thenReturn(requestedResource);
         when(requestedResource.getName()).thenReturn("testResource");
-//        when(resource.getRegistry()).thenReturn(registry);
     }
 
     protected void verifyDefault() {
@@ -92,7 +91,7 @@ abstract class AbstractRequestParamParserTest {
     }
 
     protected void verifyRequestParamParser() {
-        verify(request).getResource();
+        verify(builder).getResource();
         verifyDefault();
     }
 

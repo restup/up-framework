@@ -50,7 +50,7 @@ public class DynamoDBFieldBuilderDecoratorTest {
         assertIndexes(resource, "foobar", Collections.emptyMap());
     }
 
-    private void assertIndexes(Resource resource, String field,
+    private void assertIndexes(Resource<?, ?> resource, String field,
         Map<String, Integer> expected) {
         MappedField mf = resource.findPersistedField(field);
         Set<MappedIndexField> indexes = mf.getIndexes();

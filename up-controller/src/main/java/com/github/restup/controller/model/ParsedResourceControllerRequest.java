@@ -2,6 +2,7 @@ package com.github.restup.controller.model;
 
 import com.github.restup.bind.converter.ParameterConverter;
 import com.github.restup.bind.converter.ParameterConverterFactory;
+import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.ErrorCode;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.errors.Errors;
@@ -31,10 +32,12 @@ import org.apache.commons.collections4.list.SetUniqueList;
  * 
  * @param <T> type of resource requested
  */
-public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
+public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest,
+    RequestPathParserResult {
 
-    static <T> Builder<T> builder(ResourceRegistry registry, ResourceControllerRequest request) {
-        return new Builder<>(registry, request);
+    static <T> Builder<T> builder(ResourceRegistry registry, ResourceControllerRequest request,
+        RequestPathParserResult requestPathParserResult) {
+        return new Builder<>(registry, request, requestPathParserResult);
     }
 
     T getData();
@@ -63,6 +66,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         private final ResourceRegistry registry;
         private final ResourceControllerRequest request;
+        private final RequestPathParserResult pathParserResult;
         private ResourceData<T> body;
         private T data;
         private List<ResourcePath> requestedPaths;
@@ -79,11 +83,13 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         private int maxPageSize;
 
-        Builder(ResourceRegistry registry, ResourceControllerRequest request) {
+        Builder(ResourceRegistry registry, ResourceControllerRequest request,
+            RequestPathParserResult pathParserResult) {
             super();
             maxPageSize = 100;
             this.request = request;
             this.registry = registry;
+            this.pathParserResult = pathParserResult;
             acceptedParameterNames = new ArrayList<>();
             acceptedResourceParameterNames = new ArrayList();
         }
@@ -275,7 +281,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return resourceQueries == null ? null : resourceQueries.get(resourceName);
         }
 
-        public Builder<T> addFilter(Resource resource, String rawParameterName,
+        public Builder<T> addFilter(Resource<?, ?> resource, String rawParameterName,
             String rawParameterValue, String field, String operator,
                 String value) {
             Operator op = Operator.of(operator);
@@ -288,21 +294,21 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return addFilter(resource, rawParameterName, rawParameterValue, field, op, value);
         }
 
-        public Builder<T> addFilter(Resource resource, String rawParameterName,
+        public Builder<T> addFilter(Resource<?, ?> resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
             Collection<?> value) {
             return addFilterInternal(resource, rawParameterName, rawParameterValue, field, operator,
                 value);
         }
 
-        public Builder<T> addFilter(Resource resource, String rawParameterName,
+        public Builder<T> addFilter(Resource<?, ?> resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
                 String value) {
             return addFilterInternal(resource, rawParameterName, rawParameterValue, field, operator,
                 value);
         }
 
-        private Builder<T> addFilterInternal(Resource resource, String rawParameterName,
+        private Builder<T> addFilterInternal(Resource<?, ?> resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
                 String value) {
             ResourcePath path = path(resource, field);
@@ -314,7 +320,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return addFilter(new ResourcePathFilter(path, operator, converted));
         }
 
-        private Builder<T> addFilterInternal(Resource resource, String rawParameterName,
+        private Builder<T> addFilterInternal(Resource<?, ?> resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
                 Collection<?> value) {
             ResourcePath path = path(resource, field);
@@ -350,7 +356,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             if (!path.isValid()) {
                 addError(getParameterError(rawParameterName, rawParameterValue).code("INVALID_PARAMETER_PATH")
                         .title("Invalid path specified ")
-                        .detail("{0} specifies an invalid field, '{1}', for {2} resources", rawParameterName, field,
+                    .detail("{0} specifies an invalid field, ''{1}'', for {2} resources",
+                        rawParameterName, field,
                                 resource));
                 return false;
             }
@@ -361,7 +368,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return setPageLimit(getResource(), parameterName, value);
         }
 
-        public Builder<T> setPageLimit(Resource resource, String parameterName, Integer value) {
+        public Builder<T> setPageLimit(Resource<?, ?> resource, String parameterName,
+            Integer value) {
             if (pageLimit != null) {
                 addDuplicateParameter(parameterName, value, pageLimitParameterName, pageLimit);
             } else if (hasMinError(parameterName, 0, value)) {
@@ -381,7 +389,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return me();
         }
 
-        public Builder<T> setPageOffset(Resource resource, String parameterName, Integer value) {
+        public Builder<T> setPageOffset(Resource<?, ?> resource, String parameterName,
+            Integer value) {
             return setPageOffset(resource, parameterName, value, false);
         }
 
@@ -394,7 +403,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return setPageOffset(getResource(), parameterName, value, pageOffsetAsOneBased);
         }
 
-        public Builder<T> setPageOffset(Resource resource, String parameterName, Integer value,
+        public Builder<T> setPageOffset(Resource<?, ?> resource, String parameterName,
+            Integer value,
             boolean pageOffsetAsOneBased) {
             pageOffsetOneBased = pageOffsetAsOneBased;
             if (pageOffset != null) {
@@ -463,8 +473,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             return registry.getSettings().getErrorFactory();
         }
 
-        private Resource<?, ?> getResource() {
-            return request.getResource();
+        public Resource<?, ?> getResource() {
+            return pathParserResult.getResource();
         }
 
         @Override
@@ -510,7 +520,8 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             }
             ParsedResourceControllerRequest<T> result = new BasicParsedResourceControllerRequest<>(
                 data, requestedPaths,
-                queries, request, body, acceptedParameterNames, acceptedResourceParameterNames,
+                queries, request, pathParserResult, body, acceptedParameterNames,
+                acceptedResourceParameterNames,
                 pageLimitParameterName,
                 pageOffsetParameterName, pageOffsetOneBased);
             return result;

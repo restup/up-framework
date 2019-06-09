@@ -29,7 +29,7 @@ public class FieldsRequestParamParserTest extends AbstractRequestParamParserTest
     public void before() {
         when(ctx.getBuilder()).thenReturn(builder);
         when(result.getResource()).thenReturn(resultResource);
-        when(request.getResource()).thenReturn(requestedResource);
+        when(builder.getResource()).thenReturn(requestedResource);
     }
 
 
