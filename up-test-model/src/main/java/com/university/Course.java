@@ -32,7 +32,7 @@ public class Course {
     public static final String TABLE_NAME = RESOURCE_NAME;
 
     @Id
-    @GeneratedValue(strategy = GenerationType.AUTO)
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     @DynamoDBHashKey(attributeName = "Id")
     private Long id;
 

@@ -149,6 +149,14 @@
             <version>2.5.0</version>
             <scope>test</scope>
         </dependency>
+
+        <dependency>
+            <!-- required for @SafeHtml validation -->
+            <groupId>org.jsoup</groupId>
+            <artifactId>jsoup</artifactId>
+            <version>1.10.2</version>
+            <scope>test</scope>
+        </dependency>
         
     </dependencies>
 

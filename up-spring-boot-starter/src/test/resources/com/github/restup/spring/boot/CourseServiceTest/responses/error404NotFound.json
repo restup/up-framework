@@ -1,0 +1,15 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "RESOURCE_NOT_FOUND",
+      "title": "Not Found",
+      "detail": "Resource not found",
+      "meta": {
+        "resource": "course",
+        "id": 616161616
+      },
+      "status": "404"
+    }
+  ]
+}

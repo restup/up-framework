@@ -1,0 +1,12 @@
+{
+  "limit": 1,
+  "offset": 2,
+  "total": 3,
+  "data": [
+    {
+      "id": 3,
+      "type": "course",
+      "name": "French 101"
+    }
+  ]
+}

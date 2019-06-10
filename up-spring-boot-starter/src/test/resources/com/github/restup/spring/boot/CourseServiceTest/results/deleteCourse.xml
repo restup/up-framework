@@ -1,0 +1,10 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <university id="1" name="Harvard"/>
+    <university id="2" name="MIT"/>
+
+    <course id="4" school_id="2" name="Computer Science" name_lower_case="computer science"/>
+    <course id="5" school_id="2" name="Algebra" name_lower_case="algebra"/>
+    <course id="6" school_id="2" name="Calculus" name_lower_case="calculus"/>
+
+</dataset>

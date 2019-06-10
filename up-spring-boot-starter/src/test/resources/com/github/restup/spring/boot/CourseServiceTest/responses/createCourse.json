@@ -1,0 +1,8 @@
+{
+  "data": {
+    "id": "${json-unit.ignore}",
+    "type": "course",
+    "name": "foo",
+    "universityId": 1
+  }
+}

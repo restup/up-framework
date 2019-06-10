@@ -1,0 +1,18 @@
+<?xml version='1.0' encoding='UTF-8'?>
+<dataset>
+    <university id="1" name="Harvard"/>
+    <university id="2" name="MIT"/>
+
+    <course id="1" school_id="1" name="AAA" name_lower_case="aaa"/>
+    <course id="2" school_id="1" name="BBB" name_lower_case="bbb"/>
+    <course id="3" school_id="1" name="ccc" name_lower_case="ccc"/>
+    <course id="4" school_id="2" name="ddd" name_lower_case="ddd"/>
+    <course id="5" school_id="2" name="EEE" name_lower_case="eee"/>
+    <course id="6" school_id="2" name="fff" name_lower_case="fff"/>
+    <course id="7" school_id="2" name="GGG" name_lower_case="ggg"/>
+    <course id="8" school_id="2" name="HHH" name_lower_case="hhh"/>
+    <course id="9" school_id="2" name="III" name_lower_case="iii"/>
+    <course id="10" school_id="2" name="JJJ" name_lower_case="jjj"/>
+    <course id="11" school_id="2" name="YYY" name_lower_case="yyy"/>
+    <course id="12" school_id="2" name="zzz" name_lower_case="zzz"/>
+</dataset>

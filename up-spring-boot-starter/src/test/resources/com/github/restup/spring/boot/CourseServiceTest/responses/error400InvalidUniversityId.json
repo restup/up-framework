@@ -1,0 +1,19 @@
+{
+  "errors": [
+    {
+      "id": "${json-unit.regex}[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}",
+      "code": "COURSE_UNIVERSITY_ID_NOT_FOUND",
+      "title": "Reference not found",
+      "detail": "Course universityId not found",
+      "source": {
+        "pointer": "/data/universityId"
+      },
+      "meta": {
+        "universityId": 666,
+        "resource": "course",
+        "referencedResource": "university"
+      },
+      "status": "400"
+    }
+  ]
+}

@@ -1,0 +1,43 @@
+{
+  "offset": 0,
+  "total": 6,
+  "limit": 10,
+  "data": [
+    {
+      "id": 1,
+      "type": "course",
+      "name": "Physics",
+      "universityId": 1
+    },
+    {
+      "id": 2,
+      "type": "course",
+      "name": "Spanish 101",
+      "universityId": 1
+    },
+    {
+      "id": 3,
+      "type": "course",
+      "name": "French 101",
+      "universityId": 1
+    },
+    {
+      "id": 4,
+      "type": "course",
+      "name": "Computer Science",
+      "universityId": 2
+    },
+    {
+      "id": 5,
+      "type": "course",
+      "name": "Algebra",
+      "universityId": 2
+    },
+    {
+      "id": 6,
+      "type": "course",
+      "name": "Calculus",
+      "universityId": 2
+    }
+  ]
+}

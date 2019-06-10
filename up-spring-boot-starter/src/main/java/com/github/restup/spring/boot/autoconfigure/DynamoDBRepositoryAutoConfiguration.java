@@ -20,6 +20,7 @@ import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass({DynamoDBMapper.class, DynamoDBRepository.class})
+@ConditionalOnProperty(value = "up.dynamodb.enabled", havingValue = "true", matchIfMissing = true)
 @AutoConfigureBefore(UpAutoConfiguration.class)
 public class DynamoDBRepositoryAutoConfiguration {
 

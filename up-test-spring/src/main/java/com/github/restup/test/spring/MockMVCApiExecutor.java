@@ -2,6 +2,12 @@ package com.github.restup.test.spring;
 
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.notNullValue;
+
+import com.github.restup.test.ApiExecutor;
+import com.github.restup.test.ApiRequest;
+import com.github.restup.test.ApiResponse;
+import com.github.restup.test.BasicApiResponse;
+import com.github.restup.test.resource.Contents;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Map.Entry;
@@ -18,11 +24,6 @@ import org.springframework.test.web.servlet.ResultActions;
 import org.springframework.test.web.servlet.request.MockHttpServletRequestBuilder;
 import org.springframework.test.web.servlet.request.MockMvcRequestBuilders;
 import org.springframework.test.web.servlet.result.MockMvcResultHandlers;
-import com.github.restup.test.ApiExecutor;
-import com.github.restup.test.ApiRequest;
-import com.github.restup.test.ApiResponse;
-import com.github.restup.test.BasicApiResponse;
-import com.github.restup.test.resource.Contents;
 
 /**
  * mockMvc {@link ApiExecutor}
@@ -87,7 +88,7 @@ public class MockMVCApiExecutor implements ApiExecutor {
             MvcResult result = ra.andReturn();
             MockHttpServletResponse response = result.getResponse();
 
-            Map<String, String[]> headers = new HashMap<String, String[]>();
+            Map<String, String[]> headers = new HashMap<>();
             for (String header : response.getHeaderNames()) {
                 headers.put(header, response.getHeaders(header).toArray(new String[0]));
             }
