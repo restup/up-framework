@@ -15,6 +15,7 @@ import java.util.Arrays;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import org.apache.commons.lang3.ArrayUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -39,7 +40,8 @@ public class DefaultLinkBuilder implements LinkBuilder {
     }
 
     @Override
-    public List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> resource, Object id) {
+    public List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object result,
+        Resource<?, ?> resource, Object[] id) {
         if (HttpMethod.DELETE == request.getMethod()) {
             return Collections.emptyList();
         }
@@ -52,22 +54,25 @@ public class DefaultLinkBuilder implements LinkBuilder {
     }
 
     @Override
-    public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object Result, Resource<?, ?> relationship, Object id) {
+    public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request,
+        Object Result, Resource<?, ?> relationship, Object[] id) {
         List<Link> links = new ArrayList<>();
-
-        links.add(link(request, LinkRelations.related, request.getResource(), id, relationship));
+        links.add(link(request, LinkRelations.related, request.getResource(),
+            ArrayUtils.add(id, relationship)));
 
 //        links.add(link(LinkRelations.self, request.getResource(), id, JsonApiResult.RELATIONSHIPS, relationship));
         return links;
     }
 
     @Override
-    public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> relationship, Object id, RelationshipType type) {
+    public List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request,
+        Object result, Resource<?, ?> relationship, Object[] id, RelationshipType type) {
         List<Link> links = new ArrayList<>();
 
         String name = RelationshipType.isToOne(type) ? relationship.getName() : relationship.getPluralName();
 
-        links.add(link(request, LinkRelations.related, request.getResource(), id, name));
+        links.add(
+            link(request, LinkRelations.related, request.getResource(), ArrayUtils.add(id, name)));
 
         return links;
     }

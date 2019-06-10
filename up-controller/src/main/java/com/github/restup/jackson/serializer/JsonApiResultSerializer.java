@@ -30,7 +30,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
     @Override
     protected void writeLinking(JsonApiResult result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         List<Link> links = result.getTopLevelLinks();
-        this.writeLinks(jgen, links);
+        writeLinks(jgen, links);
     }
 
     /*TODO
@@ -49,8 +49,8 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
     @Override
     protected void writeResourceObject(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, JsonApiResult result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartObject();
-        Object id = this.writeIdentifier(resource, data, result, jgen, provider);
-        this.writeType(resource, data, result, jgen, provider);
+        Object[] id = writeIdentifier(resource, data, result, jgen, provider);
+        writeType(resource, data, result, jgen, provider);
 
         jgen.writeFieldName(JsonApiResult.ATTRIBUTES);
         jgen.writeStartObject();
@@ -61,9 +61,9 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
         super.writeAttributes(resource, paths, data, result, jgen, provider, false);
         jgen.writeEndObject();
 
-        this.writeResourceRelationships(resource, paths, data, result, jgen, provider);
+        writeResourceRelationships(resource, paths, data, result, jgen, provider);
 
-        this.writeLinks(jgen, result.getLinks(resource, id));
+        writeLinks(jgen, result.getLinks(resource, id));
 
         //TODO meta
 
@@ -74,10 +74,10 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             SerializerProvider provider) throws Exception {
         //TODO toMany relationshps
         Collection<ResourceRelationship<?,?,?,?>> relationships = resource.getRelationshipsTo();
-        if (this.hasRelationships(paths) || CollectionUtils.isNotEmpty(relationships)) {
+        if (hasRelationships(paths) || CollectionUtils.isNotEmpty(relationships)) {
             jgen.writeFieldName(JsonApiResult.RELATIONSHIPS);
             jgen.writeStartObject();
-            Object id = resource.getIdentityField().readValue(data);
+            Object[] id = getIdentityData(resource, data);
             // From relationships... these can be controlled through sparse requests
             for (Map.Entry<PathValue, ?> e : paths.entrySet()) {
                 PathValue pv = e.getKey();
@@ -93,10 +93,10 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
                     jgen.writeStartObject();
 
                     // write the resource linkage "data" object
-                    this.writeResourceIdentifierObject(jgen, rel, value);
+                    writeResourceIdentifierObject(jgen, rel, value);
 
                     // write relationship links
-                    this.writeLinks(jgen, result.getRelationshipLinks(rel, id));
+                    writeLinks(jgen, result.getRelationshipLinks(rel, id));
 
                     jgen.writeEndObject();
                 }
@@ -109,7 +109,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
                     jgen.writeStartObject();
 
                     // write relationship links
-                    this.writeLinks(jgen, result.getRelationshipLinks(relationship.getFrom(), id,
+                    writeLinks(jgen, result.getRelationshipLinks(relationship.getFrom(), id,
                         relationship.getType(resource)));
 
                     jgen.writeEndObject();
@@ -118,6 +118,14 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             }
             jgen.writeEndObject();
         }
+    }
+
+    private Object[] getIdentityData(Resource<?, ?> resource, Object data) {
+        Object[] result = new Object[resource.getIdentityField().length];
+        for (int i = 0; i < resource.getIdentityField().length; i++) {
+            result[i] = resource.getIdentityField()[i].readValue(data);
+        }
+        return result;
     }
 
     /*TODO
@@ -134,12 +142,12 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
             jgen.writeStartArray();
             Iterator<?> it = ((Iterable<?>) value).iterator();
             while (it.hasNext()) {
-                this.writeResourceIdentifierFields(jgen, type, it.next());
+                writeResourceIdentifierFields(jgen, type, it.next());
             }
             jgen.writeEndArray();
         } else {
             jgen.writeStartObject();
-            id = this.writeResourceIdentifierFields(jgen, type, value);
+            id = writeResourceIdentifierFields(jgen, type, value);
             jgen.writeEndObject();
         }
         return id;
@@ -147,7 +155,7 @@ public class JsonApiResultSerializer extends NegotiatedResultSerializer<JsonApiR
 
     protected Object writeResourceIdentifierFields(JsonGenerator jgen, String type, Object id) throws Exception {
         jgen.writeStringField(JsonApiResult.TYPE, type);
-        return this.writeIdentifier(jgen, JsonApiResult.ID, id);
+        return writeIdentifier(jgen, JsonApiResult.ID, id);
     }
 
     protected boolean hasRelationships(Map<PathValue, ?> paths) {

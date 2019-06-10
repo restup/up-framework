@@ -42,7 +42,7 @@ public class DynamoDBFieldBuilderDecoratorTest {
         assertEquals(6, resource.getAllPaths().size());
         assertNull(resource.findPersistedField("ignoreme").getPersistedName());
         assertNotNull(resource.findPersistedField("foobar"));
-        assertEquals("id", resource.getIdentityField().getPersistedName());
+        assertEquals("id", resource.getIdentityField()[0].getPersistedName());
         assertIndexes(resource, "id", (Map) mapOf(PRIMARY_KEY, 0));
         assertIndexes(resource, "foo", (Map) mapOf("idx1", 0, "idx3", 0, "idx2", 1, "idx4", 1));
         assertIndexes(resource, "bar", (Map) mapOf("idx2", 0, "idx1", 1));

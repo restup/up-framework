@@ -31,7 +31,8 @@ public interface LinkBuilder {
      * @param id
      * @return item links for the resource and id specified
      */
-    List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object Result, Resource<?, ?> resource, Object id);
+    List<Link> getLinks(ParsedResourceControllerRequest<?> request, Object Result,
+        Resource<?, ?> resource, Object[] id);
 
     /*TODO
      * @param request
@@ -40,7 +41,9 @@ public interface LinkBuilder {
      * @param id
      * @return the relationship links
      */
-    List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object Result, Resource<?, ?> relationship, Object id);
+    List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object Result,
+        Resource<?, ?> relationship, Object[] id);
 
-    List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object result, Resource<?, ?> relationship, Object id, RelationshipType type);
+    List<Link> getRelationshipLinks(ParsedResourceControllerRequest<?> request, Object result,
+        Resource<?, ?> relationship, Object[] id, RelationshipType type);
 }

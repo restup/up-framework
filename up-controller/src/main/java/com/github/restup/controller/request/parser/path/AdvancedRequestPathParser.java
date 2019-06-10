@@ -20,11 +20,11 @@ import java.util.List;
 import java.util.Objects;
 import org.apache.commons.lang3.StringUtils;
 
-public class DefaultRequestPathParser implements RequestPathParser {
+public class AdvancedRequestPathParser implements RequestPathParser {
 
     private final ResourceRegistry registry;
 
-    public DefaultRequestPathParser(ResourceRegistry registry) {
+    public AdvancedRequestPathParser(ResourceRegistry registry) {
         this.registry = registry;
     }
 
@@ -121,6 +121,23 @@ public class DefaultRequestPathParser implements RequestPathParser {
 
             // get path parts
             String arr[] = path.split("/");
+//
+//            Resource<?, ?> resource = null;
+//            Resource<?, ?> relationship = null;
+//            int resourceIndex = 0;
+//            for (int i = 0; i < arr.length; i++) {
+//                if (resource == null) {
+//                    resource = registry.getResourceByPluralName(arr[i]);
+//                    if (resource != null) {
+//                        resource.getIdentityField();
+//                        resourceIndex = i;
+//                        i++; // next can never be a resource
+//                    }
+//                } else {
+//
+//                }
+//            }
+
             int n = arr.length - 1;
             int resourcePathSize = 0;
             // ex 1. foos          ; list all foos

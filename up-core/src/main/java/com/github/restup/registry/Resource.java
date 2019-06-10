@@ -68,8 +68,9 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         if (size < 1) {
             result = Collections.emptySet();
         } else {
+            Assert.noCompositeKeys(resource.getIdentityField());
             result = list.stream()
-                .map(t -> resource.getIdentityField().readValue(t))
+                .map(t -> resource.getIdentityField()[0].readValue(t))
                 .collect(Collectors.toSet());
         }
         return result;
@@ -164,7 +165,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
     /**
      * @return identity maping for the resource
      */
-    MappedField<ID> getIdentityField();
+    MappedField<ID>[] getIdentityField();
 
     /**
      * @return service implementation
@@ -440,6 +441,7 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
             MappedField<ID> identityField = (MappedField) MappedField.getIdentityField(mapping.getAttributes());
 
             Assert.notNull(identityField, "identityfield not found.");
+            MappedField[] identityFields = new MappedField[]{identityField};
 
             String name = this.name;
             if (isEmpty(name)) {
@@ -469,7 +471,8 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
                 restrictedFields = registrySettings.getDefaultRestrictedFieldsProvider();
             }
 
-            BasicResource<T, ID> resource = new BasicResource(type, name, pluralName, basePath, registry, mapping, identityField, controllerMethodAccess, serviceMethodAccess,
+            BasicResource<T, ID> resource = new BasicResource(type, name, pluralName, basePath,
+                registry, mapping, identityFields, controllerMethodAccess, serviceMethodAccess,
                     pagination, defaultSparseFields, restrictedFields);
             Object service = this.service;
             Object repository = this.repository;

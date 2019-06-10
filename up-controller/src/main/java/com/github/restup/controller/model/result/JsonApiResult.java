@@ -30,15 +30,16 @@ public class JsonApiResult extends NegotiatedResult {
     }
 
 
-    public List<Link> getLinks(Resource<?, ?> resource, Object id) {
+    public List<Link> getLinks(Resource<?, ?> resource, Object[] id) {
         return linkBuilder.getLinks(getRequest(), getResult(), resource, id);
     }
 
-    public List<Link> getRelationshipLinks(Resource<?, ?> resource, Object id) {
+    public List<Link> getRelationshipLinks(Resource<?, ?> resource, Object[] id) {
         return linkBuilder.getRelationshipLinks(getRequest(), getResult(), resource, id);
     }
 
-    public List<Link> getRelationshipLinks(Resource<?, ?> relationship, Object id, RelationshipType type) {
+    public List<Link> getRelationshipLinks(Resource<?, ?> relationship, Object[] id,
+        RelationshipType type) {
         return linkBuilder.getRelationshipLinks(getRequest(), getResult(), relationship, id, type);
     }
 

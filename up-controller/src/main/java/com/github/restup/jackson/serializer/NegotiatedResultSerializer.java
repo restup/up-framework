@@ -36,12 +36,12 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     @Override
     public void serialize(T result, JsonGenerator jgen, SerializerProvider provider)
             throws IOException, JsonProcessingException {
-        if (this.accept(result)) {
+        if (accept(result)) {
             try {
                 jgen.writeStartObject();
-                this.writeLinking(result, jgen, provider);
-                this.writeData(result, jgen, provider);
-                this.writeIncluded(result, jgen, provider);
+                writeLinking(result, jgen, provider);
+                writeData(result, jgen, provider);
+                writeIncluded(result, jgen, provider);
                 jgen.writeEndObject();
             } catch (Exception e) {
                 log.error("Resource Object Serialization error", e);
@@ -64,9 +64,9 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     protected void writeLinking(T result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
         if (result.getResult() instanceof PagedResult) {
             PagedResult<?> paged = (PagedResult<?>) result.getResult();
-            this.writeIfNotNull(jgen, "limit", paged.getLimit());
-            this.writeIfNotNull(jgen, "offset", paged.getOffset());
-            this.writeIfNotNull(jgen, "total", paged.getTotal());
+            writeIfNotNull(jgen, "limit", paged.getLimit());
+            writeIfNotNull(jgen, "offset", paged.getOffset());
+            writeIfNotNull(jgen, "total", paged.getTotal());
         }
     }
 
@@ -98,7 +98,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     protected void writeData(T result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         if (!result.isCount()) {
             Resource<?, ?> resource = result.getResource();
-            this.writeObjectField(DataPathValue.DATA, resource, result.getMappedPaths(),
+            writeObjectField(DataPathValue.DATA, resource, result.getMappedPaths(),
                 result.getData(), result, jgen, provider);
         }
     }
@@ -109,7 +109,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
      */
     protected void writeObjectField(String fieldName, Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, T result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeFieldName(fieldName);
-        this.writeObject(resource, paths, data, result, jgen, provider);
+        writeObject(resource, paths, data, result, jgen, provider);
     }
 
     /*TODO
@@ -119,23 +119,23 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
         if (data == null) {
             jgen.writeNull();
         } else if (data instanceof Iterable) {
-            this.writeIterable(resource, paths, (Iterable<?>) data, result, jgen, provider);
+            writeIterable(resource, paths, (Iterable<?>) data, result, jgen, provider);
         } else if (data instanceof Object[]) {
-            this.writeArray(resource, paths, (Object[]) data, result, jgen, provider);
+            writeArray(resource, paths, (Object[]) data, result, jgen, provider);
         } else if (resource != null) {
-            this.writeResourceObject(resource, paths, data, result, jgen, provider);
+            writeResourceObject(resource, paths, data, result, jgen, provider);
         } else {
             jgen.writeStartObject();
-            this.writeAttributes(resource, paths, data, result, jgen, provider, true);
+            writeAttributes(resource, paths, data, result, jgen, provider, true);
             jgen.writeEndObject();
         }
     }
 
     protected void writeResourceObject(Resource<?, ?> resource, Map<PathValue, ?> paths, Object data, T result, JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartObject();
-        this.writeIdentifier(resource, data, result, jgen, provider);
-        this.writeType(resource, data, result, jgen, provider);
-        this.writeAttributes(resource, paths, data, result, jgen, provider, true);
+        writeIdentifier(resource, data, result, jgen, provider);
+        writeType(resource, data, result, jgen, provider);
+        writeAttributes(resource, paths, data, result, jgen, provider, true);
         jgen.writeEndObject();
     }
 
@@ -145,11 +145,11 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     protected void writeIterable(Resource<?, ?> resource, Map<PathValue, ?> paths, Iterable<?> data, T result,
             JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartArray();
-        boolean indexed = this.writeIndexed(resource, paths, data, result, jgen, provider);
+        boolean indexed = writeIndexed(resource, paths, data, result, jgen, provider);
         if (!indexed) {
             Iterator<?> it = data.iterator();
             while (it.hasNext()) {
-                this.writeObject(resource, paths, it.next(), result, jgen, provider);
+                writeObject(resource, paths, it.next(), result, jgen, provider);
             }
         }
         jgen.writeEndArray();
@@ -161,10 +161,10 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     protected void writeArray(Resource<?, ?> resource, Map<PathValue, ?> paths, Object[] data, T result,
             JsonGenerator jgen, SerializerProvider provider) throws Exception {
         jgen.writeStartArray();
-        boolean indexed = this.writeIndexed(resource, paths, data, result, jgen, provider);
+        boolean indexed = writeIndexed(resource, paths, data, result, jgen, provider);
         if (!indexed) {
             for (Object o : data) {
-                this.writeObject(resource, paths, o, result, jgen, provider);
+                writeObject(resource, paths, o, result, jgen, provider);
             }
         }
         jgen.writeEndArray();
@@ -181,7 +181,7 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
             if (pv instanceof IndexPathValue && e.getValue() instanceof Map) {
                 IndexPathValue i = (IndexPathValue) pv;
                 Object value = i.readValue(data);
-                this.writeObject(this.getResource(pv), this.asMap(e.getValue()), value, result,
+                writeObject(getResource(pv), asMap(e.getValue()), value, result,
                     jgen, provider);
                 indexed = true;
             }
@@ -200,11 +200,15 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
     /*TODO
      * writes the "id" fieldName, calls {@link #writeIdentifier(JsonGenerator, String, Object)} to write value
      */
-    protected Object writeIdentifier(Resource<?, ?> resource, Object data, T result, JsonGenerator jgen, SerializerProvider provider) throws IOException {
+    protected Object[] writeIdentifier(Resource<?, ?> resource, Object data, T result,
+        JsonGenerator jgen, SerializerProvider provider) throws IOException {
         // TODO check if id was explicitly requested to be removed
-        MappedField<?> field = resource.getIdentityField();
-        Object id = field.readValue(data);
-        this.writeIdentifier(jgen, field.getApiName(), id);
+        Object[] id = new Object[resource.getIdentityField().length];
+        for (int i = 0; i < resource.getIdentityField().length; i++) {
+            MappedField<?> field = resource.getIdentityField()[i];
+            id[i] = field.readValue(data);
+            writeIdentifier(jgen, field.getApiName(), id);
+        }
         return id;
     }
 
@@ -228,10 +232,9 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
                 Object value = readable.readValue(data);
 
                 if (e.getValue() == null) {
-                    BeanPropertyWriter bpw = this.findBeanPropertyWriter(data, jgen, provider);
+                    BeanPropertyWriter bpw = findBeanPropertyWriter(data, jgen, provider);
                     if (bpw == null) {
-                        JsonSerializer<Object> s = this
-                            .findCustomSerializer(pv, data, jgen, provider);
+                        JsonSerializer<Object> s = findCustomSerializer(pv, data, jgen, provider);
                         if (s == null) {
                             jgen.writeObjectField(fieldName, value);
                         } else {
@@ -241,8 +244,8 @@ public abstract class NegotiatedResultSerializer<T extends NegotiatedResult> ext
                         bpw.serializeAsField(data, jgen, provider);
                     }
                 } else if (e.getValue() instanceof Map) { // always should be
-                    Resource<?, ?> pathResource = this.getResource(pv);
-                    this.writeObjectField(fieldName, pathResource, this.asMap(e.getValue()), value,
+                    Resource<?, ?> pathResource = getResource(pv);
+                    writeObjectField(fieldName, pathResource, asMap(e.getValue()), value,
                         result, jgen, provider);
                 }
             }

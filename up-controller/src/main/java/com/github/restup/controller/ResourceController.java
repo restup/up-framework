@@ -456,7 +456,8 @@ public class ResourceController {
         requestParser.parse(request, requestPathParserResult, builder);
         if (CollectionUtils.size(requestPathParserResult.getIds()) > 1) {
             // Add filter for ids
-            MappedField<?> field = resource.getIdentityField();
+            Assert.noCompositeKeys(resource.getIdentityField());
+            MappedField<?> field = resource.getIdentityField()[0];
             builder
                 .addFilter(resource, "pathIds", requestPathParserResult.getIds(),
                     field.getApiName(), Operator.in,

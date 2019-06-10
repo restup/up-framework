@@ -79,7 +79,7 @@
 		<assertj.version>3.9.0</assertj.version>
 		<jsoup.version>1.10.2</jsoup.version>
 		<asm.version>3.3.1</asm.version>
-		<openpojo.version>0.8.7</openpojo.version>
+		<openpojo.version>0.8.12</openpojo.version>
 		<equalsverifier.version>2.4.2</equalsverifier.version>
 		
 	</properties>

@@ -6,12 +6,7 @@ import static org.mockito.Mockito.doThrow;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.when;
-import java.io.IOException;
-import java.util.Collections;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.mockito.Mock;
-import org.mockito.junit.MockitoJUnitRunner;
+
 import com.fasterxml.jackson.core.JsonGenerator;
 import com.fasterxml.jackson.databind.SerializerProvider;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
@@ -21,9 +16,14 @@ import com.github.restup.path.EmbeddedResourcePathValue;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.response.ResourceResult;
 import com.model.test.company.Person;
+import java.io.IOException;
+import java.util.Collections;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.mockito.Mock;
+import org.mockito.junit.MockitoJUnitRunner;
 
 @RunWith(MockitoJUnitRunner.class)
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class NegotiatedResultSerializerTest {
 
 
@@ -61,7 +61,7 @@ public class NegotiatedResultSerializerTest {
     
     @Test
     public void testWriteArray() throws Exception {
-        when(resource.getIdentityField()).thenReturn(mock(MappedField.class));
+        when(resource.getIdentityField()).thenReturn(new MappedField[]{mock(MappedField.class)});
         JsonResultSerializer serializer = new JsonResultSerializer();
         
         serializer.writeObject(resource, Collections.emptyMap(), new Object[] {new Person()}, result, jsonGenerator, provider);

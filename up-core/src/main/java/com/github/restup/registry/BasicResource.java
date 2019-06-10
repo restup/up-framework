@@ -1,10 +1,5 @@
 package com.github.restup.registry;
 
-import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
@@ -16,6 +11,11 @@ import com.github.restup.repository.ResourceRepositoryOperations;
 import com.github.restup.service.ResourceService;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.util.Assert;
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Resource meta data, defining resource name, type, service implementation, etc.
@@ -29,7 +29,7 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
 
     private final ResourceRegistry registry;
     private final MappedClass<T> mapping;
-    private final MappedField<ID> identityField;
+    private final MappedField<ID>[] identityField;
 
     private final ControllerMethodAccess controllerMethodAccess;
     private final ServiceMethodAccess serviceMethodAccess;
@@ -40,7 +40,11 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     private ResourceRepositoryOperations repositoryOperations;
     private ResourceService<T, ID> service;
 
-    BasicResource(Type type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
+    BasicResource(Type type, String name, String pluralName, String basePath,
+        ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID>[] identityField,
+        ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess,
+        Pagination pagination, ResourcePathsProvider defaultSparseFields,
+        ResourcePathsProvider restrictedFields) {
         Assert.notNull(type, "type is required");
         Assert.notNull(name, "name is required");
         Assert.notNull(pluralName, "pluralName is required");
@@ -59,18 +63,18 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.registry = registry;
         this.mapping = mapping;
         this.identityField = identityField;
-        this.controllerMethodAccess = controllerAccess;
-        this.serviceMethodAccess = serviceAccess;
-        this.defaultPagination = pagination;
-        this.defaultSparseFieldsProvider = defaultSparseFields;
-        this.restrictedFieldsProvider = restrictedFields;
+        controllerMethodAccess = controllerAccess;
+        serviceMethodAccess = serviceAccess;
+        defaultPagination = pagination;
+        defaultSparseFieldsProvider = defaultSparseFields;
+        restrictedFieldsProvider = restrictedFields;
     }
 
 
     @Override
     public List<ResourcePath> getAllPaths() {
         //TODO better to cache immutable paths?
-        List<ResourcePath> paths = new ArrayList<ResourcePath>();
+        List<ResourcePath> paths = new ArrayList<>();
         appendPaths(paths, mapping, null);
         return paths;
     }
@@ -127,7 +131,7 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     }
 
     @Override
-    public MappedField<ID> getIdentityField() {
+    public MappedField<ID>[] getIdentityField() {
         return identityField;
     }
 

@@ -1,5 +1,6 @@
 package com.github.restup.util;
 
+import com.github.restup.mapping.fields.MappedField;
 import java.io.Serializable;
 import java.util.Collection;
 import java.util.Map;
@@ -61,4 +62,9 @@ public class Assert {
         }
     }
 
+    public static void noCompositeKeys(MappedField<?>[] identityField) {
+        if (identityField.length > 1) {
+            throw new AssertionError("Composite keys not supported");
+        }
+    }
 }

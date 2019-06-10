@@ -1,11 +1,5 @@
 package com.github.restup.path;
 
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.Objects;
-import java.util.function.Function;
 import com.github.restup.errors.ErrorSource;
 import com.github.restup.errors.Errors;
 import com.github.restup.errors.RequestError;
@@ -19,6 +13,12 @@ import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.util.Assert;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
+import java.util.Objects;
+import java.util.function.Function;
 
 /**
  * Provides support for accessing and representing fields of an object or object
@@ -147,7 +147,7 @@ public class ResourcePath implements ErrorSource {
 	}
 
 	public static List<ResourcePath> paths(Resource<?, ?> resource, String... beanPaths) {
-		List<ResourcePath> paths = new ArrayList<ResourcePath>();
+		List<ResourcePath> paths = new ArrayList<>();
 		for (String beanPath : beanPaths) {
 			paths.add(path(resource, beanPath));
 		}
@@ -155,7 +155,11 @@ public class ResourcePath implements ErrorSource {
 	}
 
 	public static ResourcePath idPath(Resource<?, ?> resource) {
-		return path(resource, resource.getIdentityField());
+		ResourcePath path = path(resource, resource.getIdentityField()[0]);
+		for (int i = 1; i < resource.getIdentityField().length; i++) {
+			path = path.append(resource.getIdentityField()[i]);
+		}
+		return path;
 	}
 
 	public ResourcePath last() {
@@ -241,13 +245,11 @@ public class ResourcePath implements ErrorSource {
 		return current;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <P extends PathValue> P lastValue(Class<P> type) {
 		ResourcePath path = last(type);
 		return path == null ? null : (P) path.value;
 	}
 
-	@SuppressWarnings("unchecked")
 	public <P extends PathValue> P firstValue(Class<P> type) {
 		ResourcePath path = first(type);
 		return path == null ? null : (P) path.value;
@@ -308,7 +310,7 @@ public class ResourcePath implements ErrorSource {
 					return result;
 				}
 			} else if (instance instanceof Iterable) {
-				return collectValues(new ArrayList<Object>(), instance);
+				return collectValues(new ArrayList<>(), instance);
 			}
 			current = current.next();
 		}
@@ -316,7 +318,6 @@ public class ResourcePath implements ErrorSource {
 		return result == instance ? null : result;
 	}
 
-	@SuppressWarnings("rawtypes")
 	public Collection<Object> collectValues(Collection<Object> into, Object instance) {
 		if (instance instanceof Collection) {
 			for (Object o : (Collection) instance) {
@@ -328,7 +329,6 @@ public class ResourcePath implements ErrorSource {
 		return into;
 	}
 
-	@SuppressWarnings("rawtypes")
 	private void addAll(Collection<Object> into, Object value) {
 		if (value instanceof Iterable) {
 			for (Object o : (Iterable) value) {
@@ -356,11 +356,10 @@ public class ResourcePath implements ErrorSource {
 		}
 	}
 
-	@SuppressWarnings("rawtypes")
 	private Object populatePath(ResourcePath path, Object instance) {
 		if (path != null) {
 			Object o = readValue(instance);
-			if (o == null && this.value instanceof WritableField) {
+			if (o == null && value instanceof WritableField) {
 				WritableField writable = (WritableField) value;
 				o = writable.createInstance();
 				writeValue(instance, o);
@@ -382,7 +381,6 @@ public class ResourcePath implements ErrorSource {
 		return null;
 	}
 
-	@SuppressWarnings({ "rawtypes", "unchecked" })
 	private void writeValue(Object instance, Object val) {
 		if (value instanceof WritableField) {
 			WritableField writable = (WritableField) value;
@@ -632,7 +630,6 @@ public class ResourcePath implements ErrorSource {
 			return append(new IndexPathValue(index));
 		}
 
-		@SuppressWarnings("rawtypes")
 		private boolean supportsIndex() {
 			if (current != null) {
                 if (currentCollection || current.value() == PathValue.data()) {
@@ -689,10 +686,9 @@ public class ResourcePath implements ErrorSource {
 				return me();
 			}
 			setMappedField(mappedField);
-			return append(new MappedFieldPathValue<T>(mappedField));
+			return append(new MappedFieldPathValue<>(mappedField));
 		}
 
-		@SuppressWarnings("rawtypes")
 		private void setMappedField(MappedField mappedField) {
 			Type type = mappedField.getType();
 			if (mappedField instanceof IterableField) {
@@ -729,7 +725,6 @@ public class ResourcePath implements ErrorSource {
 			return me();
 		}
 
-		@SuppressWarnings("rawtypes")
 		public Builder append(PathValue pv) {
 			if (filter.apply(pv)) {
 				prior = current;
@@ -796,7 +791,7 @@ public class ResourcePath implements ErrorSource {
 		}
 
 		public static enum Mode {
-			API, BEAN, PERSISTED;
+			API, BEAN, PERSISTED
 		}
 
 	}

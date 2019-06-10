@@ -1,12 +1,13 @@
 package com.github.restup.repository.collections;
 
+import com.github.restup.registry.Resource;
+import com.github.restup.repository.RepositoryFactory;
+import com.github.restup.util.Assert;
+import com.google.common.collect.ImmutableMap;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import com.github.restup.registry.Resource;
-import com.github.restup.repository.RepositoryFactory;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link RepositoryFactory} for creating {@link MapBackedRepository} instances
@@ -47,13 +48,12 @@ public class MapBackedRepositoryFactory implements RepositoryFactory {
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public Object getRepository(Resource resource) {
-        IdentityStrategy strategy = getStrategy(resource.getIdentityField().getType());
+        Assert.noCompositeKeys(resource.getIdentityField());
+        IdentityStrategy strategy = getStrategy(resource.getIdentityField()[0].getType());
         return new MapBackedRepository(strategy);
     }
 
-    @SuppressWarnings("rawtypes")
     IdentityStrategy getStrategy(Type type) {
         Supplier<? extends IdentityStrategy> strategy = map.get(type);
         if ( strategy == null ) {

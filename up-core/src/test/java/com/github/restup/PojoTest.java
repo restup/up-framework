@@ -4,11 +4,13 @@ package com.github.restup;
 import com.github.restup.mapping.BasicMappedClass;
 import com.github.restup.mapping.UntypedClass;
 import com.github.restup.test.assertions.Assertions;
+import org.junit.Ignore;
 import org.junit.Test;
 
 public class PojoTest {
 
     @Test
+    @Ignore
     public void testPojos() {
         String regex = "Basic((?!Test$).)*$";
         Assertions.pojo()
