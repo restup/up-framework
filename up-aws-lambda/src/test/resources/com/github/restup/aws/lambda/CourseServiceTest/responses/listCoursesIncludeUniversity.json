@@ -1,47 +1,45 @@
 {
   "limit": 10,
-  "offset": 0,
-  "total": 6,
   "data": [
     {
-      "id": 1,
+      "id": "1",
       "type": "course",
       "name": "Physics"
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "course",
       "name": "Spanish 101"
     },
     {
-      "id": 3,
+      "id": "3",
       "type": "course",
       "name": "French 101"
     },
     {
-      "id": 4,
+      "id": "4",
       "type": "course",
       "name": "Computer Science"
     },
     {
-      "id": 5,
+      "id": "5",
       "type": "course",
       "name": "Algebra"
     },
     {
-      "id": 6,
+      "id": "6",
       "type": "course",
       "name": "Calculus"
     }
   ],
   "included": [
     {
-      "id": 1,
+      "id": "1",
       "type": "university",
       "name": "Harvard"
     },
     {
-      "id": 2,
+      "id": "2",
       "type": "university",
       "name": "MIT"
     }

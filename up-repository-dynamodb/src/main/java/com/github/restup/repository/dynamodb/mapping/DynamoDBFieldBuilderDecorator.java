@@ -1,6 +1,7 @@
 package com.github.restup.repository.dynamodb.mapping;
 
 import static com.github.restup.util.ReflectionUtils.getAnnotation;
+import static com.github.restup.util.UpUtils.ifEmpty;
 
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBAttribute;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBHashKey;
@@ -28,28 +29,28 @@ public class DynamoDBFieldBuilderDecorator implements MappedFieldBuilderDecorato
     @Override
     public <T> void decorate(MappedField.Builder<T> b, BeanInfo<T> bi, PropertyDescriptor pd) {
         DynamoDBIgnore ignore = getAnnotation(DynamoDBIgnore.class, pd);
+        String persistedName = pd.getName();
         if (ignore != null) {
             b.persistedName(null).sortable(false);
             return;
         }
         DynamoDBAttribute attribute = getAnnotation(DynamoDBAttribute.class, pd);
         if (attribute != null) {
-            b.persistedName(attribute.attributeName())
-                .sortable(false);
-            return;
+            persistedName = attribute.attributeName();
+            b.sortable(false);
         }
         int position = 0;
         DynamoDBHashKey hashKey = getAnnotation(DynamoDBHashKey.class, pd);
         if (hashKey != null) {
-            b.persistedName(hashKey.attributeName())
-                .sortable(false)
+            persistedName = ifEmpty(hashKey.attributeName(), persistedName);
+            b.sortable(false)
                 .index(PRIMARY_KEY, position);
         }
 
         DynamoDBIndexHashKey indexHashKey = getAnnotation(DynamoDBIndexHashKey.class, pd);
         if (indexHashKey != null) {
-            b.persistedName(indexHashKey.attributeName())
-                .sortable(false)
+            persistedName = ifEmpty(indexHashKey.attributeName(), persistedName);
+            b.sortable(false)
                 .index(indexHashKey.globalSecondaryIndexName(), position);
             for (String idx : indexHashKey.globalSecondaryIndexNames()) {
                 b.index(idx, position);
@@ -59,22 +60,22 @@ public class DynamoDBFieldBuilderDecorator implements MappedFieldBuilderDecorato
         position = 1;
         DynamoDBRangeKey rangeKey = getAnnotation(DynamoDBRangeKey.class, pd);
         if (rangeKey != null) {
-            b.persistedName(rangeKey.attributeName())
-                .sortable(true)
+            persistedName = ifEmpty(rangeKey.attributeName(), persistedName);
+            b.sortable(true)
                 .index(PRIMARY_KEY, position);
         }
 
         DynamoDBIndexRangeKey indexRangeKey = getAnnotation(DynamoDBIndexRangeKey.class, pd);
         if (indexRangeKey != null) {
-            b.persistedName(indexRangeKey.attributeName())
-                .sortable(true)
+            persistedName = ifEmpty(indexRangeKey.attributeName(), persistedName);
+            b.sortable(true)
                 .index(indexRangeKey.globalSecondaryIndexName(), position);
 
             for (String idx : indexRangeKey.globalSecondaryIndexNames()) {
                 b.index(idx, position);
             }
         }
-
+        b.persistedName(persistedName);
     }
 
 

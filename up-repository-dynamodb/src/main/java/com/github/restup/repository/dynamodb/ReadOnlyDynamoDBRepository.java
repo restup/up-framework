@@ -1,5 +1,6 @@
 package com.github.restup.repository.dynamodb;
 
+import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
@@ -11,17 +12,25 @@ import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
+import com.github.restup.mapping.fields.MappedField;
+import com.github.restup.mapping.fields.MappedIndexField;
 import com.github.restup.query.Pagination;
 import com.github.restup.query.PreparedResourceQueryStatement;
+import com.github.restup.query.ResourceSort;
+import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.response.PagedResult;
 import com.github.restup.service.model.response.ReadResult;
+import com.github.restup.util.UpUtils;
 import com.google.common.collect.ImmutableSet;
 import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Collection;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -75,7 +84,13 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
         OptimizedResourceQueryCriteria optimized = OptimizedResourceQueryCriteria.builder().add(ps)
             .build();
 
-        // query in by partition key not allows
+        if (optimized.hasKeyCriteria()) {
+            // query by partition key using in not allowed
+            List<T> result = listWithInKeyCriteria(resource, optimized);
+            if (isNotEmpty(result)) {
+                return PagedResult.of(result, ps.getPagination(), Long.valueOf(result.size()));
+            }
+        }
         if (!optimized.hasIndexCriteria()) {
             if (resource.getMapping().isIndexedQueryOnly()) {
                 throw new UnsupportedOperationException("Insufficient index criteria");
@@ -86,9 +101,16 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
         ExpressionBuilder expressionBuilder = new ExpressionBuilder();
 
         DynamoDBQueryExpression<T> expression = new DynamoDBQueryExpression<>();
-
-        expressionBuilder.addCriteria(optimized.getIndexCriteria());
-        expression.withKeyConditionExpression(expressionBuilder.getExpression());
+        if (optimized.hasKeyCriteria()) {
+            expressionBuilder.addCriteria(optimized.getKeyCriteria());
+            expression.withKeyConditionExpression(expressionBuilder.getExpression());
+            expressionBuilder.addCriteria(optimized.getIndexCriteria());
+        } else {
+            expression.setIndexName(optimized.getIndexName());
+            expression.setConsistentRead(false); // not permitted with GSI
+            expressionBuilder.addCriteria(optimized.getIndexCriteria());
+            expression.withKeyConditionExpression(expressionBuilder.getExpression());
+        }
 
         expressionBuilder.addCriteria(optimized.getFilterCriteria());
 
@@ -99,13 +121,8 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
 
         expression.withExpressionAttributeValues(expressionBuilder.getAttributeValues());
 
-        expression.withScanIndexForward(true);
+        sort(expression, ps, optimized);
 
-//
-//        // build & apply sort
-//        List<Order> order = sort(ps, cb, root);
-//        sort(q, order);
-//
         // apply paging if required
         List<T> list = null;
         Long totalCount = null;
@@ -115,14 +132,7 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
             pagination = null;
             list = mapper.query(resourceClass, expression);
         } else {
-//            if (pagination.isWithTotalsEnabled()) {
-//                totalCount = count(resourceClass, predicates);
-//                log.debug("{} count({}); {}", resource, query, totalCount);
-//            }
-
             Integer limit = pagination.getLimit();
-//            if (Pagination.isPagedListRequired(pagination, totalCount)) {
-//                int start = Pagination.getStart(pagination);
             expression.withLimit(limit);
 
             if (isNotEmpty(pagination.getKey())) {
@@ -132,17 +142,72 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
             QueryResultPage page = mapper.queryPage(resourceClass, expression);
             list = page.getResults();
             pagination = Pagination.of(limit, fromKey(page.getLastEvaluatedKey()));
-//            } else if (limit > 0) {
-//                list = Collections.EMPTY_LIST;
-//            } else {
-//                pagination = null;
-//            }
         }
         return PagedResult.of(list, pagination, totalCount);
     }
 
+    private List<T> listWithInKeyCriteria(Resource resource,
+        OptimizedResourceQueryCriteria optimized) {
+        Class<T> resourceClass = resource.getClassType();
+        List<T> result = new ArrayList<>();
+
+        boolean otherOperatorsExist = false;
+        for (ResourcePathFilter f : optimized.getKeyCriteria()) {
+            //  dynamo does not permit in with key
+            if (Objects.equals(f.getOperator(), Operator.in)) {
+                Collection collection = UpUtils.asCollection(f.getValue());
+                for (Object id : collection) {
+                    T item = findOne(resourceClass, id);
+                    UpUtils.addIfNotNull(result, item);
+                }
+            } else if (Objects.equals(f.getOperator(), Operator.eq)) {
+                T item = findOne(resourceClass, f.getValue());
+                UpUtils.addIfNotNull(result, item);
+            } else {
+                otherOperatorsExist = true;
+            }
+        }
+
+        if (otherOperatorsExist && result.size() > 0) {
+            throw new UnsupportedOperationException(
+                "Unable to combine operators for primary key");
+        }
+        return result;
+    }
+
+    private void sort(DynamoDBQueryExpression<T> expression, PreparedResourceQueryStatement ps,
+        OptimizedResourceQueryCriteria optimized) {
+
+        if (ps.getRequestedSort() != null) {
+            for (ResourceSort sort : ps.getRequestedSort()) {
+                MappedField mf = sort.getPath().lastMappedField();
+                MappedIndexField mappedIndexField = getIndex(optimized.getIndexName(),
+                    mf.getIndexes());
+                if (mappedIndexField == null) {
+                    throw new UnsupportedOperationException("Sort invalid for selected criteria");
+                }
+
+                expression.withScanIndexForward(sort.isAscending());
+            }
+
+        }
+    }
+
+    private MappedIndexField getIndex(String indexName, Collection<MappedIndexField> indexes) {
+        if (indexes != null) {
+            return indexes.stream()
+                .filter((idx) -> Objects.equals(indexName, idx.getIndexName()))
+                .findFirst().get();
+        }
+        return null;
+    }
+
     private PagedResult<T> scan(PreparedResourceQueryStatement ps,
         OptimizedResourceQueryCriteria optimized) {
+
+        if (isNotEmpty(ps.getRequestedSort())) {
+            throw new UnsupportedOperationException("Sort not allowed with provided filters");
+        }
         ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         expressionBuilder.addCriteria(optimized.getFilterCriteria());
 
@@ -150,7 +215,7 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
 
         String filter = expressionBuilder.getExpression();
         if (isNotEmpty(filter)) {
-            expression.withFilterExpression(expressionBuilder.getExpression())
+            expression.withFilterExpression(filter)
                 .withExpressionAttributeValues(expressionBuilder.getAttributeValues());
         }
 
@@ -164,13 +229,8 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
             pagination = null;
             list = mapper.scan(resourceClass, expression);
         } else {
-//            if (pagination.isWithTotalsEnabled()) {
-//                totalCount = count(resourceClass, predicates);
-//                log.debug("{} count({}); {}", resource, query, totalCount);
-//            }
 
             Integer limit = pagination.getLimit();
-//            if (Pagination.isPagedListRequired(pagination, totalCount)) {
             expression.withLimit(limit);
 
             if (isNotEmpty(pagination.getKey())) {
@@ -180,11 +240,6 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
             ScanResultPage page = mapper.scanPage(resourceClass, expression);
             list = page.getResults();
             pagination = Pagination.of(limit, fromKey(page.getLastEvaluatedKey()));
-//            } else if (limit > 0) {
-//                list = Collections.EMPTY_LIST;
-//            } else {
-//                pagination = null;
-//            }
         }
         return PagedResult.of(list, pagination, totalCount);
     }

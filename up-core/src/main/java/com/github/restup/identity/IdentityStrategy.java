@@ -1,4 +1,4 @@
-package com.github.restup.repository.collections;
+package com.github.restup.identity;
 
 import java.io.Serializable;
 

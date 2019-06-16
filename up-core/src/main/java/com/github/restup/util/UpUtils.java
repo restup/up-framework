@@ -1,9 +1,12 @@
 package com.github.restup.util;
 
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import com.github.restup.path.ResourcePath;
 import com.google.common.collect.Iterables;
 import java.text.MessageFormat;
 import java.util.Arrays;
+import java.util.Collection;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -65,6 +68,10 @@ public class UpUtils {
         return a == null ? b : a;
     }
 
+    public static String ifEmpty(String a, String b) {
+        return isEmpty(a) ? b : a;
+    }
+
     public static <T> T nvl(T a, Supplier<T> b) {
         return a == null ? b.get() : a;
     }
@@ -93,4 +100,16 @@ public class UpUtils {
     }
 
 
+    public static <T> void addIfNotNull(Collection<T> result, T item) {
+        if (item != null) {
+            result.add(item);
+        }
+    }
+
+    public static Collection asCollection(Object value) {
+        if (value instanceof Collection) {
+            return (Collection) value;
+        }
+        return Arrays.asList(value);
+    }
 }

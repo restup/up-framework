@@ -1,19 +1,23 @@
 package com.github.restup.repository.collections;
 
+import com.github.restup.identity.AtomicIntegerIdentityStrategy;
+import com.github.restup.identity.AtomicLongIdentityStrategy;
+import com.github.restup.identity.IdentityStrategy;
+import com.github.restup.identity.UUIDIdentityStrategy;
+import com.github.restup.registry.Resource;
+import com.github.restup.repository.RepositoryFactory;
+import com.google.common.collect.ImmutableMap;
 import java.lang.reflect.Type;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.function.Supplier;
-import com.github.restup.registry.Resource;
-import com.github.restup.repository.RepositoryFactory;
-import com.google.common.collect.ImmutableMap;
 
 /**
  * {@link RepositoryFactory} for creating {@link MapBackedRepository} instances
  */
 public class MapBackedRepositoryFactory implements RepositoryFactory {
-    
-    private final Map<Type, Supplier<? extends IdentityStrategy<?>>> map; 
+
+    private final Map<Type, Supplier<? extends IdentityStrategy<?>>> map;
 
     public MapBackedRepositoryFactory(Map<Type, Supplier<? extends IdentityStrategy<?>>> map) {
         this.map = ImmutableMap.copyOf(map);
@@ -25,35 +29,33 @@ public class MapBackedRepositoryFactory implements RepositoryFactory {
 
     private static Map<Type, Supplier<? extends IdentityStrategy<?>>> defaultIdentityStrategies() {
         Map<Type, Supplier<? extends IdentityStrategy<?>>> map = new HashMap<>();
-        map.put(String.class, new Supplier<StringIdentityStrategy>() {
+        map.put(String.class, new Supplier<UUIDIdentityStrategy>() {
             @Override
-            public StringIdentityStrategy get() {
-                return new StringIdentityStrategy();
+            public UUIDIdentityStrategy get() {
+                return new UUIDIdentityStrategy();
             }
         });
-        map.put(Long.class, new Supplier<LongIdentityStrategy>() {
+        map.put(Long.class, new Supplier<AtomicLongIdentityStrategy>() {
             @Override
-            public LongIdentityStrategy get() {
-                return new LongIdentityStrategy();
+            public AtomicLongIdentityStrategy get() {
+                return new AtomicLongIdentityStrategy();
             }
         });
-        map.put(Integer.class, new Supplier<IntegerIdentityStrategy>() {
+        map.put(Integer.class, new Supplier<AtomicIntegerIdentityStrategy>() {
             @Override
-            public IntegerIdentityStrategy get() {
-                return new IntegerIdentityStrategy();
+            public AtomicIntegerIdentityStrategy get() {
+                return new AtomicIntegerIdentityStrategy();
             }
         });
         return map;
     }
 
     @Override
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public Object getRepository(Resource resource) {
         IdentityStrategy strategy = getStrategy(resource.getIdentityField().getType());
         return new MapBackedRepository(strategy);
     }
 
-    @SuppressWarnings("rawtypes")
     IdentityStrategy getStrategy(Type type) {
         Supplier<? extends IdentityStrategy> strategy = map.get(type);
         if ( strategy == null ) {

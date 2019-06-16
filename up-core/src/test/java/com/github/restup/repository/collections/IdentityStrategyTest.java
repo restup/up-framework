@@ -2,6 +2,11 @@ package com.github.restup.repository.collections;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+
+import com.github.restup.identity.IdentityStrategy;
+import com.github.restup.identity.AtomicIntegerIdentityStrategy;
+import com.github.restup.identity.AtomicLongIdentityStrategy;
+import com.github.restup.identity.UUIDIdentityStrategy;
 import java.util.HashSet;
 import java.util.Set;
 import org.junit.Test;
@@ -10,15 +15,15 @@ public class IdentityStrategyTest {
 
     @Test
     public void testStringIdentityStrategy() {
-        assertUniqueIds(new StringIdentityStrategy());
+        assertUniqueIds(new UUIDIdentityStrategy());
     }
     @Test
     public void testIntegerIdentityStrategy() {
-        assertUniqueIds(new IntegerIdentityStrategy());
+        assertUniqueIds(new AtomicIntegerIdentityStrategy());
     }
     @Test
     public void testLongIdentityStrategy() {
-        assertUniqueIds(new LongIdentityStrategy());
+        assertUniqueIds(new AtomicLongIdentityStrategy());
     }
 
     private void assertUniqueIds(IdentityStrategy<?> strategy) {

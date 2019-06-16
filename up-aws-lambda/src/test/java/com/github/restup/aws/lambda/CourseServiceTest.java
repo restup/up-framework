@@ -2,9 +2,9 @@ package com.github.restup.aws.lambda;
 
 import com.github.restup.aws.lambda.support.AbstractAWSLambdaTest;
 import com.github.restup.test.RestApiAssertions;
-import com.university.Course;
-import com.university.Student;
-import com.university.University;
+import com.mutable.university.Course;
+import com.mutable.university.Student;
+import com.mutable.university.University;
 import org.junit.Before;
 import org.junit.Ignore;
 import org.junit.Test;
@@ -30,22 +30,20 @@ public class CourseServiceTest extends AbstractAWSLambdaTest {
 
     @Test
     public void listCourses() {
-        api.list().query("fields=name").ok();
+        api.list().query("fields=name").ignoreOrder().ok();
     }
 
     @Test
-    @Ignore
     public void listCoursesIncludeUniversity() {
-        api.list().query("fields=name&fields[university]=name").ok();
+        api.list().query("fields=name&fields[university]=name").ignoreOrder().ok();
     }
 
     @Test
     public void listPaged() {
-        api.list().query("fields=name&limit=2").ok();
+        api.list().query("fields=name&limit=2&filter[universityId]=1&sort=-name").ok();
     }
 
     @Test
-    @Ignore
     public void testRelationships() {
         // examples of fetching relationships between resources
         RestApiAssertions.Builder api = builder("/courses/{courseId}/university", 5);
@@ -53,12 +51,11 @@ public class CourseServiceTest extends AbstractAWSLambdaTest {
 
         // and the reverse works as well
         api = builder("/universities/{universityId}/courses", 1);
-        api.get().query("fields=name&limit=1&offset=2&sort=-name").test("getUniversityCourses")
+        api.get().query("fields=name&limit=1&sort=name").test("getUniversityCourses")
             .ok();
     }
 
     @Test
-    @Ignore
     public void createCourse() {
         api.add().ok();
     }

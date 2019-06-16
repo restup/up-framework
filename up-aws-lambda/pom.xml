@@ -11,9 +11,9 @@
 
   <modelVersion>4.0.0</modelVersion>
 
+  <name>Up! :: aws :: lambda</name>
   <artifactId>up-aws-lambda</artifactId>
   <packaging>jar</packaging>
-  <name>Up! :: aws :: lambda</name>
 
 
   <properties>

@@ -1,6 +1,7 @@
 package com.github.restup.test;
 
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
+import static net.javacrumbs.jsonunit.core.Option.IGNORING_ARRAY_ORDER;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 
@@ -8,6 +9,7 @@ import com.github.restup.test.matchers.ContentTypeMatcher;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
 import java.util.Map;
+import net.javacrumbs.jsonunit.ConfigurableJsonMatcher;
 import org.hamcrest.Matcher;
 
 /**
@@ -39,6 +41,7 @@ public class RpcApiAssertions {
         private int okStatus = 200;
         private boolean testNameAsMethodName;
         private boolean createMissingResource;
+        private boolean ignoreOrder;
 
         Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
             this.executor = executor;
@@ -178,6 +181,15 @@ public class RpcApiAssertions {
             return me();
         }
 
+        public Builder ignoreOrder() {
+            return ignoreOrder(true);
+        }
+
+        public Builder ignoreOrder(boolean ignoreOrder) {
+            this.ignoreOrder = ignoreOrder;
+            return me();
+        }
+
         /**
          * Create missing expected result files if true.  Tests will still fail, however the result
          * will be saved to the expected file
@@ -257,7 +269,11 @@ public class RpcApiAssertions {
 
             if (bodyMatcher == null & (tddCheat || expectedValue != null)) {
                 if (isJson(response)) {
-                    bodyMatcher = jsonEquals(expectedValue);
+                    ConfigurableJsonMatcher jsonMatcher = jsonEquals(expectedValue);
+                    if (ignoreOrder) {
+                        jsonMatcher = jsonMatcher.when(IGNORING_ARRAY_ORDER);
+                    }
+                    bodyMatcher = jsonMatcher;
                 } else {
                     bodyMatcher = is(expectedValue);
                 }
@@ -312,7 +328,6 @@ public class RpcApiAssertions {
         public Builder page(int offset, int limit) {
             return param("offset", String.valueOf(offset)).param("limit", String.valueOf(limit));
         }
-
     }
 
 }

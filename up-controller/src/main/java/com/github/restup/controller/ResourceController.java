@@ -406,11 +406,14 @@ public class ResourceController {
         validateData(parsedRequest, request, requestPathParserResult, access, itemOperation, ids);
 
         interceptor.before(parsedRequest);
-        Object result = methodController.request(parsedRequest);
-        interceptor.after(parsedRequest);
-
-        response.setStatus(methodController.getSuccessStatus());
-        return contentNegotiator.formatResponse(parsedRequest, response, result);
+        Object result;
+        try {
+            result = methodController.request(parsedRequest);
+            response.setStatus(methodController.getSuccessStatus());
+            return contentNegotiator.formatResponse(parsedRequest, response, result);
+        } finally {
+            interceptor.after(parsedRequest);
+        }
     }
 
     private void accept(ResourceControllerRequest request, Resource resource) {

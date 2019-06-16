@@ -1,0 +1,10 @@
+{
+  "limit": 1,
+  "data": [
+    {
+      "id": "3",
+      "type": "course",
+      "name": "French 101"
+    }
+  ]
+}

@@ -1,11 +1,11 @@
-package com.github.restup.repository.collections;
+package com.github.restup.identity;
 
 import java.util.UUID;
 
 /**
  * An {@link IdentityStrategy} for String ids returning a new random UUID for each id
  */
-public class StringIdentityStrategy implements IdentityStrategy<String> {
+public class UUIDIdentityStrategy implements IdentityStrategy<String> {
 
     @Override
     public String getNextId() {

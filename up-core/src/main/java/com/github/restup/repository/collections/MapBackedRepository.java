@@ -1,20 +1,11 @@
 package com.github.restup.repository.collections;
 
-import java.io.Serializable;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
-import org.apache.commons.collections4.CollectionUtils;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.DeleteResource;
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
 import com.github.restup.annotations.operations.UpdateResource;
+import com.github.restup.identity.IdentityStrategy;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.Pagination;
@@ -27,6 +18,16 @@ import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PagedResult;
+import java.io.Serializable;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.List;
+import java.util.Map;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * A repository backed by a {@link Map}
@@ -42,10 +43,9 @@ public class MapBackedRepository<T, ID extends Serializable> {
     }
 
     public MapBackedRepository(IdentityStrategy<ID> identityStrategy) {
-        this(identityStrategy, new ConcurrentHashMap<ID, T>());
+        this(identityStrategy, new ConcurrentHashMap<>());
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @CreateResource
     public T create(Resource<?, ?> resource, CreateRequest<T> request) {
         T t = request.getData();
@@ -87,10 +87,9 @@ public class MapBackedRepository<T, ID extends Serializable> {
         return existing;
     }
 
-    @SuppressWarnings("unchecked")
-	@ListResource
+    @ListResource
     public PagedResult<T> list(PreparedResourceQueryStatement ps) {
-        List<T> result = new ArrayList<T>(map.values());
+        List<T> result = new ArrayList<>(map.values());
 
         Pagination paging = ps.getPagination();
 
@@ -160,8 +159,7 @@ public class MapBackedRepository<T, ID extends Serializable> {
             this.sortFields = sortFields;
         }
 
-        @SuppressWarnings({ "unchecked", "rawtypes" })
-		@Override
+        @Override
         public int compare(T a, T b) {
             for (ResourceSort sort : sortFields) {
                 ResourcePath path = sort.getPath();

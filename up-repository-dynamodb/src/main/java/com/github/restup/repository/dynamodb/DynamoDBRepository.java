@@ -4,6 +4,9 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.DeleteResource;
 import com.github.restup.annotations.operations.UpdateResource;
+import com.github.restup.identity.IdentityStrategy;
+import com.github.restup.identity.UUIDIdentityStrategy;
+import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.registry.Resource;
@@ -18,13 +21,24 @@ import java.util.Objects;
 public class DynamoDBRepository<T, ID extends Serializable> extends
     ReadOnlyDynamoDBRepository<T, ID> {
 
-    public DynamoDBRepository(DynamoDBMapper mapper) {
+    private final IdentityStrategy<ID> identityStrategy;
+
+    public DynamoDBRepository(DynamoDBMapper mapper, IdentityStrategy<ID> identityStrategy) {
         super(mapper);
+        this.identityStrategy = identityStrategy;
+    }
+
+    public DynamoDBRepository(DynamoDBMapper mapper) {
+        this(mapper, (IdentityStrategy) new UUIDIdentityStrategy());
     }
 
     @CreateResource
     public T create(CreateRequest<T> request) {
         T t = request.getData();
+        MappedField identityField = request.getResource().getIdentityField();
+        if (null == identityField.readValue(t)) {
+            identityField.writeValue(t, identityStrategy.getNextId());
+        }
         save(t);
         return t;
     }
@@ -44,6 +58,7 @@ public class DynamoDBRepository<T, ID extends Serializable> extends
     public PersistenceResult<T> update(UpdateRequest<T, ID> request,
         ResourceQueryDefaults defaults) {
         //TODO shouldn't have to read back and update, but easiest for poc
+        // see https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html
         T t = findOne((Resource<T, ID>) request.getResource(), request.getId());
         T update = request.getData();
         applyUpdate(t, update, request.getRequestedPaths());

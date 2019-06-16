@@ -21,9 +21,17 @@ public interface OptimizedResourceQueryCriteria {
         return new Builder();
     }
 
+    List<ResourcePathFilter> getKeyCriteria();
+
+    String getIndexName();
+
     List<ResourcePathFilter> getIndexCriteria();
 
     List<ResourcePathFilter> getFilterCriteria();
+
+    default boolean hasKeyCriteria() {
+        return isNotEmpty(getKeyCriteria());
+    }
 
     default boolean hasIndexCriteria() {
         return isNotEmpty(getIndexCriteria());
@@ -58,6 +66,7 @@ public interface OptimizedResourceQueryCriteria {
             Table<String, Short, List<ResourcePathFilter>> table = HashBasedTable.create();
 
             List<ResourcePathFilter> nonIndexCriteria = new ArrayList<>();
+            List<ResourcePathFilter> keyCriteria = new ArrayList<>();
             for (ResourceQueryCriteria criteria : filters) {
                 if (criteria instanceof ResourcePathFilter) {
                     ResourcePathFilter<?> f = (ResourcePathFilter) criteria;
@@ -66,7 +75,9 @@ public interface OptimizedResourceQueryCriteria {
 
                     //TODO when we get to composited indexes, we have to improve this logic
                     // as the first position of the identifier may be missing
-                    if (mf.isIndexed()) {
+                    if (mf.isIdentifier()) {
+                        keyCriteria.add(f);
+                    } else if (mf.isIndexed()) {
                         for (MappedIndexField indexedField : mf.getIndexes()) {
                             List<ResourcePathFilter> values = table
                                 .get(indexedField.getIndexName(), indexedField.getPosition());
@@ -99,7 +110,7 @@ public interface OptimizedResourceQueryCriteria {
                 }
             }
 
-            return new BasicOptimizedResourceQueryCriteria(indexCriteria,
+            return new BasicOptimizedResourceQueryCriteria(keyCriteria, index, indexCriteria,
                 nonIndexCriteria);
         }
 

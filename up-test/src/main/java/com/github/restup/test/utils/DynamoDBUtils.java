@@ -48,6 +48,14 @@ public class DynamoDBUtils {
                     new ProvisionedThroughput()
                         .withReadCapacityUnits(1l)
                         .withWriteCapacityUnits(1l));
+
+            if (tableRequest.getGlobalSecondaryIndexes() != null) {
+                tableRequest.getGlobalSecondaryIndexes().forEach((g) -> g.setProvisionedThroughput(
+                    new ProvisionedThroughput()
+                        .withReadCapacityUnits(1l)
+                        .withWriteCapacityUnits(1l)));
+            }
+
             ddb.createTable(tableRequest);
         }
     }

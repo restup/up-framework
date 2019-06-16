@@ -10,8 +10,6 @@ import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
-import com.amazonaws.services.dynamodbv2.model.CreateTableRequest;
-import com.amazonaws.services.dynamodbv2.model.ProvisionedThroughput;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.Pagination;
 import com.github.restup.query.PreparedResourceQueryStatement;
@@ -59,20 +57,7 @@ public class DynamoDBRepositoryTest {
         DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(mapper);
         DynamoDBRepository<?, ?> repo = (DynamoDBRepository<?, ?>) factory.getRepository(resource);
 
-        CreateTableRequest tableRequest = mapper.generateCreateTableRequest(OverIndexedTable.class)
-            .withProvisionedThroughput(
-                new ProvisionedThroughput()
-                    .withReadCapacityUnits(1l)
-                    .withWriteCapacityUnits(1l));
-
-        tableRequest.getGlobalSecondaryIndexes().forEach((g) -> g.setProvisionedThroughput(
-            new ProvisionedThroughput()
-                .withReadCapacityUnits(1l)
-                .withWriteCapacityUnits(1l)));
-
-        ddb.createTable(tableRequest);
-
-        DynamoDBUtils.createTables(ddb, mapper, Course.class);
+        DynamoDBUtils.createTables(ddb, mapper, Course.class, OverIndexedTable.class);
         return (DynamoDBRepository) repo;
     }
 
@@ -203,8 +188,10 @@ public class DynamoDBRepositoryTest {
     private Course create(Course course) {
         CreateRequest<Course> request = mock(CreateRequest.class);
         when(request.getData()).thenReturn(course);
+        when(request.getResource()).thenReturn((Resource) courseResource);
         Course result = courseRepo.create(request);
         verify(request).getData();
+        verify(request).getResource();
         verifyNoMoreInteractions(request);
         return result;
     }
