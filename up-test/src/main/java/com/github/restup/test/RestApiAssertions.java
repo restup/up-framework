@@ -34,7 +34,6 @@ public class RestApiAssertions {
         private boolean itemResource;
         private HttpMethod method;
         private Object[] args;
-        private int okStatus = 200;
         private String testName;
         private MediaType mediaType;
         private boolean https;
@@ -137,7 +136,6 @@ public class RestApiAssertions {
         }
 
         public RpcApiAssertions.Builder add(Object... args) {
-            okStatus = 201;
             return collectionResource()
                     .method(HttpMethod.POST)
                     .args(args)
@@ -167,7 +165,8 @@ public class RestApiAssertions {
             return itemResource()
                     .method(HttpMethod.PUT)
                     .args(args)
-                    .build();
+                .build()
+                .expectStatus(HttpStatus.CREATED);
         }
 
         public RpcApiAssertions.Builder patch(byte[] body, Object... args) {
@@ -200,7 +199,8 @@ public class RestApiAssertions {
             return itemResource()
                     .method(HttpMethod.DELETE)
                     .args(args)
-                    .build();
+                .build()
+                .expectStatus(HttpStatus.NO_CONTENT);
         }
 
         public Builder https() {
@@ -232,8 +232,7 @@ public class RestApiAssertions {
                     .test(testName)
                     .mediaType(mediaType)
                     .https(https)
-                    .createMissingResource(createMissingResource)
-                    .okStatus(okStatus));
+                    .createMissingResource(createMissingResource));
         }
 
     }

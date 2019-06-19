@@ -1,10 +1,10 @@
 package com.github.restup.controller.method;
 
 import static com.github.restup.util.UpUtils.getFirst;
-import java.io.Serializable;
-import java.util.List;
-import org.apache.commons.collections4.CollectionUtils;
+
+import com.github.restup.annotations.model.StatusCode;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
+import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
 import com.github.restup.service.ResourceServiceOperations;
@@ -12,6 +12,9 @@ import com.github.restup.service.model.request.ListRequest;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.service.model.response.ReadResult;
+import java.io.Serializable;
+import java.util.List;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * Handle GET operations
@@ -30,7 +33,10 @@ public class GetMethodController<T, ID extends Serializable> extends MethodContr
     }
 
     @Override
-    public Object request(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource, ResourceServiceOperations service) {
+    public Object request(ParsedResourceControllerRequest<T> request,
+        ResourceControllerResponse response, Resource<T, ID> resource,
+        ResourceServiceOperations service) {
+        response.setStatus(StatusCode.OK);
         if (request.getResourceRelationship() != null) {
             return findRelationship(request, resource);
         } else {
@@ -51,7 +57,6 @@ public class GetMethodController<T, ID extends Serializable> extends MethodContr
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private Object findRelationship(ParsedResourceControllerRequest<T> request, Resource<T, ID> resource) {
         ResourceRelationship relationship = request.getResourceRelationship();
         ListRequest<T> readRequest = factory.getListRequest(resource, request.getRequestedQueries(), request);

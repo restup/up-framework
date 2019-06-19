@@ -11,7 +11,7 @@ import java.util.Map;
 public class MockResourceControllerResponse implements ResourceControllerResponse {
 
     private int status;
-    private Map<String, String[]> headers = new HashMap<String, String[]>();
+    private Map<String, String[]> headers = new HashMap<>();
 
     @Override
     public void setHeader(String name, String value) {
@@ -22,6 +22,7 @@ public class MockResourceControllerResponse implements ResourceControllerRespons
         return headers;
     }
 
+    @Override
     public int getStatus() {
         return status;
     }
@@ -30,4 +31,5 @@ public class MockResourceControllerResponse implements ResourceControllerRespons
     public void setStatus(int status) {
         this.status = status;
     }
+
 }

@@ -1,5 +1,8 @@
 package com.github.restup.annotations;
 
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import java.lang.annotation.Documented;
 import java.lang.annotation.ElementType;
 import java.lang.annotation.Retention;
@@ -23,5 +26,11 @@ public @interface Resource {
      * Ultimately it is up to the Repository implementation to enforce this behavior.
      */
     boolean indexedQueryOnly() default true;
+
+    CreateStrategy createStrategy() default CreateStrategy.DEFAULT;
+
+    UpdateStrategy updateStrategy() default UpdateStrategy.DEFAULT;
+
+    DeleteStrategy deleteStrategy() default DeleteStrategy.DEFAULT;
 
 }

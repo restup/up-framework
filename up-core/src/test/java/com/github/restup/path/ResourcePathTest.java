@@ -5,14 +5,15 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
-import java.util.Arrays;
-import java.util.HashSet;
-import org.junit.Test;
-import org.mockito.internal.util.collections.Sets;
+
 import com.github.restup.service.model.request.BasicUpdateRequest;
 import com.model.test.company.Company;
 import com.model.test.company.Person;
 import com.music.Label;
+import java.util.Arrays;
+import java.util.HashSet;
+import org.junit.Test;
+import org.mockito.internal.util.collections.Sets;
 
 public class ResourcePathTest {
 
@@ -98,7 +99,7 @@ public class ResourcePathTest {
         assertTrue(path.equalsPath(data.next()));
         assertTrue(path.equalsPath(indexed.next().next()));
 
-        HashSet<ResourcePath> set = new HashSet<ResourcePath>();
+        HashSet<ResourcePath> set = new HashSet<>();
         set.add(path);
         set.add(data);
         set.add(indexed);
@@ -150,18 +151,19 @@ public class ResourcePathTest {
         testReadWrite(path, new Person(), "foo");
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void testReadDataValue() {
         ResourcePath data = builder(Person.class).data().path("address.street").build();
-        testReadWrite(data, new BasicUpdateRequest(null, null, new Person(), null, null, null), "bar");
+        testReadWrite(data,
+            new BasicUpdateRequest(null, null, new Person(), null, null, null, null), "bar");
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     @Test
     public void testReadDataIndexedValue() {
         ResourcePath indexed = builder(Person.class).data(0).path("address.street").build();
-        testReadWrite(indexed, new BasicUpdateRequest(null, null, Arrays.asList(new Person()), null, null, null), "foo");
+        testReadWrite(indexed,
+            new BasicUpdateRequest(null, null, Arrays.asList(new Person()), null, null, null, null),
+            "foo");
     }
 
     @Test
@@ -180,7 +182,8 @@ public class ResourcePathTest {
 
         workers = builder(Company.class).path("workers").build();
         assertEquals(Arrays.asList(1l, 3l, 5l, 1l, 2l, 3l), workers.getValue(Arrays.asList(b, c)));
-        assertEquals(Sets.newSet(1l, 2l, 3l, 5l), workers.collectValues(new HashSet<Object>(), Arrays.asList(b, c)));
+        assertEquals(Sets.newSet(1l, 2l, 3l, 5l),
+            workers.collectValues(new HashSet<>(), Arrays.asList(b, c)));
     }
 
     private void testReadWrite(ResourcePath path, Object target, String value) {

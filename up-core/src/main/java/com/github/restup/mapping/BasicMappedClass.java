@@ -2,6 +2,9 @@ package com.github.restup.mapping;
 
 import static com.github.restup.util.UpUtils.unmodifiableList;
 
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.util.ReflectionUtils;
 import java.lang.reflect.Type;
@@ -23,10 +26,15 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     private final List<MappedField<?>> attributes;
     private final boolean typedMapPresent;
     private final boolean indexedQueryOnly;
+    private final CreateStrategy createStrategy;
+    private final UpdateStrategy updateStrategy;
+    private final DeleteStrategy deleteStrategy;
 
     protected BasicMappedClass(String name, String pluralName, String persistedName, Type type,
         Type parentType, List<MappedField<?>> attributes, boolean typedMapPresent,
-        boolean indexedQueryOnly) {
+        boolean indexedQueryOnly, CreateStrategy createStrategy,
+        UpdateStrategy updateStrategy,
+        DeleteStrategy deleteStrategy) {
         this.name = name;
         this.pluralName = pluralName;
         this.persistedName = persistedName;
@@ -35,6 +43,9 @@ public class BasicMappedClass<T> implements MappedClass<T> {
         this.attributes = unmodifiableList(attributes);
         this.typedMapPresent = typedMapPresent;
         this.indexedQueryOnly = indexedQueryOnly;
+        this.createStrategy = createStrategy;
+        this.updateStrategy = updateStrategy;
+        this.deleteStrategy = deleteStrategy;
     }
     
     @Override
@@ -106,6 +117,21 @@ public class BasicMappedClass<T> implements MappedClass<T> {
     @Override
     public boolean isIndexedQueryOnly() {
         return indexedQueryOnly;
+    }
+
+    @Override
+    public CreateStrategy getCreateStrategy() {
+        return createStrategy;
+    }
+
+    @Override
+    public UpdateStrategy getUpdateStrategy() {
+        return updateStrategy;
+    }
+
+    @Override
+    public DeleteStrategy getDeleteStrategy() {
+        return deleteStrategy;
     }
 
     @Override

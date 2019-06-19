@@ -1,6 +1,13 @@
 package com.github.restup.spring.mvc.controller;
 
-import static org.mockito.Mockito.*;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+
+import com.github.restup.controller.ResourceController;
+import com.github.restup.http.model.HttpServletResourceControllerRequest;
+import com.github.restup.http.model.HttpServletResourceControllerResponse;
+import com.github.restup.jackson.service.model.JacksonRequestBody;
+import com.github.restup.registry.ResourceRegistry;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import org.junit.Test;
@@ -8,11 +15,6 @@ import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.github.restup.controller.ResourceController;
-import com.github.restup.http.model.HttpServletResourceControllerRequest;
-import com.github.restup.http.model.HttpServletResourceControllerResponse;
-import com.github.restup.jackson.service.model.JacksonRequestBody;
-import com.github.restup.registry.ResourceRegistry;
 
 @RunWith(MockitoJUnitRunner.class)
 public class SpringMVCResourceControllerTest {
@@ -32,7 +34,6 @@ public class SpringMVCResourceControllerTest {
     public void testRequest() {
         SpringMVCResourceController mvc = new UpSpringMVCConfiguration().upSpringMVCResourceController(registry, controller);
         mvc.request(request, response, body);
-        verify(response).setStatus(200);
 
         ArgumentCaptor<HttpServletResourceControllerRequest.Builder> builder = ArgumentCaptor.forClass(HttpServletResourceControllerRequest.Builder.class);
         ArgumentCaptor<HttpServletResourceControllerResponse> controllerResponse = ArgumentCaptor.forClass(HttpServletResourceControllerResponse.class);

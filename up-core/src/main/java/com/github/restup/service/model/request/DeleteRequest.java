@@ -1,5 +1,6 @@
 package com.github.restup.service.model.request;
 
+import com.github.restup.annotations.model.DeleteStrategy;
 import com.github.restup.service.model.Identified;
 import java.io.Serializable;
 
@@ -10,4 +11,5 @@ import java.io.Serializable;
  */
 public interface DeleteRequest<T, ID extends Serializable> extends ResourceRequest<T>, Identified<ID> {
 
+    DeleteStrategy getDeleteStrategy();
 }

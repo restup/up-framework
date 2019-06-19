@@ -3,12 +3,13 @@ package com.github.restup.service.model.request;
 import static com.github.restup.util.TestRegistries.defaultRegistry;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
-import java.util.Arrays;
-import org.junit.Test;
+
 import com.github.restup.bind.param.NoOpParameterProvider;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.ResourceRegistry;
 import com.model.test.company.Person;
+import java.util.Arrays;
+import org.junit.Test;
 
 public class BasicPersistenceRequestTest {
 
@@ -58,9 +59,9 @@ public class BasicPersistenceRequestTest {
         assertFalse(request(street, dStreet, iStreet).hasPath(lastName));
     }
 
-    @SuppressWarnings({"unchecked", "rawtypes"})
     private AbstractPersistenceRequest request(ResourcePath... paths) {
-        return new BasicUpdateRequest(null, null, null, Arrays.asList(paths), null, NoOpParameterProvider.getInstance());
+        return new BasicUpdateRequest(null, null, null, Arrays.asList(paths), null,
+            NoOpParameterProvider.getInstance(), null);
     }
 
 }

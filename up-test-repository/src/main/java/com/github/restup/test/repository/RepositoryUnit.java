@@ -1,14 +1,11 @@
 package com.github.restup.test.repository;
 
-import java.io.IOException;
-import java.util.Collections;
-import java.util.Iterator;
-import java.util.Map.Entry;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.node.ArrayNode;
 import com.fasterxml.jackson.databind.node.ObjectNode;
+import com.github.restup.annotations.model.CreateStrategy;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.repository.ResourceRepositoryOperations;
@@ -16,10 +13,18 @@ import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.test.resource.RelativeTestResource;
 import com.github.restup.util.Assert;
+import java.io.IOException;
+import java.util.Collections;
+import java.util.Iterator;
+import java.util.Map.Entry;
 
 public class RepositoryUnit {
 
     private static ObjectMapper mapper;
+
+    private RepositoryUnit() {
+        super();
+    }
 
     public static ObjectMapper getMapper() {
         if (mapper == null) {
@@ -142,16 +147,14 @@ public class RepositoryUnit {
 			}
             // we have to validate the object to handle Untyped Objects (deserialized to map & lose type details)
             Resource.validate(resource, t);
-            
+
             ResourceRepositoryOperations repository = resource.getRepositoryOperations();
             RequestObjectFactory factory = resource.getRegistry().getSettings().getRequestObjectFactory();
-            CreateRequest<T> request = factory.getCreateRequest(resource, t, Collections.emptyList(), Collections.emptyList(), null);
+            CreateRequest<T> request = factory
+                .getCreateRequest(resource, t, Collections.emptyList(), Collections.emptyList(),
+                    null, CreateStrategy.CREATED);
             repository.create(request);
         }
-    }
-    
-    private RepositoryUnit() {
-        super();
     }
     
 }

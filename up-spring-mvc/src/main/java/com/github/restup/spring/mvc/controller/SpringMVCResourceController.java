@@ -61,7 +61,6 @@ public class SpringMVCResourceController {
 
     @ResponseBody
     public Object request(HttpServletRequest request, HttpServletResponse response, @RequestBody(required = false) JacksonRequestBody body) {
-        response.setStatus(200);
         return controller.request(HttpServletResourceControllerRequest.builder(request)
             .body(body)
                 .registry(registry), new HttpServletResourceControllerResponse(response));

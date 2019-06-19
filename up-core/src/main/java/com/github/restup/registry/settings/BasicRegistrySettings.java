@@ -12,6 +12,9 @@ import com.github.restup.path.ResourcePathsProvider;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
+import com.github.restup.response.strategy.CreateStrategySupplier;
+import com.github.restup.response.strategy.DeleteStrategySupplier;
+import com.github.restup.response.strategy.UpdateStrategySupplier;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.google.common.collect.ImmutableList;
 import java.util.Comparator;
@@ -44,6 +47,11 @@ public class BasicRegistrySettings implements RegistrySettings {
     private final List<Object> defaultServiceFilters;
     private final String basePath;
 
+
+    private final CreateStrategySupplier createStrategySupplier;
+    private final UpdateStrategySupplier updateStrategySupplier;
+    private final DeleteStrategySupplier deleteStrategySupplier;
+
     BasicRegistrySettings(ResourceRegistryRepository resourceRegistryMap,
         MappedClassFactory mappedClassFactory,
         String[] packagesToScan, MappedFieldFactory mappedFieldFactory,
@@ -55,7 +63,10 @@ public class BasicRegistrySettings implements RegistrySettings {
         MethodArgumentFactory methodArgumentFactory, ConverterFactory converterFactory,
         ParameterConverterFactory parameterConverterFactory, Object[] defaultServiceFilters,
         Pagination defaultPagination, ResourcePathsProvider defaultSparseFieldsProvider,
-        ResourcePathsProvider defaultRestrictedFieldsProvider, String basePath) {
+        ResourcePathsProvider defaultRestrictedFieldsProvider, String basePath,
+        CreateStrategySupplier createStrategySupplier,
+        UpdateStrategySupplier updateStrategySupplier,
+        DeleteStrategySupplier deleteStrategySupplier) {
         this.packagesToScan = ImmutableList.copyOf(packagesToScan);
         this.mappedFieldFactory = mappedFieldFactory;
         this.mappedFieldOrderComparator = mappedFieldOrderComparator;
@@ -71,6 +82,9 @@ public class BasicRegistrySettings implements RegistrySettings {
         this.defaultSparseFieldsProvider = defaultSparseFieldsProvider;
         this.defaultRestrictedFieldsProvider = defaultRestrictedFieldsProvider;
         this.basePath = basePath;
+        this.createStrategySupplier = createStrategySupplier;
+        this.updateStrategySupplier = updateStrategySupplier;
+        this.deleteStrategySupplier = deleteStrategySupplier;
 
         // wrap with operations
         RegistryOperations operations = new RegistryOperations(resourceRegistryMap,
@@ -183,4 +197,19 @@ public class BasicRegistrySettings implements RegistrySettings {
         return basePath;
     }
 
+
+    @Override
+    public CreateStrategySupplier getCreateStrategySupplier() {
+        return createStrategySupplier;
+    }
+
+    @Override
+    public UpdateStrategySupplier getUpdateStrategySupplier() {
+        return updateStrategySupplier;
+    }
+
+    @Override
+    public DeleteStrategySupplier getDeleteStrategySupplier() {
+        return deleteStrategySupplier;
+    }
 }

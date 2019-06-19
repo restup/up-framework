@@ -1,5 +1,10 @@
 package com.github.restup.registry.settings;
 
+import static com.github.restup.util.UpUtils.nvl;
+
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
@@ -18,6 +23,12 @@ import com.github.restup.query.Pagination;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistryRepository;
 import com.github.restup.repository.RepositoryFactory;
+import com.github.restup.response.strategy.CreateStrategySupplier;
+import com.github.restup.response.strategy.DefaultCreateStrategySupplier;
+import com.github.restup.response.strategy.DefaultDeleteStrategySupplier;
+import com.github.restup.response.strategy.DefaultUpdateStrategySupplier;
+import com.github.restup.response.strategy.DeleteStrategySupplier;
+import com.github.restup.response.strategy.UpdateStrategySupplier;
 import com.github.restup.service.filters.BulkOperationByQueryFilter;
 import com.github.restup.service.filters.CaseInsensitiveSearchFieldFilter;
 import com.github.restup.service.filters.ImmutableFieldValidationFilter;
@@ -86,6 +97,12 @@ public interface RegistrySettings {
 
     String getBasePath();
 
+    CreateStrategySupplier getCreateStrategySupplier();
+
+    UpdateStrategySupplier getUpdateStrategySupplier();
+
+    DeleteStrategySupplier getDeleteStrategySupplier();
+
     class Builder {
 
         private final static Logger log = LoggerFactory.getLogger(RegistrySettings.class);
@@ -115,6 +132,10 @@ public interface RegistrySettings {
         private ResourcePathsProvider defaultRestrictedFieldsProvider;
         private String basePath;
         private ConverterFactory converterFactory;
+
+        private CreateStrategySupplier createStrategySupplier;
+        private UpdateStrategySupplier updateStrategySupplier;
+        private DeleteStrategySupplier deleteStrategySupplier;
 
         private Builder me() {
             return this;
@@ -364,6 +385,33 @@ public interface RegistrySettings {
             return me();
         }
 
+        public Builder createStrategySupplier(CreateStrategySupplier createStrategySupplier) {
+            this.createStrategySupplier = createStrategySupplier;
+            return me();
+        }
+
+        public Builder createStrategy(CreateStrategy strategy) {
+            return createStrategySupplier(new DefaultCreateStrategySupplier(strategy));
+        }
+
+        public Builder updateStrategySupplier(UpdateStrategySupplier updateStrategySupplier) {
+            this.updateStrategySupplier = updateStrategySupplier;
+            return me();
+        }
+
+        public Builder updateStrategy(UpdateStrategy strategy) {
+            return updateStrategySupplier(new DefaultUpdateStrategySupplier(strategy));
+        }
+
+        public Builder deleteStrategySupplier(DeleteStrategySupplier deleteStrategySupplier) {
+            this.deleteStrategySupplier = deleteStrategySupplier;
+            return me();
+        }
+
+        public Builder deleteStrategy(DeleteStrategy strategy) {
+            return deleteStrategySupplier(new DefaultDeleteStrategySupplier(strategy));
+        }
+
         public RegistrySettings build() {
             String[] packagesToScan = this.packagesToScan;
             if (ArrayUtils.isEmpty(packagesToScan)) {
@@ -484,6 +532,13 @@ public interface RegistrySettings {
                     mappedClassBuilderDecorators);
             }
 
+            CreateStrategySupplier createStrategySupplier = nvl(this.createStrategySupplier,
+                () -> new DefaultCreateStrategySupplier());
+            UpdateStrategySupplier updateStrategySupplier = nvl(this.updateStrategySupplier,
+                () -> new DefaultUpdateStrategySupplier());
+            DeleteStrategySupplier deleteStrategySupplier = nvl(this.deleteStrategySupplier,
+                () -> new DefaultDeleteStrategySupplier());
+
             return new BasicRegistrySettings(resourceRegistryMap, mappedClassFactory,
                 packagesToScan,
                 mappedFieldFactory, mappedFieldOrderComparator,
@@ -491,7 +546,8 @@ public interface RegistrySettings {
                 defaultServiceMethodAccess, repositoryFactory, errorFactory, requestObjectFactory,
                 methodArgumentFactory, converterFactory, parameterConverterFactory,
                 defaultServiceFilters,
-                pagination, defaultSparseFields, restrictedFields, basePath);
+                pagination, defaultSparseFields, restrictedFields, basePath, createStrategySupplier,
+                updateStrategySupplier, deleteStrategySupplier);
         }
     }
 

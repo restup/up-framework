@@ -1,5 +1,8 @@
 package com.github.restup.mapping;
 
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.util.Assert;
 import java.lang.reflect.Type;
@@ -76,6 +79,12 @@ public interface MappedClass<T> {
      */
     boolean isIndexedQueryOnly();
 
+    CreateStrategy getCreateStrategy();
+
+    UpdateStrategy getUpdateStrategy();
+
+    DeleteStrategy getDeleteStrategy();
+
     class AnonymousBuilder extends Builder<Object> {
 
         @Override
@@ -95,6 +104,9 @@ public interface MappedClass<T> {
         private List<MappedField<?>> attributes;
         private Comparator<MappedField<?>> fieldComparator;
         private boolean indexedQueryOnly;
+        private CreateStrategy createStrategy = CreateStrategy.DEFAULT;
+        private UpdateStrategy updateStrategy = UpdateStrategy.DEFAULT;
+        private DeleteStrategy deleteStrategy = DeleteStrategy.DEFAULT;
 
         Builder(Type type) {
             Assert.notNull(type, "type is required");
@@ -135,6 +147,21 @@ public interface MappedClass<T> {
 
         public Builder<T> indexedQueryOnly(Boolean indexedQueryOnly) {
             this.indexedQueryOnly = indexedQueryOnly;
+            return me();
+        }
+
+        public Builder<T> createStrategy(CreateStrategy createStrategy) {
+            this.createStrategy = createStrategy;
+            return me();
+        }
+
+        public Builder<T> updateStrategy(UpdateStrategy updateStrategy) {
+            this.updateStrategy = updateStrategy;
+            return me();
+        }
+
+        public Builder<T> deleteStrategy(DeleteStrategy deleteStrategy) {
+            this.deleteStrategy = deleteStrategy;
             return me();
         }
 
@@ -206,7 +233,8 @@ public interface MappedClass<T> {
                 Collections.sort(attributes, fieldComparator);
             }
             return new BasicMappedClass<>(name, pluralName, persistedName, type, parentType,
-                attributes, containsTypedMap, indexedQueryOnly);
+                attributes, containsTypedMap, indexedQueryOnly, createStrategy, updateStrategy,
+                deleteStrategy);
         }
 
     }

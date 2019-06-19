@@ -26,7 +26,7 @@ public class CourseServiceJsonAPITest extends AbstractMockJsonApiTest {
 
     @Test
     public void createCourse() {
-        api.add().ok();
+        api.add().created();
     }
 
     @Test
@@ -77,7 +77,7 @@ public class CourseServiceJsonAPITest extends AbstractMockJsonApiTest {
 
     @Test
     public void testDelete() {
-        api.delete().ok();
+        api.delete().noContent();
     }
 
 }

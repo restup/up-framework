@@ -1,6 +1,10 @@
 package com.github.restup.repository.dynamodb;
 
+import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.Builder;
+import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.SaveBehavior;
 import com.github.restup.mapping.MappedClassBuilderDecorator;
 import com.github.restup.mapping.MappedClassBuilderDecoratorSupplier;
 import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
@@ -23,6 +27,10 @@ public class DynamoDBRepositoryFactory implements RepositoryFactory,
     private final DynamoDBClassBuilderDecorator dynamoDBClassBuilderDecorator;
     private final Pagination defaultPagination;
 
+    public DynamoDBRepositoryFactory(AmazonDynamoDB ddb) {
+        this(new DynamoDBMapper(ddb, getDynamoDBMapperConfigBuilder().build()));
+    }
+
     public DynamoDBRepositoryFactory(DynamoDBMapper mapper) {
         this(mapper, Pagination.of(100, 10, null));
     }
@@ -41,6 +49,16 @@ public class DynamoDBRepositoryFactory implements RepositoryFactory,
         this.dynamoDBFieldBuilderDecorator = dynamoDBFieldBuilderDecorator;
         this.dynamoDBClassBuilderDecorator = dynamoDBClassBuilderDecorator;
         this.defaultPagination = defaultPagination;
+    }
+
+
+    /**
+     * {@link DynamoDBMapperConfig.Builder} with save behavior to ignore nulls and unmodelled
+     * attributes
+     */
+    public static Builder getDynamoDBMapperConfigBuilder() {
+        return DynamoDBMapperConfig.builder()
+            .withSaveBehavior(SaveBehavior.UPDATE_SKIP_NULL_ATTRIBUTES);
     }
 
     @Override

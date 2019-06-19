@@ -1,8 +1,8 @@
 package com.github.restup.service.model.request;
 
-import java.util.List;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.service.model.ResourceData;
+import java.util.List;
 
 /**
  * Common interface for {@link CreateRequest} and {@link UpdateRequest} operations

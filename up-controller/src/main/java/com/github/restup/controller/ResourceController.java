@@ -3,6 +3,7 @@ package com.github.restup.controller;
 import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.annotations.model.StatusCode;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.interceptor.RequestInterceptor;
@@ -27,7 +28,6 @@ import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.controller.settings.ControllerSettings;
 import com.github.restup.errors.RequestError;
 import com.github.restup.errors.RequestErrorException;
-import com.github.restup.errors.StatusCode;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.registry.Resource;
@@ -408,8 +408,7 @@ public class ResourceController {
         interceptor.before(parsedRequest);
         Object result;
         try {
-            result = methodController.request(parsedRequest);
-            response.setStatus(methodController.getSuccessStatus());
+            result = methodController.request(parsedRequest, response);
             return contentNegotiator.formatResponse(parsedRequest, response, result);
         } finally {
             interceptor.after(parsedRequest);

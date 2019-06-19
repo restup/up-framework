@@ -1,20 +1,18 @@
 package com.github.restup.repository.jpa;
 
-import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
-import javax.persistence.EntityManager;
-import javax.transaction.Transactional;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.DeleteResource;
 import com.github.restup.annotations.operations.UpdateResource;
-import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PersistenceResult;
+import com.github.restup.util.UpRepositoryUtils;
+import java.io.Serializable;
+import javax.persistence.EntityManager;
+import javax.transaction.Transactional;
 
 public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaRepository<T, ID> {
 
@@ -32,7 +30,6 @@ public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaReposi
 
     @DeleteResource
     @Transactional
-    @SuppressWarnings("unchecked")
     public T delete(DeleteRequest<T, ID> request) {
         //TODO apply additional query criteria for optimistic updates?
         T t = findOne((Resource<T, ID>) request.getResource(), request.getId());
@@ -43,32 +40,14 @@ public class JpaRepository<T, ID extends Serializable> extends ReadOnlyJpaReposi
         return t;
     }
 
-    @SuppressWarnings("unchecked")
     @Transactional
     @UpdateResource
     public PersistenceResult<T> update(UpdateRequest<T, ID> request, ResourceQueryDefaults defaults) {
         //TODO apply additional query criteria for optimistic updates?
         T t = findOne((Resource<T, ID>) request.getResource(), request.getId());
-        T update = request.getData();
-        applyUpdate(t, update, request.getRequestedPaths());
-        if (defaults != null) {
-            applyUpdate(t, update, defaults.getRequiredFields());
-        }
+        UpRepositoryUtils.prepareUpdate(request, defaults, t);
         save(t);
-        return PersistenceResult.of(t);
-    }
-
-    private void applyUpdate(T t, T update, List<ResourcePath> requestedPaths) {
-        if (requestedPaths != null) {
-            for (ResourcePath p : requestedPaths) {
-                Object currentValue = p.getValue(t);
-                Object newValue = p.getValue(update);
-                if (!Objects.equals(currentValue, newValue)) {
-                    // TODO collect diff for result
-                    p.setValue(t, p.getValue(update));
-                }
-            }
-        }
+        return UpRepositoryUtils.getPersitenceResult(defaults, request, t);
     }
 
     private void save(T resource) {

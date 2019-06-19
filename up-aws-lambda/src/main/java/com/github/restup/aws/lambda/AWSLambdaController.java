@@ -53,6 +53,9 @@ public class AWSLambdaController implements
     }
 
     private String toJson(Object result) {
+        if (result == null) {
+            return null;
+        }
         if (result instanceof String) {
             return (String) result;
         }

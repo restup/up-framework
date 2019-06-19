@@ -38,7 +38,7 @@ public class RpcApiAssertions {
         private MediaType mediaType;
 
         private Matcher<Object> bodyMatcher;
-        private int okStatus = 200;
+        private int status = 200;
         private boolean testNameAsMethodName;
         private boolean createMissingResource;
         private boolean ignoreOrder;
@@ -152,6 +152,10 @@ public class RpcApiAssertions {
             return me();
         }
 
+        public Builder expectStatus(HttpStatus httpStatus) {
+            return expectStatus(httpStatus.getHttpStatus());
+        }
+
         public Builder expectHeader(String name, Matcher<String[]> matcher) {
             expected.header(name, matcher);
             return me();
@@ -173,11 +177,6 @@ public class RpcApiAssertions {
 
         public Builder expectBody(Contents body) {
             expected.body(body);
-            return me();
-        }
-
-        public Builder okStatus(int okStatus) {
-            this.okStatus = okStatus;
             return me();
         }
 
@@ -222,7 +221,45 @@ public class RpcApiAssertions {
         }
 
         public ApiResponse<String[]> ok() {
-            return expectStatus(okStatus).build();
+            return expectStatus(HttpStatus.OK).build();
+        }
+
+        public ApiResponse<String[]> created() {
+            return expectStatus(HttpStatus.CREATED).build();
+        }
+
+        public ApiResponse<String[]> accepted() {
+            return expectStatus(HttpStatus.ACCEPTED).build();
+        }
+
+        public ApiResponse<String[]> noContent() {
+            return expectStatus(HttpStatus.NO_CONTENT)
+                .expectBody((String) null)
+                .build();
+        }
+
+        public ApiResponse<String[]> badRequest() {
+            return expectStatus(HttpStatus.BAD_REQUEST).build();
+        }
+
+        public ApiResponse<String[]> forbidden() {
+            return expectStatus(HttpStatus.FORBIDDEN).build();
+        }
+
+        public ApiResponse<String[]> notFound() {
+            return expectStatus(HttpStatus.NOT_FOUND).build();
+        }
+
+        public ApiResponse<String[]> conflict() {
+            return expectStatus(HttpStatus.CONFLICT).build();
+        }
+
+        public ApiResponse<String[]> unsupportedMediaType() {
+            return expectStatus(HttpStatus.UNSUPPORTED_MEDIA_TYPE).build();
+        }
+
+        public ApiResponse<String[]> methodNotAllowed() {
+            return expectStatus(HttpStatus.METHOD_NOT_ALLOWED).build();
         }
 
         private Builder json(String contentType) {

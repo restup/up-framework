@@ -19,24 +19,39 @@ public abstract class ContentTypeNegotiation implements ContentNegotiator {
     public ContentTypeNegotiation(String contentType) {
         super();
         this.contentType = contentType;
-        this.headerValue = this.contentType;
+        headerValue = this.contentType;
     }
 
     @Override
     public boolean accept(ResourceControllerRequest request) {
-        return Objects.equals(request.getContentType(), this.contentType);
+        return Objects.equals(request.getContentType(), contentType);
     }
 
     @Override
     public final <T> Object formatResponse(ParsedResourceControllerRequest<T> request, ResourceControllerResponse response,
             Object result) {
-        response.setHeader(CONTENT_TYPE, this.headerValue);
-        return this.format(request, response, result);
+        response.setHeader(CONTENT_TYPE, headerValue);
+        if (supportsContent(response.getStatus())) {
+            return format(request, response, result);
+        } else {
+            return null;
+        }
+
+    }
+
+    protected boolean supportsContent(int status) {
+        switch (status) {
+            case 202:
+            case 204:
+                return false;
+            default:
+                return true;
+        }
     }
 
     abstract Object format(ParsedResourceControllerRequest<?> request, ResourceControllerResponse response, Object result);
 
     public String getContentType() {
-        return this.contentType;
+        return contentType;
     }
 }

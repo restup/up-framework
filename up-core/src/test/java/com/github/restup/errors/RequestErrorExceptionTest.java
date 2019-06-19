@@ -1,9 +1,11 @@
 package com.github.restup.errors;
 
 import static com.github.restup.assertions.Assertions.assertThrows;
+
+import com.github.restup.annotations.model.StatusCode;
+import com.github.restup.assertions.Assertions;
 import java.util.Arrays;
 import org.junit.Test;
-import com.github.restup.assertions.Assertions;
 
 public class RequestErrorExceptionTest {
     

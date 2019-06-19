@@ -92,13 +92,13 @@ public class CourseServiceTest extends AbstractMockMVCTest {
         api.add("{\"data\":{\"name\":\"Bar\",\"universityId\": 1}}")
             .expectBody(
                 "{\"data\":{\"id\":\"${json-unit.ignore}\",\"type\":\"course\",\"name\":\"Bar\",\"universityId\":1}}")
-            .ok();
+            .created();
 
         // 2. Specify body as a relative request resource and expectedBody as a relative response resource
-        api.add(request("createCourse")).expectBody(response("createCourse")).ok();
+        api.add(request("createCourse")).expectBody(response("createCourse")).created();
 
         // 3. Use named test, which adds relative response and resource by default
-        api.add().test("createCourse").ok();
+        api.add().test("createCourse").created();
     }
 
     @Test
@@ -120,13 +120,13 @@ public class CourseServiceTest extends AbstractMockMVCTest {
         // 1. Specify expected body as String
         api.delete().expectBody(
             "{\"data\":{\"id\":1,\"type\":\"course\",\"name\":\"Physics\",\"universityId\":1}}")
-            .ok();
+            .noContent();
 
         // 2. Specify body as a relative response resource
-        api.delete(2).expectBody(response("deleteCourse2")).ok();
+        api.delete(2).expectBody(response("deleteCourse2")).noContent();
 
         // 3. Use named test, which adds relative response resource by default
-        api.delete(3).test("deleteCourse3").ok();
+        api.delete(3).test("deleteCourse3").noContent();
     }
 
     @Test

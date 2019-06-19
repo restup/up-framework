@@ -1,27 +1,21 @@
 package com.github.restup.service;
 
-import static com.github.restup.errors.StatusCode.BAD_REQUEST;
-import static com.github.restup.errors.StatusCode.INTERNAL_SERVER_ERROR;
+import static com.github.restup.annotations.model.StatusCode.BAD_REQUEST;
+import static com.github.restup.annotations.model.StatusCode.INTERNAL_SERVER_ERROR;
 import static com.github.restup.util.TestRegistries.mapBackedRegistry;
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertNotNull;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Map;
-import java.util.UUID;
-import java.util.function.Function;
-import org.junit.Test;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
+
 import com.github.restup.annotations.filter.PreCreateFilter;
 import com.github.restup.annotations.filter.Validation;
+import com.github.restup.annotations.model.CreateStrategy;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.UpdateResource;
-import com.github.restup.errors.RequestErrorException;
 import com.github.restup.errors.Errors;
 import com.github.restup.errors.RequestError;
+import com.github.restup.errors.RequestErrorException;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
@@ -30,6 +24,14 @@ import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.DefaultRequestObjectFactory;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.model.test.company.Company;
+import java.util.Arrays;
+import java.util.List;
+import java.util.Map;
+import java.util.UUID;
+import java.util.function.Function;
+import org.junit.Test;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 public class FilteredServiceMethodCommandTest {
 
     private final static Logger log = LoggerFactory.getLogger(FilteredServiceMethodCommandTest.class);
@@ -41,15 +43,13 @@ public class FilteredServiceMethodCommandTest {
     }
 
     @Test(expected = RequestErrorException.class)
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public void testRuntimeException() {
-        final String s = null;
+        String s = null;
         create(new Repository() {
             @PreCreateFilter
             public void f(Errors errors) {
             }
 
-            @SuppressWarnings("null")
             @CreateResource
             public void f(CreateRequest request) {
                 s.toLowerCase();
@@ -73,7 +73,6 @@ public class FilteredServiceMethodCommandTest {
     }
 
     @Test(expected = RequestErrorException.class)
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public void testRequestErrorException() {
         create(new Repository() {
             @Validation(path = "name", required = false)
@@ -114,7 +113,6 @@ public class FilteredServiceMethodCommandTest {
     }
 
     @Test(expected = RequestErrorException.class)
-    @SuppressWarnings({"rawtypes", "unchecked"})
     public void testRequestErrorExceptionOnUpdate() {
         update(new Repository() {
             @Validation(path = {"name", "workers"})
@@ -157,10 +155,11 @@ public class FilteredServiceMethodCommandTest {
         });
     }
 
-    @SuppressWarnings({"rawtypes"})
     private void create(Repository repository, Function<RequestError, Boolean> function) {
         try {
-            getService(repository).create((CreateRequest) getInstance().getCreateRequest(null, null, null, null, null));
+            getService(repository).create(
+                (CreateRequest) getInstance()
+                    .getCreateRequest(null, null, null, null, null, CreateStrategy.CREATED));
         } catch (RequestErrorException e) {
             assertEquals(1, e.getErrors().size());
             function.apply(e.getErrors().iterator().next());
@@ -168,14 +167,15 @@ public class FilteredServiceMethodCommandTest {
         }
     }
 
-    @SuppressWarnings({"rawtypes", "unchecked"})
     private void update(Repository repository, Function<RequestError, Boolean> function) {
         try {
             Company c = new Company();
             c.setName("foo");
             ResourceServiceOperations service = getService(repository);
             List<ResourcePath> paths = Arrays.asList(ResourcePath.path(registry, Company.class, "name"));
-            service.update(getInstance().getUpdateRequest((Resource)registry.getResource(c.getClass()), 1l, c, paths, null, null));
+            service.update(getInstance()
+                .getUpdateRequest((Resource) registry.getResource(c.getClass()), 1l, c, paths, null,
+                    null, null));
         } catch (RequestErrorException e) {
             log.debug("Error", e.getCause());
             assertEquals(1, e.getErrors().size());

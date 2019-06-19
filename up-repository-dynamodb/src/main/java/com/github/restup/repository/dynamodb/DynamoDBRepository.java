@@ -7,16 +7,15 @@ import com.github.restup.annotations.operations.UpdateResource;
 import com.github.restup.identity.IdentityStrategy;
 import com.github.restup.identity.UUIDIdentityStrategy;
 import com.github.restup.mapping.fields.MappedField;
-import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryDefaults;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.CreateRequest;
 import com.github.restup.service.model.request.DeleteRequest;
 import com.github.restup.service.model.request.UpdateRequest;
 import com.github.restup.service.model.response.PersistenceResult;
+import com.github.restup.util.ReflectionUtils;
+import com.github.restup.util.UpRepositoryUtils;
 import java.io.Serializable;
-import java.util.List;
-import java.util.Objects;
 
 public class DynamoDBRepository<T, ID extends Serializable> extends
     ReadOnlyDynamoDBRepository<T, ID> {
@@ -45,41 +44,26 @@ public class DynamoDBRepository<T, ID extends Serializable> extends
 
     @DeleteResource
     public T delete(DeleteRequest<T, ID> request) {
-        //TODO Should not have to read back but easiest for poc
-        T t = findOne((Resource<T, ID>) request.getResource(), request.getId());
-        if (t != null) {
-            DynamoDBMapper ddb = getMapper();
-            ddb.delete(t);
-        }
+        Resource resource = request.getResource();
+        T t = (T) ReflectionUtils.newInstance(resource.getClassType());
+        resource.getIdentityField().writeValue(t, request.getId());
+        DynamoDBMapper ddb = getMapper();
+        ddb.delete(t);
         return t;
     }
 
     @UpdateResource
     public PersistenceResult<T> update(UpdateRequest<T, ID> request,
         ResourceQueryDefaults defaults) {
-        //TODO shouldn't have to read back and update, but easiest for poc
-        // see https://docs.amazonaws.cn/en_us/amazondynamodb/latest/developerguide/Expressions.UpdateExpressions.html
-        T t = findOne((Resource<T, ID>) request.getResource(), request.getId());
-        T update = request.getData();
-        applyUpdate(t, update, request.getRequestedPaths());
-        if (defaults != null) {
-            applyUpdate(t, update, defaults.getRequiredFields());
+        T t = null;
+        if (UpRepositoryUtils.isContentRequired(defaults, request)) {
+            t = findOne((Resource<T, ID>) request.getResource(), request.getId());
+            UpRepositoryUtils.prepareUpdate(request, defaults, t);
+        } else {
+            t = request.getData();
         }
         save(t);
-        return PersistenceResult.of(t);
-    }
-
-    private void applyUpdate(T t, T update, List<ResourcePath> requestedPaths) {
-        if (requestedPaths != null) {
-            for (ResourcePath p : requestedPaths) {
-                Object currentValue = p.getValue(t);
-                Object newValue = p.getValue(update);
-                if (!Objects.equals(currentValue, newValue)) {
-                    // TODO collect diff for result
-                    p.setValue(t, p.getValue(update));
-                }
-            }
-        }
+        return UpRepositoryUtils.getPersitenceResult(defaults, request, t);
     }
 
     private void save(T resource) {

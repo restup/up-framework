@@ -140,7 +140,7 @@ public class RestApiAssertionsTest {
         Contents body = body();
 
         api().jsonapi().https().add(body)
-                .expectBody(expectedContents).ok();
+            .expectBody(expectedContents).created();
 
         assertCollectionRequest(requestCaptor, HttpMethod.POST, body, true, contentType);
     }
@@ -153,7 +153,7 @@ public class RestApiAssertionsTest {
 
         assertThrows("Expected: Content-Type=", () -> api()
                 .add(body.getContentAsString())
-                .expectBody(expectedContents).ok());
+            .expectBody(expectedContents).created());
     }
 
     @Test
@@ -162,7 +162,7 @@ public class RestApiAssertionsTest {
 
         assertThrows("Expected: is <201>", () -> api()
                 .add(body().getContentAsByteArray())
-                .expectBody(expectedContents).ok());
+            .expectBody(expectedContents).created());
     }
 
     private void assertThrows(String messageContains, ThrowingCallable f) {

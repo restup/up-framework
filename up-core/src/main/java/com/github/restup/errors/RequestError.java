@@ -5,6 +5,7 @@ import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.join;
 import static org.apache.commons.lang3.StringUtils.splitByCharacterTypeCamelCase;
 
+import com.github.restup.annotations.model.StatusCode;
 import com.github.restup.path.DataPathValue;
 import com.github.restup.path.MappedFieldPathValue;
 import com.github.restup.path.ResourcePath;

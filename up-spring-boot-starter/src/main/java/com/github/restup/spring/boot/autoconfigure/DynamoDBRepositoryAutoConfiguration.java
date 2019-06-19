@@ -24,11 +24,6 @@ import org.springframework.context.annotation.Configuration;
 @AutoConfigureBefore(UpAutoConfiguration.class)
 public class DynamoDBRepositoryAutoConfiguration {
 
-    @Bean
-    @ConditionalOnMissingBean
-    public DynamoDBRepository<?, ?> defaultUpDynamoDBRepository(DynamoDBMapper mapper) {
-        return new DynamoDBRepository<>(mapper);
-    }
 
     @Bean
     @ConditionalOnMissingBean(value = {RepositoryFactory.class, DynamoDBRepositoryFactory.class})
@@ -60,7 +55,7 @@ public class DynamoDBRepositoryAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public DynamoDBMapperConfig defaultDynamoDBMapperConfig(TableNameResolver tableNameResolver) {
-        return DynamoDBMapperConfig.builder()
+        return DynamoDBRepositoryFactory.getDynamoDBMapperConfigBuilder()
             .withTableNameResolver(tableNameResolver)
             .build();
     }

@@ -1,5 +1,8 @@
 package com.github.restup.registry;
 
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.errors.ErrorFactory;
@@ -16,6 +19,9 @@ import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.registry.settings.ServiceMethodAccess;
 import com.github.restup.repository.RepositoryFactory;
+import com.github.restup.response.strategy.CreateStrategySupplier;
+import com.github.restup.response.strategy.DeleteStrategySupplier;
+import com.github.restup.response.strategy.UpdateStrategySupplier;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Streams;
 import java.util.Collection;
@@ -77,7 +83,7 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
     Collection<ResourceRelationship<?, ?, ?, ?>> getRelationships(String resourceName);
 
-    public final static class Builder {
+    final class Builder {
         private final RegistrySettings.Builder settings;
 
         public Builder() {
@@ -203,6 +209,36 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
         public Builder defaultSparseFieldsProvider(ResourcePathsProvider defaultSparseFieldsProvider) {
             settings.defaultSparseFieldsProvider(defaultSparseFieldsProvider);
+            return me();
+        }
+
+        public Builder createStrategySupplier(CreateStrategySupplier strategy) {
+            settings.createStrategySupplier(strategy);
+            return me();
+        }
+
+        public Builder createStrategy(CreateStrategy strategy) {
+            settings.createStrategy(strategy);
+            return me();
+        }
+
+        public Builder updateStrategySupplier(UpdateStrategySupplier strategy) {
+            settings.updateStrategySupplier(strategy);
+            return me();
+        }
+
+        public Builder updateStrategy(UpdateStrategy strategy) {
+            settings.updateStrategy(strategy);
+            return me();
+        }
+
+        public Builder deleteStrategySupplier(DeleteStrategySupplier strategy) {
+            settings.deleteStrategySupplier(strategy);
+            return me();
+        }
+
+        public Builder deleteStrategy(DeleteStrategy strategy) {
+            settings.deleteStrategy(strategy);
             return me();
         }
 

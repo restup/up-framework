@@ -3,6 +3,7 @@ package com.github.restup.errors;
 import static com.github.restup.util.UpUtils.unmodifiableList;
 import static org.apache.commons.collections4.CollectionUtils.isEmpty;
 
+import com.github.restup.annotations.model.StatusCode;
 import com.github.restup.registry.Resource;
 import java.util.Arrays;
 import java.util.Collections;

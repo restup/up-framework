@@ -12,13 +12,17 @@ public class HttpServletResourceControllerResponse implements ResourceController
     }
 
     @Override
-    public void setStatus(int status) {
-        response.setStatus(status);
-    }
-
-    @Override
     public void setHeader(String name, String value) {
         response.setHeader(name, value);
     }
 
+    @Override
+    public int getStatus() {
+        return response.getStatus();
+    }
+
+    @Override
+    public void setStatus(int status) {
+        response.setStatus(status);
+    }
 }

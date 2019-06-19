@@ -1,10 +1,8 @@
 package com.github.restup.registry;
 
-import java.io.Serializable;
-import java.lang.reflect.Type;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
@@ -16,6 +14,11 @@ import com.github.restup.repository.ResourceRepositoryOperations;
 import com.github.restup.service.ResourceService;
 import com.github.restup.service.ResourceServiceOperations;
 import com.github.restup.util.Assert;
+import java.io.Serializable;
+import java.lang.reflect.Type;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Resource meta data, defining resource name, type, service implementation, etc.
@@ -36,11 +39,19 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     private final Pagination defaultPagination;
     private final ResourcePathsProvider defaultSparseFieldsProvider;
     private final ResourcePathsProvider restrictedFieldsProvider;
+    private final CreateStrategy createStrategy;
+    private final UpdateStrategy updateStrategy;
+    private final DeleteStrategy deleteStrategy;
     private ResourceServiceOperations serviceOperations;
     private ResourceRepositoryOperations repositoryOperations;
     private ResourceService<T, ID> service;
 
-    BasicResource(Type type, String name, String pluralName, String basePath, ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField, ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess, Pagination pagination, ResourcePathsProvider defaultSparseFields, ResourcePathsProvider restrictedFields) {
+    BasicResource(Type type, String name, String pluralName, String basePath,
+        ResourceRegistry registry, MappedClass<T> mapping, MappedField<ID> identityField,
+        ControllerMethodAccess controllerAccess, ServiceMethodAccess serviceAccess,
+        Pagination pagination, ResourcePathsProvider defaultSparseFields,
+        ResourcePathsProvider restrictedFields, CreateStrategy createStrategy,
+        UpdateStrategy updateStrategy, DeleteStrategy deleteStrategy) {
         Assert.notNull(type, "type is required");
         Assert.notNull(name, "name is required");
         Assert.notNull(pluralName, "pluralName is required");
@@ -59,18 +70,21 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
         this.registry = registry;
         this.mapping = mapping;
         this.identityField = identityField;
-        this.controllerMethodAccess = controllerAccess;
-        this.serviceMethodAccess = serviceAccess;
-        this.defaultPagination = pagination;
-        this.defaultSparseFieldsProvider = defaultSparseFields;
-        this.restrictedFieldsProvider = restrictedFields;
+        controllerMethodAccess = controllerAccess;
+        serviceMethodAccess = serviceAccess;
+        defaultPagination = pagination;
+        defaultSparseFieldsProvider = defaultSparseFields;
+        restrictedFieldsProvider = restrictedFields;
+        this.createStrategy = createStrategy;
+        this.updateStrategy = updateStrategy;
+        this.deleteStrategy = deleteStrategy;
     }
 
 
     @Override
     public List<ResourcePath> getAllPaths() {
         //TODO better to cache immutable paths?
-        List<ResourcePath> paths = new ArrayList<ResourcePath>();
+        List<ResourcePath> paths = new ArrayList<>();
         appendPaths(paths, mapping, null);
         return paths;
     }
@@ -139,6 +153,21 @@ class BasicResource<T, ID extends Serializable> implements Resource<T,ID> {
     protected final void setService(ResourceService<T, ID> service) {
         Assert.isNull(this.service, "service is immutable");
         this.service = service;
+    }
+
+    @Override
+    public CreateStrategy getCreateStrategy() {
+        return createStrategy;
+    }
+
+    @Override
+    public UpdateStrategy getUpdateStrategy() {
+        return updateStrategy;
+    }
+
+    @Override
+    public DeleteStrategy getDeleteStrategy() {
+        return deleteStrategy;
     }
 
     @Override

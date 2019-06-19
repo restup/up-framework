@@ -7,17 +7,8 @@ import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
-import java.io.Serializable;
-import java.util.Arrays;
-import java.util.List;
-import javax.persistence.EntityManager;
-import javax.persistence.PersistenceContext;
-import org.junit.Before;
-import org.junit.Test;
-import org.junit.runner.RunWith;
-import org.springframework.test.context.ContextConfiguration;
-import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
-import org.springframework.transaction.annotation.Transactional;
+
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.Pagination;
 import com.github.restup.query.PreparedResourceQueryStatement;
@@ -35,11 +26,21 @@ import com.github.restup.service.model.response.PersistenceResult;
 import com.github.restup.service.model.response.ReadResult;
 import com.github.restup.util.TestRegistries;
 import com.university.Course;
+import java.io.Serializable;
+import java.util.Arrays;
+import java.util.List;
+import javax.persistence.EntityManager;
+import javax.persistence.PersistenceContext;
+import org.junit.Before;
+import org.junit.Test;
+import org.junit.runner.RunWith;
+import org.springframework.test.context.ContextConfiguration;
+import org.springframework.test.context.junit4.SpringJUnit4ClassRunner;
+import org.springframework.transaction.annotation.Transactional;
 
 @Transactional
 @RunWith(SpringJUnit4ClassRunner.class)
 @ContextConfiguration(classes = ApplicationConfig.class)
-@SuppressWarnings({"unchecked", "rawtypes"})
 public class JpaRepositoryTest {
     
     private ResourceRegistry registry;
@@ -176,11 +177,13 @@ public class JpaRepositoryTest {
         when(request.getData()).thenReturn(course);
         when(request.getResource()).thenReturn((Resource) courseResource);
         when(request.getRequestedPaths()).thenReturn(Arrays.asList(ResourcePath.path(courseResource, field)));
+        when(request.getUpdateStrategy()).thenReturn(UpdateStrategy.UPDATED);
         PersistenceResult<Course> result = courseRepo.update(request, mock(ResourceQueryDefaults.class));
         verify(request).getId();
         verify(request).getData();
         verify(request).getRequestedPaths();
         verify(request).getResource();
+        verify(request).getUpdateStrategy();
         verifyNoMoreInteractions(request);
         return result.getData();
     }

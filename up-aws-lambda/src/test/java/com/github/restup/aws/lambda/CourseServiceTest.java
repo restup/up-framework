@@ -57,7 +57,7 @@ public class CourseServiceTest extends AbstractAWSLambdaTest {
 
     @Test
     public void createCourse() {
-        api.add().ok();
+        api.add().created();
     }
 
     @Test
@@ -67,7 +67,7 @@ public class CourseServiceTest extends AbstractAWSLambdaTest {
 
     @Test
     public void testDelete() {
-        api.delete().ok();
+        api.delete().noContent();
     }
 
     @Test

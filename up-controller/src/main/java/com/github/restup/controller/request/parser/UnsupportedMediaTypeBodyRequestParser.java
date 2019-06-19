@@ -1,11 +1,11 @@
 package com.github.restup.controller.request.parser;
 
+import com.github.restup.annotations.model.StatusCode;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.errors.RequestError;
-import com.github.restup.errors.StatusCode;
 
 /**
  * Simply throws an unsupported media type error. May be added to {@link RequestParserChain} as last

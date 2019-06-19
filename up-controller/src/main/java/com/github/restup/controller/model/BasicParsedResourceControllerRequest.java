@@ -7,7 +7,6 @@ import com.github.restup.path.ResourcePath;
 import com.github.restup.query.ResourceQueryStatement;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRelationship;
-import com.github.restup.service.model.ResourceData;
 import java.util.List;
 
 /**
@@ -29,10 +28,10 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     BasicParsedResourceControllerRequest(T data, List<ResourcePath> requestedPaths,
         List<ResourceQueryStatement> requestedQueries, ResourceControllerRequest request,
         RequestPathParserResult requestPathParserResult,
-        ResourceData<?> body, List<String> acceptedParameterNames,
+        List<String> acceptedParameterNames,
         List<String> acceptedResourceParameterNames, String pageLimitParameterName,
         String pageOffsetParameterName, boolean pageOffsetOneBased) {
-        super(request.getMethod(), body, request.getContentType(),
+        super(request.getMethod(), request.getBody(), request.getContentType(),
             request.getBaseRequestUrl(), request.getRequestUrl());
         this.data = data;
         this.requestedPaths = unmodifiableList(requestedPaths);
@@ -128,4 +127,5 @@ class BasicParsedResourceControllerRequest<T> extends BasicResourceControllerReq
     public RequestPathParserResult getRequestPathParserResult() {
         return requestPathParserResult;
     }
+
 }

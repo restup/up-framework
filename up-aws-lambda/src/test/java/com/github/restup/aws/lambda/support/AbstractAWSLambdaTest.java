@@ -1,7 +1,6 @@
 package com.github.restup.aws.lambda.support;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.ResourceController.Builder;
@@ -43,8 +42,7 @@ public abstract class AbstractAWSLambdaTest {
     public static ResourceRegistry registry(Class<?>... resourceClasses) {
         AmazonDynamoDB ddb = DynamoDBUtils.init();
 
-        DynamoDBMapper mapper = new DynamoDBMapper(ddb);
-        DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(mapper);
+        DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(ddb);
 
         DynamoDBUtils.createTables(ddb, resourceClasses);
 

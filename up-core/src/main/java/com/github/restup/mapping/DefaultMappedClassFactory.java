@@ -106,6 +106,9 @@ public class DefaultMappedClassFactory implements MappedClassFactory {
             Resource resource = clazz.getAnnotation(Resource.class);
             if (resource != null) {
                 builder.indexedQueryOnly(resource.indexedQueryOnly());
+                builder.createStrategy(resource.createStrategy());
+                builder.updateStrategy(resource.updateStrategy());
+                builder.deleteStrategy(resource.deleteStrategy());
             }
 
             BeanInfo<T> bi = getBeanInfo(clazz);

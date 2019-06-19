@@ -4,12 +4,13 @@ import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertNotNull;
 import static org.junit.Assert.assertNull;
 import static org.mockito.Mockito.mock;
+import static org.mockito.Mockito.times;
 import static org.mockito.Mockito.verify;
 import static org.mockito.Mockito.verifyNoMoreInteractions;
 import static org.mockito.Mockito.when;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
-import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.Pagination;
 import com.github.restup.query.PreparedResourceQueryStatement;
@@ -52,12 +53,10 @@ public class DynamoDBRepositoryTest {
     private <T, ID extends Serializable> DynamoDBRepository<T, ID> getRepository(
         Resource<T, ID> resource) {
         AmazonDynamoDB ddb = DynamoDBUtils.init();
-
-        DynamoDBMapper mapper = new DynamoDBMapper(ddb);
-        DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(mapper);
+        DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(ddb);
         DynamoDBRepository<?, ?> repo = (DynamoDBRepository<?, ?>) factory.getRepository(resource);
 
-        DynamoDBUtils.createTables(ddb, mapper, Course.class, OverIndexedTable.class);
+        DynamoDBUtils.createTables(ddb, Course.class, OverIndexedTable.class);
         return (DynamoDBRepository) repo;
     }
 
@@ -134,6 +133,7 @@ public class DynamoDBRepositoryTest {
 
     private Course update(Course course, String field) {
         UpdateRequest<Course, Long> request = mock(UpdateRequest.class);
+        when(request.getUpdateStrategy()).thenReturn(UpdateStrategy.UPDATED);
         when(request.getId()).thenReturn(course.getId());
         when(request.getData()).thenReturn(course);
         when(request.getResource()).thenReturn((Resource) courseResource);
@@ -141,6 +141,7 @@ public class DynamoDBRepositoryTest {
             .thenReturn(Arrays.asList(ResourcePath.path(courseResource, field)));
         PersistenceResult<Course> result = courseRepo
             .update(request, mock(ResourceQueryDefaults.class));
+        verify(request, times(2)).getUpdateStrategy();
         verify(request).getId();
         verify(request).getData();
         verify(request).getRequestedPaths();

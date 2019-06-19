@@ -17,13 +17,13 @@ import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.service.model.ResourceData;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.list.SetUniqueList;
 
@@ -46,6 +46,10 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
     List<ResourceQueryStatement> getRequestedQueries();
 
+    default boolean isJsonApi() {
+        return Objects.equals(MediaType.APPLICATION_JSON_API.getContentType(), getContentType());
+    }
+
     String getPageLimitParameterName();
 
     String getPageOffsetParameterName();
@@ -67,7 +71,6 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         private final ResourceRegistry registry;
         private final ResourceControllerRequest request;
         private final RequestPathParserResult pathParserResult;
-        private ResourceData<T> body;
         private T data;
         private List<ResourcePath> requestedPaths;
         private Map<String, ResourceQueryStatement.Builder> resourceQueries;
@@ -520,7 +523,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             }
             ParsedResourceControllerRequest<T> result = new BasicParsedResourceControllerRequest<>(
                 data, requestedPaths,
-                queries, request, pathParserResult, body, acceptedParameterNames,
+                queries, request, pathParserResult, acceptedParameterNames,
                 acceptedResourceParameterNames,
                 pageLimitParameterName,
                 pageOffsetParameterName, pageOffsetOneBased);

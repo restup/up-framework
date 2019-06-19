@@ -1,14 +1,15 @@
 package com.github.restup.query;
 
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.query.criteria.ListCriteria;
 import com.github.restup.query.criteria.ResourcePathFilter;
 import com.github.restup.query.criteria.ResourcePathFilter.Operator;
 import com.github.restup.query.criteria.ResourceQueryCriteria;
 import com.github.restup.registry.Resource;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import org.apache.commons.collections4.CollectionUtils;
 
 /**
  * <p>
@@ -87,17 +88,17 @@ public class ResourceQueryDefaults {
      * @param beanPaths required
      */
     public void addRequiredFields(String... beanPaths) {
-        this.requiredFields = addPaths(requiredFields, beanPaths);
+        requiredFields = addPaths(requiredFields, beanPaths);
     }
 
     public void addRequired(ResourcePath path) {
-        this.requiredFields = addPath(requiredFields, path);
+        requiredFields = addPath(requiredFields, path);
     }
 
     private List<ResourcePath> addPaths(List<ResourcePath> target, String[] beanPaths) {
         List<ResourcePath> result = target;
         if (result == null) {
-            result = new ArrayList<ResourcePath>();
+            result = new ArrayList<>();
         }
         for (String beanPath : beanPaths) {
             result.add(ResourcePath.path(resource, beanPath));
@@ -108,7 +109,7 @@ public class ResourceQueryDefaults {
     private List<ResourcePath> addPath(List<ResourcePath> target, ResourcePath path) {
         List<ResourcePath> result = target;
         if (result == null) {
-            result = new ArrayList<ResourcePath>();
+            result = new ArrayList<>();
         }
         result.add(path);
         return result;
@@ -122,18 +123,18 @@ public class ResourceQueryDefaults {
     public void addCriteria(ResourceQueryCriteria queryCriteria) {
         if (queryCriteria != null) {
             if (criteria == null) {
-                criteria = new ArrayList<ResourceQueryCriteria>();
+                criteria = new ArrayList<>();
             }
             criteria.add(queryCriteria);
         }
     }
 
     public void addCriteria(String beanPath, Object value) {
-        addCriteria(new ResourcePathFilter<Object>(resource, beanPath, value));
+        addCriteria(new ResourcePathFilter<>(resource, beanPath, value));
     }
 
     public void addCriteria(String beanPath, Operator operator, Object value) {
-        addCriteria(new ResourcePathFilter<Object>(resource, beanPath, operator, value));
+        addCriteria(new ResourcePathFilter<>(resource, beanPath, operator, value));
     }
 
     /**
@@ -151,11 +152,11 @@ public class ResourceQueryDefaults {
     }
 
     public void addDefaultCriteria(String beanPath, Object value) {
-        addDefaultCriteria(new ResourcePathFilter<Object>(resource, beanPath, value));
+        addDefaultCriteria(new ResourcePathFilter<>(resource, beanPath, value));
     }
 
     public void addDefaultCriteria(String beanPath, Operator operator, Object value) {
-        addDefaultCriteria(new ResourcePathFilter<Object>(resource, beanPath, operator, value));
+        addDefaultCriteria(new ResourcePathFilter<>(resource, beanPath, operator, value));
     }
 
     /**
@@ -169,6 +170,10 @@ public class ResourceQueryDefaults {
 
     public List<ResourcePath> getRequiredFields() {
         return requiredFields;
+    }
+
+    public boolean hasRequiredFields() {
+        return CollectionUtils.isNotEmpty(getRequiredFields());
     }
 
     public List<ResourceQueryCriteria> getCriteria() {
@@ -185,7 +190,7 @@ public class ResourceQueryDefaults {
      * @param beanPaths to sort
      */
     public void setSort(String... beanPaths) {
-        List<ResourceSort> sort = new ArrayList<ResourceSort>();
+        List<ResourceSort> sort = new ArrayList<>();
         for (String beanPath : beanPaths) {
             sort.add(ResourceSort.of(resource, beanPath));
         }

@@ -1,12 +1,12 @@
 package com.github.restup.service.filters;
 
-import java.io.Serializable;
 import com.github.restup.annotations.filter.PostReadFilter;
+import com.github.restup.annotations.model.StatusCode;
 import com.github.restup.errors.RequestError;
-import com.github.restup.errors.StatusCode;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.request.ReadRequest;
 import com.github.restup.service.model.response.ReadResult;
+import java.io.Serializable;
 
 /**
  * Provides post filter for resource not found errors

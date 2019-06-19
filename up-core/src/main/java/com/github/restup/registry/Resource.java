@@ -1,7 +1,11 @@
 package com.github.restup.registry;
 
+import static com.github.restup.util.UpUtils.nvl;
 import static org.apache.commons.lang3.StringUtils.isEmpty;
 
+import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.annotations.model.DeleteStrategy;
+import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassRegistry;
 import com.github.restup.mapping.UntypedClass;
@@ -243,6 +247,12 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         return getName().compareTo(o.getName());
     }
 
+    CreateStrategy getCreateStrategy();
+
+    UpdateStrategy getUpdateStrategy();
+
+    DeleteStrategy getDeleteStrategy();
+
     final class Builder<T, ID extends Serializable> {
 
         private final Type type;
@@ -261,6 +271,9 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         private ResourcePathsProvider restrictedFieldsProvider;
         private MappedClass<T> mappedClass;
         private MappedClassRegistry mappedClassRegistry;
+        private CreateStrategy createStrategy;
+        private UpdateStrategy updateStrategy;
+        private DeleteStrategy deleteStrategy;
 
         Builder(Type resourceClass) {
             Assert.notNull(resourceClass, "resource class must not be null");
@@ -334,6 +347,21 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
 
         public Builder<T, ID> serviceMethodAccess(ServiceMethodAccess serviceAccess) {
             this.serviceAccess = serviceAccess;
+            return me();
+        }
+
+        public Builder<T, ID> createStrategy(CreateStrategy createStrategy) {
+            this.createStrategy = createStrategy;
+            return me();
+        }
+
+        public Builder<T, ID> updateStrategy(UpdateStrategy updateStrategy) {
+            this.updateStrategy = updateStrategy;
+            return me();
+        }
+
+        public Builder<T, ID> deleteStrategy(DeleteStrategy deleteStrategy) {
+            this.deleteStrategy = deleteStrategy;
             return me();
         }
 
@@ -469,8 +497,13 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
                 restrictedFields = registrySettings.getDefaultRestrictedFieldsProvider();
             }
 
+            CreateStrategy createStrategy = nvl(this.createStrategy, mapping.getCreateStrategy());
+            UpdateStrategy updateStrategy = nvl(this.updateStrategy, mapping.getUpdateStrategy());
+            DeleteStrategy deleteStrategy = nvl(this.deleteStrategy, mapping.getDeleteStrategy());
+
             BasicResource<T, ID> resource = new BasicResource(type, name, pluralName, basePath, registry, mapping, identityField, controllerMethodAccess, serviceMethodAccess,
-                    pagination, defaultSparseFields, restrictedFields);
+                pagination, defaultSparseFields, restrictedFields, createStrategy,
+                updateStrategy, deleteStrategy);
             Object service = this.service;
             Object repository = this.repository;
             if (service == null) {

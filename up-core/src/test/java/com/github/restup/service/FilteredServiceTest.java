@@ -24,6 +24,7 @@ import com.github.restup.annotations.filter.PreReadFilter;
 import com.github.restup.annotations.filter.PreUpdateFilter;
 import com.github.restup.annotations.filter.Rank;
 import com.github.restup.annotations.filter.Validation;
+import com.github.restup.annotations.model.CreateStrategy;
 import com.github.restup.annotations.operations.CreateResource;
 import com.github.restup.annotations.operations.DeleteResource;
 import com.github.restup.annotations.operations.ListResource;
@@ -319,7 +320,9 @@ public class FilteredServiceTest {
         when(parameterProvider.getParameterNames()).thenReturn(Arrays.asList("barName"));
         when(parameterProvider.getParameter("barName")).thenReturn(new String[]{"boundValue"});
         try {
-            service.create(new BasicCreateRequest(null, null, null, null, parameterProvider));
+            service.create(
+                new BasicCreateRequest(null, null, null, null, parameterProvider,
+                    CreateStrategy.CREATED));
             assertTrue(create);
         } catch (RequestErrorException e) {
             assertFalse(create);
@@ -331,13 +334,14 @@ public class FilteredServiceTest {
             assertFalse(find);
         }
         try {
-            service.update(new BasicUpdateRequest(null, null, null, null, null, parameterProvider));
+            service.update(
+                new BasicUpdateRequest(null, null, null, null, null, parameterProvider, null));
             assertTrue(update);
         } catch (RequestErrorException e) {
             assertFalse(update);
         }
         try {
-            service.delete(new BasicDeleteRequest(null, null, null, parameterProvider));
+            service.delete(new BasicDeleteRequest(null, null, null, parameterProvider, null));
             assertTrue(delete);
         } catch (RequestErrorException e) {
             assertFalse(delete);
