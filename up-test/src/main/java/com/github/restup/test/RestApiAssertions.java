@@ -1,8 +1,10 @@
 package com.github.restup.test;
 
-import com.github.restup.test.RpcApiAssertions.Decorator;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 /**
  * Provides a {@link Builder} for RESTful apis with test methods for collection and item resource aligned with http verbs.
@@ -33,29 +35,30 @@ public class RestApiAssertions {
         private final Object[] defaultArgs;
         private boolean itemResource;
         private HttpMethod method;
-        private Object[] args;
+        private Object[] pathArgs;
         private String testName;
         private MediaType mediaType;
         private boolean https;
-        private Decorator decorator;
+        private List<RpcApiAssertionsBuilderDecorator> rpcApiAssertionsBuilderDecorators = new ArrayList();
         private boolean createMissingResource;
+        private boolean contentsAssertions;
 
-        Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... args) {
+        Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... pathArgs) {
             this.executor = executor;
             this.unitTest = unitTest;
             this.path = path;
-            defaultArgs = args;
+            defaultArgs = pathArgs;
             mediaType = MediaType.APPLICATION_JSON;
-            decorator = (b) -> b;
             createMissingResource = true;
+            contentsAssertions = true;
         }
 
-        Builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
-            this(executor, unitTest.getClass(), path, args);
+        Builder(ApiExecutor executor, Object unitTest, String path, Object... pathArgs) {
+            this(executor, unitTest.getClass(), path, pathArgs);
         }
 
-        Builder(ApiExecutor executor, String path, Object... args) {
-            this(executor, RelativeTestResource.getClassFromStack(), path, args);
+        Builder(ApiExecutor executor, String path, Object... pathArgs) {
+            this(executor, RelativeTestResource.getClassFromStack(), path, pathArgs);
         }
 
         private Builder me() {
@@ -70,6 +73,11 @@ public class RestApiAssertions {
          */
         public Builder createMissingResource(boolean createMissingResource) {
             this.createMissingResource = createMissingResource;
+            return me();
+        }
+
+        public Builder contentsAssertions(boolean contentsAssertions) {
+            this.contentsAssertions = contentsAssertions;
             return me();
         }
 
@@ -91,13 +99,22 @@ public class RestApiAssertions {
             return me();
         }
 
-        public Builder decorator(Decorator decorator) {
-            this.decorator = decorator;
+        public Builder decorate(RpcApiAssertionsBuilderDecorator... decorators) {
+            for (RpcApiAssertionsBuilderDecorator decorator : decorators) {
+                rpcApiAssertionsBuilderDecorators.add(decorator);
+            }
             return me();
         }
 
-        private Builder args(Object[] args) {
-            this.args = args;
+        public Builder decorate(Collection<RpcApiAssertionsBuilderDecorator> decorators) {
+            for (RpcApiAssertionsBuilderDecorator decorator : decorators) {
+                rpcApiAssertionsBuilderDecorators.add(decorator);
+            }
+            return me();
+        }
+
+        private Builder pathArgs(Object[] pathArgs) {
+            this.pathArgs = pathArgs;
             return me();
         }
 
@@ -123,82 +140,82 @@ public class RestApiAssertions {
             return me();
         }
 
-        public RpcApiAssertions.Builder add(byte[] body, Object... args) {
-            return add(args).body(body);
+        public RpcApiAssertions.Builder add(byte[] body, Object... pathArgs) {
+            return add(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder add(String body, Object... args) {
-            return add(args).body(body);
+        public RpcApiAssertions.Builder add(String body, Object... pathArgs) {
+            return add(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder add(Contents body, Object... args) {
-            return add(args).body(body);
+        public RpcApiAssertions.Builder add(Contents body, Object... pathArgs) {
+            return add(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder add(Object... args) {
+        public RpcApiAssertions.Builder add(Object... pathArgs) {
             return collectionResource()
                     .method(HttpMethod.POST)
-                    .args(args)
+                .pathArgs(pathArgs)
                     .build();
         }
 
-        public RpcApiAssertions.Builder list(Object... args) {
+        public RpcApiAssertions.Builder list(Object... pathArgs) {
             return collectionResource()
                     .method(HttpMethod.GET)
-                    .args(args)
+                .pathArgs(pathArgs)
                     .build();
         }
 
-        public RpcApiAssertions.Builder update(byte[] body, Object... args) {
-            return update(args).body(body);
+        public RpcApiAssertions.Builder update(byte[] body, Object... pathArgs) {
+            return update(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder update(String body, Object... args) {
-            return update(args).body(body);
+        public RpcApiAssertions.Builder update(String body, Object... pathArgs) {
+            return update(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder update(Contents body, Object... args) {
-            return update(args).body(body);
+        public RpcApiAssertions.Builder update(Contents body, Object... pathArgs) {
+            return update(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder update(Object... args) {
+        public RpcApiAssertions.Builder update(Object... pathArgs) {
             return itemResource()
                     .method(HttpMethod.PUT)
-                    .args(args)
+                .pathArgs(pathArgs)
                 .build()
                 .expectStatus(HttpStatus.CREATED);
         }
 
-        public RpcApiAssertions.Builder patch(byte[] body, Object... args) {
-            return patch(args).body(body);
+        public RpcApiAssertions.Builder patch(byte[] body, Object... pathArgs) {
+            return patch(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder patch(String body, Object... args) {
-            return patch(args).body(body);
+        public RpcApiAssertions.Builder patch(String body, Object... pathArgs) {
+            return patch(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder patch(Contents body, Object... args) {
-            return patch(args).body(body);
+        public RpcApiAssertions.Builder patch(Contents body, Object... pathArgs) {
+            return patch(pathArgs).body(body);
         }
 
-        public RpcApiAssertions.Builder patch(Object... args) {
+        public RpcApiAssertions.Builder patch(Object... pathArgs) {
             return itemResource()
                     .method(HttpMethod.PATCH)
-                    .args(args)
+                .pathArgs(pathArgs)
                     .build();
         }
 
-        public RpcApiAssertions.Builder get(Object... args) {
+        public RpcApiAssertions.Builder get(Object... pathArgs) {
             return itemResource()
                     .method(HttpMethod.GET)
-                    .args(args)
+                .pathArgs(pathArgs)
                     .build();
         }
 
-        public RpcApiAssertions.Builder delete(Object... args) {
+        public RpcApiAssertions.Builder delete(Object... pathArgs) {
             return itemResource()
                     .method(HttpMethod.DELETE)
-                    .args(args)
+                .pathArgs(pathArgs)
                 .build()
                 .expectStatus(HttpStatus.NO_CONTENT);
         }
@@ -225,14 +242,15 @@ public class RestApiAssertions {
                 testPath += "/{id}";
             }
 
-            return decorator
-                .decorate(new RpcApiAssertions.Builder(executor, unitTest, testPath, defaultArgs)
-                    .pathArgs(args)
+            return new RpcApiAssertions.Builder(executor, unitTest, testPath, defaultArgs)
+                .pathArgs(pathArgs)
                     .method(method)
                     .test(testName)
                     .mediaType(mediaType)
+                .decorate(rpcApiAssertionsBuilderDecorators)
                     .https(https)
-                    .createMissingResource(createMissingResource));
+                .createMissingResource(createMissingResource)
+                .contentsAssertions(contentsAssertions);
         }
 
     }

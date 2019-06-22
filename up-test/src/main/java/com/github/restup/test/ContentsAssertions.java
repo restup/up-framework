@@ -31,10 +31,10 @@ public class ContentsAssertions {
         super();
     }
 
-    public final static boolean tddCheat(final Contents expected, final Contents actual) {
+    public final static boolean tddCheat(Contents expected, Contents actual) {
         if (expected instanceof ResourceContents) {
-            final ResourceContents resource = (ResourceContents) expected;
-            if (!resource.exists()) {
+            ResourceContents resource = (ResourceContents) expected;
+            if (actual != null && !resource.exists()) {
                 resource.writeResult(actual.getContentAsByteArray());
                 return true;
             }
@@ -60,7 +60,7 @@ public class ContentsAssertions {
      * @param unitTest to use for relative resources
      * @return a new contents assertions builder
      */
-    public static Builder builder(final Class<?> unitTest) {
+    public static Builder builder(Class<?> unitTest) {
         return new Builder(unitTest);
     }
 
@@ -79,7 +79,7 @@ public class ContentsAssertions {
      * @param unitTest to use for relative resources
      * @return a new contents assertions builder
      */
-    public static Builder assertText(final Class<?> unitTest) {
+    public static Builder assertText(Class<?> unitTest) {
         return ContentsAssertions.builder(unitTest);
     }
 
@@ -90,7 +90,7 @@ public class ContentsAssertions {
      * @param unitTest to use for relative resources
      * @return a new contents assertions builder
      */
-    public static Builder assertJson(final Class<?> unitTest) {
+    public static Builder assertJson(Class<?> unitTest) {
         return new Builder(unitTest).json();
     }
 
@@ -111,7 +111,7 @@ public class ContentsAssertions {
      * @param mapper to use for json serialization
      * @return a new contents assertions builder
      */
-    public static Builder assertJson(final ObjectMapper mapper) {
+    public static Builder assertJson(ObjectMapper mapper) {
         return ContentsAssertions.assertJson().mapper(mapper);
     }
 
@@ -122,7 +122,7 @@ public class ContentsAssertions {
      * @param gson to use for json serialization
      * @return a new contents assertions builder
      */
-    public static Builder assertJson(final Gson gson) {
+    public static Builder assertJson(Gson gson) {
         return ContentsAssertions.assertJson().gson(gson);
     }
 
@@ -134,93 +134,93 @@ public class ContentsAssertions {
         private ResultSerializer serializer;
         private boolean json;
 
-        Builder(final Class<?> unitTest) {
-            this.actual = Contents.builder();
-            this.actual.relativeTo(unitTest);
-            this.expected = Contents.builder();
-            this.expected.relativeTo(unitTest);
+        Builder(Class<?> unitTest) {
+            actual = Contents.builder();
+            actual.relativeTo(unitTest);
+            expected = Contents.builder();
+            expected.relativeTo(unitTest);
         }
 
-        Builder result(final byte[] body) {
-            this.actual.contents(body);
-            return this.me();
+        Builder result(byte[] body) {
+            actual.contents(body);
+            return me();
         }
 
-        Builder result(final String body) {
-            this.actual.contents(body);
-            return this.me();
+        Builder result(String body) {
+            actual.contents(body);
+            return me();
         }
 
-        Builder result(final Contents body) {
-            this.actual.contents(body);
-            return this.me();
+        Builder result(Contents body) {
+            actual.contents(body);
+            return me();
         }
 
-        Builder result(final Object value) {
-            final String body = this.serialize(value);
-            return this.result(body);
+        Builder result(Object value) {
+            String body = serialize(value);
+            return result(body);
         }
 
-        public Builder gson(final Gson gson) {
-            return this.serializer(new GsonSerializer(gson));
+        public Builder gson(Gson gson) {
+            return serializer(new GsonSerializer(gson));
         }
 
-        public Builder mapper(final ObjectMapper mapper) {
-            return this.serializer(new JacksonSerializer(mapper));
+        public Builder mapper(ObjectMapper mapper) {
+            return serializer(new JacksonSerializer(mapper));
         }
 
-        public Builder serializer(final ResultSerializer serializer) {
+        public Builder serializer(ResultSerializer serializer) {
             this.serializer = serializer;
-            return this.me();
+            return me();
         }
 
-        public String serialize(final Object value) {
-            if (this.serializer == null) {
+        public String serialize(Object value) {
+            if (serializer == null) {
                 if (AutoDetectConstants.JACKSON2_EXISTS) {
-                    this.serializer = new JacksonSerializer();
+                    serializer = new JacksonSerializer();
                 } else if (AutoDetectConstants.GSON_EXISTS) {
-                    this.serializer = new GsonSerializer();
+                    serializer = new GsonSerializer();
                 } else {
                     throw new IllegalStateException("Unable to serialize value. Please add a supported serializer to classpath (Jackson, Gson))");
                 }
             }
-            return this.serializer.convertToString(value);
+            return serializer.convertToString(value);
         }
 
-        public Builder expect(final byte[] body) {
-            this.expected.contents(body);
-            return this.me();
+        public Builder expect(byte[] body) {
+            expected.contents(body);
+            return me();
         }
 
-        public Builder expect(final String body) {
-            this.expected.contents(body);
-            return this.me();
+        public Builder expect(String body) {
+            expected.contents(body);
+            return me();
         }
 
-        public Builder expect(final Contents body) {
-            this.expected.contents(body);
-            return this.me();
+        public Builder expect(Contents body) {
+            expected.contents(body);
+            return me();
         }
 
-        public Builder expect(final Object body) {
-            return this.expect(this.serialize(body));
+        public Builder expect(Object body) {
+            return expect(serialize(body));
         }
 
-        public Builder matcher(final Matcher<String> matcher) {
+        public Builder matcher(Matcher<String> matcher) {
             this.matcher = matcher;
-            return this.me();
+            return me();
         }
 
         public Builder json() {
-            return this.json(true);
+            return json(true);
         }
 
-        public Builder json(final boolean json) {
+        public Builder json(boolean json) {
             this.json = json;
             String type = json ? "json" : null;
-            this.expected.type(type);
-            this.actual.type(type);
-            return this.me();
+            expected.type(type);
+            actual.type(type);
+            return me();
         }
 
         protected Builder me() {
@@ -232,8 +232,8 @@ public class ContentsAssertions {
          * 
          * @param contents to match
          */
-        public void matches(final byte[] contents) {
-            this.result(contents).build();
+        public void matches(byte[] contents) {
+            result(contents).build();
         }
 
         /**
@@ -241,8 +241,8 @@ public class ContentsAssertions {
          * 
          * @param contents to match
          */
-        public void matches(final String contents) {
-            this.result(contents).build();
+        public void matches(String contents) {
+            result(contents).build();
         }
 
         /**
@@ -250,8 +250,8 @@ public class ContentsAssertions {
          * 
          * @param contents to match
          */
-        public void matches(final Contents contents) {
-            this.result(contents).build();
+        public void matches(Contents contents) {
+            result(contents).build();
         }
 
         /**
@@ -259,8 +259,8 @@ public class ContentsAssertions {
          * 
          * @param contents to match
          */
-        public void matches(final Object contents) {
-            this.result(contents).build();
+        public void matches(Object contents) {
+            result(contents).build();
         }
 
         /**
@@ -268,15 +268,15 @@ public class ContentsAssertions {
          * @param testName name of test to use.  Used by default for relative resource file names.
          * @return builder this builder
          */
-        public Builder test(final String testName) {
-            this.actual.name(testName);
-            this.expected.name(testName);
-            return this.me();
+        public Builder test(String testName) {
+            actual.name(testName);
+            expected.name(testName);
+            return me();
         }
 
         void build() {
-            final Contents expectedContents = this.expected.build();
-            final Contents actualContents = this.actual.build();
+            Contents expectedContents = expected.build();
+            Contents actualContents = actual.build();
 
 
             String expected = null;
@@ -287,17 +287,17 @@ public class ContentsAssertions {
                 expected = expectedContents.getContentAsString();
             }
 
-            final String actual = actualContents.getContentAsString();
-            if (this.matcher == null) {
-                if (this.json) {
-                    this.matcher = jsonEquals(expected);
+            String actual = actualContents.getContentAsString();
+            if (matcher == null) {
+                if (json) {
+                    matcher = jsonEquals(expected);
                 } else {
-                    this.matcher = is(expected);
+                    matcher = is(expected);
                 }
             }
             ContentsAssertions.log.debug("Expected:\n{}", expected);
             ContentsAssertions.log.debug("Actual:\n{}", actual);
-            assertThat(message, actual, this.matcher);
+            assertThat(message, actual, matcher);
         }
     }
 

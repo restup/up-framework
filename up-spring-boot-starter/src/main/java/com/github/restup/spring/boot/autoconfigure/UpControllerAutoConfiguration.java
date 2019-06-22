@@ -127,8 +127,8 @@ public class UpControllerAutoConfiguration {
         RequestParser.Builder requestParser,
         ResourceControllerBuilderDecorator decorator,
         ContentNegotiator.Builder contentNegotiator) {
-        return decorator.decorate(
-            ResourceController.builder()
+        return ResourceController.builder()
+            .decorate(decorator)
                 .registry(registry)
                 .serviceDiscovery(serviceDiscovery)
                 .linkBuilderFactory(linkBuilderFactory)
@@ -139,7 +139,7 @@ public class UpControllerAutoConfiguration {
                 .contentNegotiator(contentNegotiator)
                 .jacksonObjectMapper(mapper)
                 // .interceptors(interceptorA, interceptorB, new NoOpRequestInterceptor())
-        ).build();
+            .build();
     }
 
 }

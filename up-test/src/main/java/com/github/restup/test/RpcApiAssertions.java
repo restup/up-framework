@@ -8,7 +8,11 @@ import static org.hamcrest.Matchers.is;
 import com.github.restup.test.matchers.ContentTypeMatcher;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import net.javacrumbs.jsonunit.ConfigurableJsonMatcher;
 import org.hamcrest.Matcher;
 
@@ -25,11 +29,6 @@ public class RpcApiAssertions {
         return new Builder(executor, unitTest, path, defaultPathArgs);
     }
 
-    public static interface Decorator {
-
-        Builder decorate(Builder b);
-    }
-
     public static class Builder {
 
         private final ApiExecutor executor;
@@ -42,6 +41,8 @@ public class RpcApiAssertions {
         private boolean testNameAsMethodName;
         private boolean createMissingResource;
         private boolean ignoreOrder;
+        private boolean contentsAssertions;
+        private List<RpcApiAssertionsBuilderDecorator> rpcApiAssertionsBuilderDecorators = new ArrayList();
 
         Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
             this.executor = executor;
@@ -51,6 +52,7 @@ public class RpcApiAssertions {
             expected.testClass(unitTest);
             testNameAsMethodName = true;
             createMissingResource = true;
+            contentsAssertions = true;
         }
 
         protected Builder me() {
@@ -127,6 +129,10 @@ public class RpcApiAssertions {
             return me();
         }
 
+        public Builder jsonapi() {
+            return mediaType(MediaType.APPLICATION_JSON_API);
+        }
+
         public Builder pathArgs(Object... pathArgs) {
             request.pathArgs(pathArgs);
             return me();
@@ -190,6 +196,14 @@ public class RpcApiAssertions {
         }
 
         /**
+         * If contents assertions ( comparing response body to expected file contents) is enabled
+         */
+        public Builder contentsAssertions(boolean contentsAssertions) {
+            this.contentsAssertions = contentsAssertions;
+            return me();
+        }
+
+        /**
          * Create missing expected result files if true.  Tests will still fail, however the result
          * will be saved to the expected file
          *
@@ -197,6 +211,20 @@ public class RpcApiAssertions {
          */
         public Builder createMissingResource(boolean createMissingResource) {
             this.createMissingResource = createMissingResource;
+            return me();
+        }
+
+        public Builder decorate(RpcApiAssertionsBuilderDecorator... decorators) {
+            for (RpcApiAssertionsBuilderDecorator decorator : decorators) {
+                rpcApiAssertionsBuilderDecorators.add(decorator);
+            }
+            return me();
+        }
+
+        public Builder decorate(Collection<RpcApiAssertionsBuilderDecorator> decorators) {
+            for (RpcApiAssertionsBuilderDecorator decorator : decorators) {
+                rpcApiAssertionsBuilderDecorators.add(decorator);
+            }
             return me();
         }
 
@@ -224,12 +252,23 @@ public class RpcApiAssertions {
             return expectStatus(HttpStatus.OK).build();
         }
 
+        public ApiResponse<String[]> ok(boolean contentsAssertion) {
+            return contentsAssertions(contentsAssertion).ok();
+        }
+
         public ApiResponse<String[]> created() {
             return expectStatus(HttpStatus.CREATED).build();
         }
 
-        public ApiResponse<String[]> accepted() {
+        public ApiResponse<String[]> accepted(boolean withContent) {
+            if (!withContent) {
+                expectBody((String) null);
+            }
             return expectStatus(HttpStatus.ACCEPTED).build();
+        }
+
+        public ApiResponse<String[]> accepted() {
+            return accepted(false);
         }
 
         public ApiResponse<String[]> noContent() {
@@ -268,58 +307,74 @@ public class RpcApiAssertions {
         }
 
         public ApiResponse<String[]> build() {
+
+            rpcApiAssertionsBuilderDecorators.stream().forEach(d -> d.decorate(this));
             if (mediaType != null) {
                 json(mediaType.getContentType());
             }
             if (testNameAsMethodName && !expected.hasConfiguredBody()) {
                 test();
             }
+
+            if (!contentsAssertions && expected.getContents() == null) {
+                expected.body((String) null);
+            }
+
             ApiRequest request = this.request.build();
             ApiResponse<Matcher<String[]>> expected = this.expected.build();
             ApiResponse<String[]> response = executor.execute(request);
-
-            // assert status
-            assertThat("Status ", response.getStatus(), is(expected.getStatus()));
 
             // header assertions
             for (Map.Entry<String, Matcher<String[]>> e : expected.getHeaders().entrySet()) {
                 assertThat(e.getKey() + " Header", response.getHeader(e.getKey()), e.getValue());
             }
 
-            Contents expectedBody = expected.getBody();
-            Contents responseBody = response.getBody();
+            if (contentsAssertions
+                // compare for output if statuses are not equal && there is content... usually due to 400
+                || (!Objects.equals(response.getStatus(), expected.getStatus())
+                && response.getBody() != null)) {
+                Contents expectedBody = expected.getBody();
+                Contents responseBody = response.getBody();
 
-            // Convert to String for assertions so that assertion
-            // failure messages are meaningful
-            boolean assertUsingString = isAssertByteAsString(response);
+                // Convert to String for assertions so that assertion
+                // failure messages are meaningful
+                boolean assertUsingString = isAssertByteAsString(response);
 
-            boolean tddCheat =
-                createMissingResource && ContentsAssertions.tddCheat(expectedBody, responseBody);
-            Object expectedValue = tddCheat ? null : getContent(expectedBody, assertUsingString);
-            Object responseValue = getContent(responseBody, assertUsingString);
+                boolean tddCheat =
+                    createMissingResource && contentsAssertions && ContentsAssertions
+                        .tddCheat(expectedBody, responseBody);
+                Object expectedValue =
+                    tddCheat ? null : getContent(expectedBody, assertUsingString);
+                Object responseValue = getContent(responseBody, assertUsingString);
 
-            String message = "Body";
+                String message = "Body";
 
-            if (tddCheat) {
-                message = "Result has been written for convenience. Verify correctness of results for future executions";
-            }
+                if (tddCheat) {
+                    message = "Result has been written for convenience. Verify correctness of results for future executions";
+                }
 
-            if (bodyMatcher == null & (tddCheat || expectedValue != null)) {
-                if (isJson(response)) {
-                    ConfigurableJsonMatcher jsonMatcher = jsonEquals(expectedValue);
-                    if (ignoreOrder) {
-                        jsonMatcher = jsonMatcher.when(IGNORING_ARRAY_ORDER);
+                if (bodyMatcher == null & (tddCheat || expectedValue != null || (
+                    expectedValue == null
+                        && responseValue != null))) {
+                    if (isJson(response)) {
+                        ConfigurableJsonMatcher jsonMatcher = jsonEquals(expectedValue);
+                        if (ignoreOrder) {
+                            jsonMatcher = jsonMatcher.when(IGNORING_ARRAY_ORDER);
+                        }
+                        bodyMatcher = jsonMatcher;
+                    } else {
+                        bodyMatcher = is(expectedValue);
                     }
-                    bodyMatcher = jsonMatcher;
-                } else {
-                    bodyMatcher = is(expectedValue);
+                }
+
+                // compare body
+                if (bodyMatcher != null) {
+                    assertThat(message, responseValue, bodyMatcher);
                 }
             }
 
-            // compare body
-            if (bodyMatcher != null) {
-                assertThat(message, responseValue, bodyMatcher);
-            }
+            // assert status
+            assertThat("Status ", response.getStatus(), is(expected.getStatus()));
             return response;
         }
 

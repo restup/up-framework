@@ -1,5 +1,7 @@
 package com.github.restup.repository.dynamodb;
 
+import static com.github.restup.errors.ErrorCode.INVALID_FILTER_CRITERIA;
+import static com.github.restup.errors.ErrorCode.INVALID_SORT_CRITERIA;
 import static org.apache.commons.collections4.CollectionUtils.isNotEmpty;
 import static org.apache.commons.lang3.StringUtils.isNotBlank;
 import static org.apache.commons.lang3.StringUtils.isNotEmpty;
@@ -12,6 +14,7 @@ import com.amazonaws.services.dynamodbv2.datamodeling.ScanResultPage;
 import com.amazonaws.services.dynamodbv2.model.AttributeValue;
 import com.github.restup.annotations.operations.ListResource;
 import com.github.restup.annotations.operations.ReadResource;
+import com.github.restup.errors.RequestError;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.mapping.fields.MappedIndexField;
 import com.github.restup.query.Pagination;
@@ -54,6 +57,14 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
         return null;
     }
 
+    static void sortError(ResourceSort sort) {
+        RequestError.builder(sort.getPath().getResource())
+            .code(INVALID_SORT_CRITERIA)
+            .detail("Unable to sort using {0} with provided filters",
+                sort.getPath().getApiPath())
+            .throwError();
+    }
+
     boolean supportsCollection(Operator operator) {
         return collectionValues.contains(operator);
     }
@@ -93,7 +104,10 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
         }
         if (!optimized.hasIndexCriteria()) {
             if (resource.getMapping().isIndexedQueryOnly()) {
-                throw new UnsupportedOperationException("Insufficient index criteria");
+                RequestError.builder(resource)
+                    .code("INVALID_FILTER_CRITERIA")
+                    .detail("Insufficient filter criteria")
+                    .throwError();
             }
             return scan(ps, optimized);
         }
@@ -151,7 +165,7 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
         Class<T> resourceClass = resource.getClassType();
         List<T> result = new ArrayList<>();
 
-        boolean otherOperatorsExist = false;
+        Operator otherOperator = null;
         for (ResourcePathFilter f : optimized.getKeyCriteria()) {
             //  dynamo does not permit in with key
             if (Objects.equals(f.getOperator(), Operator.in)) {
@@ -164,13 +178,16 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
                 T item = findOne(resourceClass, f.getValue());
                 UpUtils.addIfNotNull(result, item);
             } else {
-                otherOperatorsExist = true;
+                otherOperator = f.getOperator();
             }
         }
 
-        if (otherOperatorsExist && result.size() > 0) {
-            throw new UnsupportedOperationException(
-                "Unable to combine operators for primary key");
+        if (otherOperator != null && result.size() > 0) {
+            RequestError.builder(resource)
+                .code(INVALID_FILTER_CRITERIA)
+                .detail("{0} cannot be used in combination with in and eq for {1} filters",
+                    otherOperator, resource.getIdentityField().getApiName())
+                .throwError();
         }
         return result;
     }
@@ -184,7 +201,7 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
                 MappedIndexField mappedIndexField = getIndex(optimized.getIndexName(),
                     mf.getIndexes());
                 if (mappedIndexField == null) {
-                    throw new UnsupportedOperationException("Sort invalid for selected criteria");
+                    sortError(sort);
                 }
 
                 expression.withScanIndexForward(sort.isAscending());
@@ -206,7 +223,7 @@ public class ReadOnlyDynamoDBRepository<T, ID extends Serializable> {
         OptimizedResourceQueryCriteria optimized) {
 
         if (isNotEmpty(ps.getRequestedSort())) {
-            throw new UnsupportedOperationException("Sort not allowed with provided filters");
+            sortError(ps.getRequestedSort().get(0));
         }
         ExpressionBuilder expressionBuilder = new ExpressionBuilder();
         expressionBuilder.addCriteria(optimized.getFilterCriteria());

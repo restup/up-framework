@@ -16,7 +16,7 @@ public interface ServiceMethodAccess extends MethodAccess {
         return builder().setAllEnabled().build();
     }
 
-    static class Builder extends AbstractMethodAccessBuilder<Builder, ServiceMethodAccess> {
+    class Builder extends AbstractMethodAccessBuilder<Builder, ServiceMethodAccess> {
 
         private Builder() {
             super();

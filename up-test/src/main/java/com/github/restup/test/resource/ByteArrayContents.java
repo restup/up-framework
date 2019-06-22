@@ -15,6 +15,6 @@ class ByteArrayContents implements Contents {
 
     @Override
     public String getContentAsString() {
-        return new String(bytes);
+        return bytes == null || bytes.length == 0 ? null : new String(bytes);
     }
 }

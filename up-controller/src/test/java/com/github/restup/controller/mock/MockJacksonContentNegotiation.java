@@ -1,10 +1,10 @@
 package com.github.restup.controller.mock;
 
-import java.io.IOException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.jackson.service.model.JacksonRequestBody;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.test.resource.Contents;
+import java.io.IOException;
 
 /**
  * Jackson implementation of {@link MockContentNegotiation}
@@ -32,6 +32,12 @@ public class MockJacksonContentNegotiation implements MockContentNegotiation {
 
     @Override
     public Contents serialize(Object result) throws Exception {
+        if (result == null) {
+            return null;
+        }
+        if (result instanceof String) {
+            return Contents.of((String) result);
+        }
         String json = mapper.writeValueAsString(result);
         return Contents.of(json);
     }

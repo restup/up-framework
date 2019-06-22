@@ -5,10 +5,12 @@ import static com.github.restup.util.ReflectionUtils.getGenericReturnType;
 import static com.github.restup.util.ReflectionUtils.getReturnType;
 
 import com.github.restup.annotations.field.CaseInsensitive;
+import com.github.restup.annotations.field.ClientGeneratedIdentifier;
 import com.github.restup.annotations.field.Immutable;
 import com.github.restup.annotations.field.Param;
 import com.github.restup.annotations.field.Relationship;
 import com.github.restup.mapping.fields.MappedField.Builder;
+import com.github.restup.mapping.fields.composition.Identifier;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 
@@ -49,6 +51,13 @@ public class DefaultMappedFieldFactory implements MappedFieldFactory {
             for (MappedFieldBuilderDecorator decorator : decorators) {
                 decorator.decorate(b, bi, pd);
             }
+        }
+
+        ClientGeneratedIdentifier clientGeneratedIdentifier = getAnnotation(
+            ClientGeneratedIdentifier.class, pd);
+        if (clientGeneratedIdentifier != null) {
+            b.identifier(Identifier.builder()
+                .clientGeneratedIdentifierPermitted(clientGeneratedIdentifier.allowed()).build());
         }
 
         return b.build();

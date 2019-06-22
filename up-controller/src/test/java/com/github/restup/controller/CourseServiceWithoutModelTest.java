@@ -1,6 +1,7 @@
 package com.github.restup.controller;
 
 import com.github.restup.controller.mock.AbstractMockTest;
+import com.github.restup.controller.mock.ApiTest;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.registry.Resource;
@@ -12,11 +13,13 @@ import org.junit.Test;
 public class CourseServiceWithoutModelTest extends AbstractMockTest {
 
     public CourseServiceWithoutModelTest() {
-        super(courseRegistry(), "/courses", 1);
+        super(ApiTest.builder()
+            .relativeTo(CourseServiceTest.class)
+            .registry(courseRegistry()), "/courses", 1);
     }
     
 	static ResourceRegistry courseRegistry() {
-      ResourceRegistry registry = registry();
+      ResourceRegistry registry = ApiTest.registry();
 		
 		registry.registerResource(Resource.builder()
 				.name("university")
@@ -39,14 +42,8 @@ public class CourseServiceWithoutModelTest extends AbstractMockTest {
 		return registry;
 	}
 
-	@Override
-    protected Class<?> getRelativeToClass() {
-    		return CourseServiceTest.class;
-    }
-
     @Before
     public void setup() {
-        super.before();
         loader().load("course");
     }
 
@@ -68,11 +65,11 @@ public class CourseServiceWithoutModelTest extends AbstractMockTest {
     @Test
     public void testRelationships() {
         // examples of fetching relationships between resources
-        RestApiAssertions.Builder api = builder("/courses/{courseId}/university", 5);
+        RestApiAssertions.Builder api = getApi("/courses/{courseId}/university", 5);
         api.get().test("getCourseUniversity").ok();
 
         // and the reverse works as well
-        api = builder("/universities/{universityId}/courses", 1);
+        api = getApi("/universities/{universityId}/courses", 1);
         api.get().query("fields=name&limit=1&offset=2&sort=-name").test("getUniversityCourses").ok();
     }
 

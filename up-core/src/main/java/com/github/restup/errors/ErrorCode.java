@@ -14,7 +14,9 @@ public enum ErrorCode {
     WRAP_FIELDS_WITH_ATTRIBUTES("field must be wrapped",
         "The field is valid, but it must be wrapped in attributes"),
     PARAMETER_INVALID("Invalid parameter value"),
-    PARAMETER_INVALID_RESOURCE("Invalid parameter resource specified");
+    PARAMETER_INVALID_RESOURCE("Invalid parameter resource specified"),
+    INVALID_FILTER_CRITERIA("Invalid filter criteria"),
+    INVALID_SORT_CRITERIA("Invalid sort criteria");
 
     private final String title;
     private final String detail;

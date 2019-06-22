@@ -13,7 +13,6 @@ public abstract class AbstractMethodAccessBuilder<T extends AbstractMethodAccess
     boolean deleteByQueryDisabled;
     boolean patchByQueryDisabled;
 
-    @SuppressWarnings("unchecked")
     protected T me() {
         return (T) this;
     }
@@ -42,6 +41,26 @@ public abstract class AbstractMethodAccessBuilder<T extends AbstractMethodAccess
     public T setCreateDisabled(boolean createDisabled) {
         this.createDisabled = createDisabled;
         return me();
+    }
+
+    public T setPatchEnabled(boolean updateDisabled) {
+        return setPatchDisabled(!updateDisabled);
+    }
+
+    public T setPatchDisabled(boolean updateDisabled) {
+        return setPatchMultipleDisabled(updateDisabled)
+            .setPatchByIdDisabled(updateDisabled)
+            .setPatchByQueryDisabled(updateDisabled);
+    }
+
+    public T setDeleteEnabled(boolean deleteDisabled) {
+        return setDeleteEnabled(!deleteDisabled);
+    }
+
+    public T setDeleteDisabled(boolean deleteDisabled) {
+        return setDeleteByIdDisabled(deleteDisabled)
+            .setDeleteByIdsDisabled(deleteDisabled)
+            .setDeleteByQueryDisabled(deleteDisabled);
     }
 
     public T setCreateMultipleDisabled(boolean createMultipleDisabled) {

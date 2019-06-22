@@ -1,21 +1,20 @@
 package com.github.restup.test;
 
+import com.github.restup.test.resource.Contents;
+import com.github.restup.test.resource.RelativeTestResource;
 import java.util.HashMap;
 import java.util.Map;
 import org.apache.commons.lang3.ArrayUtils;
 import org.apache.commons.lang3.StringUtils;
-import com.github.restup.test.resource.Contents;
-import com.github.restup.test.resource.RelativeTestResource;
 
 public abstract class AbstractApiRequestBuilder<B extends AbstractApiRequestBuilder<B, H>, H> {
 
-    protected Map<String, H> headers = new HashMap<String, H>();
+    protected Map<String, H> headers = new HashMap<>();
     private Class<?> testClass;
     private String testName;
     private String testFileExtension;
     private Contents bodyContents;
 
-    @SuppressWarnings({"unchecked"})
     protected B me() {
         return (B) this;
     }
@@ -81,6 +80,10 @@ public abstract class AbstractApiRequestBuilder<B extends AbstractApiRequestBuil
 
     protected boolean hasConfiguredBody() {
         return bodyContents != null || isDefaultTestResourceAllowed();
+    }
+
+    protected Contents getContents() {
+        return bodyContents;
     }
 
     public Contents getBody() {

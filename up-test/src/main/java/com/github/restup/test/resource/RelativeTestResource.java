@@ -45,14 +45,27 @@ public class RelativeTestResource implements ResourceContents {
      * @return first non Up! test element from the stack
      */
     public static StackTraceElement getCallingStackElement() {
+        return getCallingStackElement(ApiExecutor.class);
+    }
+
+    public static StackTraceElement getCallingStackElement(Class<?>... ignoreBasePackageClasses) {
         int i = 2;
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         StackTraceElement el = stack[i];
         while (i < stack.length
-                && el.getClassName().startsWith(ApiExecutor.class.getPackage().getName())) {
+            && ignorePackages(el.getClassName(), ignoreBasePackageClasses)) {
             el = stack[i++];
         }
         return el;
+    }
+
+    private static boolean ignorePackages(String className, Class<?>[] ignoreBasePackageClasses) {
+        for (Class<?> ignore : ignoreBasePackageClasses) {
+            if (className.startsWith(ignore.getPackage().getName())) {
+                return true;
+            }
+        }
+        return false;
     }
 
     /**
@@ -63,8 +76,12 @@ public class RelativeTestResource implements ResourceContents {
     }
 
     public static Class<?> getClassFromStack() {
+        return getClassFromStack(ApiExecutor.class);
+    }
+
+    public static Class<?> getClassFromStack(Class<?>... ignoreBasePackageClasses) {
         try {
-            return Class.forName(getCallingStackElement().getClassName());
+            return Class.forName(getCallingStackElement(ignoreBasePackageClasses).getClassName());
         } catch (ClassNotFoundException e) {
             throw new AssertionError("Class Not Found", e);
         }

@@ -8,13 +8,6 @@ public class JacksonSerializer implements ResultSerializer {
     private static ObjectMapper instance;
     private ObjectMapper mapper;
 
-    private static ObjectMapper getMapper() {
-        if (instance == null) {
-            instance = new ObjectMapper();
-        }
-        return instance;
-    }
-    
     public JacksonSerializer(ObjectMapper mapper) {
         this.mapper = mapper;
     }
@@ -22,9 +15,22 @@ public class JacksonSerializer implements ResultSerializer {
     public JacksonSerializer() {
         this(getMapper());
     }
+
+    private static ObjectMapper getMapper() {
+        if (instance == null) {
+            instance = new ObjectMapper();
+        }
+        return instance;
+    }
     
     @Override
     public String convertToString(Object o) {
+        if (o == null) {
+            return null;
+        }
+        if (o instanceof String) {
+            return (String) o;
+        }
         try {
             return mapper.writeValueAsString(o);
         } catch (JsonProcessingException e) {

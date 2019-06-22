@@ -478,7 +478,8 @@ public class ResourceController {
 
     public static class Builder {
 
-        ControllerSettings.Builder settings;
+        private ControllerSettings.Builder settings;
+        private List<ResourceControllerBuilderDecorator> resourceControllerBuilderDecorators = new ArrayList<>();
 
         public Builder() {
             settings = ControllerSettings.builder();
@@ -490,6 +491,18 @@ public class ResourceController {
 
         public Builder registry(ResourceRegistry registry) {
             settings.registry(registry);
+            return me();
+        }
+
+        public Builder decorate(ResourceControllerBuilderDecorator... decorators) {
+            for (ResourceControllerBuilderDecorator decorator : decorators) {
+                resourceControllerBuilderDecorators.add(decorator);
+            }
+            return me();
+        }
+
+        public Builder decorate(Collection<ResourceControllerBuilderDecorator> decorators) {
+            resourceControllerBuilderDecorators.addAll(decorators);
             return me();
         }
 
@@ -571,9 +584,9 @@ public class ResourceController {
         }
 
         public ResourceController build() {
+            resourceControllerBuilderDecorators.stream().forEach(d -> d.decorate(this));
             return new ResourceController(settings);
         }
-
     }
 
 }

@@ -1,11 +1,10 @@
 package com.github.restup.test;
 
-import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
 import java.util.Map;
 import org.hamcrest.Matcher;
 
-public interface ApiResponse<H> {
+public interface ApiResponse<H> extends ApiResponseReader {
 
     static Builder builder() {
         return new Builder();
@@ -24,8 +23,6 @@ public interface ApiResponse<H> {
     int getStatus();
 
     Map<String, H> getHeaders();
-
-    Contents getBody();
 
     class Builder extends AbstractApiRequestBuilder<Builder, Matcher<String[]>> {
 

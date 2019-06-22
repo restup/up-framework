@@ -17,7 +17,6 @@ public class UniversityServiceJsonAPITest extends AbstractMockJsonApiTest {
 
     @Before
     public void setup() {
-        super.before();
         loader().relativeTo(CourseServiceTest.class).load("course");
     }
 

@@ -33,6 +33,7 @@ import java.util.Collections;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 import org.apache.commons.collections4.CollectionUtils;
@@ -446,11 +447,6 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
                 controllerMethodAccess = registrySettings.getDefaultControllerAccess();
             }
 
-            ServiceMethodAccess serviceMethodAccess = serviceAccess;
-            if (serviceMethodAccess == null) {
-                serviceMethodAccess = registrySettings.getDefaultServiceAccess();
-            }
-
             MappedClass<?> mapping = mappedClass;
             if (mapping == null) {
                 MappedClassRegistry mappedClassFactory = mappedClassRegistry;
@@ -460,6 +456,26 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
                 Assert.notNull(mappedClassFactory, "mappedClassFactory must not be null");
 
                 mapping = mappedClassFactory.getMappedClass(type);
+            }
+
+            ServiceMethodAccess serviceMethodAccess = serviceAccess;
+            if (serviceMethodAccess == null) {
+                boolean createDisabled = Objects
+                    .equals(mapping.getCreateStrategy(), CreateStrategy.NOT_ALLOWED);
+                boolean updateDisabled = Objects
+                    .equals(mapping.getUpdateStrategy(), UpdateStrategy.NOT_ALLOWED);
+                boolean deleteDisabled = Objects
+                    .equals(mapping.getDeleteStrategy(), DeleteStrategy.NOT_ALLOWED);
+
+                if (createDisabled || updateDisabled || deleteDisabled) {
+                    serviceMethodAccess = ServiceMethodAccess.builder()
+                        .setCreateDisabled(createDisabled)
+                        .setPatchDisabled(updateDisabled)
+                        .setDeleteDisabled(deleteDisabled)
+                        .build();
+                } else {
+                    serviceMethodAccess = registrySettings.getDefaultServiceAccess();
+                }
             }
 
             Assert.notNull(mapping, "mapping must not be null");

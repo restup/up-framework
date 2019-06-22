@@ -16,10 +16,8 @@ public class CourseServiceJsonAPITest extends AbstractMockJsonApiTest {
                 , University.class);
     }
 
-    @Override
     @Before
     public void before() {
-        super.before();
         loader().relativeTo(CourseServiceTest.class)
                 .load("course");
     }
@@ -47,11 +45,11 @@ public class CourseServiceJsonAPITest extends AbstractMockJsonApiTest {
     @Test
     public void testRelationships() {
         // examples of fetching relationships between resources
-        RestApiAssertions.Builder api = builder("/courses/{courseId}/university", 5);
+        RestApiAssertions.Builder api = getApi("/courses/{courseId}/university", 5);
         api.get().test("getCourseUniversity").ok();
 
         // and the reverse works as well
-        api = builder("/universities/{universityId}/courses", 1);
+        api = getApi("/universities/{universityId}/courses", 1);
         api.get().query("fields=name&limit=1&offset=2&sort=-name").test("getUniversityCourses").ok();
     }
 
