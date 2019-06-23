@@ -43,6 +43,8 @@ public interface ControllerSettings {
 
     String getMediaTypeParam();
 
+    LinkBuilderFactory getLinkBuilderFactory();
+
     class Builder {
 
         private ResourceRegistry registry;
@@ -171,10 +173,12 @@ public interface ControllerSettings {
             ExceptionHandler exceptionHandler = nvl(this.exceptionHandler,
                 () -> ExceptionHandler.getDefaultInstance());
 
+            LinkBuilderFactory linkBuilderFactory = settingsCaptor.getLinkBuilderFactory();
+
             //TODO
             registry.registerResource(
                     Resource.builder(Resource.class)
-                            .service(new DiscoveryService(settingsCaptor.getLinkBuilderFactory()))
+                        .service(new DiscoveryService(linkBuilderFactory))
                             .excludeFrameworkFilters(true)
                             .mapping(
                                     MappedClass.builder(Resource.class)
@@ -186,7 +190,7 @@ public interface ControllerSettings {
             return new BasicControllerSettings(registry, contentNegotiator, interceptor,
                 requestParser, requestPathParser, exceptionHandler,
                 settingsCaptor.getDefaultMediaType(),
-                mediaTypeParam);
+                mediaTypeParam, linkBuilderFactory);
         }
     }
 

@@ -55,6 +55,13 @@ public class RpcApiAssertions {
             contentsAssertions = true;
         }
 
+        static boolean accepts(Matcher<String> matcher, ApiResponse<String[]> response) {
+            if (matcher instanceof ApiResponseFilter) {
+                return ((ApiResponseFilter) matcher).accept(response);
+            }
+            return true;
+        }
+
         protected Builder me() {
             return this;
         }
@@ -162,12 +169,12 @@ public class RpcApiAssertions {
             return expectStatus(httpStatus.getHttpStatus());
         }
 
-        public Builder expectHeader(String name, Matcher<String[]> matcher) {
+        public Builder expectHeader(String name, Matcher<String> matcher) {
             expected.header(name, matcher);
             return me();
         }
 
-        public Builder expectHeader(String name, String... values) {
+        public Builder expectHeader(String name, String values) {
             return expectHeader(name, is(values));
         }
 
@@ -321,13 +328,8 @@ public class RpcApiAssertions {
             }
 
             ApiRequest request = this.request.build();
-            ApiResponse<Matcher<String[]>> expected = this.expected.build();
+            ApiResponse<Matcher<String>> expected = this.expected.build();
             ApiResponse<String[]> response = executor.execute(request);
-
-            // header assertions
-            for (Map.Entry<String, Matcher<String[]>> e : expected.getHeaders().entrySet()) {
-                assertThat(e.getKey() + " Header", response.getHeader(e.getKey()), e.getValue());
-            }
 
             if (contentsAssertions
                 // compare for output if statuses are not equal && there is content... usually due to 400
@@ -375,6 +377,16 @@ public class RpcApiAssertions {
 
             // assert status
             assertThat("Status ", response.getStatus(), is(expected.getStatus()));
+
+            // header assertions
+            for (Map.Entry<String, Matcher<String>> e : expected.getHeaders().entrySet()) {
+                if (accepts(e.getValue(), response)) {
+                    String[] headers = response.getHeader(e.getKey());
+                    assertThat("Expect a single header for " + e.getKey(), 1,
+                        is(headers == null ? 0 : headers.length));
+                    assertThat(e.getKey() + " Header", headers[0], e.getValue());
+                }
+            }
             return response;
         }
 

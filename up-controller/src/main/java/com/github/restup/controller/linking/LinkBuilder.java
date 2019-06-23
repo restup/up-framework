@@ -10,6 +10,8 @@ import java.util.List;
  */
 public interface LinkBuilder {
 
+    Link getSelfLink(ParsedResourceControllerRequest<?> request, Object result);
+
     /**
      * @param request object
      * @param resource object

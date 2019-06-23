@@ -29,14 +29,17 @@ public class StrategyTest {
 
     @Test
     public void testNoContent() {
-        String id = UUID.randomUUID().toString();
         RestApiAssertions.Builder api = ApiTest.builder()
             .registerResources(Message.class)
             .decorateApi((b) -> b.contentsAssertions(false))
             .build()
-            .getApi("/messages", id);
+            .getApi("/messages");
 
-        api.add("{\"data\":{\"id\":\"" + id + "\",\"message\":\"foo\"}}").noContent();
+        String location = api.add("{\"data\":{\"message\":\"foo\"}}")
+            .noContent().getLocation();
+
+        api.location(location);
+
         assertEquals("foo", api.get().ok().read("data.message"));
         api.update("{\"data\":{\"message\":\"bar\"}}").noContent();
         assertEquals("bar", api.get().ok().read("data.message"));

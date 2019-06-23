@@ -3,6 +3,9 @@ package com.github.restup.controller.method;
 import static com.github.restup.util.UpUtils.nvl;
 
 import com.github.restup.annotations.model.CreateStrategy;
+import com.github.restup.controller.linking.Link;
+import com.github.restup.controller.linking.LinkBuilder;
+import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.registry.Resource;
@@ -26,8 +29,12 @@ import java.io.Serializable;
 public class PostMethodController<T, ID extends Serializable> extends
     BulkMethodController<T, ID, CreateRequest<T>, CreateStrategySupplier> {
 
-    public PostMethodController(RequestObjectFactory factory) {
+    private final LinkBuilderFactory linkBuilderFactory;
+
+    public PostMethodController(RequestObjectFactory factory,
+        LinkBuilderFactory linkBuilderFactory) {
         super(factory);
+        this.linkBuilderFactory = linkBuilderFactory;
     }
 
     @Override
@@ -53,6 +60,11 @@ public class PostMethodController<T, ID extends Serializable> extends
             strategyType = createRequest.getCreateStrategy();
             result = service.create(createRequest);
             //TODO Location Header
+            LinkBuilder builder = linkBuilderFactory.getLinkBuilder(request, result);
+            Link self = builder.getSelfLink(request, result);
+            if (self != null) {
+                response.setHeader("Location", self.getHref());
+            }
         }
         status(request, response, result, strategyType);
         return result;

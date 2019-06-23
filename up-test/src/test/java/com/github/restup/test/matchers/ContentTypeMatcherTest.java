@@ -1,12 +1,17 @@
 package com.github.restup.test.matchers;
 
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
+import static org.mockito.Mockito.any;
+import static org.mockito.Mockito.verify;
+import static org.mockito.Mockito.verifyNoMoreInteractions;
+import static org.mockito.Mockito.when;
+
+import org.hamcrest.Description;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.Mockito;
 import org.mockito.junit.MockitoJUnitRunner;
-import static org.mockito.Mockito.*;
-import static org.junit.Assert.*;
-import org.hamcrest.Description;
 
 @RunWith(MockitoJUnitRunner.class)
 public class ContentTypeMatcherTest {
@@ -15,8 +20,8 @@ public class ContentTypeMatcherTest {
     public void testMatches() {
         ContentTypeMatcher matcher = new ContentTypeMatcher("application/foo");
         assertFalse(matcher.matches("foo"));
-        assertTrue(matcher.matches(new String[] {"application/foo"}));
-        assertTrue(matcher.matches(new String[] {"application/foo; charset=utf-8"}));
+        assertTrue(matcher.matches("application/foo"));
+        assertTrue(matcher.matches("application/foo; charset=utf-8"));
     }
 
     @Test

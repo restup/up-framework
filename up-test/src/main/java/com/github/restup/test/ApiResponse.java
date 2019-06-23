@@ -24,7 +24,25 @@ public interface ApiResponse<H> extends ApiResponseReader {
 
     Map<String, H> getHeaders();
 
-    class Builder extends AbstractApiRequestBuilder<Builder, Matcher<String[]>> {
+    /**
+     * @return The Location header if present in the response, null otherwise. Typically available
+     * for create resource
+     */
+    default String getLocation() {
+        Object location = getHeader("location");
+        String result = null;
+        if (location instanceof String[]) {
+            String[] arr = (String[]) location;
+            if (arr.length > 0) {
+                result = arr[0];
+            }
+        } else if (location instanceof String) {
+            result = (String) location;
+        }
+        return result;
+    }
+
+    class Builder extends AbstractApiRequestBuilder<Builder, Matcher<String>> {
 
         private int status;
 
@@ -38,7 +56,7 @@ public interface ApiResponse<H> extends ApiResponseReader {
             return RelativeTestResource.RESPONSES;
         }
 
-        public ApiResponse<Matcher<String[]>> build() {
+        public ApiResponse<Matcher<String>> build() {
             return new BasicApiResponse<>(status, getHeaders(), getBody());
         }
     }

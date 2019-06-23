@@ -33,6 +33,7 @@ public class MockServiceTest {
         test.before();
         test.jsonapi();
         test.before();
+        test.api.contentsAssertions(false);
     }
     
     @Test

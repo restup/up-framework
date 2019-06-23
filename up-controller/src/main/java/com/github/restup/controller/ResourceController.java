@@ -188,7 +188,8 @@ public class ResourceController {
         getController = new GetMethodController(factory);
         deleteController = new DeleteMethodController(factory);
         patchController = new PatchMethodController(factory);
-        postController = new PostMethodController(factory);
+
+        postController = new PostMethodController(factory, settings.getLinkBuilderFactory());
         putController = new PutMethodController(factory);
     }
 

@@ -36,6 +36,9 @@ public class MockResourceControllerRequest extends BasicResourceControllerReques
     }
 
     public static String getUrl(String path) {
+        if (path.startsWith(LOCALHOST)) {
+            return path;
+        }
         return LOCALHOST + (path.startsWith("/") ? "" : "/") + path;
     }
 

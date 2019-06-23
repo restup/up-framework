@@ -3,6 +3,7 @@ package com.github.restup.controller.settings;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.interceptor.RequestInterceptor;
+import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.request.parser.path.RequestPathParser;
 import com.github.restup.registry.ResourceRegistry;
@@ -17,11 +18,13 @@ public class BasicControllerSettings implements ControllerSettings {
     private final ExceptionHandler exceptionHandler;
     private final String defaultMediaType;
     private final String mediaTypeParam;
+    private final LinkBuilderFactory linkBuilderFactory;
 
     protected BasicControllerSettings(ResourceRegistry registry, ContentNegotiator contentNegotiator,
         RequestInterceptor requestInterceptor, RequestParser requestParser,
         RequestPathParser requestPathParser,
-        ExceptionHandler exceptionHandler, String defaultMediaType, String mediaTypeParam) {
+        ExceptionHandler exceptionHandler, String defaultMediaType, String mediaTypeParam,
+        LinkBuilderFactory linkBuilderFactory) {
         super();
         this.registry = registry;
         this.contentNegotiator = contentNegotiator;
@@ -31,6 +34,7 @@ public class BasicControllerSettings implements ControllerSettings {
         this.exceptionHandler = exceptionHandler;
         this.defaultMediaType = defaultMediaType;
         this.mediaTypeParam = mediaTypeParam;
+        this.linkBuilderFactory = linkBuilderFactory;
     }
 
     @Override
@@ -71,6 +75,11 @@ public class BasicControllerSettings implements ControllerSettings {
     @Override
     public ExceptionHandler getExceptionHandler() {
         return exceptionHandler;
+    }
+
+    @Override
+    public LinkBuilderFactory getLinkBuilderFactory() {
+        return linkBuilderFactory;
     }
 
 }

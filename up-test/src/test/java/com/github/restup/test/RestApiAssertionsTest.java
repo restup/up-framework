@@ -67,6 +67,7 @@ public class RestApiAssertionsTest {
         when(executor.execute(request.capture())).thenReturn(response);
         when(response.getStatus()).thenReturn(status);
         when(response.getHeader("Content-Type")).thenReturn(new String[] {contentType});
+        when(response.getHeader("Location")).thenReturn(new String[]{"http://localhost/foo/111"});
         when(response.getBody()).thenReturn(resultContents);
         return request;
     }
@@ -113,7 +114,7 @@ public class RestApiAssertionsTest {
         Contents body = body();
 
         assertThrows("Expected: Content-Type=", () -> api("foo/{id}").hal()
-                .patch(body.getContentAsByteArray()).ok());
+            .patch(body.getContentAsByteArray()).contentsAssertions(false).ok());
     }
 
     @Test

@@ -123,9 +123,16 @@ public interface ApiRequest {
                 //
                 s = s.substring(0, q);
             }
+            String hostName = "";
+            if (s.startsWith("http")) {
+                int i = s.indexOf("/", "https://".length());
+                hostName = s.substring(0, i);
+                s = s.substring(i);
+            }
             String[] parts = s.split("/");
             int i = 0;
             StringBuilder url = new StringBuilder();
+            url.append(hostName);
             for (String part : parts) {
                 if (part.length() > 0) {
                     url.append("/");

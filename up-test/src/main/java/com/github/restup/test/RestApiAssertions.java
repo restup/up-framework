@@ -1,5 +1,8 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.matchers.LocationMatcher.matchesLocationPath;
+import static org.apache.commons.lang3.StringUtils.isEmpty;
+
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
 import java.util.ArrayList;
@@ -33,6 +36,7 @@ public class RestApiAssertions {
         private final Class<?> unitTest;
         private final String path;
         private final Object[] defaultArgs;
+        private String location;
         private boolean itemResource;
         private HttpMethod method;
         private Object[] pathArgs;
@@ -42,7 +46,7 @@ public class RestApiAssertions {
         private List<RpcApiAssertionsBuilderDecorator> rpcApiAssertionsBuilderDecorators = new ArrayList();
         private boolean createMissingResource;
         private boolean contentsAssertions;
-
+        private Boolean expectLocationHeader;
         Builder(ApiExecutor executor, Class<?> unitTest, String path, Object... pathArgs) {
             this.executor = executor;
             this.unitTest = unitTest;
@@ -51,6 +55,7 @@ public class RestApiAssertions {
             mediaType = MediaType.APPLICATION_JSON;
             createMissingResource = true;
             contentsAssertions = true;
+            expectLocationHeader = true;
         }
 
         Builder(ApiExecutor executor, Object unitTest, String path, Object... pathArgs) {
@@ -63,6 +68,15 @@ public class RestApiAssertions {
 
         private Builder me() {
             return this;
+        }
+
+        /**
+         * Set the location used for the request.  Expected to be returned from a Location header of
+         * a prior request and have the full url of the resource.
+         */
+        public Builder location(String location) {
+            this.location = location;
+            return me();
         }
 
         /**
@@ -152,11 +166,21 @@ public class RestApiAssertions {
             return add(pathArgs).body(body);
         }
 
+        public Builder expectLocationHeader(boolean expectLocationHeader) {
+            this.expectLocationHeader = expectLocationHeader;
+            return me();
+        }
+
         public RpcApiAssertions.Builder add(Object... pathArgs) {
-            return collectionResource()
-                    .method(HttpMethod.POST)
+            RpcApiAssertions.Builder rpc = collectionResource()
+                .method(HttpMethod.POST)
                 .pathArgs(pathArgs)
-                    .build();
+                .build();
+
+            if (expectLocationHeader) {
+                rpc = rpc.expectHeader("Location", matchesLocationPath(path));
+            }
+            return rpc;
         }
 
         public RpcApiAssertions.Builder list(Object... pathArgs) {
@@ -231,27 +255,29 @@ public class RestApiAssertions {
 
         private RpcApiAssertions.Builder build() {
 
-            String testPath = path;
-            if (testPath.contains("}")) {
-                if (!itemResource) {
-                    // collection resource can't end with id
-                    testPath = path.substring(0, path.lastIndexOf('/'));
+            String testPath = location;
+            if (isEmpty(testPath)) {
+                testPath = path;
+                if (testPath.contains("}")) {
+                    if (!itemResource) {
+                        // collection resource can't end with id
+                        testPath = path.substring(0, path.lastIndexOf('/'));
+                    }
+                } else if (itemResource) {
+                    // item resource has to end with id
+                    testPath += "/{id}";
                 }
-            } else if (itemResource) {
-                // item resource has to end with id
-                testPath += "/{id}";
             }
 
             return new RpcApiAssertions.Builder(executor, unitTest, testPath, defaultArgs)
                 .pathArgs(pathArgs)
-                    .method(method)
-                    .test(testName)
-                    .mediaType(mediaType)
+                .method(method)
+                .test(testName)
+                .mediaType(mediaType)
                 .decorate(rpcApiAssertionsBuilderDecorators)
-                    .https(https)
+                .https(https)
                 .createMissingResource(createMissingResource)
                 .contentsAssertions(contentsAssertions);
         }
-
     }
 }

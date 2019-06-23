@@ -8,6 +8,7 @@ import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.registry.Resource;
 import com.github.restup.service.model.ResourceData;
 import com.github.restup.service.model.response.PagedResult;
+import com.github.restup.service.model.response.PersistenceResult;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.ArrayList;
@@ -28,6 +29,17 @@ public class DefaultLinkBuilder implements LinkBuilder {
 
     public DefaultLinkBuilder(ServiceDiscovery serviceDiscovery) {
         this.serviceDiscovery = serviceDiscovery;
+    }
+
+    @Override
+    public Link getSelfLink(ParsedResourceControllerRequest<?> request, Object result) {
+        Resource resource = request.getResource();
+        Object id = null;
+        if (result instanceof PersistenceResult) {
+            PersistenceResult persistenceResult = (PersistenceResult) result;
+            id = resource.getIdentityField().readValue(persistenceResult.getData());
+        }
+        return link(request, LinkRelations.self, resource, id);
     }
 
     @Override
