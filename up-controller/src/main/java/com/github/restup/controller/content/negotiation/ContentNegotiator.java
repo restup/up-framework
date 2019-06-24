@@ -7,6 +7,9 @@ import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerResponse;
 import com.github.restup.controller.settings.BuilderSettingsCaptor;
 import com.github.restup.registry.settings.AutoDetectConstants;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -43,6 +46,8 @@ public interface ContentNegotiator {
 
         private ContentNegotiator[] contentNegotiators;
         private BuilderSettingsCaptor settingsCaptor;
+        private List<ContentNegotiatorBuilderDecorator> contentNegotiatorBuilderDecorators = new ArrayList<>();
+
 
         Builder() {
             super();
@@ -83,7 +88,20 @@ public interface ContentNegotiator {
             return me();
         }
 
+        public Builder decorate(ContentNegotiatorBuilderDecorator... decorators) {
+            for (ContentNegotiatorBuilderDecorator decorator : decorators) {
+                contentNegotiatorBuilderDecorators.add(decorator);
+            }
+            return me();
+        }
+
+        public Builder decorate(Collection<ContentNegotiatorBuilderDecorator> decorators) {
+            contentNegotiatorBuilderDecorators.addAll(decorators);
+            return me();
+        }
+
         public ContentNegotiator build() {
+            contentNegotiatorBuilderDecorators.stream().forEach(d -> d.decorate(this));
             settingsCaptor.build();
 
             ContentNegotiator[] arr = contentNegotiators;
@@ -101,7 +119,6 @@ public interface ContentNegotiator {
             }
             return arr != null ? new ContentNegotiatorChain(arr) : new ContentNegotiatorChain();
         }
-
     }
 
 }

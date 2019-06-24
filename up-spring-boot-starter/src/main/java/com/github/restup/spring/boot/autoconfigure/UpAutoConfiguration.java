@@ -94,8 +94,8 @@ public class UpAutoConfiguration {
             return Pagination.disabled();
         }
         return Pagination.of(props.getMaxPageLimit(),
-                props.getDefaultPageLimit(), 0,
-                props.isPaginationTotalsDisabled());
+            props.getDefaultPageLimit(), 0,
+            props.isPaginationTotalsDisabled());
     }
 
     @Bean
@@ -147,19 +147,22 @@ public class UpAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ServiceFilterFactory defaultUpServiceFilterFactory() {
-        return new ServiceFilterFactory() {};
+        return new ServiceFilterFactory() {
+        };
     }
 
     @Bean
     @ConditionalOnMissingBean
     public RestrictedFieldsProviderFactory defaultUpRestrictedFieldsProviderFactory() {
-        return new RestrictedFieldsProviderFactory() {};
+        return new RestrictedFieldsProviderFactory() {
+        };
     }
 
     @Bean
     @ConditionalOnMissingBean
     public SparseFieldsProviderFactory defaultUpSparseFieldsProviderFactory() {
-        return new SparseFieldsProviderFactory() {};
+        return new SparseFieldsProviderFactory() {
+        };
     }
 
     @Bean
@@ -184,21 +187,22 @@ public class UpAutoConfiguration {
         SparseFieldsProviderFactory sparseFieldsProviderFactory,
         ResourceRegistryBuilderDecorator decorator) throws ClassNotFoundException {
 
-        return decorator.decorate(
-            ResourceRegistry.builder()
-                .basePath(props.getBasePath())
-                .excludeFrameworkFilters(props.isExcludeFrameworkFilters())
-                .controllerMethodAccess(controllerMethodAccess)
-                .defaultPagination(pagination)
-                .errorFactory(errorFactory)
-                .mappedClassFactory(mappedClassFactory)
-                .converterFactory(converterFactory)
-                .repositoryFactory(repositoryFactory)
-                .requestObjectFactory(requestObjectFactory)
-                .serviceMethodAccess(serviceMethodAccess)
-                .defaultServiceFilters(serviceFilterFactory.getServiceFilters())
-                .defaultRestrictedFieldsProvider(restrictedFieldsProviderFactory.getRestrictedFieldsProvider())
-                .defaultSparseFieldsProvider(sparseFieldsProviderFactory.getSparseFieldsProvider())
+        return ResourceRegistry.builder()
+            .decorate(decorator)
+            .basePath(props.getBasePath())
+            .excludeFrameworkFilters(props.isExcludeFrameworkFilters())
+            .controllerMethodAccess(controllerMethodAccess)
+            .defaultPagination(pagination)
+            .errorFactory(errorFactory)
+            .mappedClassFactory(mappedClassFactory)
+            .converterFactory(converterFactory)
+            .repositoryFactory(repositoryFactory)
+            .requestObjectFactory(requestObjectFactory)
+            .serviceMethodAccess(serviceMethodAccess)
+            .defaultServiceFilters(serviceFilterFactory.getServiceFilters())
+            .defaultRestrictedFieldsProvider(
+                restrictedFieldsProviderFactory.getRestrictedFieldsProvider())
+            .defaultSparseFieldsProvider(sparseFieldsProviderFactory.getSparseFieldsProvider()
         ).build();
     }
 

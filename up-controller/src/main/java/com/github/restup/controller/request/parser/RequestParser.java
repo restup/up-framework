@@ -7,6 +7,9 @@ import com.github.restup.controller.request.parser.path.RequestPathParserResult;
 import com.github.restup.controller.settings.BuilderSettingsCaptor;
 import com.github.restup.jackson.JacksonConfiguration;
 import com.github.restup.registry.settings.AutoDetectConstants;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 import org.apache.commons.lang3.ArrayUtils;
 
 /**
@@ -34,6 +37,7 @@ public interface RequestParser {
         private RequestParser relationshipParser;
         private ObjectMapper mapper;
         private BuilderSettingsCaptor settingsCaptor;
+        private List<RequestParserBuilderDecorator> requestParserBuilderDecorators = new ArrayList<>();
 
         Builder() {
             super();
@@ -79,7 +83,21 @@ public interface RequestParser {
             return me();
         }
 
+        public Builder decorate(RequestParserBuilderDecorator... decorators) {
+            for (RequestParserBuilderDecorator decorator : decorators) {
+                requestParserBuilderDecorators.add(decorator);
+            }
+            return me();
+        }
+
+        public Builder decorate(
+            Collection<RequestParserBuilderDecorator> decorators) {
+            requestParserBuilderDecorators.addAll(decorators);
+            return me();
+        }
+
         public RequestParser build() {
+            requestParserBuilderDecorators.stream().forEach(d -> d.decorate(this));
             settingsCaptor.build();
 
             RequestParamParser.Builder b = requestParamParser;

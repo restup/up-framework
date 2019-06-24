@@ -39,7 +39,7 @@ public class UpControllerAutoConfiguration {
     @ConditionalOnMissingBean
     public ServiceDiscovery defaultUpServiceDiscovery() {
         return CachedServiceDiscovery
-                .cache(ServiceDiscovery.getDefaultServiceDiscovery());
+            .cache(ServiceDiscovery.getDefaultServiceDiscovery());
     }
 
     @Bean
@@ -87,58 +87,56 @@ public class UpControllerAutoConfiguration {
     @ConditionalOnMissingBean
     public RequestParser.Builder defaultUpRequestParser(ObjectMapper mapper,
         RequestParserBuilderDecorator decorator) {
-        return decorator.decorate(
-            RequestParser.builder()
-                .autoDetectDisabled(props.isDisableSerializationAutoDetection())
-                .defaultMediaType(props.getDefaultMediaType())
-                .requestParamParser(RequestParamParser.builder()
-                    .withFieldsNamed(props.getFieldsParamName())
-                    .withFilterNamed(props.getFilterParamName())
-                    .withIncludeNamed(props.getIncludeParamName())
-                    .withPageLimitNamed(props.getLimitParamName())
-                    .withPageNumberNamed(props.getPageNumberParamName())
-                    .withPageOffsetNamed(props.getOffsetParamName())
-                    .withSortNamed(props.getSortParamName())
-                )
-                .jacksonObjectMapper(mapper)
-        );
+        return RequestParser.builder()
+            .decorate(decorator)
+            .autoDetectDisabled(props.isDisableSerializationAutoDetection())
+            .defaultMediaType(props.getDefaultMediaType())
+            .requestParamParser(RequestParamParser.builder()
+                .withFieldsNamed(props.getFieldsParamName())
+                .withFilterNamed(props.getFilterParamName())
+                .withIncludeNamed(props.getIncludeParamName())
+                .withPageLimitNamed(props.getLimitParamName())
+                .withPageNumberNamed(props.getPageNumberParamName())
+                .withPageOffsetNamed(props.getOffsetParamName())
+                .withSortNamed(props.getSortParamName())
+            )
+            .jacksonObjectMapper(mapper);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ContentNegotiator.Builder defaultUpContentNegotiator(ServiceDiscovery serviceDiscovery,
         LinkBuilderFactory linkBuilderFactory, ContentNegotiatorBuilderDecorator decorator) {
-        return decorator.decorate(
-            ContentNegotiator.builder()
-                .autoDetectDisabled(props.isDisableSerializationAutoDetection())
-                .defaultMediaType(props.getDefaultMediaType())
-                .serviceDiscovery(serviceDiscovery)
-                .linkBuilderFactory(linkBuilderFactory)
-        );
+        return ContentNegotiator.builder()
+            .decorate(decorator)
+            .autoDetectDisabled(props.isDisableSerializationAutoDetection())
+            .defaultMediaType(props.getDefaultMediaType())
+            .serviceDiscovery(serviceDiscovery)
+            .linkBuilderFactory(linkBuilderFactory);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ResourceController defaultUpResourceController(ResourceRegistry registry,
         ObjectMapper mapper,
-            ServiceDiscovery serviceDiscovery,
-            LinkBuilderFactory linkBuilderFactory,
-            ExceptionHandler exceptionHandler,
+        ServiceDiscovery serviceDiscovery,
+        LinkBuilderFactory linkBuilderFactory,
+        ExceptionHandler exceptionHandler,
         RequestParser.Builder requestParser,
         ResourceControllerBuilderDecorator decorator,
         ContentNegotiator.Builder contentNegotiator) {
         return ResourceController.builder()
             .decorate(decorator)
-                .registry(registry)
-                .serviceDiscovery(serviceDiscovery)
-                .linkBuilderFactory(linkBuilderFactory)
-                .exceptionHandler(exceptionHandler)
-                .autoDetectDisabled(props.isDisableSerializationAutoDetection())
-                .defaultMediaType(props.getDefaultMediaType())
-                .requestParser(requestParser)
-                .contentNegotiator(contentNegotiator)
-                .jacksonObjectMapper(mapper)
-                // .interceptors(interceptorA, interceptorB, new NoOpRequestInterceptor())
+            .registry(registry)
+            .serviceDiscovery(serviceDiscovery)
+            .linkBuilderFactory(linkBuilderFactory)
+            .exceptionHandler(exceptionHandler)
+            .autoDetectDisabled(props.isDisableSerializationAutoDetection())
+            .defaultMediaType(props.getDefaultMediaType())
+            .requestParser(requestParser)
+            .contentNegotiator(contentNegotiator)
+            .jacksonObjectMapper(mapper)
+            // .interceptors(interceptorA, interceptorB, new NoOpRequestInterceptor())
             .build();
     }
 

@@ -24,8 +24,10 @@ import com.github.restup.response.strategy.DeleteStrategySupplier;
 import com.github.restup.response.strategy.UpdateStrategySupplier;
 import com.github.restup.service.model.request.RequestObjectFactory;
 import com.github.restup.util.Streams;
+import java.util.ArrayList;
 import java.util.Collection;
 import java.util.Comparator;
+import java.util.List;
 import javax.validation.Validator;
 
 /**
@@ -85,6 +87,7 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
     final class Builder {
         private final RegistrySettings.Builder settings;
+        private List<ResourceRegistryBuilderDecorator> resourceRegistryBuilderDecorators = new ArrayList<>();
 
         public Builder() {
             settings = RegistrySettings.builder();
@@ -247,7 +250,20 @@ public interface ResourceRegistry extends MappedClassRegistry {
             return me();
         }
 
+        public Builder decorate(ResourceRegistryBuilderDecorator... decorators) {
+            for (ResourceRegistryBuilderDecorator decorator : decorators) {
+                resourceRegistryBuilderDecorators.add(decorator);
+            }
+            return me();
+        }
+
+        public Builder decorate(Collection<ResourceRegistryBuilderDecorator> decorators) {
+            resourceRegistryBuilderDecorators.addAll(decorators);
+            return me();
+        }
+
         public ResourceRegistry build() {
+            resourceRegistryBuilderDecorators.stream().forEach(d -> d.decorate(this));
             return new DefaultResourceRegistry(settings.build());
         }
 
