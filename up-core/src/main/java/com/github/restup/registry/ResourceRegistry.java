@@ -5,6 +5,7 @@ import com.github.restup.annotations.model.DeleteStrategy;
 import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
+import com.github.restup.config.UpFactories;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.mapping.MappedClassBuilderDecorator;
@@ -263,8 +264,13 @@ public interface ResourceRegistry extends MappedClassRegistry {
         }
 
         public ResourceRegistry build() {
-            resourceRegistryBuilderDecorators.stream().forEach(d -> d.decorate(this));
+            apply(UpFactories.instance.getInstances(ResourceRegistryBuilderDecorator.class));
+            apply(resourceRegistryBuilderDecorators);
             return new DefaultResourceRegistry(settings.build());
+        }
+
+        private void apply(List<ResourceRegistryBuilderDecorator> decorators) {
+            decorators.stream().forEach(d -> d.decorate(this));
         }
 
     }

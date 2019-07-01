@@ -53,7 +53,7 @@ public class DynamoDBRepositoryTest {
     private <T, ID extends Serializable> DynamoDBRepository<T, ID> getRepository(
         Resource<T, ID> resource) {
         AmazonDynamoDB ddb = DynamoDBUtils.init();
-        DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(ddb);
+        DynamoDBRepositoryFactory factory = DynamoDBRepositoryFactory.builder(ddb).build();
         DynamoDBRepository<?, ?> repo = (DynamoDBRepository<?, ?>) factory.getRepository(resource);
 
         DynamoDBUtils.createTables(ddb, Course.class, OverIndexedTable.class);

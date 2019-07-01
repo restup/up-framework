@@ -7,6 +7,8 @@ import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapper;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.DefaultTableNameResolver;
 import com.amazonaws.services.dynamodbv2.datamodeling.DynamoDBMapperConfig.TableNameResolver;
+import com.github.restup.identity.IdentityStrategy;
+import com.github.restup.identity.UUIDIdentityStrategy;
 import com.github.restup.repository.RepositoryFactory;
 import com.github.restup.repository.dynamodb.DynamoDBRepository;
 import com.github.restup.repository.dynamodb.DynamoDBRepositoryFactory;
@@ -27,12 +29,25 @@ public class DynamoDBRepositoryAutoConfiguration {
 
     @Bean
     @ConditionalOnMissingBean(value = {RepositoryFactory.class, DynamoDBRepositoryFactory.class})
-    public RepositoryFactory defaultUpDynamoDBRepositoryFactory(DynamoDBMapper mapper) {
-        return new DynamoDBRepositoryFactory(mapper);
+    public RepositoryFactory defaultUpDynamoDBRepositoryFactory(DynamoDBMapper mapper,
+        IdentityStrategy identityStrategy) {
+        return DynamoDBRepositoryFactory.builder()
+            .dynamoDBMapper(mapper)
+            .identityStrategy(identityStrategy)
+            .build();
+    }
+
+
+    @Bean
+    @ConditionalOnMissingBean(value = {RepositoryFactory.class, DynamoDBRepositoryFactory.class,
+        IdentityStrategy.class})
+    public IdentityStrategy defaultUpIdentityStrategy() {
+        return new UUIDIdentityStrategy();
     }
 
     @Bean
     @ConditionalOnProperty("aws.dynamodb.endpoint")
+    @ConditionalOnMissingBean(value = {DynamoDBMapper.class})
     public EndpointConfiguration EndpointConfiguration(
         @Value("${aws.dynamodb.endpoint:}") String amazonDynamoDBEndpoint,
         @Value("${aws.dynamodb.region:us-east-1}") String amazonDynamoDBRegion) {
@@ -40,24 +55,23 @@ public class DynamoDBRepositoryAutoConfiguration {
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = {AmazonDynamoDB.class, EndpointConfiguration.class})
+    @ConditionalOnMissingBean(value = {AmazonDynamoDB.class, EndpointConfiguration.class,
+        DynamoDBMapper.class})
     public AmazonDynamoDB amazonDynamoDBDefault() {
         return AmazonDynamoDBClientBuilder.defaultClient();
     }
 
     @Bean
-    @ConditionalOnMissingBean(value = {AmazonDynamoDB.class})
+    @ConditionalOnMissingBean(value = {AmazonDynamoDB.class, DynamoDBMapper.class})
     public AmazonDynamoDB amazonDynamoDBStandard(EndpointConfiguration endpointConfiguration) {
         return AmazonDynamoDBClientBuilder.standard()
             .withEndpointConfiguration(endpointConfiguration).build();
     }
 
     @Bean
-    @ConditionalOnMissingBean
+    @ConditionalOnMissingBean(value = {DynamoDBMapperConfig.class, DynamoDBMapper.class})
     public DynamoDBMapperConfig defaultDynamoDBMapperConfig(TableNameResolver tableNameResolver) {
-        return DynamoDBRepositoryFactory.getDynamoDBMapperConfigBuilder()
-            .withTableNameResolver(tableNameResolver)
-            .build();
+        return DynamoDBRepositoryFactory.getDynamoDBMapperConfigDefault(tableNameResolver);
     }
 
     @Bean

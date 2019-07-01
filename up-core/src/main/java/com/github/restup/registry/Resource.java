@@ -12,7 +12,6 @@ import com.github.restup.mapping.UntypedClass;
 import com.github.restup.mapping.fields.MappedField;
 import com.github.restup.path.ResourcePath;
 import com.github.restup.path.ResourcePathsProvider;
-import com.github.restup.query.DefaultPaginationSupplier;
 import com.github.restup.query.Pagination;
 import com.github.restup.registry.settings.ControllerMethodAccess;
 import com.github.restup.registry.settings.RegistrySettings;
@@ -286,30 +285,14 @@ public interface Resource<T, ID extends Serializable> extends Comparable<Resourc
         }
 
         /**
-         * Get pagination from configured value then check if service, repository or
-         * repositoryFactory are {@link DefaultPaginationSupplier}s in that order and finally
-         * defaulting to the registry default settings.
+         * Get pagination from configured value or
+         * default to the registry default settings.
          */
         static Pagination getPagination(Pagination configured, Object service,
             Object repository,
             RegistrySettings registrySettings) {
             Pagination pagination = configured;
             if (pagination == null) {
-                if (service instanceof DefaultPaginationSupplier) {
-                    pagination = ((DefaultPaginationSupplier) service).getDefaultPagination();
-                }
-                if (pagination == null) {
-                    if (repository instanceof DefaultPaginationSupplier) {
-                        pagination = ((DefaultPaginationSupplier) repository)
-                            .getDefaultPagination();
-                    }
-                }
-                if (pagination == null && service == null && repository == null) {
-                    RepositoryFactory factory = registrySettings.getRepositoryFactory();
-                    if (factory instanceof DefaultPaginationSupplier) {
-                        pagination = ((DefaultPaginationSupplier) factory).getDefaultPagination();
-                    }
-                }
                 if (pagination == null) {
                     pagination = registrySettings.getDefaultPagination();
                 }

@@ -1,5 +1,6 @@
 package com.github.restup.mapping.fields;
 
+import com.github.restup.config.UpFactories;
 import com.github.restup.mapping.fields.decorators.IdentityByConventionMappedFieldBuilderDecorator;
 import com.github.restup.mapping.fields.decorators.JacksonMappedFieldBuilderDecorator;
 import com.github.restup.registry.settings.AutoDetectConstants;
@@ -39,7 +40,7 @@ public interface MappedFieldBuilderDecorator {
         private List<MappedFieldBuilderDecorator> decorators = new ArrayList<>();
 
         private Builder() {
-
+            defaults = true;
         }
 
         private Builder me() {
@@ -71,16 +72,6 @@ public interface MappedFieldBuilderDecorator {
             return me();
         }
 
-        public Builder addSuppliers(Object... arr) {
-            for (Object o : arr) {
-                if (o instanceof MappedFieldBuilderDecoratorSupplier) {
-                    addAll(((MappedFieldBuilderDecoratorSupplier) o)
-                        .getMappedFieldBuilderDecorators());
-                }
-            }
-            return me();
-        }
-
         public MappedFieldBuilderDecorator[] build() {
             List<MappedFieldBuilderDecorator> result = new ArrayList<>(decorators);
             if (defaults) {
@@ -90,6 +81,7 @@ public interface MappedFieldBuilderDecorator {
                     result.add(new JacksonMappedFieldBuilderDecorator());
                 }
             }
+            result.addAll(UpFactories.instance.getInstances(MappedFieldBuilderDecorator.class));
             return result.toArray(new MappedFieldBuilderDecorator[0]);
         }
     }

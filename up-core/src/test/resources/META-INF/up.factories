@@ -1,0 +1,9 @@
+
+# com.github.restup.registry.ResourceRegistryBuilderDecorator=
+# com.github.restup.controller.ResourceControllerBuilderDecorator
+# com.github.restup.controller.content.negotiation.ContentNegotiatorBuilderDecorator
+# com.github.restup.controller.request.parser.RequestParserBuilderDecorator
+# com.github.restup.mapping.fields.MappedFieldBuilderDecorator
+# com.github.restup.mapping.MappedClassBuilderDecorator
+
+

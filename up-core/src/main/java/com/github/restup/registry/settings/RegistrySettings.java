@@ -428,7 +428,6 @@ public interface RegistrySettings {
                     mappedFieldBuilderDecoratorBuilder = MappedFieldBuilderDecorator.builder()
                         .withDefaults();
                 }
-                mappedFieldBuilderDecoratorBuilder.addSuppliers(repositoryFactory);
                 MappedFieldBuilderDecorator[] mappedFieldBuilderDecorators = mappedFieldBuilderDecoratorBuilder
                     .build();
                 mappedFieldFactory = new DefaultMappedFieldFactory(mappedFieldBuilderDecorators);
@@ -521,8 +520,6 @@ public interface RegistrySettings {
                 if (mappedClassBuilderDecoratorBuilder == null) {
                     mappedClassBuilderDecoratorBuilder = MappedClassBuilderDecorator.builder();
                 }
-
-                mappedClassBuilderDecoratorBuilder.addSuppliers(repositoryFactory);
 
                 MappedClassBuilderDecorator[] mappedClassBuilderDecorators = mappedClassBuilderDecoratorBuilder
                     .build();

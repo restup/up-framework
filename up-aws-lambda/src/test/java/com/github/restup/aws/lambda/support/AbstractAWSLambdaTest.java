@@ -5,7 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.ResourceController.Builder;
 import com.github.restup.registry.ResourceRegistry;
-import com.github.restup.repository.dynamodb.DynamoDBRepositoryFactory;
+import com.github.restup.repository.dynamodb.DynamoDBResourceRegistryBuilderDecorator;
 import com.github.restup.test.RestApiAssertions;
 import com.github.restup.test.repository.RepositoryUnit;
 import com.github.restup.test.utils.DynamoDBUtils;
@@ -42,14 +42,11 @@ public abstract class AbstractAWSLambdaTest {
     public static ResourceRegistry registry(Class<?>... resourceClasses) {
         AmazonDynamoDB ddb = DynamoDBUtils.init();
 
-        DynamoDBRepositoryFactory factory = new DynamoDBRepositoryFactory(ddb);
-
         DynamoDBUtils.createTables(ddb, resourceClasses);
 
         // build registry setting, minimally passing in a repository factory
         ResourceRegistry registry = ResourceRegistry.builder()
-//            .repositoryFactory(new MapBackedRepositoryFactory())
-            .repositoryFactory(factory)
+            .decorate(new DynamoDBResourceRegistryBuilderDecorator(ddb))
             .build();
         registry.registerResources(resourceClasses);
         return registry;

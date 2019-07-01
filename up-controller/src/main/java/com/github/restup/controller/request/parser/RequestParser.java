@@ -1,6 +1,7 @@
 package com.github.restup.controller.request.parser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.config.UpFactories;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.path.RequestPathParserResult;
@@ -96,8 +97,13 @@ public interface RequestParser {
             return me();
         }
 
+        private void apply(List<RequestParserBuilderDecorator> decorators) {
+            decorators.stream().forEach(d -> d.decorate(this));
+        }
+
         public RequestParser build() {
-            requestParserBuilderDecorators.stream().forEach(d -> d.decorate(this));
+            apply(UpFactories.instance.getInstances(RequestParserBuilderDecorator.class));
+            decorate(requestParserBuilderDecorators);
             settingsCaptor.build();
 
             RequestParamParser.Builder b = requestParamParser;

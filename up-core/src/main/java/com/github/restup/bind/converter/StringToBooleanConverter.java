@@ -1,8 +1,9 @@
 package com.github.restup.bind.converter;
 
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
+
 import java.util.HashSet;
 import java.util.Set;
-import static org.apache.commons.lang3.StringUtils.*;
 
 public class StringToBooleanConverter {
 
@@ -10,7 +11,7 @@ public class StringToBooleanConverter {
     private static final Set<String> falseValues;
 
     static {
-        trueValues = new HashSet<String>(6);
+        trueValues = new HashSet<>(6);
         trueValues.add("true");
         trueValues.add("on");
         trueValues.add("yes");
@@ -18,7 +19,7 @@ public class StringToBooleanConverter {
         trueValues.add("t");
         trueValues.add("y");
 
-        falseValues = new HashSet<String>(6);
+        falseValues = new HashSet<>(6);
         falseValues.add("false");
         falseValues.add("off");
         falseValues.add("no");
@@ -28,14 +29,22 @@ public class StringToBooleanConverter {
     }
 
 
+    private StringToBooleanConverter() {
+        super();
+    }
+
     public static boolean isTrue(Object value) {
+        return isTrue(value, false);
+    }
+
+    public static boolean isTrue(Object value, boolean defaultValue) {
         if (value instanceof Boolean) {
             return (Boolean) value;
         }
         if (value instanceof String) {
             return trueValues.contains(((String) value).toLowerCase());
         }
-        return false;
+        return defaultValue;
     }
 
     public static Boolean toBoolean(String from) {
@@ -51,9 +60,5 @@ public class StringToBooleanConverter {
             }
         }
         throw new IllegalArgumentException(from + " is not a valid boolean value");
-    }
-
-    private StringToBooleanConverter() {
-        super();        
     }
 }

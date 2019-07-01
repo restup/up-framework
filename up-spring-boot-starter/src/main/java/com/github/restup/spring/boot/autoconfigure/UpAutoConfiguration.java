@@ -121,7 +121,6 @@ public class UpAutoConfiguration {
         for (MappedFieldBuilderDecoratorBuilderDecorator decorator : mappedFieldBuilderDecoratorBuilderDecorators) {
             builder = decorator.decorate(builder);
         }
-        builder.addSuppliers(repositoryFactory);
         return new DefaultMappedFieldFactory(mappedFieldBuilderDecoratorBuilder.build());
     }
 
@@ -131,9 +130,6 @@ public class UpAutoConfiguration {
         MappedFieldFactory mappedFieldFactory,
         MappedClassBuilderDecorator.Builder builder,
         RepositoryFactory repositoryFactory) {
-
-        builder.addSuppliers(repositoryFactory);
-
         return new DefaultMappedClassFactory(mappedFieldFactory, getPackages(applicationContext),
             MappedClass.getDefaultFieldComparator(), builder.build());
     }

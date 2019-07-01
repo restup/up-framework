@@ -1,5 +1,6 @@
 package com.github.restup.mapping;
 
+import com.github.restup.config.UpFactories;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,18 +39,10 @@ public interface MappedClassBuilderDecorator {
             return me();
         }
 
-        public Builder addSuppliers(Object... arr) {
-            for (Object o : arr) {
-                if (o instanceof MappedClassBuilderDecoratorSupplier) {
-                    addAll(((MappedClassBuilderDecoratorSupplier) o)
-                        .getMappedClassBuilderDecorators());
-                }
-            }
-            return me();
-        }
-
         public MappedClassBuilderDecorator[] build() {
             List<MappedClassBuilderDecorator> result = new ArrayList<>(decorators);
+
+            result.addAll(UpFactories.instance.getInstances(MappedClassBuilderDecorator.class));
             return result.toArray(new MappedClassBuilderDecorator[0]);
         }
 

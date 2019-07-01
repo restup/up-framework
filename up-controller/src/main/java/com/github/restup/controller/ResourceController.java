@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.annotations.model.StatusCode;
+import com.github.restup.config.UpFactories;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
 import com.github.restup.controller.interceptor.RequestInterceptor;
@@ -584,8 +585,13 @@ public class ResourceController {
             return defaultMediaType(mediaType.getContentType());
         }
 
+        private void apply(List<ResourceControllerBuilderDecorator> decorators) {
+            decorators.stream().forEach(d -> d.decorate(this));
+        }
+
         public ResourceController build() {
-            resourceControllerBuilderDecorators.stream().forEach(d -> d.decorate(this));
+            apply(UpFactories.instance.getInstances(ResourceControllerBuilderDecorator.class));
+            apply(resourceControllerBuilderDecorators);
             return new ResourceController(settings);
         }
     }

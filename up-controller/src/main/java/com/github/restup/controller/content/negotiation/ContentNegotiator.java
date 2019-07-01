@@ -1,5 +1,6 @@
 package com.github.restup.controller.content.negotiation;
 
+import com.github.restup.config.UpFactories;
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
@@ -100,8 +101,13 @@ public interface ContentNegotiator {
             return me();
         }
 
+        private void apply(List<ContentNegotiatorBuilderDecorator> decorators) {
+            decorators.stream().forEach(d -> d.decorate(this));
+        }
+
         public ContentNegotiator build() {
-            contentNegotiatorBuilderDecorators.stream().forEach(d -> d.decorate(this));
+            apply(UpFactories.instance.getInstances(ContentNegotiatorBuilderDecorator.class));
+            apply(contentNegotiatorBuilderDecorators);
             settingsCaptor.build();
 
             ContentNegotiator[] arr = contentNegotiators;

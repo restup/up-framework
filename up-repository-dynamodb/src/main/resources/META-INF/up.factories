@@ -1,0 +1,8 @@
+
+com.github.restup.mapping.fields.MappedFieldBuilderDecorator=\
+  com.github.restup.repository.dynamodb.mapping.DynamoDBFieldBuilderDecorator
+
+com.github.restup.mapping.MappedClassBuilderDecorator=\
+  com.github.restup.repository.dynamodb.mapping.DynamoDBClassBuilderDecorator
+
+

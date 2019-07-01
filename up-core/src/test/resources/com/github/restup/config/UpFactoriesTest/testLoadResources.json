@@ -1,0 +1,12 @@
+{
+  "com.github.restup.mapping.MappedClassBuilderDecorator": [
+    "com.github.restup.registry.factories.test.AClassBuilderDecorator",
+    "com.github.restup.registry.factories.test.ADisabledClassBuilderDecorator",
+    "com.github.restup.registry.factories.test.AnotherClassBuilderDecorator"
+  ],
+  "com.github.restup.mapping.fields.MappedFieldBuilderDecorator": [
+    "com.github.restup.registry.factories.test.AFieldBuilderDecorator",
+    "com.github.restup.registry.factories.test.ADisabledFieldBuilderDecorator",
+    "com.github.restup.registry.factories.test.AnotherFieldBuilderDecorator"
+  ]
+}
