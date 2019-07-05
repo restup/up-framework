@@ -9,7 +9,9 @@ import static com.github.restup.controller.request.parser.params.ComposedRequest
 import static com.github.restup.controller.request.parser.params.ComposedRequestParamParser.sort;
 import static com.github.restup.controller.request.parser.params.ParameterParser.ParameterParsers.Bracketed;
 import static com.github.restup.util.Streams.forEachNonNull;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
 import com.github.restup.controller.request.parser.params.ComposedRequestParamParser;
@@ -21,6 +23,7 @@ import java.util.Collections;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.function.Supplier;
 
 /**
  * Defines a parser which handles a request parameter
@@ -87,8 +90,24 @@ public interface RequestParamParser extends Comparable<RequestParamParser> {
         private Set<String> fieldsParamName = new HashSet<>();
         private Set<String> pageNumberParamName = new HashSet();
 
-        static Set<String> getOrDefault(Set<String> set, String defaultValue) {
-            return set.isEmpty() ? Sets.newHashSet(defaultValue) : set;
+        private ConfigurationContext configurationContext;
+
+
+        Set<String> getOrDefault(String key, Set<String> set) {
+            return getOrDefault(key, set, () -> Collections.emptySet());
+        }
+
+        Set<String> getOrDefault(String key, Set<String> set, String defaultValue) {
+            return getOrDefault(key, set, () -> Sets.newHashSet(defaultValue));
+        }
+
+        Set<String> getOrDefault(String key, Set<String> set, Supplier<Set<String>> defaultValue) {
+            String configured = configurationContext.getProperty(key);
+            if (isNotEmpty(configured)) {
+                Set<String> configuredSet = Sets.newHashSet(configured.split(","));
+                set = configuredSet.isEmpty() ? set : configuredSet;
+            }
+            return set.isEmpty() ? defaultValue.get() : set;
         }
 
         Builder me() {
@@ -167,17 +186,29 @@ public interface RequestParamParser extends Comparable<RequestParamParser> {
             return me();
         }
 
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            this.configurationContext = configurationContext;
+            return me();
+        }
+
         public ParameterParserChain build() {
 
             List<RequestParamParser> requestParamParsers = new ArrayList<>();
 
-            Set<String> pageOffset = getOrDefault(pageOffsetParamName, OFFSET);
-            Set<String> pageLimit = getOrDefault(pageLimitParamName, LIMIT);
-            Set<String> sort = getOrDefault(sortParamName, SORT);
-            Set<String> filter = getOrDefault(filterParamName, FILTER);
-            Set<String> include = getOrDefault(includeParamName, INCLUDE);
-            Set<String> fields = getOrDefault(fieldsParamName, FIELDS);
-            Set<String> pageNumber = pageNumberParamName;
+            Set<String> pageOffset = getOrDefault(ConfigurationContext.PARAM_NAME_OFFSET,
+                pageOffsetParamName, OFFSET);
+            Set<String> pageLimit = getOrDefault(ConfigurationContext.PARAM_NAME_LIMIT,
+                pageLimitParamName, LIMIT);
+            Set<String> sort = getOrDefault(ConfigurationContext.PARAM_NAME_SORT, sortParamName,
+                SORT);
+            Set<String> filter = getOrDefault(ConfigurationContext.PARAM_NAME_FILTER,
+                filterParamName, FILTER);
+            Set<String> include = getOrDefault(ConfigurationContext.PARAM_NAME_INCLUDE,
+                includeParamName, INCLUDE);
+            Set<String> fields = getOrDefault(ConfigurationContext.PARAM_NAME_FIELDS,
+                fieldsParamName, FIELDS);
+            Set<String> pageNumber = getOrDefault(ConfigurationContext.PARAM_NAME_PAGE_NUMBER,
+                pageNumberParamName);
 
             List<ComposedRequestParamParser.Builder> paramParserBuilders = new ArrayList<>();
             forEachNonNull(pageOffset, s -> paramParserBuilders.add(offset(s)));

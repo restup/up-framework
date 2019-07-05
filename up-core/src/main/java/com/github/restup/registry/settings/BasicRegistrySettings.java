@@ -3,6 +3,7 @@ package com.github.restup.registry.settings;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClassFactory;
 import com.github.restup.mapping.MappedClassRegistry;
@@ -46,13 +47,15 @@ public class BasicRegistrySettings implements RegistrySettings {
     private final ParameterConverterFactory parameterConverterFactory;
     private final List<Object> defaultServiceFilters;
     private final String basePath;
+    private final ConfigurationContext configurationContext;
 
 
     private final CreateStrategySupplier createStrategySupplier;
     private final UpdateStrategySupplier updateStrategySupplier;
     private final DeleteStrategySupplier deleteStrategySupplier;
 
-    BasicRegistrySettings(ResourceRegistryRepository resourceRegistryMap,
+    BasicRegistrySettings(ConfigurationContext configurationContext,
+        ResourceRegistryRepository resourceRegistryMap,
         MappedClassFactory mappedClassFactory,
         String[] packagesToScan, MappedFieldFactory mappedFieldFactory,
         Comparator<MappedField<?>> mappedFieldOrderComparator,
@@ -67,6 +70,7 @@ public class BasicRegistrySettings implements RegistrySettings {
         CreateStrategySupplier createStrategySupplier,
         UpdateStrategySupplier updateStrategySupplier,
         DeleteStrategySupplier deleteStrategySupplier) {
+        this.configurationContext = configurationContext;
         this.packagesToScan = ImmutableList.copyOf(packagesToScan);
         this.mappedFieldFactory = mappedFieldFactory;
         this.mappedFieldOrderComparator = mappedFieldOrderComparator;
@@ -99,6 +103,11 @@ public class BasicRegistrySettings implements RegistrySettings {
         } else {
             this.methodArgumentFactory = methodArgumentFactory;
         }
+    }
+
+    @Override
+    public ConfigurationContext getConfigurationContext() {
+        return configurationContext;
     }
 
     @Override

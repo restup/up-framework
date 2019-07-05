@@ -1,9 +1,12 @@
 package com.github.restup.spring.boot.autoconfigure;
 
+
 import com.github.restup.annotations.ApiName;
 import com.github.restup.annotations.Plural;
 import com.github.restup.annotations.Resource;
 import com.github.restup.bind.converter.ConverterFactory;
+import com.github.restup.config.ConfigurationContext;
+import com.github.restup.config.properties.PropertiesLoader;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
@@ -30,22 +33,19 @@ import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
 import org.springframework.boot.autoconfigure.domain.EntityScanPackages;
 import org.springframework.boot.autoconfigure.domain.EntityScanner;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.core.env.Environment;
 
 @Configuration
 @ConditionalOnClass(ResourceRegistry.class)
-@EnableConfigurationProperties(UpProperties.class)
 public class UpAutoConfiguration {
 
-    private final UpProperties props;
     private final ApplicationContext applicationContext;
 
-    public UpAutoConfiguration(UpProperties props, ApplicationContext applicationContext) {
+    public UpAutoConfiguration(ApplicationContext applicationContext) {
         super();
-        this.props = props;
         this.applicationContext = applicationContext;
     }
 
@@ -90,24 +90,23 @@ public class UpAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public Pagination defaultUpPagination() {
-        if (props.isPaginationDisabled()) {
-            return Pagination.disabled();
-        }
-        return Pagination.of(props.getMaxPageLimit(),
-            props.getDefaultPageLimit(), 0,
-            props.isPaginationTotalsDisabled());
+        return Pagination.of(10, 0);
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public MappedFieldBuilderDecorator.Builder defaultMappedFieldBuilderDecoratorBuilder() {
-        return MappedFieldBuilderDecorator.builder().withIdentityConvention("id");
+    public MappedFieldBuilderDecorator.Builder defaultMappedFieldBuilderDecoratorBuilder(
+        ConfigurationContext configurationContext) {
+        return MappedFieldBuilderDecorator.builder().configurationContext(configurationContext)
+            .withIdentityConvention("id");
     }
 
     @Bean
     @ConditionalOnMissingBean
-    public MappedClassBuilderDecorator.Builder defaultMappedClassBuilderDecoratorBuilder() {
-        return MappedClassBuilderDecorator.builder();
+    public MappedClassBuilderDecorator.Builder defaultMappedClassBuilderDecoratorBuilder(
+        ConfigurationContext configurationContext) {
+        return MappedClassBuilderDecorator.builder()
+            .configurationContext(configurationContext);
     }
 
     @Bean
@@ -115,12 +114,14 @@ public class UpAutoConfiguration {
     public MappedFieldFactory defaultUpMappedFieldFactory(
         MappedFieldBuilderDecorator.Builder mappedFieldBuilderDecoratorBuilder,
         List<MappedFieldBuilderDecoratorBuilderDecorator> mappedFieldBuilderDecoratorBuilderDecorators,
-        RepositoryFactory repositoryFactory) {
+        RepositoryFactory repositoryFactory,
+        ConfigurationContext configurationContext) {
 
         MappedFieldBuilderDecorator.Builder builder = mappedFieldBuilderDecoratorBuilder;
         for (MappedFieldBuilderDecoratorBuilderDecorator decorator : mappedFieldBuilderDecoratorBuilderDecorators) {
             builder = decorator.decorate(builder);
         }
+        builder.configurationContext(configurationContext);
         return new DefaultMappedFieldFactory(mappedFieldBuilderDecoratorBuilder.build());
     }
 
@@ -164,7 +165,15 @@ public class UpAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ResourceRegistryBuilderDecorator defaultUpResourceRegistryBuilderDecorator() {
-        return (b) -> b;
+        return (a, b) -> b;
+    }
+
+    @Bean
+    @ConditionalOnMissingBean
+    public ConfigurationContext defaultUpConfigurationContext(
+        Environment environment) {
+        return EnvironmentConfigurationContext
+            .of(environment, ConfigurationContext.of(PropertiesLoader.getDefault()));
     }
 
     @Bean
@@ -181,12 +190,12 @@ public class UpAutoConfiguration {
         ServiceFilterFactory serviceFilterFactory,
         RestrictedFieldsProviderFactory restrictedFieldsProviderFactory,
         SparseFieldsProviderFactory sparseFieldsProviderFactory,
-        ResourceRegistryBuilderDecorator decorator) throws ClassNotFoundException {
+        ResourceRegistryBuilderDecorator decorator,
+        ConfigurationContext configurationContext) throws ClassNotFoundException {
 
         return ResourceRegistry.builder()
+            .configurationContext(configurationContext)
             .decorate(decorator)
-            .basePath(props.getBasePath())
-            .excludeFrameworkFilters(props.isExcludeFrameworkFilters())
             .controllerMethodAccess(controllerMethodAccess)
             .defaultPagination(pagination)
             .errorFactory(errorFactory)

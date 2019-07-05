@@ -16,7 +16,7 @@ abstract class AbstractMediaTypeTest extends AbstractMockTest {
         super(ApiTest.builder(Course.class
             , Student.class
             , University.class)
-            .decorateController(b -> b.mediaTypeParam(PARAM))
+            .decorateController((a, b) -> b.mediaTypeParam(PARAM))
             .decorateApi(b -> b.jsonapi().mediaType(MediaType.APPLICATION_JSON_API)
                 .requestHeader("Content-Type", "text/html")), path, 1);
     }

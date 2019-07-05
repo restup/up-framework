@@ -1,5 +1,6 @@
 package com.github.restup.registry;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.registry.ResourceRegistry.Builder;
 
 @FunctionalInterface
@@ -12,6 +13,6 @@ public interface ResourceRegistryBuilderDecorator {
      * @param builder to decorate
      * @return the builder
      */
-    Builder decorate(Builder builder);
+    Builder decorate(ConfigurationContext configurationContext, Builder builder);
 
 }

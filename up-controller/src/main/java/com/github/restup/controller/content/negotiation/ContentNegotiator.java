@@ -1,5 +1,6 @@
 package com.github.restup.controller.content.negotiation;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.config.UpFactories;
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
@@ -49,7 +50,6 @@ public interface ContentNegotiator {
         private BuilderSettingsCaptor settingsCaptor;
         private List<ContentNegotiatorBuilderDecorator> contentNegotiatorBuilderDecorators = new ArrayList<>();
 
-
         Builder() {
             super();
             settingsCaptor = new BuilderSettingsCaptor();
@@ -71,6 +71,11 @@ public interface ContentNegotiator {
 
         public Builder defaultMediaType(String mediaType) {
             settingsCaptor.setDefaultMediaType(mediaType);
+            return me();
+        }
+
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            settingsCaptor.setConfigurationContext(configurationContext);
             return me();
         }
 
@@ -102,13 +107,17 @@ public interface ContentNegotiator {
         }
 
         private void apply(List<ContentNegotiatorBuilderDecorator> decorators) {
-            decorators.stream().forEach(d -> d.decorate(this));
+            decorators.stream()
+                .forEach(d -> d.decorate(settingsCaptor.getConfigurationContext(), this));
         }
 
         public ContentNegotiator build() {
-            apply(UpFactories.instance.getInstances(ContentNegotiatorBuilderDecorator.class));
-            apply(contentNegotiatorBuilderDecorators);
             settingsCaptor.build();
+
+            apply(UpFactories.getInstance()
+                .getInstances(settingsCaptor.getConfigurationContext(),
+                    ContentNegotiatorBuilderDecorator.class));
+            apply(contentNegotiatorBuilderDecorators);
 
             ContentNegotiator[] arr = contentNegotiators;
             if (!settingsCaptor.getAutoDetectDisabled()) {

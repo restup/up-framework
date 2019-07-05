@@ -4,10 +4,12 @@ import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.mock;
 import static org.mockito.Mockito.when;
-import org.junit.Test;
+
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
 import com.github.restup.controller.model.ResourceControllerRequest;
+import org.junit.Test;
 
 public class ContentNegotiatorChainTest {
 
@@ -22,6 +24,7 @@ public class ContentNegotiatorChainTest {
         ResourceControllerRequest request = mock(ResourceControllerRequest.class);
         ContentNegotiatorChain chain = new ContentNegotiatorChain(
                 ContentNegotiator.builder().autoDetectDisabled(true)
+                    .configurationContext(mock(ConfigurationContext.class))
                         .serviceDiscovery(ServiceDiscovery.getDefaultServiceDiscovery())
                         .linkBuilderFactory(LinkBuilderFactory.getDefaultLinkBuilderFactory(ServiceDiscovery.getDefaultServiceDiscovery())).build());
         assertFalse(chain.accept(request));
@@ -41,7 +44,8 @@ public class ContentNegotiatorChainTest {
         ResourceControllerRequest request = mock(ResourceControllerRequest.class);
         ContentNegotiatorChain chain = new ContentNegotiatorChain(
                 ContentNegotiator.builder()
-                        .defaultMediaType("application/json").build());
+                    .configurationContext(mock(ConfigurationContext.class))
+                    .defaultMediaType("application/json").build());
         assertTrue(chain.accept(request));
     }
 }

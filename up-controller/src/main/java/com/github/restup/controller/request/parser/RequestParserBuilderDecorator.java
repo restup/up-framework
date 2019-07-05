@@ -1,6 +1,7 @@
 package com.github.restup.controller.request.parser;
 
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.request.parser.RequestParser.Builder;
 
 @FunctionalInterface
@@ -13,6 +14,6 @@ public interface RequestParserBuilderDecorator {
      * @param builder to decorate
      * @return the builder
      */
-    Builder decorate(Builder builder);
+    Builder decorate(ConfigurationContext configurationContext, Builder builder);
 
 }

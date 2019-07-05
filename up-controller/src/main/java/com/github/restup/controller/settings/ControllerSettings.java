@@ -18,6 +18,7 @@ import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.Resource;
 import com.github.restup.registry.ResourceRegistry;
 import com.github.restup.service.registry.DiscoveryService;
+import com.github.restup.util.Assert;
 import org.apache.commons.lang3.ArrayUtils;
 
 public interface ControllerSettings {
@@ -81,6 +82,8 @@ public interface ControllerSettings {
 
         public Builder registry(ResourceRegistry registry) {
             this.registry = registry;
+            settingsCaptor
+                .setConfigurationContext(registry.getSettings().getConfigurationContext());
             return me();
         }
 
@@ -150,6 +153,7 @@ public interface ControllerSettings {
         }
 
         public ControllerSettings build() {
+            Assert.notNull(registry, "registry is required");
             RequestInterceptor interceptor = getInterceptor(interceptors);
 
             RequestParser.Builder requestParserBuilder = nvl(this.requestParserBuilder,

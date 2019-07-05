@@ -1,5 +1,6 @@
 package com.github.restup.controller;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.ResourceController.Builder;
 
 @FunctionalInterface
@@ -12,6 +13,6 @@ public interface ResourceControllerBuilderDecorator {
      * @param builder to decorate
      * @return the builder
      */
-    Builder decorate(Builder builder);
+    Builder decorate(ConfigurationContext configurationContext, Builder builder);
 
 }

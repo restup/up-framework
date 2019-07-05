@@ -1,6 +1,8 @@
 package com.github.restup.mapping;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.config.UpFactories;
+import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -17,6 +19,7 @@ public interface MappedClassBuilderDecorator {
     class Builder {
 
         private List<MappedClassBuilderDecorator> decorators = new ArrayList<>();
+        private ConfigurationContext configurationContext;
 
         private Builder() {
 
@@ -39,10 +42,17 @@ public interface MappedClassBuilderDecorator {
             return me();
         }
 
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            this.configurationContext = configurationContext;
+            return me();
+        }
+
         public MappedClassBuilderDecorator[] build() {
+            Assert.notNull(configurationContext, "configurationContext is required");
             List<MappedClassBuilderDecorator> result = new ArrayList<>(decorators);
 
-            result.addAll(UpFactories.instance.getInstances(MappedClassBuilderDecorator.class));
+            result.addAll(UpFactories.getInstance()
+                .getInstances(configurationContext, MappedClassBuilderDecorator.class));
             return result.toArray(new MappedClassBuilderDecorator[0]);
         }
 

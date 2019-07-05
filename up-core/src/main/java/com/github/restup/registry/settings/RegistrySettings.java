@@ -1,6 +1,7 @@
 package com.github.restup.registry.settings;
 
 import static com.github.restup.util.UpUtils.nvl;
+import static org.apache.commons.lang3.StringUtils.isNotEmpty;
 
 import com.github.restup.annotations.model.CreateStrategy;
 import com.github.restup.annotations.model.DeleteStrategy;
@@ -8,6 +9,7 @@ import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
 import com.github.restup.bind.converter.ParameterConverterFactory;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.DefaultMappedClassFactory;
 import com.github.restup.mapping.MappedClass;
@@ -103,6 +105,8 @@ public interface RegistrySettings {
 
     DeleteStrategySupplier getDeleteStrategySupplier();
 
+    ConfigurationContext getConfigurationContext();
+
     class Builder {
 
         private final static Logger log = LoggerFactory.getLogger(RegistrySettings.class);
@@ -111,7 +115,6 @@ public interface RegistrySettings {
 
         private ResourceRegistryRepository resourceRegistryMap;
         private MappedClassFactory mappedClassFactory;
-        private MappedClassRegistry mappedClassRegistry;
         private String[] packagesToScan;
         private MappedFieldFactory mappedFieldFactory;
         private MappedFieldBuilderDecorator.Builder mappedFieldBuilderDecoratorBuilder;
@@ -136,6 +139,8 @@ public interface RegistrySettings {
         private CreateStrategySupplier createStrategySupplier;
         private UpdateStrategySupplier updateStrategySupplier;
         private DeleteStrategySupplier deleteStrategySupplier;
+
+        private ConfigurationContext configurationContext;
 
         private Builder me() {
             return this;
@@ -412,6 +417,11 @@ public interface RegistrySettings {
             return deleteStrategySupplier(new DefaultDeleteStrategySupplier(strategy));
         }
 
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            this.configurationContext = configurationContext;
+            return me();
+        }
+
         public RegistrySettings build() {
             String[] packagesToScan = this.packagesToScan;
             if (ArrayUtils.isEmpty(packagesToScan)) {
@@ -429,6 +439,7 @@ public interface RegistrySettings {
                         .withDefaults();
                 }
                 MappedFieldBuilderDecorator[] mappedFieldBuilderDecorators = mappedFieldBuilderDecoratorBuilder
+                    .configurationContext(configurationContext)
                     .build();
                 mappedFieldFactory = new DefaultMappedFieldFactory(mappedFieldBuilderDecorators);
             }
@@ -522,6 +533,7 @@ public interface RegistrySettings {
                 }
 
                 MappedClassBuilderDecorator[] mappedClassBuilderDecorators = mappedClassBuilderDecoratorBuilder
+                    .configurationContext(configurationContext)
                     .build();
                 mappedClassFactory = new DefaultMappedClassFactory(mappedFieldFactory,
                     Arrays.asList(packagesToScan),
@@ -536,7 +548,32 @@ public interface RegistrySettings {
             DeleteStrategySupplier deleteStrategySupplier = nvl(this.deleteStrategySupplier,
                 () -> new DefaultDeleteStrategySupplier());
 
-            return new BasicRegistrySettings(resourceRegistryMap, mappedClassFactory,
+            basePath = configurationContext.getProperty(ConfigurationContext.BASEPATH, basePath);
+
+            boolean paginationDisabled = configurationContext
+                .getProperty(ConfigurationContext.PAGINATION_DISABLED,
+                    pagination.isPagingDisabled());
+            if (paginationDisabled) {
+                pagination = Pagination.disabled();
+            } else {
+                Integer maxLimit = configurationContext
+                    .getProperty(ConfigurationContext.PAGE_LIMIT_MAX, pagination.getMaxLimit());
+                Integer limit = configurationContext
+                    .getProperty(ConfigurationContext.PAGE_LIMIT_DEFAULT, pagination.getLimit());
+                boolean withTotalsDisabled = configurationContext
+                    .getProperty(ConfigurationContext.PAGINATION_TOTALS_DISABLED,
+                        pagination.isWithTotalsDisabled());
+                pagination = Pagination
+                    .of(maxLimit, limit, pagination.getOffset(), withTotalsDisabled);
+            }
+
+            String scan = configurationContext.getProperty(ConfigurationContext.PACKAGES_TO_SCAN);
+            if (isNotEmpty(scan)) {
+                packagesToScan = scan.split(",");
+            }
+
+            return new BasicRegistrySettings(configurationContext, resourceRegistryMap,
+                mappedClassFactory,
                 packagesToScan,
                 mappedFieldFactory, mappedFieldOrderComparator,
                 defaultControllerMethodAccess,

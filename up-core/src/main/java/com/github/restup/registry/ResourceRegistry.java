@@ -5,6 +5,7 @@ import com.github.restup.annotations.model.DeleteStrategy;
 import com.github.restup.annotations.model.UpdateStrategy;
 import com.github.restup.bind.MethodArgumentFactory;
 import com.github.restup.bind.converter.ConverterFactory;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.config.UpFactories;
 import com.github.restup.errors.ErrorFactory;
 import com.github.restup.mapping.MappedClass;
@@ -88,6 +89,7 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
     final class Builder {
         private final RegistrySettings.Builder settings;
+        private ConfigurationContext configurationContext;
         private List<ResourceRegistryBuilderDecorator> resourceRegistryBuilderDecorators = new ArrayList<>();
 
         public Builder() {
@@ -100,6 +102,11 @@ public interface ResourceRegistry extends MappedClassRegistry {
 
         public Builder resourceRegistryRepository(ResourceRegistryRepository resourceRegistryMap) {
             settings.resourceRegistryRepository(resourceRegistryMap);
+            return me();
+        }
+
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            this.configurationContext = configurationContext;
             return me();
         }
 
@@ -264,13 +271,19 @@ public interface ResourceRegistry extends MappedClassRegistry {
         }
 
         public ResourceRegistry build() {
-            apply(UpFactories.instance.getInstances(ResourceRegistryBuilderDecorator.class));
+            if (configurationContext == null) {
+                configurationContext = ConfigurationContext.getDefault();
+            }
+            settings.configurationContext(configurationContext);
+            apply(UpFactories.getInstance()
+                .getInstances(configurationContext, ResourceRegistryBuilderDecorator.class));
             apply(resourceRegistryBuilderDecorators);
             return new DefaultResourceRegistry(settings.build());
         }
 
-        private void apply(List<ResourceRegistryBuilderDecorator> decorators) {
-            decorators.stream().forEach(d -> d.decorate(this));
+        private void apply(
+            List<ResourceRegistryBuilderDecorator> decorators) {
+            decorators.stream().forEach(d -> d.decorate(configurationContext, this));
         }
 
     }

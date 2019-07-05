@@ -17,7 +17,7 @@ public class SpringBootStarterTestApplication {
 
     @Bean
     public ResourceControllerBuilderDecorator resourceControllerBuilderDecorator() {
-        return (b) -> b
+        return (a, b) -> b
             .defaultMediaType(MediaType.APPLICATION_JSON_API)
             .mediaTypeParam("mediaType");
     }

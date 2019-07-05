@@ -1,5 +1,6 @@
 package com.github.restup.spring.mvc.controller;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.errors.RequestErrorException;
 import com.github.restup.http.model.HttpServletResourceControllerRequest;
@@ -31,7 +32,13 @@ public class SpringMVCResourceController {
         this("/**", registry, controller);
     }
 
-    public SpringMVCResourceController(String requestMapping, ResourceRegistry registry, ResourceController controller) {
+    public SpringMVCResourceController(ConfigurationContext ctx, ResourceRegistry registry,
+        ResourceController controller) {
+        this(ctx.getProperty(ConfigurationContext.BASEPATH, "/"), registry, controller);
+    }
+
+    public SpringMVCResourceController(String requestMapping, ResourceRegistry registry,
+        ResourceController controller) {
         this.requestMapping = cleanRequestMapping(requestMapping.trim());
         this.registry = registry;
         this.controller = controller;

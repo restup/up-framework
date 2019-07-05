@@ -1,13 +1,13 @@
-package com.github.restup.config;
+package com.github.restup.config.properties;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.net.URL;
 import java.util.Properties;
 
-public class DefaultPropertyLoader implements PropertyLoader {
+public class DefaultPropertiesLoader implements PropertiesLoader {
 
-    private static Properties loadProperties(URL resource) throws IOException {
+    static Properties loadProperties(URL resource) throws IOException {
         Properties result = new Properties();
         if (resource != null) {
             try (InputStream stream = resource.openStream()) {

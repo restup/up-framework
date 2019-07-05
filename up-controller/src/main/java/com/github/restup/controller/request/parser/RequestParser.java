@@ -1,6 +1,7 @@
 package com.github.restup.controller.request.parser;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.config.UpFactories;
 import com.github.restup.controller.model.ParsedResourceControllerRequest;
 import com.github.restup.controller.model.ResourceControllerRequest;
@@ -24,9 +25,6 @@ public interface RequestParser {
 
     /**
      * parse request appending results to builder
-     *
-     * @param request
-     * @param builder
      */
     void parse(ResourceControllerRequest request, RequestPathParserResult requestPathParserResult,
         ParsedResourceControllerRequest.Builder<?> builder);
@@ -97,20 +95,32 @@ public interface RequestParser {
             return me();
         }
 
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            settingsCaptor.setConfigurationContext(configurationContext);
+            return me();
+        }
+
         private void apply(List<RequestParserBuilderDecorator> decorators) {
-            decorators.stream().forEach(d -> d.decorate(this));
+            decorators.stream()
+                .forEach(d -> d.decorate(settingsCaptor.getConfigurationContext(), this));
         }
 
         public RequestParser build() {
-            apply(UpFactories.instance.getInstances(RequestParserBuilderDecorator.class));
-            decorate(requestParserBuilderDecorators);
             settingsCaptor.build();
+
+            apply(UpFactories.getInstance()
+                .getInstances(settingsCaptor.getConfigurationContext(),
+                    RequestParserBuilderDecorator.class));
+            decorate(requestParserBuilderDecorators);
 
             RequestParamParser.Builder b = requestParamParser;
             if (b == null) {
-                b = RequestParamParser.builder().withDefaults();
+                b = RequestParamParser.builder()
+                    .configurationContext(settingsCaptor.getConfigurationContext())
+                    .withDefaults();
             }
-            ParameterParserChain parameterParserChain = b.build();
+            ParameterParserChain parameterParserChain = b
+                .configurationContext(settingsCaptor.getConfigurationContext()).build();
 
             if (!settingsCaptor.getAutoDetectDisabled()) {
                 // Jackson as the default request parser if jackson exists

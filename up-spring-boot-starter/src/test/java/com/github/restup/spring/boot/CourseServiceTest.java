@@ -25,7 +25,7 @@ import org.springframework.test.context.support.DependencyInjectionTestExecution
 @TestExecutionListeners({DependencyInjectionTestExecutionListener.class,
     DbUnitTestExecutionListener.class})
 @TestPropertySource(properties = {
-    "up.asyncController=false",
+    "up.controller.async=false",
     "up.dynamodb.enabled=false"
 })
 public class CourseServiceTest extends AbstractMockMVCTest {

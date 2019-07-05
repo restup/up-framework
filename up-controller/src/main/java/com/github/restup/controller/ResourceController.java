@@ -4,6 +4,7 @@ import static org.apache.commons.lang3.ArrayUtils.isNotEmpty;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.github.restup.annotations.model.StatusCode;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.config.UpFactories;
 import com.github.restup.controller.content.negotiation.ContentNegotiator;
 import com.github.restup.controller.content.negotiation.ContentTypeNegotiation;
@@ -482,9 +483,16 @@ public class ResourceController {
 
         private ControllerSettings.Builder settings;
         private List<ResourceControllerBuilderDecorator> resourceControllerBuilderDecorators = new ArrayList<>();
+        private ConfigurationContext configurationContext;
 
         public Builder() {
             settings = ControllerSettings.builder();
+        }
+
+        public Builder configurationContext(
+            ConfigurationContext configurationContext) {
+            this.configurationContext = configurationContext;
+            return me();
         }
 
         private Builder me() {
@@ -493,6 +501,7 @@ public class ResourceController {
 
         public Builder registry(ResourceRegistry registry) {
             settings.registry(registry);
+            configurationContext(registry.getSettings().getConfigurationContext());
             return me();
         }
 
@@ -586,11 +595,12 @@ public class ResourceController {
         }
 
         private void apply(List<ResourceControllerBuilderDecorator> decorators) {
-            decorators.stream().forEach(d -> d.decorate(this));
+            decorators.stream().forEach(d -> d.decorate(configurationContext, this));
         }
 
         public ResourceController build() {
-            apply(UpFactories.instance.getInstances(ResourceControllerBuilderDecorator.class));
+            apply(UpFactories.getInstance()
+                .getInstances(configurationContext, ResourceControllerBuilderDecorator.class));
             apply(resourceControllerBuilderDecorators);
             return new ResourceController(settings);
         }

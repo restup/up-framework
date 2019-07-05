@@ -16,12 +16,12 @@ import java.util.Map;
 import java.util.Properties;
 import org.junit.Test;
 
-public class UpFactoriesTest {
+public class DefaultUpFactoriesTest {
 
     static Map<String, List<String>> getTestFactories() throws IOException {
         Enumeration<URL> enumeration = getResourceEnumeration("/factories-test1.properties",
             "/factories-test2.properties");
-        return UpFactories.loadResources(enumeration);
+        return DefaultUpFactories.loadResources(enumeration);
     }
 
     static Enumeration<URL> getResourceEnumeration(String... arr) {
@@ -44,15 +44,16 @@ public class UpFactoriesTest {
     public void testGetInstances()
         throws IOException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         Properties properties = new Properties();
+        ConfigurationContext ctx = ConfigurationContext.of(properties);
         Map<String, List<String>> factories = getTestFactories();
         assertEquals(3,
-            UpFactories.getInstances(properties, factories, MappedFieldBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, MappedFieldBuilderDecorator.class)
                 .size());
         assertEquals(3,
-            UpFactories.getInstances(properties, factories, MappedClassBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, MappedClassBuilderDecorator.class)
                 .size());
         assertEquals(0,
-            UpFactories.getInstances(properties, factories, ResourceRegistryBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, ResourceRegistryBuilderDecorator.class)
                 .size());
     }
 
@@ -60,6 +61,7 @@ public class UpFactoriesTest {
     public void testGetInstancesDisabled()
         throws IOException, IllegalAccessException, InstantiationException, ClassNotFoundException {
         Properties properties = new Properties();
+        ConfigurationContext ctx = ConfigurationContext.of(properties);
         properties.setProperty(
             "com.github.restup.registry.factories.test.ADisabledClassBuilderDecorator.disabled",
             "true");
@@ -69,22 +71,22 @@ public class UpFactoriesTest {
 
         Map<String, List<String>> factories = getTestFactories();
         assertEquals(2,
-            UpFactories.getInstances(properties, factories, MappedClassBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, MappedClassBuilderDecorator.class)
                 .size());
 
         properties.setProperty(
             "com.github.restup.mapping.MappedClassBuilderDecorator.enabled",
             "false");
         assertEquals(0,
-            UpFactories.getInstances(properties, factories, MappedClassBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, MappedClassBuilderDecorator.class)
                 .size());
         
         assertEquals(2,
-            UpFactories.getInstances(properties, factories, MappedFieldBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, MappedFieldBuilderDecorator.class)
                 .size());
 
         assertEquals(0,
-            UpFactories.getInstances(properties, factories, ResourceRegistryBuilderDecorator.class)
+            DefaultUpFactories.getInstances(ctx, factories, ResourceRegistryBuilderDecorator.class)
                 .size());
     }
 

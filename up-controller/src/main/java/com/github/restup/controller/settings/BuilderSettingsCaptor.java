@@ -2,9 +2,11 @@ package com.github.restup.controller.settings;
 
 import static com.github.restup.util.UpUtils.nvl;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
+import com.github.restup.util.Assert;
 
 /**
  * Captures state shared across {@link ControllerSettings.Builder}},
@@ -21,15 +23,14 @@ public class BuilderSettingsCaptor {
     private ServiceDiscovery serviceDiscovery;
     private Boolean autoDetectDisabled;
     private String defaultMediaType;
+    private ConfigurationContext configurationContext;
 
     public LinkBuilderFactory getLinkBuilderFactory() {
         return linkBuilderFactory;
     }
 
     public void setLinkBuilderFactory(LinkBuilderFactory linkBuilderFactory) {
-        if (linkBuilderFactory != null) {
-            this.linkBuilderFactory = linkBuilderFactory;
-        }
+        this.linkBuilderFactory = nvl(linkBuilderFactory, this.linkBuilderFactory);
     }
 
     public ServiceDiscovery getServiceDiscovery() {
@@ -37,9 +38,7 @@ public class BuilderSettingsCaptor {
     }
 
     public void setServiceDiscovery(ServiceDiscovery serviceDiscovery) {
-        if (serviceDiscovery != null) {
-            this.serviceDiscovery = serviceDiscovery;
-        }
+        this.serviceDiscovery = nvl(serviceDiscovery, this.serviceDiscovery);
     }
 
     public Boolean getAutoDetectDisabled() {
@@ -47,9 +46,7 @@ public class BuilderSettingsCaptor {
     }
 
     public void setAutoDetectDisabled(Boolean autoDetectDisabled) {
-        if (autoDetectDisabled != null) {
-            this.autoDetectDisabled = autoDetectDisabled;
-        }
+        this.autoDetectDisabled = nvl(autoDetectDisabled, this.autoDetectDisabled);
     }
 
     public String getDefaultMediaType() {
@@ -57,9 +54,15 @@ public class BuilderSettingsCaptor {
     }
 
     public void setDefaultMediaType(String defaultMediaType) {
-        if (defaultMediaType != null) {
-            this.defaultMediaType = defaultMediaType;
-        }
+        this.defaultMediaType = nvl(defaultMediaType, this.defaultMediaType);
+    }
+
+    public ConfigurationContext getConfigurationContext() {
+        return configurationContext;
+    }
+
+    public void setConfigurationContext(ConfigurationContext configurationContext) {
+        this.configurationContext = nvl(configurationContext, this.configurationContext);
     }
 
     public BuilderSettingsCaptor capture(BuilderSettingsCaptor settingsCaptor) {
@@ -67,10 +70,14 @@ public class BuilderSettingsCaptor {
         setAutoDetectDisabled(nvl(settingsCaptor.getAutoDetectDisabled(), getAutoDetectDisabled()));
         setDefaultMediaType(nvl(settingsCaptor.getDefaultMediaType(), getDefaultMediaType()));
         setServiceDiscovery(nvl(settingsCaptor.getServiceDiscovery(), getServiceDiscovery()));
+        setConfigurationContext(
+            nvl(settingsCaptor.getConfigurationContext(), getConfigurationContext()));
         return this;
     }
 
     public void build() {
+        Assert.notNull(configurationContext, "configurationContext is required");
+
         ServiceDiscovery discovery = serviceDiscovery;
         LinkBuilderFactory factory = linkBuilderFactory;
         if (discovery == null) {
@@ -85,6 +92,15 @@ public class BuilderSettingsCaptor {
         if (autoDetectDisabled == null) {
             autoDetectDisabled = false;
         }
+
+        setDefaultMediaType(
+            configurationContext
+                .getProperty(ConfigurationContext.DEFAULT_MEDIA_TYPE, defaultMediaType));
+
+        setAutoDetectDisabled(
+            configurationContext
+                .getProperty(ConfigurationContext.AUTO_DETECT_DISABLED, autoDetectDisabled));
+
     }
 
 }

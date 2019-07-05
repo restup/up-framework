@@ -1,6 +1,7 @@
 package com.github.restup.spring.boot.autoconfigure;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.ExceptionHandler;
 import com.github.restup.controller.ResourceController;
 import com.github.restup.controller.ResourceControllerBuilderDecorator;
@@ -9,7 +10,6 @@ import com.github.restup.controller.content.negotiation.ContentNegotiatorBuilder
 import com.github.restup.controller.linking.LinkBuilderFactory;
 import com.github.restup.controller.linking.discovery.CachedServiceDiscovery;
 import com.github.restup.controller.linking.discovery.ServiceDiscovery;
-import com.github.restup.controller.request.parser.RequestParamParser;
 import com.github.restup.controller.request.parser.RequestParser;
 import com.github.restup.controller.request.parser.RequestParserBuilderDecorator;
 import com.github.restup.mapping.fields.MappedFieldBuilderDecoratorBuilderDecorator;
@@ -18,22 +18,13 @@ import com.github.restup.registry.ResourceRegistry;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnClass;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnMissingBean;
-import org.springframework.boot.context.properties.EnableConfigurationProperties;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 
 @Configuration
 @ConditionalOnClass({ResourceController.class})
-@EnableConfigurationProperties(UpProperties.class)
 @AutoConfigureAfter(UpAutoConfiguration.class)
 public class UpControllerAutoConfiguration {
-
-    private final UpProperties props;
-
-    public UpControllerAutoConfiguration(UpProperties props) {
-        super();
-        this.props = props;
-    }
 
     @Bean
     @ConditionalOnMissingBean
@@ -68,49 +59,39 @@ public class UpControllerAutoConfiguration {
     @Bean
     @ConditionalOnMissingBean
     public ResourceControllerBuilderDecorator defaultUpResourceControllerBuilderDecorator() {
-        return (b) -> b;
+        return (a, b) -> b;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public RequestParserBuilderDecorator defaultUpRequestParserBuilderDecorator() {
-        return (b) -> b;
+        return (a, b) -> b;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ContentNegotiatorBuilderDecorator defaultUpContentNegotiatorBuilderDecorator() {
-        return (b) -> b;
+        return (a, b) -> b;
     }
 
     @Bean
     @ConditionalOnMissingBean
     public RequestParser.Builder defaultUpRequestParser(ObjectMapper mapper,
-        RequestParserBuilderDecorator decorator) {
+        RequestParserBuilderDecorator decorator, ConfigurationContext configurationContext) {
         return RequestParser.builder()
             .decorate(decorator)
-            .autoDetectDisabled(props.isDisableSerializationAutoDetection())
-            .defaultMediaType(props.getDefaultMediaType())
-            .requestParamParser(RequestParamParser.builder()
-                .withFieldsNamed(props.getFieldsParamName())
-                .withFilterNamed(props.getFilterParamName())
-                .withIncludeNamed(props.getIncludeParamName())
-                .withPageLimitNamed(props.getLimitParamName())
-                .withPageNumberNamed(props.getPageNumberParamName())
-                .withPageOffsetNamed(props.getOffsetParamName())
-                .withSortNamed(props.getSortParamName())
-            )
+            .configurationContext(configurationContext)
             .jacksonObjectMapper(mapper);
     }
 
     @Bean
     @ConditionalOnMissingBean
     public ContentNegotiator.Builder defaultUpContentNegotiator(ServiceDiscovery serviceDiscovery,
-        LinkBuilderFactory linkBuilderFactory, ContentNegotiatorBuilderDecorator decorator) {
+        LinkBuilderFactory linkBuilderFactory, ContentNegotiatorBuilderDecorator decorator,
+        ConfigurationContext configurationContext) {
         return ContentNegotiator.builder()
             .decorate(decorator)
-            .autoDetectDisabled(props.isDisableSerializationAutoDetection())
-            .defaultMediaType(props.getDefaultMediaType())
+            .configurationContext(configurationContext)
             .serviceDiscovery(serviceDiscovery)
             .linkBuilderFactory(linkBuilderFactory);
     }
@@ -124,15 +105,14 @@ public class UpControllerAutoConfiguration {
         ExceptionHandler exceptionHandler,
         RequestParser.Builder requestParser,
         ResourceControllerBuilderDecorator decorator,
-        ContentNegotiator.Builder contentNegotiator) {
+        ContentNegotiator.Builder contentNegotiator, ConfigurationContext configurationContext) {
         return ResourceController.builder()
             .decorate(decorator)
+            .configurationContext(configurationContext)
             .registry(registry)
             .serviceDiscovery(serviceDiscovery)
             .linkBuilderFactory(linkBuilderFactory)
             .exceptionHandler(exceptionHandler)
-            .autoDetectDisabled(props.isDisableSerializationAutoDetection())
-            .defaultMediaType(props.getDefaultMediaType())
             .requestParser(requestParser)
             .contentNegotiator(contentNegotiator)
             .jacksonObjectMapper(mapper)

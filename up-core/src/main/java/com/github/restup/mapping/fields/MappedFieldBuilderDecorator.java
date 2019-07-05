@@ -1,9 +1,11 @@
 package com.github.restup.mapping.fields;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.config.UpFactories;
 import com.github.restup.mapping.fields.decorators.IdentityByConventionMappedFieldBuilderDecorator;
 import com.github.restup.mapping.fields.decorators.JacksonMappedFieldBuilderDecorator;
 import com.github.restup.registry.settings.AutoDetectConstants;
+import com.github.restup.util.Assert;
 import com.github.restup.util.ReflectionUtils.BeanInfo;
 import com.github.restup.util.ReflectionUtils.PropertyDescriptor;
 import java.util.ArrayList;
@@ -38,6 +40,7 @@ public interface MappedFieldBuilderDecorator {
 
         private boolean defaults;
         private List<MappedFieldBuilderDecorator> decorators = new ArrayList<>();
+        private ConfigurationContext configurationContext;
 
         private Builder() {
             defaults = true;
@@ -72,7 +75,13 @@ public interface MappedFieldBuilderDecorator {
             return me();
         }
 
+        public Builder configurationContext(ConfigurationContext configurationContext) {
+            this.configurationContext = configurationContext;
+            return me();
+        }
+
         public MappedFieldBuilderDecorator[] build() {
+            Assert.notNull(configurationContext, "configurationContext is required");
             List<MappedFieldBuilderDecorator> result = new ArrayList<>(decorators);
             if (defaults) {
                 result.add(new IdentityByConventionMappedFieldBuilderDecorator());
@@ -81,7 +90,8 @@ public interface MappedFieldBuilderDecorator {
                     result.add(new JacksonMappedFieldBuilderDecorator());
                 }
             }
-            result.addAll(UpFactories.instance.getInstances(MappedFieldBuilderDecorator.class));
+            result.addAll(UpFactories.getInstance()
+                .getInstances(configurationContext, MappedFieldBuilderDecorator.class));
             return result.toArray(new MappedFieldBuilderDecorator[0]);
         }
     }

@@ -1,7 +1,9 @@
 package com.github.restup.controller.request.parser;
 
 import static org.junit.Assert.assertEquals;
+import static org.mockito.Mockito.mock;
 
+import com.github.restup.config.ConfigurationContext;
 import org.junit.Test;
 
 public class RequestParserTest {
@@ -17,10 +19,11 @@ public class RequestParserTest {
                 .withPageOffsetNamed("o")
                 .withPageNumberNamed("n")
                 .withSortNamed("s"))
-                .autoDetectDisabled(true)
-                .defaultMediaType("application/json")
-                .relationshipParser(new DefaultRelationshipsParser())
-                .build();
+            .autoDetectDisabled(true)
+            .defaultMediaType("application/json")
+            .relationshipParser(new DefaultRelationshipsParser())
+            .configurationContext(mock(ConfigurationContext.class))
+            .build();
 
         assertAccepts(parser, true, "a", "i", "l", "o", "s", "n");
         assertAccepts(parser, false, "include", "limit", "offset", "sort", "pageNumber");

@@ -1,6 +1,7 @@
 package com.github.restup.repository.dynamodb;
 
 import com.amazonaws.services.dynamodbv2.AmazonDynamoDB;
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.mapping.MappedClassBuilderDecorator;
 import com.github.restup.mapping.fields.MappedFieldBuilderDecorator;
 import com.github.restup.query.Pagination;
@@ -23,11 +24,11 @@ public class DynamoDBResourceRegistryBuilderDecorator implements ResourceRegistr
     }
 
     @Override
-    public Builder decorate(Builder builder) {
+    public Builder decorate(ConfigurationContext configurationContext, Builder builder) {
 
-        //TODO read optional properties for local settings
-        String amazonDynamoDBEndpoint = null;
-        String amazonDynamoDBRegion = null;
+        String amazonDynamoDBEndpoint = configurationContext.getProperty("aws.dynamodb.endpoint");
+        String amazonDynamoDBRegion = configurationContext
+            .getProperty("aws.dynamodb.region", "us-east-1");
         DynamoDBRepositoryFactory dynamoDBRepositoryFactory = DynamoDBRepositoryFactory
             .builder()
             .amazonDynamoDB(amazonDynamoDB)

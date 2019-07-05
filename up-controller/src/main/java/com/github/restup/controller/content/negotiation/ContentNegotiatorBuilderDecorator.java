@@ -1,5 +1,6 @@
 package com.github.restup.controller.content.negotiation;
 
+import com.github.restup.config.ConfigurationContext;
 import com.github.restup.controller.content.negotiation.ContentNegotiator.Builder;
 
 @FunctionalInterface
@@ -12,6 +13,6 @@ public interface ContentNegotiatorBuilderDecorator {
      * @param builder to decorate
      * @return the builder
      */
-    Builder decorate(Builder builder);
+    Builder decorate(ConfigurationContext configurationContext, Builder builder);
 
 }

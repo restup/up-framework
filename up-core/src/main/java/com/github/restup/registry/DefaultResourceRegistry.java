@@ -1,10 +1,10 @@
 package com.github.restup.registry;
 
-import java.lang.reflect.Type;
-import java.util.Collection;
 import com.github.restup.mapping.MappedClass;
 import com.github.restup.registry.settings.RegistrySettings;
 import com.github.restup.util.Assert;
+import java.lang.reflect.Type;
+import java.util.Collection;
 
 /**
  * A registry of application {@link Resource}s, containing a {@link Resource}, containing meta data, field mappings, repository, and service details for each registered each resource <p> A singleton instance exists for convenience, but it is possible to construct multiple {@link DefaultResourceRegistry}s instances if needed.
@@ -27,12 +27,11 @@ public class DefaultResourceRegistry implements ResourceRegistry {
     public DefaultResourceRegistry(RegistrySettings settings) {
         Assert.notNull(settings, "settings is required");
         Assert.notNull(settings.getResourceRegistryRepository(), "resourceRegistryRepository is required");
-        this.registryRepository = settings.getResourceRegistryRepository();
+        registryRepository = settings.getResourceRegistryRepository();
         this.settings = settings;
     }
 
     @Override
-    @SuppressWarnings("rawtypes")
     public void registerResource(Resource.Builder b) {
         registerResource(b.registry(this).build());
     }
