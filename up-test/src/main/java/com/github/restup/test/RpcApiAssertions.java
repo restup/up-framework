@@ -18,7 +18,7 @@ public class RpcApiAssertions {
     private RpcApiAssertions() {
         super();
     }
-    
+
     public static Builder builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
         return new Builder(executor, unitTest, path, defaultPathArgs);
     }
@@ -62,6 +62,7 @@ public class RpcApiAssertions {
 
         /**
          * Uses the calling method's name as the test name]
+         *
          * @return this builder
          */
         public Builder test() {
@@ -114,6 +115,136 @@ public class RpcApiAssertions {
             return me();
         }
 
+        public Builder get() {
+            return method(HttpMethod.GET);
+        }
+
+        /**
+         * sets http method to POST
+         *
+         * @return this builder
+         */
+        public Builder post() {
+            return method(HttpMethod.POST);
+        }
+
+        /**
+         * sets http method to POST and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder post(byte[] body) {
+            return body(body).post();
+        }
+
+        /**
+         * sets http method to POST and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder post(String body) {
+            return body(body).post();
+        }
+
+        /**
+         * sets http method to POST and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder post(Contents body) {
+            return body(body).post();
+        }
+
+        /**
+         * sets http method to PATCH
+         *
+         * @return this builder
+         */
+        public Builder patch() {
+            return method(HttpMethod.PATCH);
+        }
+
+        /**
+         * sets http method to PATCH and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder patch(byte[] body) {
+            return body(body).patch();
+        }
+
+        /**
+         * sets http method to PATCH and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder patch(String body) {
+            return body(body).patch();
+        }
+
+        /**
+         * sets http method to PATCH and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder patch(Contents body) {
+            return body(body).patch();
+        }
+
+        /**
+         * sets http method to PUT
+         *
+         * @return this builder
+         */
+        public Builder put() {
+            return method(HttpMethod.PUT);
+        }
+
+        /**
+         * sets http method to PUT and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder put(byte[] body) {
+            return body(body).put();
+        }
+
+        /**
+         * sets http method to PUT and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder put(String body) {
+            return body(body).put();
+        }
+
+        /**
+         * sets http method to PUT and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder put(Contents body) {
+            return body(body).put();
+        }
+
+        /**
+         * sets http method to DELETE
+         *
+         * @return this builder
+         */
+        public Builder delete() {
+            return method(HttpMethod.DELETE);
+        }
+
         public Builder method(HttpMethod method) {
             request.method(method);
             return me();
@@ -146,7 +277,7 @@ public class RpcApiAssertions {
 
         public Builder expectStatus(int httpStatus) {
             expected.status(httpStatus);
-            return me();
+            return okStatus(httpStatus);
         }
 
         public Builder expectHeader(String name, Matcher<String[]> matcher) {
@@ -173,14 +304,19 @@ public class RpcApiAssertions {
             return me();
         }
 
+        /**
+         * Overrides the default successful expected status
+         *
+         * @param okStatus
+         * @return
+         */
         public Builder okStatus(int okStatus) {
             this.okStatus = okStatus;
             return me();
         }
 
         /**
-         * Create missing expected result files if true.  Tests will still fail, however the result
-         * will be saved to the expected file
+         * Create missing expected result files if true.  Tests will still fail, however the result will be saved to the expected file
          *
          * @param createMissingResource if true, create missing resource
          */
@@ -215,7 +351,7 @@ public class RpcApiAssertions {
 
         private Builder json(String contentType) {
             return requestHeader("Content-Type", contentType).requestHeader("Accept", contentType)
-                    .expectHeader("Content-Type", new ContentTypeMatcher(contentType)).testFileExtension("json");
+                .expectHeader("Content-Type", new ContentTypeMatcher(contentType)).testFileExtension("json");
         }
 
         public ApiResponse<String[]> build() {
@@ -306,7 +442,7 @@ public class RpcApiAssertions {
          * </pre>
          *
          * @param offset page offset
-         * @param limit page limit
+         * @param limit  page limit
          * @return this builder
          */
         public Builder page(int offset, int limit) {
