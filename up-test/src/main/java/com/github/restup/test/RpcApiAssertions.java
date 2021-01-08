@@ -250,6 +250,15 @@ public class RpcApiAssertions {
             return me();
         }
 
+        /**
+         * sets mediaType to {@link MediaType#APPLICATION_JSON}
+         *
+         * @return this builder
+         */
+        public Builder json() {
+            return mediaType(MediaType.APPLICATION_JSON);
+        }
+
         public Builder mediaType(MediaType mediaType) {
             return mediaType(mediaType.getContentType());
         }
@@ -258,7 +267,7 @@ public class RpcApiAssertions {
          * Allows for the plethora of existing media type enums to be passed in.  The result of toString must return the desired media type
          *
          * @param mediaType
-         * @return
+         * @return this builder
          */
         public Builder mediaType(Object mediaType) {
             if (mediaType != null) {
