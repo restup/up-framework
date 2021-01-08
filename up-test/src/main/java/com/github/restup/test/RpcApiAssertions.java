@@ -1,5 +1,6 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.resource.RelativeTestResource.response;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -328,6 +329,15 @@ public class RpcApiAssertions {
         public Builder expectBody(Contents body) {
             expected.body(body);
             return me();
+        }
+
+        /**
+         * Expects the body to match the contents of file relative to this class with a name corresponding to the test method name
+         *
+         * @return
+         */
+        public Builder expectBody() {
+            return expectBody(response());
         }
 
         /**

@@ -49,7 +49,7 @@ public class RelativeTestResource implements ResourceContents {
         StackTraceElement[] stack = Thread.currentThread().getStackTrace();
         StackTraceElement el = stack[i];
         while (i < stack.length
-                && el.getClassName().startsWith(ApiExecutor.class.getPackage().getName())) {
+            && el.getClassName().startsWith(ApiExecutor.class.getPackage().getName())) {
             el = stack[i++];
         }
         return el;
@@ -87,16 +87,32 @@ public class RelativeTestResource implements ResourceContents {
         return resource(DUMPS, fileName);
     }
 
+    public static RelativeTestResource dump() {
+        return dump(RelativeTestResource.getCallingMethodName());
+    }
+
     public static RelativeTestResource result(String fileName) {
         return resource(RESULTS, fileName);
+    }
+
+    public static RelativeTestResource result() {
+        return result(RelativeTestResource.getCallingMethodName());
     }
 
     public static RelativeTestResource request(String fileName) {
         return resource(REQUESTS, fileName);
     }
 
+    public static RelativeTestResource request() {
+        return request(RelativeTestResource.getCallingMethodName());
+    }
+
     public static RelativeTestResource response(String fileName) {
         return resource(RESPONSES, fileName);
+    }
+
+    public static RelativeTestResource response() {
+        return response(RelativeTestResource.getCallingMethodName());
     }
 
     @Override
