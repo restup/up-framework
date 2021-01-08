@@ -3,6 +3,7 @@ package com.github.restup.test;
 import com.github.restup.test.RpcApiAssertions.Decorator;
 import com.github.restup.test.resource.Contents;
 import com.github.restup.test.resource.RelativeTestResource;
+import org.apache.commons.lang3.StringUtils;
 
 /**
  * Provides a {@link Builder} for RESTful apis with test methods for collection and item resource aligned with http verbs.
@@ -59,13 +60,18 @@ public class RestApiAssertions {
             this(executor, RelativeTestResource.getClassFromStack(), path, args);
         }
 
+        static boolean isResourceIdParameterized(String testPath) {
+            int i = testPath.lastIndexOf('/');
+            i = testPath.indexOf("}", i);
+            return i >= 0;
+        }
+
         private Builder me() {
             return this;
         }
 
         /**
-         * Create missing expected result files if true.  Tests will still fail, however the result
-         * will be saved to the expected file
+         * Create missing expected result files if true.  Tests will still fail, however the result will be saved to the expected file
          *
          * @param createMissingResource if true, create missing resource
          */
@@ -139,16 +145,16 @@ public class RestApiAssertions {
         public RpcApiAssertions.Builder add(Object... args) {
             okStatus = 201;
             return collectionResource()
-                    .method(HttpMethod.POST)
-                    .args(args)
-                    .build();
+                .method(HttpMethod.POST)
+                .args(args)
+                .build();
         }
 
         public RpcApiAssertions.Builder list(Object... args) {
             return collectionResource()
-                    .method(HttpMethod.GET)
-                    .args(args)
-                    .build();
+                .method(HttpMethod.GET)
+                .args(args)
+                .build();
         }
 
         public RpcApiAssertions.Builder update(byte[] body, Object... args) {
@@ -165,9 +171,9 @@ public class RestApiAssertions {
 
         public RpcApiAssertions.Builder update(Object... args) {
             return itemResource()
-                    .method(HttpMethod.PUT)
-                    .args(args)
-                    .build();
+                .method(HttpMethod.PUT)
+                .args(args)
+                .build();
         }
 
         public RpcApiAssertions.Builder patch(byte[] body, Object... args) {
@@ -184,23 +190,23 @@ public class RestApiAssertions {
 
         public RpcApiAssertions.Builder patch(Object... args) {
             return itemResource()
-                    .method(HttpMethod.PATCH)
-                    .args(args)
-                    .build();
+                .method(HttpMethod.PATCH)
+                .args(args)
+                .build();
         }
 
         public RpcApiAssertions.Builder get(Object... args) {
             return itemResource()
-                    .method(HttpMethod.GET)
-                    .args(args)
-                    .build();
+                .method(HttpMethod.GET)
+                .args(args)
+                .build();
         }
 
         public RpcApiAssertions.Builder delete(Object... args) {
             return itemResource()
-                    .method(HttpMethod.DELETE)
-                    .args(args)
-                    .build();
+                .method(HttpMethod.DELETE)
+                .args(args)
+                .build();
         }
 
         public Builder https() {
@@ -215,14 +221,18 @@ public class RestApiAssertions {
         private RpcApiAssertions.Builder build() {
 
             String testPath = path;
-            if (testPath.contains("}")) {
+            if (isResourceIdParameterized(testPath)) {
                 if (!itemResource) {
                     // collection resource can't end with id
                     testPath = path.substring(0, path.lastIndexOf('/'));
                 }
             } else if (itemResource) {
-                // item resource has to end with id
-                testPath += "/{id}";
+
+                int tokens = StringUtils.countMatches(testPath, "}");
+                if (tokens + 1 == defaultArgs.length) {
+                    // item resource has to end with id
+                    testPath += "/{id}";
+                }
             }
 
             return decorator

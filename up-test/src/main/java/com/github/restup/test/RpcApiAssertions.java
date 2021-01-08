@@ -1,5 +1,6 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.resource.RelativeTestResource.response;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
@@ -18,7 +19,7 @@ public class RpcApiAssertions {
     private RpcApiAssertions() {
         super();
     }
-    
+
     public static Builder builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
         return new Builder(executor, unitTest, path, defaultPathArgs);
     }
@@ -33,7 +34,7 @@ public class RpcApiAssertions {
         private final ApiExecutor executor;
         private ApiRequest.Builder request;
         private ApiResponse.Builder expected;
-        private MediaType mediaType;
+        private String mediaType;
 
         private Matcher<Object> bodyMatcher;
         private int okStatus = 200;
@@ -62,6 +63,7 @@ public class RpcApiAssertions {
 
         /**
          * Uses the calling method's name as the test name]
+         *
          * @return this builder
          */
         public Builder test() {
@@ -114,12 +116,168 @@ public class RpcApiAssertions {
             return me();
         }
 
+        public Builder get() {
+            return method(HttpMethod.GET);
+        }
+
+        /**
+         * sets http method to POST
+         *
+         * @return this builder
+         */
+        public Builder post() {
+            return method(HttpMethod.POST);
+        }
+
+        /**
+         * sets http method to POST and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder post(byte[] body) {
+            return body(body).post();
+        }
+
+        /**
+         * sets http method to POST and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder post(String body) {
+            return body(body).post();
+        }
+
+        /**
+         * sets http method to POST and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder post(Contents body) {
+            return body(body).post();
+        }
+
+        /**
+         * sets http method to PATCH
+         *
+         * @return this builder
+         */
+        public Builder patch() {
+            return method(HttpMethod.PATCH);
+        }
+
+        /**
+         * sets http method to PATCH and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder patch(byte[] body) {
+            return body(body).patch();
+        }
+
+        /**
+         * sets http method to PATCH and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder patch(String body) {
+            return body(body).patch();
+        }
+
+        /**
+         * sets http method to PATCH and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder patch(Contents body) {
+            return body(body).patch();
+        }
+
+        /**
+         * sets http method to PUT
+         *
+         * @return this builder
+         */
+        public Builder put() {
+            return method(HttpMethod.PUT);
+        }
+
+        /**
+         * sets http method to PUT and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder put(byte[] body) {
+            return body(body).put();
+        }
+
+        /**
+         * sets http method to PUT and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder put(String body) {
+            return body(body).put();
+        }
+
+        /**
+         * sets http method to PUT and request body to passed value
+         *
+         * @param body of request
+         * @return this builder
+         */
+        public Builder put(Contents body) {
+            return body(body).put();
+        }
+
+        /**
+         * sets http method to DELETE
+         *
+         * @return this builder
+         */
+        public Builder delete() {
+            return method(HttpMethod.DELETE);
+        }
+
         public Builder method(HttpMethod method) {
             request.method(method);
             return me();
         }
 
+        /**
+         * sets mediaType to {@link MediaType#APPLICATION_JSON}
+         *
+         * @return this builder
+         */
+        public Builder json() {
+            return mediaType(MediaType.APPLICATION_JSON);
+        }
+
         public Builder mediaType(MediaType mediaType) {
+            return mediaType(mediaType.getContentType());
+        }
+
+        /**
+         * Allows for the plethora of existing media type enums to be passed in.  The result of toString must return the desired media type
+         *
+         * @param mediaType
+         * @return this builder
+         */
+        public Builder mediaType(Object mediaType) {
+            if (mediaType != null) {
+                return mediaType(mediaType.toString());
+            }
+            return me();
+        }
+
+        public Builder mediaType(String mediaType) {
             this.mediaType = mediaType;
             return me();
         }
@@ -146,7 +304,7 @@ public class RpcApiAssertions {
 
         public Builder expectStatus(int httpStatus) {
             expected.status(httpStatus);
-            return me();
+            return okStatus(httpStatus);
         }
 
         public Builder expectHeader(String name, Matcher<String[]> matcher) {
@@ -173,14 +331,28 @@ public class RpcApiAssertions {
             return me();
         }
 
+        /**
+         * Expects the body to match the contents of file relative to this class with a name corresponding to the test method name
+         *
+         * @return
+         */
+        public Builder expectBody() {
+            return expectBody(response());
+        }
+
+        /**
+         * Overrides the default successful expected status
+         *
+         * @param okStatus
+         * @return
+         */
         public Builder okStatus(int okStatus) {
             this.okStatus = okStatus;
             return me();
         }
 
         /**
-         * Create missing expected result files if true.  Tests will still fail, however the result
-         * will be saved to the expected file
+         * Create missing expected result files if true.  Tests will still fail, however the result will be saved to the expected file
          *
          * @param createMissingResource if true, create missing resource
          */
@@ -215,12 +387,12 @@ public class RpcApiAssertions {
 
         private Builder json(String contentType) {
             return requestHeader("Content-Type", contentType).requestHeader("Accept", contentType)
-                    .expectHeader("Content-Type", new ContentTypeMatcher(contentType)).testFileExtension("json");
+                .expectHeader("Content-Type", new ContentTypeMatcher(contentType)).testFileExtension("json");
         }
 
         public ApiResponse<String[]> build() {
             if (mediaType != null) {
-                json(mediaType.getContentType());
+                json(mediaType);
             }
             if (testNameAsMethodName && !expected.hasConfiguredBody()) {
                 test();
@@ -306,7 +478,7 @@ public class RpcApiAssertions {
          * </pre>
          *
          * @param offset page offset
-         * @param limit page limit
+         * @param limit  page limit
          * @return this builder
          */
         public Builder page(int offset, int limit) {

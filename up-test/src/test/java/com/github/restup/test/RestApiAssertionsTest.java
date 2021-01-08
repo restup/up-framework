@@ -1,9 +1,12 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.RestApiAssertions.Builder.isResourceIdParameterized;
 import static com.github.restup.test.assertions.Assertions.assertPrivateConstructor;
 import static org.hamcrest.MatcherAssert.assertThat;
 import static org.hamcrest.Matchers.is;
 import static org.junit.Assert.assertEquals;
+import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertTrue;
 import static org.mockito.Mockito.when;
 
 import com.github.restup.test.assertions.Assertions;
@@ -66,9 +69,15 @@ public class RestApiAssertionsTest {
 
         when(executor.execute(request.capture())).thenReturn(response);
         when(response.getStatus()).thenReturn(status);
-        when(response.getHeader("Content-Type")).thenReturn(new String[] {contentType});
+        when(response.getHeader("Content-Type")).thenReturn(new String[]{contentType});
         when(response.getBody()).thenReturn(resultContents);
         return request;
+    }
+
+    @Test
+    public void testIsResourceIdParameterized() {
+        assertTrue(isResourceIdParameterized("/foo/bar/{id}"));
+        assertFalse(isResourceIdParameterized("/{foo}/bar/items"));
     }
 
     @Test
@@ -113,23 +122,23 @@ public class RestApiAssertionsTest {
         Contents body = body();
 
         assertThrows("Expected: Content-Type=", () -> api("foo/{id}").hal()
-                .patch(body.getContentAsByteArray()).ok());
+            .patch(body.getContentAsByteArray()).ok());
     }
 
     @Test
     public void testBodyError() {
         request();
         assertThrows("Expected: foo", () -> api()
-                .patch(body().getContentAsString())
-                .expectBody("foo").ok());
+            .patch(body().getContentAsString())
+            .expectBody("foo").ok());
 
         assertThrows("Expected: foo", () -> api()
-                .update(body().getContentAsString())
-                .expectBody("foo").ok());
+            .update(body().getContentAsString())
+            .expectBody("foo").ok());
 
         assertThrows("Expected: foo", () -> api()
-                .update(body().getContentAsByteArray())
-                .expectBody("foo").ok());
+            .update(body().getContentAsByteArray())
+            .expectBody("foo").ok());
     }
 
     @Test
@@ -140,7 +149,7 @@ public class RestApiAssertionsTest {
         Contents body = body();
 
         api().jsonapi().https().add(body)
-                .expectBody(expectedContents).ok();
+            .expectBody(expectedContents).ok();
 
         assertCollectionRequest(requestCaptor, HttpMethod.POST, body, true, contentType);
     }
@@ -152,8 +161,8 @@ public class RestApiAssertionsTest {
         Contents body = body();
 
         assertThrows("Expected: Content-Type=", () -> api()
-                .add(body.getContentAsString())
-                .expectBody(expectedContents).ok());
+            .add(body.getContentAsString())
+            .expectBody(expectedContents).ok());
     }
 
     @Test
@@ -161,8 +170,8 @@ public class RestApiAssertionsTest {
         request();
 
         assertThrows("Expected: is <201>", () -> api()
-                .add(body().getContentAsByteArray())
-                .expectBody(expectedContents).ok());
+            .add(body().getContentAsByteArray())
+            .expectBody(expectedContents).ok());
     }
 
     private void assertThrows(String messageContains, ThrowingCallable f) {
@@ -183,8 +192,8 @@ public class RestApiAssertionsTest {
         ArgumentCaptor<ApiRequest> requestCaptor = request();
 
         RestApiAssertions.builder(executor, this, "/foo", 1)
-                .delete()
-                .expectBody(expectedContents).ok();
+            .delete()
+            .expectBody(expectedContents).ok();
 
         assertItemRequest(requestCaptor, HttpMethod.DELETE);
     }
@@ -194,9 +203,9 @@ public class RestApiAssertionsTest {
         ArgumentCaptor<ApiRequest> requestCaptor = request();
 
         RestApiAssertions.builder(executor, getClass(), "/foo/{id}", 1)
-                .mediaType(MediaType.APPLICATION_JSON)
-                .list()
-                .expectBody(expectedContents).ok();
+            .mediaType(MediaType.APPLICATION_JSON)
+            .list()
+            .expectBody(expectedContents).ok();
 
         assertCollectionRequest(requestCaptor, HttpMethod.GET);
     }
