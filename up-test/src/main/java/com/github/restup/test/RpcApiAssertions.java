@@ -33,7 +33,7 @@ public class RpcApiAssertions {
         private final ApiExecutor executor;
         private ApiRequest.Builder request;
         private ApiResponse.Builder expected;
-        private MediaType mediaType;
+        private String mediaType;
 
         private Matcher<Object> bodyMatcher;
         private int okStatus = 200;
@@ -251,6 +251,23 @@ public class RpcApiAssertions {
         }
 
         public Builder mediaType(MediaType mediaType) {
+            return mediaType(mediaType.getContentType());
+        }
+
+        /**
+         * Allows for the plethora of existing media type enums to be passed in.  The result of toString must return the desired media type
+         *
+         * @param mediaType
+         * @return
+         */
+        public Builder mediaType(Object mediaType) {
+            if (mediaType != null) {
+                return mediaType(mediaType.toString());
+            }
+            return me();
+        }
+
+        public Builder mediaType(String mediaType) {
             this.mediaType = mediaType;
             return me();
         }
@@ -356,7 +373,7 @@ public class RpcApiAssertions {
 
         public ApiResponse<String[]> build() {
             if (mediaType != null) {
-                json(mediaType.getContentType());
+                json(mediaType);
             }
             if (testNameAsMethodName && !expected.hasConfiguredBody()) {
                 test();
