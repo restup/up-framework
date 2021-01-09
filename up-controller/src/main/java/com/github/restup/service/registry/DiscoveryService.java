@@ -44,6 +44,7 @@ public class DiscoveryService {
     }
 
     /**
+     * @param resource resource
      * @return Ignores and resource whose type is the internal {@link Resource}
      */
     protected boolean ignore(Resource<?, ?> resource) {

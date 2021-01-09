@@ -293,7 +293,7 @@ public class ComposedRequestParamParser implements RequestParamParser {
             return allowMultiple ? allowedParameterOccurrences(0) : allowedParameterOccurrences(1);
         }
 
-        /**
+        /*
          * The number of occurrences of the parameter permitted. < 1 is unlimited
          */
         public Builder allowedParameterOccurrences(int allowedParameterOccurrences) {

@@ -8,16 +8,15 @@ import com.github.restup.query.ResourceQueryStatement.Type;
 import com.github.restup.registry.Resource;
 
 /**
- * <p> Parses include parameters <p> <p> Ex: For a resource with relationships to resources named
+ * <p> Parses include parameters  Ex: For a resource with relationships to resources named
  * foo &amp; bar </p>
  *
  * <pre>
  * ?include=foo,bar
  * </pre>
  * <p> Since a resource may have multiple relationships to a resource, the path may be targeted as
- * well. For example, given a resource Foo with goodBarId and badBarId fields both with a {@link
- * com.github.restup.registry.ResourceRelationship} to Bar, the field(s) to join on may be specified
- * in [] </p>
+ * well. For example, given a resource Foo with goodBarId and badBarId fields both with a {@link com.github.restup.registry.ResourceRelationship} to Bar, the
+ * field(s) to join on may be specified in [] </p>
  *
  * <pre>
  * /foo?include=bar[goodBarId]

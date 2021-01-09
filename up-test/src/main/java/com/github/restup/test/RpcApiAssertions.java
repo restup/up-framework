@@ -267,7 +267,7 @@ public class RpcApiAssertions {
         /**
          * Allows for the plethora of existing media type enums to be passed in.  The result of toString must return the desired media type
          *
-         * @param mediaType
+         * @param mediaType specifies media type
          * @return this builder
          */
         public Builder mediaType(Object mediaType) {
@@ -334,7 +334,7 @@ public class RpcApiAssertions {
         /**
          * Expects the body to match the contents of file relative to this class with a name corresponding to the test method name
          *
-         * @return
+         * @return this builder
          */
         public Builder expectBody() {
             return expectBody(response());
@@ -343,8 +343,8 @@ public class RpcApiAssertions {
         /**
          * Overrides the default successful expected status
          *
-         * @param okStatus
-         * @return
+         * @param okStatus status for successful api request
+         * @return this builder
          */
         public Builder okStatus(int okStatus) {
             this.okStatus = okStatus;
@@ -355,6 +355,7 @@ public class RpcApiAssertions {
          * Create missing expected result files if true.  Tests will still fail, however the result will be saved to the expected file
          *
          * @param createMissingResource if true, create missing resource
+         * @return this builder
          */
         public Builder createMissingResource(boolean createMissingResource) {
             this.createMissingResource = createMissingResource;

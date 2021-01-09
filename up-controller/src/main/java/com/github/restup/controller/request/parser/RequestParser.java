@@ -20,8 +20,8 @@ public interface RequestParser {
     /**
      * parse request appending results to builder
      *
-     * @param request
-     * @param builder
+     * @param request ResourceControllerRequest
+     * @param builder ParsedResourceControllerRequest.Builder
      */
     void parse(ResourceControllerRequest request,
         ParsedResourceControllerRequest.Builder<?> builder);

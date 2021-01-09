@@ -44,3 +44,5 @@ docs/_site
 .gradle
 build
 !gradle-wrapper.jar
+
+*.releaseBackup

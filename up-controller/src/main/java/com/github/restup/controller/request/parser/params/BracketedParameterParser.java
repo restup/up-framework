@@ -36,8 +36,7 @@ public class BracketedParameterParser implements ParameterParser {
         this.resourceParser = resourceParser;
     }
 
-    /**
-     * parses resource or returns null
+    /* parses resource or returns null
      */
     public static Resource parseResourceBeforeBrackets(ParameterParsingContext ctx, String value,
         String... tokens) {

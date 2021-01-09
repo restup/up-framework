@@ -11,8 +11,8 @@ import java.util.function.Supplier;
 
 /**
  * <p>{@link ParameterParsers} will work for most parameters, however there are some exceptions. So
- * that these exceptions do not add to configuration complexity, these factories provided parameter
- * specific implementations corresponding to {@link ParameterParser} configured.</p>
+ * that these exceptions do not add to configuration complexity, these factories provided parameter specific implementations corresponding to {@link
+ * ParameterParser} configured.</p>
  *
  * <p>For example, filter[resource][field][gt] requires some additional logic than the default
  * Bracketed implementation to parse out resource correctly.</p>
@@ -65,9 +65,10 @@ public interface ParameterParserFactory {
 
         /**
          * <p>Filter parameter name parser to support parsing resource correctly when resource is
-         * the requested resource or an included resource. <ul><li>[field]=1</li>
+         * the requested resource or an included resource. </p>
+         * <ul><li>[field]=1</li>
          * <li>[field][gt]=1</li> <li>[resource][field]=1</li> <li>[resource][field][gt]=1</li>
-         * </ul> </p>
+         * </ul>
          */
         FilterNameParameterParserFactory {
 

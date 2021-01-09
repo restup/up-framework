@@ -120,6 +120,8 @@ public interface RequestParamParser extends Comparable<RequestParamParser> {
 
         /**
          * withPageOffsetNamed("start").withPageNumberNamed("count")
+         *
+         * @return this builder
          */
         public Builder withTwitterStylePagination() {
             return withPageOffsetNamed("start").withPageNumberNamed("count");
@@ -127,6 +129,8 @@ public interface RequestParamParser extends Comparable<RequestParamParser> {
 
         /**
          * withPageLimitNamed("rpp").withPageNumberNamed("page")
+         *
+         * @return this builder
          */
         public Builder withLinkedInStylePagination() {
             return withPageLimitNamed("rpp").withPageNumberNamed("page");

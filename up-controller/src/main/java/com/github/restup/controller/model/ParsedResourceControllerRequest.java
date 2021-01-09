@@ -28,7 +28,7 @@ import org.apache.commons.collections4.list.SetUniqueList;
 
 /**
  * Contains result of parsing parameters
- * 
+ *
  * @param <T> type of resource requested
  */
 public interface ParsedResourceControllerRequest<T> extends ResourceControllerRequest {
@@ -49,11 +49,15 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
     /**
      * Parameters accepted in the request specific to the resource (ex. resource specific filters)
+     *
+     * @return list of parameter names
      */
     List<String> getAcceptedResourceParameterNames();
 
     /**
      * Parameters accepted in the request which may apply to related resources (ex. contentType)
+     *
+     * @return list of parameter names
      */
     List<String> getAcceptedParameterNames();
 
@@ -161,7 +165,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         public Builder<T> addSort(String rawParameterName, String rawParameterValue,
             Resource<?, ?> resource,
-                String field, Boolean asc) {
+            String field, Boolean asc) {
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
@@ -187,7 +191,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         public Builder<T> setFieldRequest(Resource<?, ?> resource,
-                Type type) {
+            Type type) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             return setType(builder, type);
         }
@@ -224,7 +228,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         public Builder<T> addExcludedField(Resource<?, ?> resource,
-                String field) {
+            String field) {
             ResourceQueryStatement.Builder builder = getOrCreateQuery(resource);
             if (builder != null) {
                 builder.addRequestedPathsExcluded(field);
@@ -236,13 +240,13 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             Resource<?, ?> resource = registry.getResource(resourceName);
             if (resource == null) {
                 addError(getParameterError(rawParameterName, rawParameterValue).code(ErrorCode.UNKNOWN_RESOURCE)
-                        .detail("Unknown resource specified for parameter {0}", rawParameterName));
+                    .detail("Unknown resource specified for parameter {0}", rawParameterName));
             }
             return resource;
         }
 
         private ResourceQueryStatement.Builder getOrCreateQuery(String rawParameterName, String rawParameterValue,
-                String resourceName) {
+            String resourceName) {
             ResourceQueryStatement.Builder builder = getQuery(resourceName);
             if (builder == null) {
                 Resource<?, ?> resource = getResource(rawParameterName, rawParameterValue, resourceName);
@@ -277,12 +281,12 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         public Builder<T> addFilter(Resource resource, String rawParameterName,
             String rawParameterValue, String field, String operator,
-                String value) {
+            String value) {
             Operator op = Operator.of(operator);
             if (op == null) {
                 addError(getParameterError(rawParameterName, value).code("INVALID_OPERATOR")
-                        .title("Invalid operator specified ")
-                        .detail("{0} specifies an invalid operator, '{1}'", rawParameterName, operator));
+                    .title("Invalid operator specified ")
+                    .detail("{0} specifies an invalid operator, '{1}'", rawParameterName, operator));
                 return me();
             }
             return addFilter(resource, rawParameterName, rawParameterValue, field, op, value);
@@ -297,14 +301,14 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         public Builder<T> addFilter(Resource resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
-                String value) {
+            String value) {
             return addFilterInternal(resource, rawParameterName, rawParameterValue, field, operator,
                 value);
         }
 
         private Builder<T> addFilterInternal(Resource resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
-                String value) {
+            String value) {
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
@@ -316,15 +320,15 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
 
         private Builder<T> addFilterInternal(Resource resource, String rawParameterName,
             Object rawParameterValue, String field, Operator operator,
-                Collection<?> value) {
+            Collection<?> value) {
             ResourcePath path = path(resource, field);
             if (!validatePath(rawParameterName, rawParameterValue, path, resource, field)) {
                 return me();
             }
             // TODO check if field supports operator
             Object converted = value.stream()
-            		.map( v -> convertValue(path, v, rawParameterName) )
-            		.collect(Collectors.toList());
+                .map(v -> convertValue(path, v, rawParameterName))
+                .collect(Collectors.toList());
 
             return addFilter(new ResourcePathFilter<>(path, operator, converted));
         }
@@ -333,7 +337,7 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
             if (value instanceof String) {
                 MappedField<?> mf = path.lastMappedField();
                 if (mf != null) {
-                	java.lang.reflect.Type type = mf.getType();
+                    java.lang.reflect.Type type = mf.getType();
 
                     ParameterConverterFactory factory = registry.getSettings().getParameterConverterFactory();
                     ParameterConverter converter = factory.getConverter(type);
@@ -346,12 +350,12 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         }
 
         private <ID extends Serializable> boolean validatePath(String rawParameterName, Object rawParameterValue,
-                ResourcePath path, Resource<?, ?> resource, String field) {
+            ResourcePath path, Resource<?, ?> resource, String field) {
             if (!path.isValid()) {
                 addError(getParameterError(rawParameterName, rawParameterValue).code("INVALID_PARAMETER_PATH")
-                        .title("Invalid path specified ")
-                        .detail("{0} specifies an invalid field, '{1}', for {2} resources", rawParameterName, field,
-                                resource));
+                    .title("Invalid path specified ")
+                    .detail("{0} specifies an invalid field, '{1}', for {2} resources", rawParameterName, field,
+                        resource));
                 return false;
             }
             return true;
@@ -414,9 +418,9 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         private boolean hasMaxError(String parameterName, int maxValue, Integer actualValue) {
             if (actualValue > maxValue) {
                 addError(getParameterError(parameterName, actualValue)
-                        // TODO split camelcase
-                        .code("MAX_" + parameterName.toUpperCase()).title("Max exceeded")
-                        .detail("Maximum allowable {0} is {1}", parameterName, maxValue));
+                    // TODO split camelcase
+                    .code("MAX_" + parameterName.toUpperCase()).title("Max exceeded")
+                    .detail("Maximum allowable {0} is {1}", parameterName, maxValue));
                 return true;
             }
             return false;
@@ -425,24 +429,24 @@ public interface ParsedResourceControllerRequest<T> extends ResourceControllerRe
         private boolean hasMinError(String parameterName, int minValue, Integer actualValue) {
             if (actualValue == null || actualValue < minValue) {
                 addError(getParameterError(parameterName, actualValue)
-                        // TODO split camelcase
-                        .code("MIN_" + parameterName.toUpperCase()).title("Minimum error") // There is no english
-                        // opposite of
-                        // exceed :)
-                        // Neologism: deceed
-                        .detail("Minimum allowable value for {0} is {1}", parameterName, minValue));
+                    // TODO split camelcase
+                    .code("MIN_" + parameterName.toUpperCase()).title("Minimum error") // There is no english
+                    // opposite of
+                    // exceed :)
+                    // Neologism: deceed
+                    .detail("Minimum allowable value for {0} is {1}", parameterName, minValue));
                 return true;
             }
             return false;
         }
 
         private void addDuplicateParameter(String parameterName, Integer value, String existingParameterName,
-                Integer existingValue) {
+            Integer existingValue) {
             addError(getParameterError(parameterName, value).code("DUPLICATE_PARAMETER")
-                    .title("Parameter value already specified")
-                    .detail("{0} was already specified using '{1}={2}'", parameterName, existingParameterName,
-                            String.valueOf(existingValue))
-                    .meta("existingParameterName", existingParameterName).meta("existingValue", existingValue));
+                .title("Parameter value already specified")
+                .detail("{0} was already specified using '{1}={2}'", parameterName, existingParameterName,
+                    String.valueOf(existingValue))
+                .meta("existingParameterName", existingParameterName).meta("existingValue", existingValue));
         }
 
         public void addParameterError(String parameterName, Object value) {

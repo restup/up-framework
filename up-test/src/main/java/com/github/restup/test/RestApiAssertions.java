@@ -74,6 +74,7 @@ public class RestApiAssertions {
          * Create missing expected result files if true.  Tests will still fail, however the result will be saved to the expected file
          *
          * @param createMissingResource if true, create missing resource
+         * @return this builder
          */
         public Builder createMissingResource(boolean createMissingResource) {
             this.createMissingResource = createMissingResource;
