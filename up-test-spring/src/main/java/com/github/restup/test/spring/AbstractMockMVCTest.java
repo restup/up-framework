@@ -1,12 +1,12 @@
 package com.github.restup.test.spring;
 
+import com.github.restup.test.RestApiAssertions;
+import com.github.restup.test.RestApiAssertions.Builder;
 import org.junit.Before;
 import org.junit.runner.RunWith;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.test.context.junit4.SpringRunner;
 import org.springframework.test.web.servlet.MockMvc;
-import com.github.restup.test.RestApiAssertions;
-import com.github.restup.test.RestApiAssertions.Builder;
 
 /**
  * Abstract implementation for convenience, autowiring mockMvc and setting up a {@link Builder}
@@ -33,7 +33,7 @@ public abstract class AbstractMockMVCTest {
 
     protected Builder builder(String path, Object... pathArgs) {
         MockMVCApiExecutor executor = new MockMVCApiExecutor(mockMvc);
-        Builder b = RestApiAssertions.builder(executor, getClass(), path, pathArgs);
+        Builder b = RestApiAssertions.builder(executor, path, pathArgs);
         if (jsonapi) {
             b.jsonapi();
         }
@@ -44,7 +44,7 @@ public abstract class AbstractMockMVCTest {
      * {@link #api} will call jsonapi() for testing jsonapi request/responses
      */
     public void jsonapi() {
-        this.jsonapi = true;
+        jsonapi = true;
     }
 
 }

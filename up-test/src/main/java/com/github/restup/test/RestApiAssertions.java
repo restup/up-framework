@@ -1,8 +1,9 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.resource.RelativeTestResource.getClassFromStack;
+
 import com.github.restup.test.RpcApiAssertions.Decorator;
 import com.github.restup.test.resource.Contents;
-import com.github.restup.test.resource.RelativeTestResource;
 import org.apache.commons.lang3.StringUtils;
 
 /**
@@ -14,16 +15,42 @@ public class RestApiAssertions {
         super();
     }
 
+    /**
+     * Create a new {@link Builder}
+     *
+     * @param executor to execute the api request
+     * @param unitTest specifies an instance which test resources will be relative to
+     * @param path     of request
+     * @param args     path bind args
+     * @return a new {@link Builder}
+     */
+    public static Builder builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
+        return builder(executor, unitTest.getClass(), path, args);
+    }
+
+    /**
+     * Create a new {@link Builder}
+     *
+     * @param executor to execute the api request
+     * @param unitTest specifies the class which test resources will be relative to
+     * @param path     of request
+     * @param args     path bind args
+     * @return a new {@link Builder}
+     */
     public static Builder builder(ApiExecutor executor, Class<?> unitTest, String path, Object... args) {
         return new Builder(executor, unitTest, path, args);
     }
 
-    public static Builder builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
-        return new Builder(executor, unitTest, path, args);
-    }
-
+    /**
+     * Create a new {@link Builder} using class invoking this method for relative test resources
+     *
+     * @param executor to execute the api request
+     * @param path     of request
+     * @param args     path bind args
+     * @return a new {@link Builder}
+     */
     public static Builder builder(ApiExecutor executor, String path, Object... args) {
-        return new Builder(executor, path, args);
+        return builder(executor, getClassFromStack(), path, args);
     }
 
     public static class Builder {
@@ -50,14 +77,6 @@ public class RestApiAssertions {
             mediaType = MediaType.APPLICATION_JSON;
             decorator = (b) -> b;
             createMissingResource = true;
-        }
-
-        Builder(ApiExecutor executor, Object unitTest, String path, Object... args) {
-            this(executor, unitTest.getClass(), path, args);
-        }
-
-        Builder(ApiExecutor executor, String path, Object... args) {
-            this(executor, RelativeTestResource.getClassFromStack(), path, args);
         }
 
         static boolean isResourceIdParameterized(String testPath) {

@@ -1,5 +1,6 @@
 package com.github.restup.test;
 
+import static com.github.restup.test.resource.RelativeTestResource.getClassFromStack;
 import static com.github.restup.test.resource.RelativeTestResource.response;
 import static net.javacrumbs.jsonunit.JsonMatchers.jsonEquals;
 import static org.hamcrest.MatcherAssert.assertThat;
@@ -20,6 +21,27 @@ public class RpcApiAssertions {
         super();
     }
 
+    /**
+     * Create a new {@link Builder}
+     *
+     * @param executor        to execute the api request
+     * @param path            of request
+     * @param defaultPathArgs path bind args
+     * @return a new RpcApiAssertions builder
+     */
+    public static Builder builder(ApiExecutor executor, String path, Object... defaultPathArgs) {
+        return builder(executor, getClassFromStack(), path, defaultPathArgs);
+    }
+
+    /**
+     * Create a new {@link Builder}
+     *
+     * @param executor        to execute the api request
+     * @param unitTest        specifies the class which test resources will be relative to
+     * @param path            of request
+     * @param defaultPathArgs path bind args
+     * @return a new RpcApiAssertions builder
+     */
     public static Builder builder(ApiExecutor executor, Class<?> unitTest, String path, Object... defaultPathArgs) {
         return new Builder(executor, unitTest, path, defaultPathArgs);
     }

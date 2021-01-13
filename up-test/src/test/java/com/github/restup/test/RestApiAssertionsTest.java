@@ -202,7 +202,7 @@ public class RestApiAssertionsTest {
     public void testListOK() {
         ArgumentCaptor<ApiRequest> requestCaptor = request();
 
-        RestApiAssertions.builder(executor, getClass(), "/foo/{id}", 1)
+        RestApiAssertions.builder(executor, "/foo/{id}", 1)
             .mediaType(MediaType.APPLICATION_JSON)
             .list()
             .expectBody(expectedContents).ok();

@@ -3,12 +3,13 @@ package com.github.restup.test;
 import static com.github.restup.test.assertions.Assertions.assertPrivateConstructor;
 import static org.junit.Assert.assertEquals;
 import static org.mockito.Mockito.when;
+
+import com.github.restup.test.resource.Contents;
 import org.junit.Test;
 import org.junit.runner.RunWith;
 import org.mockito.ArgumentCaptor;
 import org.mockito.Mock;
 import org.mockito.junit.MockitoJUnitRunner;
-import com.github.restup.test.resource.Contents;
 
 @RunWith(MockitoJUnitRunner.class)
 public class RpcApiAssertionsTest {
@@ -31,7 +32,7 @@ public class RpcApiAssertionsTest {
 
         when(executor.execute(request.capture())).thenReturn(response);
         when(response.getStatus()).thenReturn(status);
-        when(response.getHeader("Content-Type")).thenReturn(new String[] {contentType});
+        when(response.getHeader("Content-Type")).thenReturn(new String[]{contentType});
         when(response.getBody()).thenReturn(resultContents);
         return request;
     }
@@ -45,9 +46,9 @@ public class RpcApiAssertionsTest {
     public void testGet() {
         ArgumentCaptor<ApiRequest> requestCaptor = request();
 
-        RpcApiAssertions.builder(executor, getClass(), "/foo/some/{non}/{restful}/{restful}", 1, 2, 3)
-                .expectBody(expectedContents)
-                .ok();
+        RpcApiAssertions.builder(executor, "/foo/some/{non}/{restful}/{restful}", 1, 2, 3)
+            .expectBody(expectedContents)
+            .ok();
 
         assertItemRequest(requestCaptor, HttpMethod.GET);
     }
